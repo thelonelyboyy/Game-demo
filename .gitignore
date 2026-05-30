@@ -15,3 +15,12 @@ export_credentials.cfg
 .mono/
 data_*/
 mono_crash.*.json
+
+#mcp
+mcp-server-dist
+addons
+config.toml.backup
+godot_connection.js.backup
+godot_connection.js.map.backup
+godot_connection.ts.backup
+websocket_server.gd.backup

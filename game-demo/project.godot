@@ -40,6 +40,10 @@ window/stretch/mode="viewport"
 
 project/assembly_name="Deck Builder Tutorial"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+
 [gui]
 
 theme/custom="res://main_theme.tres"
