@@ -8,8 +8,8 @@
 
 [resource]
 script = ExtResource("1_d8ou5")
-character_name = "Warrior"
-description = "Likes to slice things."
+character_name = "武者"
+description = "旧版占位职业：擅长直接攻击与格挡。"
 portrait = ExtResource("1_8jkdb")
 starting_deck = ExtResource("3_d68oj")
 draftable_cards = ExtResource("2_jojs0")

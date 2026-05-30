@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterStats" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/character_stats.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0087.png" id="2"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/body_cultivator_starting_deck.tres" id="3"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/body_cultivator_draftable_cards.tres" id="4"]
+[ext_resource type="Resource" path="res://relics/reinforced_armor.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+character_name = "体修"
+description = "以血肉为炉，拳掌破山。高生命，高护体，越战越强。"
+portrait = ExtResource("2")
+starting_deck = ExtResource("3")
+draftable_cards = ExtResource("4")
+cards_per_turn = 4
+max_mana = 3
+starting_relic = ExtResource("5")
+max_health = 42
+art = ExtResource("2")

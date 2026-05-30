@@ -6,10 +6,10 @@
 [ext_resource type="Texture2D" uid="uid://dhmtctwb5ymhc" path="res://art/gold.png" id="2_s11cf"]
 
 [node name="ShopCard" type="VBoxContainer"]
-custom_minimum_size = Vector2(40, 56)
-offset_right = 40.0
-offset_bottom = 40.0
-theme_override_constants/separation = 2
+custom_minimum_size = Vector2(150, 270)
+offset_right = 150.0
+offset_bottom = 270.0
+theme_override_constants/separation = 10
 script = ExtResource("1_ojxkp")
 card = ExtResource("2_k75is")
 
@@ -23,16 +23,17 @@ layout_mode = 2
 [node name="Price" type="HBoxContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 8
 alignment = 1
 
 [node name="PriceLabel" type="Label" parent="Price"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "999"
+theme_override_font_sizes/font_size = 20
 
 [node name="GoldIcon" type="TextureRect" parent="Price"]
-custom_minimum_size = Vector2(10, 10)
+custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 texture = ExtResource("2_s11cf")
 expand_mode = 1
@@ -40,8 +41,8 @@ stretch_mode = 5
 
 [node name="BuyButton" type="Button" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 12)
+custom_minimum_size = Vector2(120, 48)
 layout_mode = 2
-text = "Buy"
+text = "购买"
 
 [connection signal="pressed" from="BuyButton" to="." method="_on_buy_button_pressed"]

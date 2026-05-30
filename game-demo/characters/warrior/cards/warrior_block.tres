@@ -7,11 +7,12 @@
 [resource]
 script = ExtResource("2_avork")
 id = "warrior_block"
+display_name = "格挡"
 type = 1
 rarity = 0
 target = 0
 cost = 1
 exhausts = false
 icon = ExtResource("1_gn3qd")
-tooltip_text = "[center]Gain [color=\"0044ff\"]%s[/color] block.[/center]"
+tooltip_text = "[center]获得 [color=\"0044ff\"]%s[/color] 点护体。[/center]"
 sound = ExtResource("3_g3rmi")

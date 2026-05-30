@@ -30,37 +30,36 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+offset_left = -190.0
+offset_top = -170.0
+offset_right = 190.0
+offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 5
+theme_override_constants/separation = 18
 
 [node name="Label" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "Bet your 
-money"
+text = "赌坊试运"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="FiftyButton" parent="VBoxContainer" instance=ExtResource("2_xqbom")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(110, 20)
+custom_minimum_size = Vector2(360, 72)
 layout_mode = 2
-text = "bet 50g: 50% chance
-to win 100g"
+text = "下注 50 灵石
+五成赢 100 灵石"
 
 [node name="ThirtyButton" parent="VBoxContainer" instance=ExtResource("2_xqbom")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(360, 72)
 layout_mode = 2
-text = "bet 50g: 30% chance
-to win 200g"
+text = "下注 50 灵石
+三成赢 200 灵石"
 
 [node name="SkipButton" parent="VBoxContainer" instance=ExtResource("2_xqbom")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 15)
+custom_minimum_size = Vector2(360, 62)
 layout_mode = 2
-text = "Skip the bet"
+text = "跳过赌局"

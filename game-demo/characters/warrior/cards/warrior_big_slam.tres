@@ -7,11 +7,12 @@
 [resource]
 script = ExtResource("2_hh2ps")
 id = "warrior_big_slam"
+display_name = "重击"
 type = 0
 rarity = 1
 target = 1
 cost = 2
 exhausts = true
 icon = ExtResource("1_11nym")
-tooltip_text = "[center]Deal [color=\"ff0000\"]%s[/color] damage and apply 2 [color=\"ffdf00\"]Exposed[/color].[/center]"
+tooltip_text = "[center]造成 [color=\"ff0000\"]%s[/color] 点伤害，并施加 2 回合 [color=\"ffdf00\"]破绽[/color]。[/center]"
 sound = ExtResource("3_0l7j0")

@@ -145,7 +145,7 @@ func _setup_top_bar():
 	
 	deck_button.card_pile = character.deck
 	deck_view.card_pile = character.deck
-	deck_button.pressed.connect(deck_view.show_current_view.bind("Deck"))
+	deck_button.pressed.connect(deck_view.show_current_view.bind("牌组"))
 
 
 func _show_regular_battle_rewards() -> void:

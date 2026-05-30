@@ -7,11 +7,12 @@
 [resource]
 script = ExtResource("2_brwxd")
 id = "warrior_axe_attack"
+display_name = "斧劈"
 type = 0
 rarity = 0
 target = 1
 cost = 1
 exhausts = false
 icon = ExtResource("1_mnudp")
-tooltip_text = "[center]Deal [color=\"ff0000\"]%s[/color] damage.[/center]"
+tooltip_text = "[center]造成 [color=\"ff0000\"]%s[/color] 点伤害。[/center]"
 sound = ExtResource("3_fudr5")

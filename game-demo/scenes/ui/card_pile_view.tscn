@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://c743ur8hoxsn5" path="res://scenes/ui/card_tooltip_popup.tscn" id="3_0v1cn"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_tpixj"]
-font_size = 12
+font_size = 36
 
 [node name="CardPileView" type="Control"]
 process_mode = 3
@@ -34,10 +34,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 40
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -46,7 +46,7 @@ theme_override_constants/separation = 10
 [node name="Title" type="Label" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Discard Pile"
+text = "弃牌堆"
 label_settings = SubResource("LabelSettings_tpixj")
 horizontal_alignment = 1
 
@@ -62,9 +62,9 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/h_separation = 0
-theme_override_constants/v_separation = 8
-columns = 6
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 18
+columns = 7
 
 [node name="CardMenuUI" parent="MarginContainer/VBoxContainer/ScrollContainer/Cards" instance=ExtResource("1_yhny2")]
 layout_mode = 2
@@ -144,12 +144,12 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -50.0
-offset_top = 7.0
-offset_right = -10.0
-offset_bottom = 21.0
+offset_left = -150.0
+offset_top = 24.0
+offset_right = -48.0
+offset_bottom = 76.0
 grow_horizontal = 0
-text = "Back"
+text = "返回"
 
 [node name="CardTooltipPopup" parent="." instance=ExtResource("3_0v1cn")]
 unique_name_in_owner = true

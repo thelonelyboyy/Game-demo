@@ -31,30 +31,30 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+offset_left = -210.0
+offset_top = -160.0
+offset_right = 210.0
+offset_bottom = 170.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Label" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "helpful boi"
+text = "山中奇遇"
 horizontal_alignment = 1
 
 [node name="DuplicateLastCardButton" parent="VBoxContainer" instance=ExtResource("1_850a0")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 20)
+custom_minimum_size = Vector2(360, 72)
 layout_mode = 2
-text = "duplicate last card
-in your deck"
+text = "复制牌组中
+最后一张牌"
 
 [node name="PlusMaxHPButton" parent="VBoxContainer" instance=ExtResource("1_850a0")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 15)
+custom_minimum_size = Vector2(360, 62)
 layout_mode = 2
-text = "+5 max HP"
+text = "生命上限 +5"
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 1
@@ -63,10 +63,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 60.0
-offset_top = -16.0
-offset_right = 100.0
-offset_bottom = 24.0
+offset_left = 260.0
+offset_top = -90.0
+offset_right = 460.0
+offset_bottom = 110.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_0pbu5")

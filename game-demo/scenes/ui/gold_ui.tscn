@@ -4,14 +4,14 @@
 [ext_resource type="Script" path="res://scenes/ui/gold_ui.gd" id="1_7byab"]
 
 [node name="GoldUI" type="HBoxContainer"]
-offset_right = 32.0
-offset_bottom = 8.0
+offset_right = 120.0
+offset_bottom = 36.0
 size_flags_vertical = 4
-theme_override_constants/separation = 2
+theme_override_constants/separation = 8
 script = ExtResource("1_7byab")
 
 [node name="Icon" type="TextureRect" parent="."]
-custom_minimum_size = Vector2(8, 8)
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = ExtResource("1_6l7dv")
 expand_mode = 1
@@ -21,4 +21,5 @@ stretch_mode = 5
 layout_mode = 2
 size_flags_vertical = 1
 text = "9999"
+theme_override_font_sizes/font_size = 22
 vertical_alignment = 1

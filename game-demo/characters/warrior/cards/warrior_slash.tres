@@ -7,12 +7,12 @@
 [resource]
 script = ExtResource("2_hvnm7")
 id = "warrior_slash"
+display_name = "横扫"
 type = 0
 rarity = 0
 target = 2
 cost = 2
 exhausts = false
 icon = ExtResource("1_uhc8e")
-tooltip_text = "[center]Deal [color=\"ff0000\"]%s[/color] damage
-to all enemies.[/center]"
+tooltip_text = "[center]对所有敌人造成 [color=\"ff0000\"]%s[/color] 点伤害。[/center]"
 sound = ExtResource("3_4dvu8")

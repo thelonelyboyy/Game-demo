@@ -1,6 +1,7 @@
 class_name Map
 extends Node2D
 
+const PIXEL_WORLD_SCALE := 5.0
 const SCROLL_SPEED := 15
 const MAP_ROOM = preload("res://scenes/map/map_room.tscn")
 const MAP_LINE = preload("res://scenes/map/map_line.tscn")
@@ -18,7 +19,9 @@ var camera_edge_y: float
 
 
 func _ready() -> void:
-	camera_edge_y = MapGenerator.Y_DIST * (MapGenerator.FLOORS - 1)
+	visuals.scale = Vector2.ONE * PIXEL_WORLD_SCALE
+	camera_2d.offset = get_viewport_rect().size / 2.0
+	camera_edge_y = MapGenerator.Y_DIST * (MapGenerator.FLOORS - 1) * PIXEL_WORLD_SCALE
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -26,9 +29,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	
 	if event.is_action_pressed("scroll_up"):
-		camera_2d.position.y -= SCROLL_SPEED
+		camera_2d.position.y -= SCROLL_SPEED * PIXEL_WORLD_SCALE
 	elif event.is_action_pressed("scroll_down"):
-		camera_2d.position.y += SCROLL_SPEED
+		camera_2d.position.y += SCROLL_SPEED * PIXEL_WORLD_SCALE
 
 	camera_2d.position.y = clamp(camera_2d.position.y, -camera_edge_y, 0)
 
@@ -61,7 +64,7 @@ func create_map() -> void:
 	var middle := floori(MapGenerator.MAP_WIDTH * 0.5)
 	_spawn_room(map_data[MapGenerator.FLOORS-1][middle])
 
-	var map_width_pixels := MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1)
+	var map_width_pixels := MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1) * PIXEL_WORLD_SCALE
 	visuals.position.x = (get_viewport_rect().size.x - map_width_pixels) / 2
 	visuals.position.y = get_viewport_rect().size.y / 2
 

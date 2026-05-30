@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CharacterStats" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/character_stats.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0084.png" id="2"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/sword_cultivator_starting_deck.tres" id="3"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/sword_cultivator_draftable_cards.tres" id="4"]
+[ext_resource type="Resource" path="res://relics/wooden_sword.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+character_name = "剑修"
+description = "一念起剑，轻灵迅捷。擅长抽牌、破绽与群体剑雨。"
+portrait = ExtResource("2")
+starting_deck = ExtResource("3")
+draftable_cards = ExtResource("4")
+cards_per_turn = 5
+max_mana = 3
+starting_relic = ExtResource("5")
+max_health = 32
+art = ExtResource("2")

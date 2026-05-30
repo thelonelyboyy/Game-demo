@@ -24,18 +24,18 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -41.5
-offset_top = -20.0
-offset_right = 41.5
-offset_bottom = 20.0
+offset_left = -250.0
+offset_top = -140.0
+offset_right = 250.0
+offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 24
 
 [node name="Cards" type="HBoxContainer" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 18
 
 [node name="CardMenuUI" parent="VBoxContainer/Cards" instance=ExtResource("1_spfg3")]
 layout_mode = 2
@@ -48,10 +48,10 @@ layout_mode = 2
 
 [node name="SkipCardReward" type="Button" parent="VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(50, 14)
+custom_minimum_size = Vector2(160, 52)
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Skip"
+text = "跳过"
 
 [node name="CardTooltipPopup" parent="." instance=ExtResource("2_738we")]
 visible = false
@@ -66,10 +66,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -25.0
-offset_top = -28.0
-offset_right = 25.0
-offset_bottom = -14.0
+offset_left = -80.0
+offset_top = -76.0
+offset_right = 80.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 0
-text = "Take"
+text = "收下"

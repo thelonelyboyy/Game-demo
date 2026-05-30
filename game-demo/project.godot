@@ -10,9 +10,9 @@ config_version=5
 
 [application]
 
-config/name="Deck Builder Tutorial"
+config/name="墨劫修真录"
 config/tags=PackedStringArray("gamelab")
-run/main_scene="res://scenes/run/run.tscn"
+run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.png"
 
@@ -30,15 +30,15 @@ gdscript/warnings/unused_signal=0
 
 [display]
 
-window/size/viewport_width=256
-window/size/viewport_height=144
+window/size/viewport_width=1280
+window/size/viewport_height=720
 window/size/window_width_override=1280
 window/size/window_height_override=720
-window/stretch/mode="viewport"
+window/stretch/mode="canvas_items"
 
 [dotnet]
 
-project/assembly_name="Deck Builder Tutorial"
+project/assembly_name="InkCultivationDeckbuilder"
 
 [editor_plugins]
 

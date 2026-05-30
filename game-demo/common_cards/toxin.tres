@@ -13,5 +13,6 @@ target = 0
 cost = 1
 exhausts = true
 icon = ExtResource("1_0j1je")
-tooltip_text = "[center]Slows you down[/center]."
+display_name = "浊气"
+tooltip_text = "[center]拖慢你的行动。[/center]"
 sound = ExtResource("3_cy6kp")

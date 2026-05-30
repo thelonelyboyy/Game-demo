@@ -6,9 +6,9 @@ enum Rarity {COMMON, UNCOMMON, RARE}
 enum Target {SELF, SINGLE_ENEMY, ALL_ENEMIES, EVERYONE}
 
 const RARITY_COLORS := {
-	Card.Rarity.COMMON: Color.GRAY,
-	Card.Rarity.UNCOMMON: Color.CORNFLOWER_BLUE,
-	Card.Rarity.RARE: Color.GOLD,
+	Card.Rarity.COMMON: Color("2f3430"),
+	Card.Rarity.UNCOMMON: Color("2f6f73"),
+	Card.Rarity.RARE: Color("c79a3b"),
 }
 
 @export_group("Card Attributes")
@@ -20,6 +20,7 @@ const RARITY_COLORS := {
 @export var exhausts: bool = false
 
 @export_group("Card Visuals")
+@export var display_name: String
 @export var icon: Texture
 @export_multiline var tooltip_text: String
 @export var sound: AudioStream
@@ -58,6 +59,10 @@ func play(targets: Array[Node], char_stats: CharacterStats, modifiers: ModifierH
 
 func apply_effects(_targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	pass
+
+
+func get_display_name() -> String:
+	return display_name if not display_name.is_empty() else id.capitalize()
 
 
 func get_default_tooltip() -> String:

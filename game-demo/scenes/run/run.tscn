@@ -32,58 +32,58 @@ alignment = 1
 [node name="MapButton" type="Button" parent="DebugButtons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Map"
+text = "地图"
 
 [node name="BattleButton" type="Button" parent="DebugButtons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Battle"
+text = "战斗"
 
 [node name="ShopButton" type="Button" parent="DebugButtons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Shop"
+text = "坊市"
 
 [node name="TreasureButton" type="Button" parent="DebugButtons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Treasure"
+text = "宝箱"
 
 [node name="RewardsButton" type="Button" parent="DebugButtons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Rewards"
+text = "战利品"
 
 [node name="CampfireButton" type="Button" parent="DebugButtons"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Campfire"
+text = "营火"
 
 [node name="TopBar" type="CanvasLayer" parent="."]
 layer = 3
 
 [node name="Background" type="ColorRect" parent="TopBar"]
-custom_minimum_size = Vector2(0, 18)
+custom_minimum_size = Vector2(0, 64)
 anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
 color = Color(0, 0, 0, 0.501961)
 
 [node name="BarItems" type="HBoxContainer" parent="TopBar"]
-custom_minimum_size = Vector2(0, 18)
+custom_minimum_size = Vector2(0, 64)
 anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
 
 [node name="HealthUI" parent="TopBar/BarItems" instance=ExtResource("4_k05q4")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(35, 0)
+custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
 show_max_hp = true
 
 [node name="GoldUI" parent="TopBar/BarItems" instance=ExtResource("4_dtarl")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(30, 0)
+custom_minimum_size = Vector2(130, 0)
 layout_mode = 2
 
 [node name="RelicHandlerContainer" type="CenterContainer" parent="TopBar/BarItems"]
@@ -92,12 +92,12 @@ size_flags_horizontal = 3
 
 [node name="RelicHandler" parent="TopBar/BarItems/RelicHandlerContainer" instance=ExtResource("6_f8fbw")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 16)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 
 [node name="DeckButton" parent="TopBar/BarItems" node_paths=PackedStringArray("counter") instance=ExtResource("4_ayx7e")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(16, 16)
+custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 texture_normal = ExtResource("5_dw5bf")
 counter = NodePath("Counter")
@@ -105,9 +105,9 @@ counter = NodePath("Counter")
 [node name="Counter" type="Label" parent="TopBar/BarItems/DeckButton"]
 layout_mode = 0
 offset_left = -5.0
-offset_top = 12.0
-offset_right = 5.0
-offset_bottom = 18.0
+offset_top = 40.0
+offset_right = 34.0
+offset_bottom = 62.0
 text = "99"
 horizontal_alignment = 1
 
@@ -149,7 +149,7 @@ theme_override_constants/separation = 15
 
 [node name="Label" type="Label" parent="PauseMenu/VBoxContainer"]
 layout_mode = 2
-text = "Paused"
+text = "暂停"
 label_settings = SubResource("LabelSettings_68deg")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -162,10 +162,10 @@ theme_override_constants/separation = 10
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 14)
 layout_mode = 2
-text = "Back"
+text = "继续"
 
 [node name="SaveAndQuitButton" type="Button" parent="PauseMenu/VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
-text = "Main Menu"
+text = "返回山门"

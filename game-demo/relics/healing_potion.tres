@@ -6,11 +6,11 @@
 [resource]
 script = ExtResource("2_yauxr")
 heal_amount = 6
-relic_name = "Healing Potion"
+relic_name = "回春葫芦"
 id = "healing_potion"
 type = 3
 character_type = 2
 starter_relic = true
 icon = ExtResource("1_xg7m0")
-tooltip = "[color=\"ffdf00\"]Endless Healing Potion[/color]
-At the end of combat, heal 6 HP."
+tooltip = "[color=\"ffdf00\"]回春葫芦[/color]
+战斗结束时，恢复 6 点生命。"

@@ -7,11 +7,12 @@
 [resource]
 script = ExtResource("2_npntm")
 id = "warrior_angry_anvil"
+display_name = "怒砧"
 type = 1
 rarity = 1
 target = 0
 cost = 1
 exhausts = false
 icon = ExtResource("1_3oe33")
-tooltip_text = "[center]Gain [color=\"0044ff\"]%s[/color] block. Exhaust 1 random card.[/center]"
+tooltip_text = "[center]获得 [color=\"0044ff\"]%s[/color] 点护体，随机消耗 1 张手牌。[/center]"
 sound = ExtResource("3_oo1yl")

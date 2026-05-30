@@ -4,9 +4,9 @@ extends Control
 const CARD_REWARDS = preload("res://scenes/ui/card_rewards.tscn")
 const REWARD_BUTTON = preload("res://scenes/ui/reward_button.tscn")
 const GOLD_ICON := preload("res://art/gold.png")
-const GOLD_TEXT := "%s gold"
+const GOLD_TEXT := "%s 灵石"
 const CARD_ICON := preload("res://art/rarity.png")
-const CARD_TEXT := "Add New Card"
+const CARD_TEXT := "择取新术法"
 
 @export var run_stats: RunStats
 @export var character_stats: CharacterStats
@@ -57,18 +57,18 @@ func add_relic_reward(relic: Relic) -> void:
 func _show_card_rewards() -> void:
 	if not run_stats or not character_stats:
 		return
-	
+
 	var card_rewards := CARD_REWARDS.instantiate() as CardRewards
 	add_child(card_rewards)
 	card_rewards.card_reward_selected.connect(_on_card_reward_taken)
-	
+
 	var card_reward_array: Array[Card] = []
 	var available_cards: Array[Card] = character_stats.draftable_cards.duplicate_cards()
-	
+
 	for i in run_stats.card_rewards:
 		_setup_card_chances()
 		var roll := RNG.instance.randf_range(0.0, card_reward_total_weight)
-		
+
 		for rarity: Card.Rarity in card_rarity_weights:
 			if card_rarity_weights[rarity] > roll:
 				_modify_weights(rarity)
@@ -100,29 +100,32 @@ func _get_random_available_card(available_cards: Array[Card], with_rarity: Card.
 		func(card: Card):
 			return card.rarity == with_rarity
 	)
+	if all_possible_cards.is_empty():
+		all_possible_cards = available_cards
+
 	return RNG.array_pick_random(all_possible_cards)
 
 
 func _on_gold_reward_taken(amount: int) -> void:
 	if not run_stats:
 		return
-	
+
 	run_stats.gold += amount
 
 
 func _on_card_reward_taken(card: Card) -> void:
 	if not character_stats or not card:
 		return
-		
+
 	character_stats.deck.add_card(card)
 
 
 func _on_relic_reward_taken(relic: Relic) -> void:
 	if not relic or not relic_handler:
 		return
-		
+
 	relic_handler.add_relic(relic)
 
 
-func _on_back_button_pressed() -> void: 
+func _on_back_button_pressed() -> void:
 	Events.battle_reward_exited.emit()
