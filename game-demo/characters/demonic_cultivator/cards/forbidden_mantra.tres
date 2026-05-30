@@ -8,7 +8,7 @@
 script = ExtResource("1")
 qi_flow_stacks = 2
 self_damage = 3
-effect_text = "失去 [color=\"b5172f\"]{self_damage}[/color] 点生命，获得 [color=\"9be564\"]{qi}[/color] 层灵息。"
+effect_text = "失去 {self_damage} 点生命，获得 {qi} 层灵息。"
 id = "forbidden_mantra"
 type = 2
 rarity = 2

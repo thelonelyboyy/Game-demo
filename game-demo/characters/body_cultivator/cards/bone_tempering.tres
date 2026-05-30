@@ -8,7 +8,7 @@
 script = ExtResource("1")
 base_block = 3
 cards_to_draw = 1
-effect_text = "获得 [color=\"87ceeb\"]{block}[/color] 点护体，抽 [color=\"9be564\"]{draw}[/color] 张牌。"
+effect_text = "获得 {block} 点护体，抽 {draw} 张牌。"
 id = "bone_tempering"
 type = 1
 rarity = 1

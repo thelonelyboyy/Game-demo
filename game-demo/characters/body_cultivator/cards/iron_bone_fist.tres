@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1")
 base_damage = 6
-effect_text = "造成 [color=\"ff4d4d\"]{damage}[/color] 点伤害。"
+effect_text = "造成 {damage} 点伤害。"
 id = "iron_bone_fist"
 type = 0
 rarity = 0

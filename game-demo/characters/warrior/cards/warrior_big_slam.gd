@@ -1,9 +1,9 @@
-extends Card
+﻿extends Card
 
 const EXPOSED_STATUS = preload("res://statuses/exposed.tres")
 
-var base_damage := 4
-var exposed_duration := 2
+@export var base_damage := 4
+@export var exposed_duration := 2
 
 
 func get_default_tooltip() -> String:
@@ -30,3 +30,4 @@ func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
 	exposed.duration = exposed_duration
 	status_effect.status = exposed
 	status_effect.execute(targets)
+

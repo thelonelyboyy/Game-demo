@@ -8,7 +8,7 @@
 script = ExtResource("1")
 base_damage = 9
 exposed_duration = 2
-effect_text = "造成 [color=\"ff4d4d\"]{damage}[/color] 点伤害，施加 [color=\"ffd166\"]{exposed}[/color] 回合破绽。"
+effect_text = "造成 {damage} 点伤害，施加 {exposed} 回合破绽。"
 id = "piercing_light"
 type = 0
 rarity = 1

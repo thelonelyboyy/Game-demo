@@ -8,7 +8,7 @@
 script = ExtResource("1")
 base_damage = 5
 base_block = 3
-effect_text = "造成 [color=\"ff4d4d\"]{damage}[/color] 点伤害，获得 [color=\"87ceeb\"]{block}[/color] 点护体。"
+effect_text = "造成 {damage} 点伤害，获得 {block} 点护体。"
 id = "soul_drain"
 type = 0
 rarity = 0

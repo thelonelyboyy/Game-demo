@@ -8,7 +8,7 @@
 script = ExtResource("1")
 base_damage = 6
 self_damage = 3
-effect_text = "失去 [color=\"b5172f\"]{self_damage}[/color] 点生命，对所有敌人造成 [color=\"ff4d4d\"]{damage}[/color] 点伤害。"
+effect_text = "失去 {self_damage} 点生命，对所有敌人造成 {damage} 点伤害。"
 id = "demon_flame"
 type = 0
 rarity = 1

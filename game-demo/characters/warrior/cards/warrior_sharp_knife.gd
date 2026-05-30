@@ -1,7 +1,7 @@
-extends Card
+﻿extends Card
 
-var base_damage := 6
-var extra_damage_after_use := 4
+@export var base_damage := 6
+@export var extra_damage_after_use := 4
 
 
 func get_default_tooltip() -> String:
@@ -24,3 +24,4 @@ func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
 	damage_effect.execute(targets)
 	
 	base_damage += extra_damage_after_use
+

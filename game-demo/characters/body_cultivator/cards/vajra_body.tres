@@ -7,7 +7,7 @@
 [resource]
 script = ExtResource("1")
 qi_flow_stacks = 2
-effect_text = "获得 [color=\"9be564\"]{qi}[/color] 层灵息。灵息会在回合开始转化为劲气。"
+effect_text = "获得 {qi} 层灵息。灵息会在回合开始转化为劲气。"
 id = "vajra_body"
 type = 2
 rarity = 2

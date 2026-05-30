@@ -1,18 +1,20 @@
-[gd_resource type="Resource" load_steps=4 format=3 uid="uid://cedsow628sq3y"]
+[gd_resource type="Resource" script_class="Card" load_steps=5 format=3]
 
-[ext_resource type="Texture2D" uid="uid://bxgrktox5it82" path="res://art/tile_0105.png" id="1_p0xvk"]
-[ext_resource type="Script" path="res://characters/warrior/cards/warrior_sharp_knife.gd" id="2_rjcfh"]
-[ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/slash.ogg" id="3_uxg0o"]
+[ext_resource type="Script" path="res://characters/warrior/cards/warrior_sharp_knife.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0105.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/slash.ogg" id="3"]
 
 [resource]
-script = ExtResource("2_rjcfh")
-id = "sharp_knife"
+script = ExtResource("1")
+base_damage = 6
+extra_damage_after_use = 4
+id = "warrior_sharp_knife"
 display_name = "磨刃"
 type = 0
 rarity = 2
 target = 1
 cost = 1
 exhausts = false
-icon = ExtResource("1_p0xvk")
-tooltip_text = "[center]造成 [color=\"ff0000\"]%s[/color] 点伤害。本场战斗此牌伤害 +%s。[/center]"
-sound = ExtResource("3_uxg0o")
+icon = ExtResource("2")
+tooltip_text = "[center]造成 {damage} 点伤害。本场战斗此牌伤害 +{extra}。[/center]"
+sound = ExtResource("3")

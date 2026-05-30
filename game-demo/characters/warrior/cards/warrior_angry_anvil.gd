@@ -1,7 +1,7 @@
-extends Card
+﻿extends Card
 
-var base_block := 7
-var exhaust_amount := 1
+@export var base_block := 7
+@export var exhaust_amount := 1
 
 
 func get_default_tooltip() -> String:
@@ -22,3 +22,4 @@ func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	exhaust_random_effect.amount = exhaust_amount
 	exhaust_random_effect.execute(targets)
 	
+

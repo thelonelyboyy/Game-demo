@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1")
 cards_to_draw = 2
-effect_text = "抽 [color=\"9be564\"]{draw}[/color] 张牌。"
+effect_text = "抽 {draw} 张牌。"
 id = "shadow_step"
 type = 1
 rarity = 1
