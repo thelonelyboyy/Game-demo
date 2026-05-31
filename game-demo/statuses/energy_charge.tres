@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnergyChargeStatus" load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://art/tile_0127.png" id="1"]
+[ext_resource type="Script" path="res://statuses/energy_charge.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+id = "energy_charge"
+type = 0
+stack_type = 1
+can_expire = false
+duration = 0
+stacks = 1
+icon = ExtResource("1")
+tooltip = "凝气：回合开始时获得 %s 点能量。"

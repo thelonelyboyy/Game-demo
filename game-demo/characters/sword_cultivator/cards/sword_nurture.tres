@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Card" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://characters/sword_cultivator/cards/sword_nurture.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0100.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/true_strength.ogg" id="3"]
+
+[resource]
+script = ExtResource("1")
+intent_stacks = 2
+id = "sword_nurture"
+display_name = "养剑诀"
+type = 1
+rarity = 0
+target = 0
+cost = 1
+exhausts = false
+icon = ExtResource("2")
+tooltip_text = "[center]获得 %s 层剑意。[/center]"
+sound = ExtResource("3")

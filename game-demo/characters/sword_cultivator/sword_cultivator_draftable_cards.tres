@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CardPile" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="CardPile" load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/card_pile.gd" id="1"]
 [ext_resource type="Script" path="res://custom_resources/card.gd" id="2"]
@@ -7,7 +7,17 @@
 [ext_resource type="Resource" path="res://characters/sword_cultivator/cards/guard_sword.tres" id="5"]
 [ext_resource type="Resource" path="res://characters/sword_cultivator/cards/piercing_light.tres" id="6"]
 [ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_heart.tres" id="7"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_wind_return.tres" id="8"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_shadow_strike.tres" id="9"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_water_break.tres" id="10"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_qi_draw.tres" id="11"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_wanjian.tres" id="12"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_nurture.tres" id="13"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_blood_curse.tres" id="14"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_energy_charge.tres" id="15"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_guard_formation.tres" id="16"]
+[ext_resource type="Resource" path="res://characters/sword_cultivator/cards/sword_star_shatter.tres" id="17"]
 
 [resource]
 script = ExtResource("1")
-cards = Array[ExtResource("2")]([ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("4"), ExtResource("4"), ExtResource("5"), ExtResource("5"), ExtResource("5"), ExtResource("6"), ExtResource("6"), ExtResource("7"), ExtResource("7")])
+cards = Array[ExtResource("2")]([ExtResource("3"), ExtResource("3"), ExtResource("4"), ExtResource("4"), ExtResource("5"), ExtResource("5"), ExtResource("6"), ExtResource("6"), ExtResource("7"), ExtResource("7"), ExtResource("8"), ExtResource("8"), ExtResource("9"), ExtResource("9"), ExtResource("10"), ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13"), ExtResource("13"), ExtResource("14"), ExtResource("14"), ExtResource("15"), ExtResource("15"), ExtResource("16"), ExtResource("17")])

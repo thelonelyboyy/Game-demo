@@ -1,6 +1,6 @@
 [gd_scene load_steps=13 format=3 uid="uid://4tj0qise1som"]
 
-[ext_resource type="Script" path="res://scenes/ui/main_menu.gd" id="1_bck1p"]
+[ext_resource type="Script" uid="uid://dxshrpk7a4p53" path="res://scenes/ui/main_menu.gd" id="1_bck1p"]
 [ext_resource type="Texture2D" uid="uid://dpfqok8tuy4r7" path="res://art/tile_0084.png" id="1_uaqd2"]
 [ext_resource type="Resource" uid="uid://bd874b0h1q8n1" path="res://scenes/run/run_startup.tres" id="2_4poyw"]
 [ext_resource type="Texture2D" uid="uid://cwf6dyi56tgo" path="res://art/tile_0088.png" id="2_tcnoe"]
@@ -8,10 +8,11 @@
 [ext_resource type="Texture2D" uid="uid://con6y7mc74c5a" path="res://art/tile_0120.png" id="4_snr5i"]
 [ext_resource type="Texture2D" uid="uid://1u3b3hwqd8yh" path="res://art/tile_0110.png" id="5_pintp"]
 [ext_resource type="Texture2D" uid="uid://c24y6l0ivlqp7" path="res://art/tile_0108.png" id="6_6iwyb"]
-[ext_resource type="Texture2D" path="res://art/tile_0090.png" id="7_beast"]
+[ext_resource type="Texture2D" uid="uid://d007n5sscvumv" path="res://art/tile_0090.png" id="7_beast"]
+[ext_resource type="PackedScene" path="res://scenes/ui/codex.tscn" id="8_codex"]
 
 [sub_resource type="Gradient" id="Gradient_7af3e"]
-colors = PackedColorArray(0.878431, 0.85098, 0.745098, 1, 0.0588235, 0.0705882, 0.0666667, 1)
+colors = PackedColorArray(0.12, 0.12, 0.12, 1, 0.05, 0.05, 0.05, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_1kxac"]
 gradient = SubResource("Gradient_7af3e")
@@ -21,7 +22,7 @@ width = 50
 line_spacing = 10.0
 font_size = 52
 shadow_size = 4
-shadow_color = Color(0.54902, 0.443137, 0.376471, 0.333333)
+shadow_color = Color(0, 0, 0, 0.5)
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -86,6 +87,11 @@ custom_minimum_size = Vector2(300, 52)
 layout_mode = 2
 text = "入山"
 
+[node name="Codex" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(300, 52)
+layout_mode = 2
+text = "图鉴"
+
 [node name="Exit" type="Button" parent="VBoxContainer"]
 custom_minimum_size = Vector2(300, 52)
 layout_mode = 2
@@ -107,28 +113,32 @@ scale = Vector2(10, 10)
 texture = ExtResource("3_vcouc")
 
 [node name="Beastmaster" type="Sprite2D" parent="."]
-position = Vector2(320, 615)
+position = Vector2(362.00003, 622)
 scale = Vector2(10, 10)
 texture = ExtResource("7_beast")
 
 [node name="Bat" type="Sprite2D" parent="."]
-position = Vector2(1010, 525)
+position = Vector2(1004, 500)
 scale = Vector2(10, 10)
 texture = ExtResource("4_snr5i")
 flip_h = true
 
 [node name="Crab" type="Sprite2D" parent="."]
-position = Vector2(1100, 625)
+position = Vector2(1050.0001, 635.00006)
 scale = Vector2(10, 10)
 texture = ExtResource("5_pintp")
 flip_h = true
 
 [node name="Ghost" type="Sprite2D" parent="."]
-position = Vector2(1170, 505)
+position = Vector2(1183, 515)
 scale = Vector2(10, 10)
 texture = ExtResource("6_6iwyb")
 flip_h = true
 
+[node name="CodexPanel" parent="." instance=ExtResource("8_codex")]
+visible = false
+
 [connection signal="pressed" from="VBoxContainer/Continue" to="." method="_on_continue_pressed"]
 [connection signal="pressed" from="VBoxContainer/NewRun" to="." method="_on_new_run_pressed"]
+[connection signal="pressed" from="VBoxContainer/Codex" to="." method="_on_codex_pressed"]
 [connection signal="pressed" from="VBoxContainer/Exit" to="." method="_on_exit_pressed"]

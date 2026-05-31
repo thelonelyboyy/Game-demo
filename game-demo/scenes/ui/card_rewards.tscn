@@ -13,7 +13,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.666667)
+color = Color(0.05, 0.05, 0.05, 0.9)
 script = ExtResource("1_okwb6")
 rewards = Array[Resource("res://custom_resources/card.gd")]([ExtResource("2_o7v21"), ExtResource("3_k78il"), ExtResource("4_iwxg7")])
 
@@ -56,7 +56,7 @@ text = "跳过"
 [node name="CardTooltipPopup" parent="." instance=ExtResource("2_738we")]
 visible = false
 layout_mode = 1
-background_color = Color(0.298039, 0.129412, 0.2, 0.784314)
+background_color = Color(0.1, 0.1, 0.1, 0.85)
 
 [node name="TakeButton" type="Button" parent="CardTooltipPopup"]
 unique_name_in_owner = true

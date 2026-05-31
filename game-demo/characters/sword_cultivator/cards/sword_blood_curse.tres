@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Card" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://characters/sword_cultivator/cards/sword_blood_curse.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0092.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/slash.ogg" id="3"]
+
+[resource]
+script = ExtResource("1")
+base_damage = 6
+self_damage = 3
+bleed_duration = 2
+id = "sword_blood_curse"
+display_name = "血祭剑咒"
+type = 0
+rarity = 1
+target = 1
+cost = 0
+exhausts = false
+icon = ExtResource("2")
+tooltip_text = "[center]失去 %s 点生命，造成 %s 点伤害，施加 %s 回合流血。[/center]"
+sound = ExtResource("3")

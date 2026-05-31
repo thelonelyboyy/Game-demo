@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/ui/battle_over_panel.gd" id="1_msgmm"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dhly6"]
-bg_color = Color(0, 0, 0, 0.34902)
+bg_color = Color(0.05, 0.05, 0.05, 0.85)
 
 [sub_resource type="LabelSettings" id="LabelSettings_bijyl"]
 font_size = 48

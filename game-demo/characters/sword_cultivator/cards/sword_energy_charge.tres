@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Card" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://characters/sword_cultivator/cards/sword_energy_charge.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0128.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/block.ogg" id="3"]
+
+[resource]
+script = ExtResource("1")
+base_block = 4
+charge_stacks = 1
+id = "sword_energy_charge"
+display_name = "凝气术"
+type = 1
+rarity = 0
+target = 0
+cost = 1
+exhausts = false
+icon = ExtResource("2")
+tooltip_text = "[center]获得 %s 点护体，获得 %s 层凝气。[/center]"
+sound = ExtResource("3")

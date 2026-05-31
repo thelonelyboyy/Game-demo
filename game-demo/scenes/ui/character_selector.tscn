@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" path="res://art/tile_0090.png" id="6_beast"]
 
 [sub_resource type="Gradient" id="Gradient_7af3e"]
-colors = PackedColorArray(0.854902, 0.835294, 0.745098, 1, 0.0705882, 0.0862745, 0.0784314, 1)
+colors = PackedColorArray(0.12, 0.12, 0.12, 1, 0.05, 0.05, 0.05, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_1kxac"]
 gradient = SubResource("Gradient_7af3e")
@@ -19,13 +19,13 @@ width = 50
 line_spacing = 10.0
 font_size = 52
 shadow_size = 4
-shadow_color = Color(0.54902, 0.443137, 0.376471, 0.333333)
+shadow_color = Color(0, 0, 0, 0.5)
 
 [sub_resource type="LabelSettings" id="LabelSettings_aveil"]
 line_spacing = 6.0
 font_size = 26
 shadow_size = 4
-shadow_color = Color(0.54902, 0.443137, 0.376471, 0.333333)
+shadow_color = Color(0, 0, 0, 0.5)
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_2s2at"]
 

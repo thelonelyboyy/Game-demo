@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SwordIntentStatus" load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://art/tile_0099.png" id="1"]
+[ext_resource type="Script" path="res://statuses/sword_intent.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+id = "sword_intent"
+type = 2
+stack_type = 1
+can_expire = false
+duration = 0
+stacks = 1
+icon = ExtResource("1")
+tooltip = "剑意：攻击伤害提高 %s%% 。"

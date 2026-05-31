@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cpydvk8mq66o5" path="res://art/tile_0087.png" id="3_13ibh"]
 
 [sub_resource type="Gradient" id="Gradient_7af3e"]
-colors = PackedColorArray(0.2, 0.117647, 0.0509804, 1, 0.054902, 0, 0.0588235, 1)
+colors = PackedColorArray(0.08, 0.08, 0.08, 1, 0.04, 0.04, 0.04, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_1kxac"]
 gradient = SubResource("Gradient_7af3e")
@@ -14,7 +14,7 @@ width = 50
 line_spacing = 6.0
 font_size = 34
 shadow_size = 4
-shadow_color = Color(0.54902, 0.443137, 0.376471, 0.333333)
+shadow_color = Color(0, 0, 0, 0.5)
 
 [node name="WinScreen" type="Control"]
 layout_mode = 3
