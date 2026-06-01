@@ -186,6 +186,13 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "调息"
 
+[node name="UpgradeButton" type="Button" parent="UILayer/UI"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "卡牌突破"
+
 [node name="Description" type="Label" parent="UILayer/UI"]
 layout_mode = 2
 text = "恢复 30% 生命"

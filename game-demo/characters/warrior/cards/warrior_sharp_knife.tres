@@ -15,6 +15,7 @@ rarity = 2
 target = 1
 cost = 1
 exhausts = false
+upgrade_type = 1
 icon = ExtResource("2")
 tooltip_text = "[center]造成 {damage} 点伤害。本场战斗此牌伤害 +{extra}。[/center]"
 sound = ExtResource("3")

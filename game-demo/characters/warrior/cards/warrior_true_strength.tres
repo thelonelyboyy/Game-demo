@@ -13,6 +13,7 @@ rarity = 2
 target = 0
 cost = 3
 exhausts = false
+upgrade_type = 2
 icon = ExtResource("2")
 tooltip_text = "[center]回合开始时，获得 2 层劲气。[/center]"
 sound = ExtResource("3")

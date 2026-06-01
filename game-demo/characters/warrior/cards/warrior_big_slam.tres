@@ -15,6 +15,7 @@ rarity = 1
 target = 1
 cost = 2
 exhausts = true
+upgrade_type = 1
 icon = ExtResource("2")
 tooltip_text = "[center]造成 {damage} 点伤害，并施加 {exposed} 回合破绽。[/center]"
 sound = ExtResource("3")

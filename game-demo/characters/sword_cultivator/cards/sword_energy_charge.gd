@@ -40,3 +40,8 @@ func _get_tree_from_targets(targets: Array[Node]) -> SceneTree:
 
 	var player := scene_tree.get_first_node_in_group("player")
 	return player.get_tree() if player else scene_tree
+
+
+func _upgrade_values() -> void:
+	base_block = _upgrade_number(base_block)
+	charge_stacks = _upgrade_number(charge_stacks)

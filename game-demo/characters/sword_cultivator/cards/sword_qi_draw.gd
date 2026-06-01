@@ -20,3 +20,7 @@ func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	var exhaust_effect := ExhaustRandomEffect.new()
 	exhaust_effect.amount = exhaust_amount
 	exhaust_effect.execute(targets)
+
+
+func _upgrade_values() -> void:
+	cards_to_draw = _upgrade_number(cards_to_draw)

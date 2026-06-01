@@ -21,3 +21,7 @@ func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
 	damage_effect.amount = modifiers.get_modified_value(base_damage, Modifier.Type.DMG_DEALT)
 	damage_effect.sound = sound
 	damage_effect.execute(targets)
+
+
+func _upgrade_values() -> void:
+	base_damage = _upgrade_number(base_damage)

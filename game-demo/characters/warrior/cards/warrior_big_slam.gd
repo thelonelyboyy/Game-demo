@@ -31,3 +31,7 @@ func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
 	status_effect.status = exposed
 	status_effect.execute(targets)
 
+
+func _upgrade_values() -> void:
+	base_damage = _upgrade_number(base_damage)
+	exposed_duration = _upgrade_number(exposed_duration)

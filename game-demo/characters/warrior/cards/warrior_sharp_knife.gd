@@ -25,3 +25,7 @@ func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
 	
 	base_damage += extra_damage_after_use
 
+
+func _upgrade_values() -> void:
+	base_damage = _upgrade_number(base_damage)
+	extra_damage_after_use = _upgrade_number(extra_damage_after_use)

@@ -36,3 +36,8 @@ func _has_bleed(enemy: Enemy) -> bool:
 		if status_ui.status.id == "bleed":
 			return true
 	return false
+
+
+func _upgrade_values() -> void:
+	base_damage = _upgrade_number(base_damage)
+	bonus_damage = _upgrade_number(bonus_damage)

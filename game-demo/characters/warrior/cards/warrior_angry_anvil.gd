@@ -23,3 +23,6 @@ func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	exhaust_random_effect.execute(targets)
 	
 
+func _upgrade_values() -> void:
+	base_block = _upgrade_number(base_block)
+

@@ -21,3 +21,8 @@ func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	var card_draw_effect := CardDrawEffect.new()
 	card_draw_effect.cards_to_draw = cards_to_draw
 	card_draw_effect.execute(targets)
+
+
+func _upgrade_values() -> void:
+	base_block = _upgrade_number(base_block)
+	cards_to_draw = _upgrade_number(cards_to_draw)

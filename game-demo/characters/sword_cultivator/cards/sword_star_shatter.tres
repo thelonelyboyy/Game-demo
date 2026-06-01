@@ -15,6 +15,7 @@ rarity = 2
 target = 1
 cost = 2
 exhausts = false
+upgrade_type = 1
 icon = ExtResource("2")
 tooltip_text = "[center]造成 %s 点伤害。若目标有流血，额外造成等量伤害。[/center]"
 sound = ExtResource("3")

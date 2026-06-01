@@ -13,5 +13,6 @@ rarity = 1
 target = 0
 cost = 0
 exhausts = true
+upgrade_type = 1
 display_name = "影遁"
 icon = ExtResource("2")

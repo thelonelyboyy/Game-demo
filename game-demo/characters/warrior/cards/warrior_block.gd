@@ -16,3 +16,7 @@ func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	block_effect.amount = base_block
 	block_effect.sound = sound
 	block_effect.execute(targets)
+
+
+func _upgrade_values() -> void:
+	base_block = _upgrade_number(base_block)

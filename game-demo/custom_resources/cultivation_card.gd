@@ -104,3 +104,12 @@ func _apply_status_to_player(player_targets: Array[Node], status_resource: Statu
 	status.stacks = stacks
 	status_effect.status = status
 	status_effect.execute(player_targets)
+
+
+func _upgrade_values() -> void:
+	base_damage = _upgrade_number(base_damage)
+	base_block = _upgrade_number(base_block)
+	cards_to_draw = _upgrade_number(cards_to_draw)
+	muscle_stacks = _upgrade_number(muscle_stacks)
+	qi_flow_stacks = _upgrade_number(qi_flow_stacks)
+	exposed_duration = _upgrade_number(exposed_duration)

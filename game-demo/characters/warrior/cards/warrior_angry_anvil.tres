@@ -14,6 +14,7 @@ rarity = 1
 target = 0
 cost = 1
 exhausts = false
+upgrade_type = 1
 icon = ExtResource("2")
 tooltip_text = "[center]获得 {block} 点护体，随机消耗 1 张手牌。[/center]"
 sound = ExtResource("3")

@@ -15,6 +15,7 @@ rarity = 1
 target = 0
 cost = 0
 exhausts = false
+upgrade_type = 1
 icon = ExtResource("2")
 tooltip_text = "[center]抽 %s 张牌，弃 %s 张随机手牌。[/center]"
 sound = ExtResource("3")

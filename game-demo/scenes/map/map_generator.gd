@@ -7,6 +7,9 @@ const PLACEMENT_RANDOMNESS := 5
 const FLOORS := 15
 const MAP_WIDTH := 7
 const PATHS := 6
+const FORCE_TEST_CAMPFIRE_SHOP_PATH := true
+const TEST_CAMPFIRE_FLOOR := 1
+const TEST_SHOP_FLOOR := 2
 const MONSTER_ROOM_WEIGHT := 12.0
 const EVENT_ROOM_WEIGHT := 5.0
 const SHOP_ROOM_WEIGHT := 2.5
@@ -37,6 +40,8 @@ func generate_map() -> Array[Array]:
 	battle_stats_pool.setup()
 	
 	_setup_boss_room()
+	if FORCE_TEST_CAMPFIRE_SHOP_PATH:
+		_setup_test_campfire_shop_path()
 	_setup_random_room_weights()
 	_setup_room_types()
 	
@@ -137,6 +142,21 @@ func _setup_boss_room() -> void:
 			
 	boss_room.type = Room.Type.BOSS
 	boss_room.battle_stats = battle_stats_pool.get_random_battle_for_tier(2)
+
+
+func _setup_test_campfire_shop_path() -> void:
+	var campfire_room := map_data[TEST_CAMPFIRE_FLOOR][floori(MAP_WIDTH * 0.5)] as Room
+	var shop_room := map_data[TEST_SHOP_FLOOR][campfire_room.column] as Room
+
+	campfire_room.type = Room.Type.CAMPFIRE
+	shop_room.type = Room.Type.SHOP
+	campfire_room.next_rooms = [] as Array[Room]
+	campfire_room.next_rooms.append(shop_room)
+
+	for room: Room in map_data[0]:
+		if room.next_rooms.size() > 0:
+			room.next_rooms = [] as Array[Room]
+			room.next_rooms.append(campfire_room)
 
 
 func _setup_random_room_weights() -> void:

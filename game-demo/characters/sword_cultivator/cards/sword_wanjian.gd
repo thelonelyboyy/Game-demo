@@ -46,3 +46,8 @@ func _get_muscle_stacks() -> int:
 			return status_ui.status.stacks
 
 	return 0
+
+
+func _upgrade_values() -> void:
+	base_damage = _upgrade_number(base_damage)
+	bonus_per_muscle = _upgrade_number(bonus_per_muscle)
