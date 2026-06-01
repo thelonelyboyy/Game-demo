@@ -15,6 +15,7 @@ rarity = 2
 target = 0
 cost = 1
 upgrade_type = 1
+element = 4
 display_name = "禁咒入魔"
 icon = ExtResource("2")
 sound = ExtResource("3")

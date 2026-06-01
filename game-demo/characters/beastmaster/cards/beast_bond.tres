@@ -15,6 +15,7 @@ rarity = 2
 target = 0
 cost = 1
 upgrade_type = 1
+element = 2
 display_name = "万兽同心"
 icon = ExtResource("2")
 sound = ExtResource("3")

@@ -14,6 +14,7 @@ rarity = 0
 target = 0
 cost = 1
 upgrade_type = 1
+element = 5
 display_name = "山息"
 icon = ExtResource("2")
 sound = ExtResource("3")

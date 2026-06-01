@@ -5,6 +5,7 @@ enum Type {ATTACK, SKILL, POWER}
 enum Rarity {COMMON, UNCOMMON, RARE}
 enum Target {SELF, SINGLE_ENEMY, ALL_ENEMIES, EVERYONE}
 enum UpgradeType {NONE, STAT_BOOST, COST_REDUCTION}
+enum Element {NONE, METAL, WOOD, WATER, FIRE, EARTH}
 
 const RARITY_COLORS := {
 	Card.Rarity.COMMON: Color("2f3430"),
@@ -16,11 +17,13 @@ const RARITY_COLORS := {
 @export var id: String
 @export var type: Type
 @export var rarity: Rarity
+@warning_ignore("shadowed_variable_base_class")
 @export var target: Target
 @export var cost: int
 @export var exhausts: bool = false
 @export var upgrade_type: UpgradeType = UpgradeType.NONE
 @export var upgraded := false
+@export var element: Element = Element.NONE
 
 @export_group("Card Visuals")
 @export var display_name: String
@@ -36,9 +39,9 @@ func is_single_targeted() -> bool:
 func _get_targets(targets: Array[Node]) -> Array[Node]:
 	if not targets:
 		return []
-		
+
 	var tree := targets[0].get_tree()
-	
+
 	match target:
 		Target.SELF:
 			return tree.get_nodes_in_group("player")
@@ -53,7 +56,7 @@ func _get_targets(targets: Array[Node]) -> Array[Node]:
 func play(targets: Array[Node], char_stats: CharacterStats, modifiers: ModifierHandler) -> void:
 	Events.card_played.emit(self)
 	char_stats.mana -= cost
-	
+
 	if is_single_targeted():
 		apply_effects(targets, modifiers)
 	else:
@@ -75,6 +78,22 @@ func get_default_tooltip() -> String:
 
 func get_updated_tooltip(_player_modifiers: ModifierHandler, _enemy_modifiers: ModifierHandler) -> String:
 	return tooltip_text
+
+
+func get_element_name() -> String:
+	match element:
+		Element.METAL:
+			return "金"
+		Element.WOOD:
+			return "木"
+		Element.WATER:
+			return "水"
+		Element.FIRE:
+			return "火"
+		Element.EARTH:
+			return "土"
+		_:
+			return "无"
 
 
 func can_upgrade() -> bool:
@@ -123,4 +142,3 @@ func _upgrade_number(value: int) -> int:
 		return value
 
 	return ceili(value * 1.5)
-	

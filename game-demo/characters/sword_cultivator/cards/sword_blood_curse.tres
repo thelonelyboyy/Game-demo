@@ -17,6 +17,7 @@ target = 1
 cost = 0
 exhausts = false
 upgrade_type = 1
+element = 1
 icon = ExtResource("2")
 tooltip_text = "[center]失去 %s 点生命，造成 %s 点伤害，施加 %s 回合流血。[/center]"
 sound = ExtResource("3")

@@ -29,4 +29,8 @@ func set_card(value: Card) -> void:
 		await ready
 
 	card = value
+	if not card:
+		visuals.card = null
+		return
+
 	visuals.card = card

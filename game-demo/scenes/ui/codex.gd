@@ -74,7 +74,6 @@ func _collect_all_data():
 func _collect_cards():
 	cards_by_class.clear()
 	var char_dirs = {
-		"战士": "warrior",
 		"体修": "body_cultivator",
 		"剑修": "sword_cultivator",
 		"魔修": "demonic_cultivator",
@@ -89,9 +88,12 @@ func _collect_cards():
 
 func _collect_enemies():
 	var result = []
-	var enemy_dirs = ["bat", "crab", "toxic_ghost"]
-	for dir in enemy_dirs:
-		var path = "res://enemies/%s/%s_enemy.tres" % [dir, dir]
+	var enemy_paths = [
+		"res://enemies/bat/bat_enemy.tres",
+		"res://enemies/crab/crab_enemy.tres",
+		"res://enemies/toxic_ghost/toxic_ghost.tres",
+	]
+	for path in enemy_paths:
 		var res = load(path)
 		if res is EnemyStats:
 			result.append(res)
@@ -102,8 +104,8 @@ func _collect_statuses():
 	var result = []
 	var status_names = ["exposed", "muscle", "qi_flow", "true_strength_form",
 						"bleed", "sword_intent", "energy_charge", "sword_guard"]
-	for name in status_names:
-		var res = load("res://statuses/%s.tres" % name)
+	for status_id in status_names:
+		var res = load("res://statuses/%s.tres" % status_id)
 		if res is Status:
 			result.append(res)
 	return result
@@ -164,6 +166,9 @@ func _populate_cards():
 		cards_to_show.append_array(filtered)
 
 	for card in cards_to_show:
+		if not card:
+			continue
+
 		var menu_ui = CARD_MENU_UI_SCENE.instantiate()
 		content_grid.add_child(menu_ui)
 		menu_ui.card = card
@@ -244,7 +249,7 @@ func _format_card_detail(card):
 		Card.Rarity.UNCOMMON: text += "  |  稀有"
 		Card.Rarity.RARE: text += "  |  传说"
 
-	text += "  |  %s 费\n\n" % card.cost
+	text += "  |  %s 费 | 元素：%s\n\n" % [card.cost, card.get_element_name()]
 
 	if card is CultivationCard:
 		text += card.get_default_tooltip()

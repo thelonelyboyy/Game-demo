@@ -15,6 +15,7 @@ rarity = 1
 target = 2
 cost = 2
 upgrade_type = 2
+element = 4
 display_name = "魔焰焚心"
 icon = ExtResource("2")
 sound = ExtResource("3")

@@ -16,6 +16,14 @@ func set_card(value: Card) -> void:
 		await ready
 
 	card = value
+	if not card:
+		cost.text = ""
+		card_name.text = ""
+		description.text = ""
+		icon.texture = null
+		rarity.modulate = Color.WHITE
+		return
+
 	cost.text = str(card.cost)
 	card_name.text = card.get_display_name()
 	description.text = card.get_default_tooltip().replace(
