@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TrueEssenceStatus" load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://art/rarity.png" id="1"]
+[ext_resource type="Script" path="res://statuses/true_essence.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+id = "true_essence"
+type = 2
+stack_type = 1
+can_expire = false
+duration = 0
+stacks = 1
+icon = ExtResource("1")
+tooltip = "真元：护体牌额外获得 %s 点护体。"

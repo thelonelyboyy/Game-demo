@@ -53,6 +53,7 @@ func _generate_shop_cards() -> void:
 	shop_card_array = available_cards.slice(0, 3)
 	
 	for card: Card in shop_card_array:
+		card.bind_spirit_root_owner(char_stats)
 		var new_shop_card := SHOP_CARD.instantiate() as ShopCard
 		cards.add_child(new_shop_card)
 		new_shop_card.card = card

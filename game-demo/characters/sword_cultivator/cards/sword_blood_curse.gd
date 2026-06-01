@@ -8,14 +8,14 @@ const BLEED_STATUS := preload("res://statuses/bleed.tres")
 
 
 func get_default_tooltip() -> String:
-	return tooltip_text % [self_damage, base_damage, bleed_duration]
+	return tooltip_text % [self_damage, get_spirit_root_modified_value(base_damage), get_spirit_root_modified_value(bleed_duration)]
 
 
 func get_updated_tooltip(player_modifiers: ModifierHandler, enemy_modifiers: ModifierHandler) -> String:
-	var modified_dmg := player_modifiers.get_modified_value(base_damage, Modifier.Type.DMG_DEALT)
+	var modified_dmg := player_modifiers.get_modified_value(get_spirit_root_modified_value(base_damage), Modifier.Type.DMG_DEALT)
 	if enemy_modifiers:
 		modified_dmg = enemy_modifiers.get_modified_value(modified_dmg, Modifier.Type.DMG_TAKEN)
-	return tooltip_text % [self_damage, modified_dmg, bleed_duration]
+	return tooltip_text % [self_damage, modified_dmg, get_spirit_root_modified_value(bleed_duration)]
 
 
 func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
@@ -28,13 +28,13 @@ func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
 		self_dmg_effect.execute(player_targets)
 
 	var damage_effect := DamageEffect.new()
-	damage_effect.amount = modifiers.get_modified_value(base_damage, Modifier.Type.DMG_DEALT)
+	damage_effect.amount = modifiers.get_modified_value(get_spirit_root_modified_value(base_damage), Modifier.Type.DMG_DEALT)
 	damage_effect.sound = sound
 	damage_effect.execute(targets)
 
 	var status_effect := StatusEffect.new()
 	var bleed := BLEED_STATUS.duplicate()
-	bleed.duration = bleed_duration
+	bleed.duration = get_spirit_root_modified_value(bleed_duration)
 	status_effect.status = bleed
 	status_effect.execute(targets)
 
@@ -54,3 +54,7 @@ func _get_tree_from_targets(targets: Array[Node]) -> SceneTree:
 func _upgrade_values() -> void:
 	base_damage = _upgrade_number(base_damage)
 	bleed_duration = _upgrade_number(bleed_duration)
+
+
+func get_spirit_root_primary_value() -> int:
+	return maxi(get_spirit_root_modified_value(base_damage), get_spirit_root_modified_value(bleed_duration))

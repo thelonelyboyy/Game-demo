@@ -63,6 +63,7 @@ func is_hovered() -> bool:
 func request_tooltip() -> void:
 	var enemy_modifiers := get_active_enemy_modifiers()
 	var updated_tooltip := card.get_updated_tooltip(player_modifiers, enemy_modifiers)
+	updated_tooltip = "%s\n%s" % [updated_tooltip, card.get_element_tooltip()]
 	Events.card_tooltip_requested.emit(card.icon, updated_tooltip)
 
 

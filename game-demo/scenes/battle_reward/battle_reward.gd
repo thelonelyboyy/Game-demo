@@ -73,6 +73,7 @@ func _show_card_rewards() -> void:
 			if card_rarity_weights[rarity] > roll:
 				_modify_weights(rarity)
 				var picked_card := _get_random_available_card(available_cards, rarity)
+				picked_card.bind_spirit_root_owner(character_stats)
 				card_reward_array.append(picked_card)
 				available_cards.erase(picked_card)
 				break

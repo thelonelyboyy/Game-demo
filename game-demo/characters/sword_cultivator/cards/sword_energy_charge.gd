@@ -7,11 +7,11 @@ const ENERGY_CHARGE_STATUS := preload("res://statuses/energy_charge.tres")
 
 
 func get_default_tooltip() -> String:
-	return tooltip_text % [base_block, charge_stacks]
+	return tooltip_text % [get_spirit_root_modified_value(base_block), get_spirit_root_modified_value(charge_stacks)]
 
 
 func get_updated_tooltip(_player_modifiers: ModifierHandler, _enemy_modifiers: ModifierHandler) -> String:
-	return tooltip_text % [base_block, charge_stacks]
+	return tooltip_text % [get_spirit_root_modified_value(base_block), get_spirit_root_modified_value(charge_stacks)]
 
 
 func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
@@ -19,13 +19,13 @@ func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	var player_targets := tree.get_nodes_in_group("player")
 
 	var block_effect := BlockEffect.new()
-	block_effect.amount = base_block
+	block_effect.amount = get_spirit_root_modified_value(base_block)
 	block_effect.sound = sound
 	block_effect.execute(player_targets)
 
 	var status_effect := StatusEffect.new()
 	var charge := ENERGY_CHARGE_STATUS.duplicate()
-	charge.stacks = charge_stacks
+	charge.stacks = get_spirit_root_modified_value(charge_stacks)
 	status_effect.status = charge
 	status_effect.execute(player_targets)
 
@@ -45,3 +45,7 @@ func _get_tree_from_targets(targets: Array[Node]) -> SceneTree:
 func _upgrade_values() -> void:
 	base_block = _upgrade_number(base_block)
 	charge_stacks = _upgrade_number(charge_stacks)
+
+
+func get_spirit_root_primary_value() -> int:
+	return maxi(get_spirit_root_modified_value(base_block), get_spirit_root_modified_value(charge_stacks))

@@ -44,7 +44,7 @@ func _ready() -> void:
 	
 	match run_startup.type:
 		RunStartup.Type.NEW_RUN:
-			character = run_startup.picked_character.create_instance()
+			character = run_startup.picked_character.create_instance(run_startup.selected_spirit_root)
 			_start_run()
 		RunStartup.Type.CONTINUED_RUN:
 			_load_run()
@@ -68,6 +68,7 @@ func _save_run(was_on_map: bool) -> void:
 	save_data.rng_state = RNG.instance.state
 	save_data.run_stats = stats
 	save_data.char_stats = character
+	save_data.spirit_root = character.spirit_root
 	save_data.current_deck = character.deck
 	save_data.current_health = character.health
 	save_data.relics = relic_handler.get_all_relics()
@@ -85,8 +86,11 @@ func _load_run() -> void:
 	RNG.set_from_save_data(save_data.rng_seed, save_data.rng_state)
 	stats = save_data.run_stats
 	character = save_data.char_stats
+	if save_data.spirit_root != Card.Element.NONE:
+		character.spirit_root = save_data.spirit_root
 	character.deck = save_data.current_deck
 	character.health = save_data.current_health
+	character.bind_all_card_piles_to_owner()
 	relic_handler.add_relics(save_data.relics)
 	_setup_top_bar()
 	_setup_event_connections()

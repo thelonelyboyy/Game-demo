@@ -2,6 +2,7 @@ class_name Battle
 extends Node2D
 
 const PIXEL_WORLD_SCALE := 5.0
+const SPIRIT_ROOT_HANDLER := preload("res://scenes/battle/spirit_root_handler.gd")
 
 @export var battle_stats: BattleStats
 @export var char_stats: CharacterStats
@@ -14,6 +15,7 @@ const PIXEL_WORLD_SCALE := 5.0
 @onready var player: Player = $Player
 
 var pixel_world: Node2D
+var spirit_root_handler: SpiritRootHandler
 
 
 func _ready() -> void:
@@ -34,6 +36,7 @@ func start_battle() -> void:
 	player.stats = char_stats
 	player_handler.relics = relics
 	enemy_handler.setup_enemies(battle_stats)
+	_setup_spirit_root_handler()
 	_prepare_world_ui()
 	enemy_handler.reset_enemy_actions()
 	
@@ -95,3 +98,11 @@ func _prepare_scaled_node_ui(world_node: Node) -> void:
 		var ui_node := world_node.get_node_or_null(ui_name) as Control
 		if ui_node:
 			ui_node.scale = Vector2.ONE / PIXEL_WORLD_SCALE
+
+
+func _setup_spirit_root_handler() -> void:
+	if not spirit_root_handler:
+		spirit_root_handler = SPIRIT_ROOT_HANDLER.new() as SpiritRootHandler
+		add_child(spirit_root_handler)
+
+	spirit_root_handler.setup(char_stats, player_handler, player, enemy_handler)

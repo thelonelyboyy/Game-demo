@@ -1,6 +1,6 @@
 extends Control
 
-const RUN_SCENE = preload("res://scenes/run/run.tscn")
+const SPIRIT_ROOT_SELECTOR_SCENE = preload("res://scenes/ui/spirit_root_selector.tscn")
 const BODY_CULTIVATOR_STATS := preload("res://characters/body_cultivator/body_cultivator.tres")
 const SWORD_CULTIVATOR_STATS := preload("res://characters/sword_cultivator/sword_cultivator.tres")
 const DEMONIC_CULTIVATOR_STATS := preload("res://characters/demonic_cultivator/demonic_cultivator.tres")
@@ -30,7 +30,7 @@ func _on_start_button_pressed() -> void:
 	print("Start new Run with %s" % current_character.character_name)
 	run_startup.type = RunStartup.Type.NEW_RUN
 	run_startup.picked_character = current_character
-	get_tree().change_scene_to_packed(RUN_SCENE)
+	get_tree().change_scene_to_packed(SPIRIT_ROOT_SELECTOR_SCENE)
 
 
 func _on_body_cultivator_button_pressed() -> void:

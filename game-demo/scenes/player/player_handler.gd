@@ -26,8 +26,10 @@ func _ready() -> void:
 func start_battle(char_stats: CharacterStats) -> void:
 	character = char_stats
 	character.draw_pile = character.deck.custom_duplicate()
+	character.draw_pile.bind_cards_to_owner(character)
 	character.draw_pile.shuffle()
 	character.discard = CardPile.new()
+	character.discard.bind_cards_to_owner(character)
 	relics.relics_activated.connect(_on_relics_activated)
 	player.status_handler.statuses_applied.connect(_on_statuses_applied)
 	start_turn()
@@ -36,6 +38,7 @@ func start_battle(char_stats: CharacterStats) -> void:
 func start_turn() -> void:
 	character.block = 0
 	character.reset_mana()
+	Events.player_turn_started.emit()
 	relics.activate_relics_by_type(Relic.Type.START_OF_TURN)
 
 
@@ -46,7 +49,11 @@ func end_turn() -> void:
 
 func draw_card() -> void:
 	reshuffle_deck_from_discard()
-	hand.add_card(character.draw_pile.draw_card())
+	var card := character.draw_pile.draw_card()
+	if not card:
+		return
+	hand.add_card(card)
+	Events.card_drawn.emit(card)
 	reshuffle_deck_from_discard()
 
 
@@ -66,6 +73,7 @@ func draw_cards(amount: int, is_start_of_turn_draw: bool = false) -> void:
 
 func discard_cards() -> void:
 	if hand.get_child_count() == 0:
+		character.reset_temporary_card_costs()
 		Events.player_hand_discarded.emit()
 		return
 
@@ -77,6 +85,7 @@ func discard_cards() -> void:
 	
 	tween.finished.connect(
 		func():
+			character.reset_temporary_card_costs()
 			Events.player_hand_discarded.emit()
 	)
 

@@ -31,6 +31,9 @@ const RARITY_COLORS := {
 @export_multiline var tooltip_text: String
 @export var sound: AudioStream
 
+var spirit_root_owner: CharacterStats
+var temporary_cost_reduction := 0
+
 
 func is_single_targeted() -> bool:
 	return target == Target.SINGLE_ENEMY
@@ -80,6 +83,42 @@ func get_updated_tooltip(_player_modifiers: ModifierHandler, _enemy_modifiers: M
 	return tooltip_text
 
 
+func bind_spirit_root_owner(owner: CharacterStats) -> void:
+	spirit_root_owner = owner
+
+
+func is_selected_spirit_root_element() -> bool:
+	return spirit_root_owner and spirit_root_owner.has_spirit_root() and element == spirit_root_owner.spirit_root
+
+
+func get_spirit_root_modified_value(value: int) -> int:
+	if value <= 0 or not is_selected_spirit_root_element():
+		return value
+
+	return spirit_root_owner.get_spirit_root_modified_value(value)
+
+
+func get_spirit_root_primary_value() -> int:
+	return 0
+
+
+func reduce_cost_for_turn(amount: int) -> void:
+	if amount <= 0 or cost <= 0:
+		return
+
+	var reduction := mini(amount, cost)
+	cost -= reduction
+	temporary_cost_reduction += reduction
+
+
+func reset_temporary_cost() -> void:
+	if temporary_cost_reduction <= 0:
+		return
+
+	cost += temporary_cost_reduction
+	temporary_cost_reduction = 0
+
+
 func get_element_name() -> String:
 	match element:
 		Element.METAL:
@@ -94,6 +133,17 @@ func get_element_name() -> String:
 			return "土"
 		_:
 			return "无"
+
+
+func get_element_tooltip() -> String:
+	var text := "[center]元素：%s" % get_element_name()
+	if is_selected_spirit_root_element():
+		text += "  |  灵根%s  |  同元素牌：%s" % [
+			spirit_root_owner.get_spirit_root_stage_name(),
+			spirit_root_owner.count_spirit_root_cards()
+		]
+	text += "[/center]"
+	return text
 
 
 func can_upgrade() -> bool:

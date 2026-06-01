@@ -103,7 +103,7 @@ func _collect_enemies():
 func _collect_statuses():
 	var result = []
 	var status_names = ["exposed", "muscle", "qi_flow", "true_strength_form",
-						"bleed", "sword_intent", "energy_charge", "sword_guard"]
+						"bleed", "sword_intent", "energy_charge", "sword_guard", "true_essence"]
 	for status_id in status_names:
 		var res = load("res://statuses/%s.tres" % status_id)
 		if res is Status:
@@ -227,6 +227,7 @@ func _status_display_name(id):
 		"sword_intent": return "剑意"
 		"energy_charge": return "凝气"
 		"sword_guard": return "剑阵"
+		"true_essence": return "真元"
 		_: return id
 
 

@@ -6,7 +6,7 @@ extends Card
 
 func get_default_tooltip() -> String:
 	var total := _calculate_total_damage()
-	return tooltip_text % [base_damage, total]
+	return tooltip_text % [get_spirit_root_modified_value(base_damage), total]
 
 
 func get_updated_tooltip(player_modifiers: ModifierHandler, enemy_modifiers: ModifierHandler) -> String:
@@ -14,7 +14,7 @@ func get_updated_tooltip(player_modifiers: ModifierHandler, enemy_modifiers: Mod
 	total = player_modifiers.get_modified_value(total, Modifier.Type.DMG_DEALT)
 	if enemy_modifiers:
 		total = enemy_modifiers.get_modified_value(total, Modifier.Type.DMG_TAKEN)
-	return tooltip_text % [base_damage, total]
+	return tooltip_text % [get_spirit_root_modified_value(base_damage), total]
 
 
 func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
@@ -29,7 +29,7 @@ func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
 
 func _calculate_total_damage() -> int:
 	var muscle_stacks := _get_muscle_stacks()
-	return base_damage + (muscle_stacks * bonus_per_muscle)
+	return get_spirit_root_modified_value(base_damage) + (muscle_stacks * get_spirit_root_modified_value(bonus_per_muscle))
 
 
 func _get_muscle_stacks() -> int:
@@ -51,3 +51,7 @@ func _get_muscle_stacks() -> int:
 func _upgrade_values() -> void:
 	base_damage = _upgrade_number(base_damage)
 	bonus_per_muscle = _upgrade_number(bonus_per_muscle)
+
+
+func get_spirit_root_primary_value() -> int:
+	return _calculate_total_damage()

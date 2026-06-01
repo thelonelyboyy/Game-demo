@@ -26,6 +26,8 @@ func set_card(value: Card) -> void:
 
 	cost.text = str(card.cost)
 	card_name.text = card.get_display_name()
+	if card.element != Card.Element.NONE:
+		card_name.text = "%s[%s]" % [card.get_display_name(), card.get_element_name()]
 	description.text = card.get_default_tooltip().replace(
 		"[center][b]%s[/b]\n" % card.get_display_name(),
 		"[center]"

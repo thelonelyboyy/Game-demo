@@ -6,11 +6,11 @@ const SWORD_INTENT_STATUS := preload("res://statuses/sword_intent.tres")
 
 
 func get_default_tooltip() -> String:
-	return tooltip_text % intent_stacks
+	return tooltip_text % get_spirit_root_modified_value(intent_stacks)
 
 
 func get_updated_tooltip(_player_modifiers: ModifierHandler, _enemy_modifiers: ModifierHandler) -> String:
-	return tooltip_text % intent_stacks
+	return tooltip_text % get_spirit_root_modified_value(intent_stacks)
 
 
 func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
@@ -19,7 +19,7 @@ func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
 
 	var status_effect := StatusEffect.new()
 	var intent := SWORD_INTENT_STATUS.duplicate()
-	intent.stacks = intent_stacks
+	intent.stacks = get_spirit_root_modified_value(intent_stacks)
 	status_effect.status = intent
 	status_effect.execute(player_targets)
 
@@ -38,3 +38,7 @@ func _get_tree_from_targets(targets: Array[Node]) -> SceneTree:
 
 func _upgrade_values() -> void:
 	intent_stacks = _upgrade_number(intent_stacks)
+
+
+func get_spirit_root_primary_value() -> int:
+	return get_spirit_root_modified_value(intent_stacks)
