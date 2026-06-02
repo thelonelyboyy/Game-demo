@@ -207,7 +207,7 @@ func _on_event_room_entered(room: Room) -> void:
 
 
 func _on_battle_won() -> void:
-	if map.floors_climbed == MapGenerator.FLOORS:
+	if map.is_final_floor_reached():
 		var win_screen := _change_view(WIN_SCREEN_SCENE) as WinScreen
 		win_screen.character = character
 		SaveGame.delete_data()

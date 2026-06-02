@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://b362c35jf6fmy"]
+[gd_scene load_steps=8 format=3 uid="uid://b362c35jf6fmy"]
 
 [ext_resource type="Theme" uid="uid://c8cqncsqlplyu" path="res://main_theme.tres" id="1_hiimn"]
 [ext_resource type="StyleBox" uid="uid://b4b3e0d14kvmi" path="res://scenes/card_ui/card_base_stylebox.tres" id="2_nvr8g"]
@@ -7,8 +7,20 @@
 [ext_resource type="Texture2D" uid="uid://c6rme2o6dyaoj" path="res://art/tile_0104.png" id="3_wd32c"]
 [ext_resource type="Texture2D" uid="uid://du7r7v1iaahuo" path="res://art/rarity.png" id="4_w0uhs"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_art"]
+bg_color = Color(0.19, 0.18, 0.14, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.46, 0.36, 0.18, 0.9)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [node name="CardVisuals" type="Control"]
-custom_minimum_size = Vector2(125, 180)
+custom_minimum_size = Vector2(160, 230)
 layout_mode = 3
 anchors_preset = 0
 theme = ExtResource("1_hiimn")
@@ -25,13 +37,26 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = ExtResource("2_nvr8g")
 
+[node name="ArtFrame" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 44.0
+offset_right = -16.0
+offset_bottom = 137.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_art")
+
 [node name="Cost" type="Label" parent="."]
 layout_mode = 0
 offset_left = 8.0
 offset_top = 6.0
-offset_right = 38.0
-offset_bottom = 36.0
-theme_override_font_sizes/font_size = 24
+offset_right = 42.0
+offset_bottom = 42.0
+theme_override_colors/font_color = Color(0.97, 0.9, 0.65, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.65)
+theme_override_font_sizes/font_size = 28
 text = "2"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -43,10 +68,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -30.0
-offset_top = -54.0
-offset_right = 30.0
-offset_bottom = 6.0
+offset_left = -36.0
+offset_top = -74.0
+offset_right = 36.0
+offset_bottom = -2.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -60,14 +85,15 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = -62.0
-offset_right = -8.0
-offset_bottom = -36.0
+offset_left = 10.0
+offset_top = -84.0
+offset_right = -10.0
+offset_bottom = -56.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_font_sizes/font_size = 18
-text = "斩击"
+theme_override_colors/font_color = Color(0.16, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 20
+text = "打击"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
@@ -78,12 +104,13 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = -38.0
-offset_right = -8.0
-offset_bottom = -8.0
+offset_left = 10.0
+offset_top = -56.0
+offset_right = -10.0
+offset_bottom = -10.0
 mouse_filter = 2
-theme_override_font_sizes/normal_font_size = 13
+theme_override_colors/default_color = Color(0.12, 0.1, 0.07, 1)
+theme_override_font_sizes/normal_font_size = 15
 bbcode_enabled = true
 text = "造成 6 点伤害。"
 fit_content = true
@@ -95,10 +122,22 @@ anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -22.0
-offset_top = 8.0
+offset_top = 42.0
 offset_right = -8.0
-offset_bottom = 22.0
+offset_bottom = 56.0
 grow_horizontal = 0
 texture = ExtResource("4_w0uhs")
 expand_mode = 1
 stretch_mode = 5
+
+[node name="ElementTag" type="Label" parent="."]
+layout_mode = 0
+offset_left = 110.0
+offset_top = 8.0
+offset_right = 150.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(0.96, 0.86, 0.62, 1)
+theme_override_font_sizes/font_size = 15
+text = "火"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -13,6 +13,7 @@ extends CanvasLayer
 
 
 func _ready() -> void:
+	_polish_ui()
 	Events.player_hand_drawn.connect(_on_player_hand_drawn)
 	end_turn_button.pressed.connect(_on_end_turn_button_pressed)
 	draw_pile_button.pressed.connect(draw_pile_view.show_current_view.bind("抽牌堆", true))
@@ -39,3 +40,30 @@ func _on_player_hand_drawn() -> void:
 func _on_end_turn_button_pressed() -> void:
 	end_turn_button.disabled = true
 	Events.player_turn_ended.emit()
+
+
+func _polish_ui() -> void:
+	var top_band := ColorRect.new()
+	top_band.name = "TopInkBand"
+	top_band.color = Color(0.05, 0.055, 0.05, 0.72)
+	top_band.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top_band.anchor_right = 1.0
+	top_band.offset_bottom = 76.0
+	add_child(top_band)
+	move_child(top_band, 0)
+
+	var hand_band := ColorRect.new()
+	hand_band.name = "HandInkBand"
+	hand_band.color = Color(0.055, 0.050, 0.043, 0.82)
+	hand_band.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hand_band.anchor_right = 1.0
+	hand_band.anchor_top = 1.0
+	hand_band.anchor_bottom = 1.0
+	hand_band.offset_top = -272.0
+	add_child(hand_band)
+	move_child(hand_band, 1)
+
+	InkTheme.apply_button(end_turn_button, true)
+	InkTheme.apply_panel(mana_ui)
+	draw_pile_button.modulate = Color(0.95, 0.86, 0.62, 0.96)
+	discard_pile_button.modulate = Color(0.95, 0.86, 0.62, 0.96)

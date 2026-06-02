@@ -176,7 +176,7 @@ func get_upgrade_description() -> String:
 
 	match upgrade_type:
 		UpgradeType.STAT_BOOST:
-			return "突破方向：数值提升 50%，向上取整"
+			return "突破方向：数值提高 50%，向上取整"
 		UpgradeType.COST_REDUCTION:
 			return "突破方向：费用减少 1 点"
 		_:
