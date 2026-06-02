@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CardPile" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="CardPile" load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/card_pile.gd" id="1"]
 [ext_resource type="Script" path="res://custom_resources/card.gd" id="2"]
@@ -7,7 +7,15 @@
 [ext_resource type="Resource" path="res://characters/body_cultivator/cards/collapsing_palm.tres" id="5"]
 [ext_resource type="Resource" path="res://characters/body_cultivator/cards/bone_tempering.tres" id="6"]
 [ext_resource type="Resource" path="res://characters/body_cultivator/cards/vajra_body.tres" id="7"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/cards/body_iron_mountain.tres" id="8"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/cards/body_earth_shake.tres" id="9"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/cards/body_fortress.tres" id="10"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/cards/body_breaking_fist.tres" id="11"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/cards/body_berserk.tres" id="12"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/cards/body_immovable.tres" id="13"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/cards/body_blood_rage.tres" id="14"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/cards/body_golden_body.tres" id="15"]
 
 [resource]
 script = ExtResource("1")
-cards = Array[ExtResource("2")]([ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("4"), ExtResource("4"), ExtResource("4"), ExtResource("5"), ExtResource("5"), ExtResource("6"), ExtResource("6"), ExtResource("7"), ExtResource("7")])
+cards = Array[ExtResource("2")]([ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("4"), ExtResource("4"), ExtResource("4"), ExtResource("5"), ExtResource("5"), ExtResource("6"), ExtResource("6"), ExtResource("7"), ExtResource("7"), ExtResource("8"), ExtResource("8"), ExtResource("9"), ExtResource("9"), ExtResource("10"), ExtResource("10"), ExtResource("10"), ExtResource("11"), ExtResource("11"), ExtResource("12"), ExtResource("12"), ExtResource("13"), ExtResource("13"), ExtResource("14"), ExtResource("14"), ExtResource("15")])

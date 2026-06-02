@@ -5,3 +5,4 @@ enum Type {NEW_RUN, CONTINUED_RUN}
 
 @export var run_init_type: Type
 @export var picked_character: CharacterStats
+@export var selected_spirit_root: Card.Element = Card.Element.NONE

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0096.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/slash.ogg" id="3"]
+
+[resource]
+script = ExtResource("1")
+base_damage = 3
+cards_to_draw = 1
+effect_text = "造成 {damage} 点伤害，抽 {draw} 张牌。"
+id = "sword_shadow_strike"
+type = 0
+rarity = 1
+target = 1
+cost = 0
+upgrade_type = 1
+element = 1
+display_name = "瞬影剑"
+icon = ExtResource("2")
+sound = ExtResource("3")

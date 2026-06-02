@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/event_rooms/helpful_boi_event.gd" id="1_7infd"]
 [ext_resource type="PackedScene" uid="uid://br2rpgkb7gbxr" path="res://scenes/event_rooms/event_room_button.tscn" id="1_850a0"]
 [ext_resource type="Texture2D" uid="uid://b1nj6u7dxl3mh" path="res://art/tile_0085.png" id="2_0pbu5"]
-[ext_resource type="Resource" uid="uid://sbkc4o401k4l" path="res://characters/warrior/warrior.tres" id="2_f8c4o"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/body_cultivator.tres" id="2_f8c4o"]
 
 [node name="HelpfulBoiEvent" type="Control"]
 layout_mode = 3
@@ -22,7 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.193175, 0.0730171, 0.1516, 0.741176)
+color = Color(0.06, 0.06, 0.06, 0.9)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1

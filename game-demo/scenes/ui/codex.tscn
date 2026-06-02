@@ -1,0 +1,181 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/codex.gd" id="1_codex"]
+[ext_resource type="PackedScene" uid="uid://trmdo65td4t7" path="res://scenes/ui/card_menu_ui.tscn" id="2_card"]
+
+[node name="Codex" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_codex")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.05, 0.95)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "修真图鉴"
+horizontal_alignment = 1
+
+[node name="TabBar" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="CardsTab" type="Button" parent="VBoxContainer/TabBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "卡牌"
+
+[node name="EnemiesTab" type="Button" parent="VBoxContainer/TabBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "怪物"
+
+[node name="StatusesTab" type="Button" parent="VBoxContainer/TabBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "词条"
+
+[node name="ClassFilterBar" type="HBoxContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="AllFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 32)
+layout_mode = 2
+text = "全部"
+
+[node name="BodyFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 32)
+layout_mode = 2
+text = "体修"
+
+[node name="SwordFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 32)
+layout_mode = 2
+text = "剑修"
+
+[node name="DemonicFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 32)
+layout_mode = 2
+text = "魔修"
+
+[node name="BeastFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 32)
+layout_mode = 2
+text = "驭兽"
+
+[node name="CommonFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 32)
+layout_mode = 2
+text = "通用"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContentGrid" type="GridContainer" parent="VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+
+[node name="BackButton" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "返回"
+
+[node name="DetailPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -160.0
+offset_right = 200.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="DetailPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DetailPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DetailIcon" type="TextureRect" parent="DetailPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DetailTitle" type="Label" parent="DetailPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "详情"
+horizontal_alignment = 1
+
+[node name="DetailText" type="RichTextLabel" parent="DetailPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+fit_content = true
+
+[node name="DetailCloseButton" type="Button" parent="DetailPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "关闭"

@@ -1,10 +1,13 @@
 class_name MapGenerator
 extends Node
 
-const X_DIST := 30
-const Y_DIST := 25
-const PLACEMENT_RANDOMNESS := 5
+enum MapMode {TEST_LINEAR, ROGUELIKE}
+
+const X_DIST := 45
+const Y_DIST := 40
+const PLACEMENT_RANDOMNESS := 4
 const FLOORS := 15
+const TEST_FLOORS := 5
 const MAP_WIDTH := 7
 const PATHS := 6
 const MONSTER_ROOM_WEIGHT := 12.0
@@ -12,6 +15,7 @@ const EVENT_ROOM_WEIGHT := 5.0
 const SHOP_ROOM_WEIGHT := 2.5
 const CAMPFIRE_ROOM_WEIGHT := 4.0
 
+@export var map_mode: MapMode = MapMode.TEST_LINEAR
 @export var battle_stats_pool: BattleStatsPool
 @export var event_room_pool: EventRoomPool
 
@@ -26,7 +30,12 @@ var map_data: Array[Array]
 
 
 func generate_map() -> Array[Array]:
-	map_data = _generate_initial_grid()
+	battle_stats_pool.setup()
+
+	if map_mode == MapMode.TEST_LINEAR:
+		return _generate_test_linear_map()
+
+	map_data = _generate_initial_grid(FLOORS)
 	var starting_points := _get_random_starting_points()
 	
 	for j in starting_points:
@@ -34,8 +43,6 @@ func generate_map() -> Array[Array]:
 		for i in FLOORS - 1:
 			current_j = _setup_connection(i, current_j)
 			
-	battle_stats_pool.setup()
-	
 	_setup_boss_room()
 	_setup_random_room_weights()
 	_setup_room_types()
@@ -43,22 +50,52 @@ func generate_map() -> Array[Array]:
 	return map_data
 
 
-func _generate_initial_grid() -> Array[Array]:
+func _generate_test_linear_map() -> Array[Array]:
+	map_data = _generate_initial_grid(TEST_FLOORS, false)
+	var middle := floori(MAP_WIDTH * 0.5)
+	var room_types := [
+		Room.Type.MONSTER,
+		Room.Type.CAMPFIRE,
+		Room.Type.SHOP,
+		Room.Type.EVENT,
+		Room.Type.BOSS,
+	]
+
+	for i in TEST_FLOORS:
+		var room := map_data[i][middle] as Room
+		room.type = room_types[i]
+		room.position = Vector2(middle * X_DIST, i * -Y_DIST)
+
+		if room.type == Room.Type.MONSTER:
+			room.battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
+		elif room.type == Room.Type.BOSS:
+			room.battle_stats = battle_stats_pool.get_random_battle_for_tier(2)
+		elif room.type == Room.Type.EVENT:
+			room.event_scene = event_room_pool.get_random()
+
+		if i < TEST_FLOORS - 1:
+			var next_room := map_data[i + 1][middle] as Room
+			room.next_rooms.append(next_room)
+
+	return map_data
+
+
+func _generate_initial_grid(floors: int, randomize_position := true) -> Array[Array]:
 	var result: Array[Array] = []
 	
-	for i in FLOORS:
+	for i in floors:
 		var adjacent_rooms: Array[Room]= []
 		
 		for j in MAP_WIDTH:
 			var current_room := Room.new()
-			var offset := Vector2(randf(), randf()) * PLACEMENT_RANDOMNESS
+			var offset := Vector2(randf(), randf()) * PLACEMENT_RANDOMNESS if randomize_position else Vector2.ZERO
 			current_room.position = Vector2(j * X_DIST, i * -Y_DIST) + offset
 			current_room.row = i
 			current_room.column = j
 			current_room.next_rooms = []
 			
 			# Boss room has a non-random Y
-			if i == FLOORS - 1:
+			if i == floors - 1:
 				current_room.position.y = (i + 1) * -Y_DIST
 			
 			adjacent_rooms.append(current_room)

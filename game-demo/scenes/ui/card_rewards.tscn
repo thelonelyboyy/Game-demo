@@ -3,9 +3,9 @@
 [ext_resource type="Script" path="res://scenes/ui/card_rewards.gd" id="1_okwb6"]
 [ext_resource type="PackedScene" uid="uid://trmdo65td4t7" path="res://scenes/ui/card_menu_ui.tscn" id="1_spfg3"]
 [ext_resource type="PackedScene" uid="uid://c743ur8hoxsn5" path="res://scenes/ui/card_tooltip_popup.tscn" id="2_738we"]
-[ext_resource type="Resource" uid="uid://n3va254ct6b3" path="res://characters/warrior/cards/warrior_slash.tres" id="2_o7v21"]
-[ext_resource type="Resource" uid="uid://d20gx8xpmgpdi" path="res://characters/warrior/cards/warrior_big_slam.tres" id="3_k78il"]
-[ext_resource type="Resource" uid="uid://c8g8a5tx1sr2p" path="res://characters/warrior/cards/warrior_true_strength.tres" id="4_iwxg7"]
+[ext_resource type="Resource" path="res://common_cards/strike.tres" id="2_o7v21"]
+[ext_resource type="Resource" path="res://common_cards/defend.tres" id="3_k78il"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/cards/bone_tempering.tres" id="4_iwxg7"]
 
 [node name="CardRewards" type="ColorRect"]
 anchors_preset = 15
@@ -13,7 +13,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.666667)
+color = Color(0.05, 0.05, 0.05, 0.9)
 script = ExtResource("1_okwb6")
 rewards = Array[Resource("res://custom_resources/card.gd")]([ExtResource("2_o7v21"), ExtResource("3_k78il"), ExtResource("4_iwxg7")])
 
@@ -56,7 +56,7 @@ text = "跳过"
 [node name="CardTooltipPopup" parent="." instance=ExtResource("2_738we")]
 visible = false
 layout_mode = 1
-background_color = Color(0.298039, 0.129412, 0.2, 0.784314)
+background_color = Color(0.1, 0.1, 0.1, 0.85)
 
 [node name="TakeButton" type="Button" parent="CardTooltipPopup"]
 unique_name_in_owner = true

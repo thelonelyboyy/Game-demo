@@ -5,6 +5,8 @@ signal card_pile_size_changed(cards_amount)
 
 @export var cards: Array[Card] = []
 
+var owner_stats: CharacterStats
+
 
 func empty() -> bool:
 	return cards.is_empty()
@@ -17,6 +19,8 @@ func draw_card() -> Card:
 
 
 func add_card(card: Card) -> void:
+	if owner_stats and card:
+		card.bind_spirit_root_owner(owner_stats)
 	cards.append(card)
 	card_pile_size_changed.emit(cards.size())
 
@@ -50,6 +54,19 @@ func custom_duplicate() -> CardPile:
 	new_card_pile.cards = duplicate_cards()
 	
 	return new_card_pile
+
+
+func bind_cards_to_owner(stats: CharacterStats) -> void:
+	owner_stats = stats
+	for card: Card in cards:
+		if card:
+			card.bind_spirit_root_owner(stats)
+
+
+func reset_temporary_card_costs() -> void:
+	for card: Card in cards:
+		if card:
+			card.reset_temporary_cost()
 
 
 func _to_string() -> String:

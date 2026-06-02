@@ -1,12 +1,12 @@
 [gd_scene load_steps=15 format=3 uid="uid://dfrdaou640irp"]
 
 [ext_resource type="Script" path="res://scenes/campfire/campfire.gd" id="1_i8fph"]
-[ext_resource type="Resource" uid="uid://sbkc4o401k4l" path="res://characters/warrior/warrior.tres" id="2_0gfpy"]
+[ext_resource type="Resource" path="res://characters/body_cultivator/body_cultivator.tres" id="2_0gfpy"]
 [ext_resource type="Texture2D" uid="uid://djbldcvfo4swr" path="res://art/line.png" id="2_ykw02"]
 
 [sub_resource type="Gradient" id="Gradient_lx464"]
 offsets = PackedFloat32Array(0.2125, 1)
-colors = PackedColorArray(0.0291667, 0.0291667, 0.0291667, 1, 0.258824, 0.145098, 0.133333, 1)
+colors = PackedColorArray(0.06, 0.06, 0.06, 1, 0.1, 0.1, 0.1, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_6orn2"]
 gradient = SubResource("Gradient_lx464")
@@ -185,6 +185,13 @@ custom_minimum_size = Vector2(180, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "调息"
+
+[node name="UpgradeButton" type="Button" parent="UILayer/UI"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "卡牌突破"
 
 [node name="Description" type="Label" parent="UILayer/UI"]
 layout_mode = 2

@@ -7,6 +7,7 @@ const SAVE_PATH := "user://savegame.tres"
 @export var rng_state: int
 @export var run_stats: RunStats
 @export var char_stats: CharacterStats
+@export var spirit_root: Card.Element = Card.Element.NONE
 @export var current_deck: CardPile
 @export var current_health: int
 @export var relics: Array[Relic]

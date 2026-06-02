@@ -1,7 +1,7 @@
 class_name Map
 extends Node2D
 
-const PIXEL_WORLD_SCALE := 5.0
+const MAP_VISUAL_SCALE := 3.0
 const SCROLL_SPEED := 15
 const MAP_ROOM = preload("res://scenes/map/map_room.tscn")
 const MAP_LINE = preload("res://scenes/map/map_line.tscn")
@@ -19,9 +19,11 @@ var camera_edge_y: float
 
 
 func _ready() -> void:
-	visuals.scale = Vector2.ONE * PIXEL_WORLD_SCALE
+	InkTheme.add_backdrop($MapBackground, "map")
+	$MapBackground/Background.hide()
+	visuals.scale = Vector2.ONE * MAP_VISUAL_SCALE
 	camera_2d.offset = get_viewport_rect().size / 2.0
-	camera_edge_y = MapGenerator.Y_DIST * (MapGenerator.FLOORS - 1) * PIXEL_WORLD_SCALE
+	_update_camera_limits()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -29,9 +31,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	
 	if event.is_action_pressed("scroll_up"):
-		camera_2d.position.y -= SCROLL_SPEED * PIXEL_WORLD_SCALE
+		camera_2d.position.y -= SCROLL_SPEED * MAP_VISUAL_SCALE
 	elif event.is_action_pressed("scroll_down"):
-		camera_2d.position.y += SCROLL_SPEED * PIXEL_WORLD_SCALE
+		camera_2d.position.y += SCROLL_SPEED * MAP_VISUAL_SCALE
 
 	camera_2d.position.y = clamp(camera_2d.position.y, -camera_edge_y, 0)
 
@@ -40,6 +42,7 @@ func generate_new_map() -> void:
 	floors_climbed = 0
 	map_data = map_generator.generate_map()
 	create_map()
+	_update_camera_limits()
 
 
 func load_map(map: Array[Array], floors_completed: int, last_room_climbed: Room) -> void:
@@ -47,6 +50,7 @@ func load_map(map: Array[Array], floors_completed: int, last_room_climbed: Room)
 	map_data = map
 	last_room = last_room_climbed
 	create_map()
+	_update_camera_limits()
 	
 	if floors_climbed > 0:
 		unlock_next_rooms()
@@ -61,12 +65,17 @@ func create_map() -> void:
 				_spawn_room(room)
 	
 	# Boss room has no next room but we need to spawn it
-	var middle := floori(MapGenerator.MAP_WIDTH * 0.5)
-	_spawn_room(map_data[MapGenerator.FLOORS-1][middle])
+	var last_floor := map_data.size() - 1
+	var middle := floori(map_data[last_floor].size() * 0.5)
+	_spawn_room(map_data[last_floor][middle])
 
-	var map_width_pixels := MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1) * PIXEL_WORLD_SCALE
+	var map_width_pixels: float = MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1) * MAP_VISUAL_SCALE
+	var map_height_pixels: float = MapGenerator.Y_DIST * maxi(get_floor_count() - 1, 0) * MAP_VISUAL_SCALE
 	visuals.position.x = (get_viewport_rect().size.x - map_width_pixels) / 2
-	visuals.position.y = get_viewport_rect().size.y / 2
+	visuals.position.y = minf(
+		get_viewport_rect().size.y * 0.84,
+		(get_viewport_rect().size.y + map_height_pixels) / 2.0
+	)
 
 
 func unlock_floor(which_floor: int = floors_climbed) -> void:
@@ -111,6 +120,10 @@ func _connect_lines(room: Room) -> void:
 		var new_map_line := MAP_LINE.instantiate() as Line2D
 		new_map_line.add_point(room.position)
 		new_map_line.add_point(next.position)
+		new_map_line.texture = null
+		new_map_line.width = 2.35
+		new_map_line.default_color = Color(0.92, 0.78, 0.42, 0.78)
+		new_map_line.antialiased = true
 		lines.add_child(new_map_line)
 
 
@@ -124,3 +137,17 @@ func _on_map_room_selected(room: Room) -> void:
 	last_room = room
 	floors_climbed += 1
 	Events.map_exited.emit(room)
+
+
+func get_floor_count() -> int:
+	if map_data:
+		return map_data.size()
+	return MapGenerator.FLOORS
+
+
+func is_final_floor_reached() -> bool:
+	return floors_climbed >= get_floor_count()
+
+
+func _update_camera_limits() -> void:
+	camera_edge_y = MapGenerator.Y_DIST * maxi(get_floor_count() - 1, 0) * MAP_VISUAL_SCALE
