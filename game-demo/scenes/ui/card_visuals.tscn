@@ -1,9 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://b362c35jf6fmy"]
+[gd_scene load_steps=7 format=3 uid="uid://b362c35jf6fmy"]
 
 [ext_resource type="Theme" uid="uid://c8cqncsqlplyu" path="res://main_theme.tres" id="1_hiimn"]
 [ext_resource type="StyleBox" uid="uid://b4b3e0d14kvmi" path="res://scenes/card_ui/card_base_stylebox.tres" id="2_nvr8g"]
 [ext_resource type="Script" path="res://scenes/ui/card_visuals.gd" id="2_uk7ay"]
-[ext_resource type="Resource" path="res://common_cards/strike.tres" id="3_t04tx"]
 [ext_resource type="Texture2D" uid="uid://c6rme2o6dyaoj" path="res://art/tile_0104.png" id="3_wd32c"]
 [ext_resource type="Texture2D" uid="uid://du7r7v1iaahuo" path="res://art/rarity.png" id="4_w0uhs"]
 
@@ -25,7 +24,6 @@ layout_mode = 3
 anchors_preset = 0
 theme = ExtResource("1_hiimn")
 script = ExtResource("2_uk7ay")
-card = ExtResource("3_t04tx")
 
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 1

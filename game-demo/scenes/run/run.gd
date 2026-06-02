@@ -7,6 +7,7 @@ const CAMPFIRE_SCENE := preload("res://scenes/campfire/campfire.tscn")
 const SHOP_SCENE := preload("res://scenes/shop/shop.tscn")
 const TREASURE_SCENE = preload("res://scenes/treasure/treasure.tscn")
 const WIN_SCREEN_SCENE := preload("res://scenes/win_screen/win_screen.tscn")
+const SPIRIT_ROOT_BADGE_SCENE := preload("res://scenes/ui/spirit_root_badge.tscn")
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 
 @export var run_startup: RunStartup
@@ -31,6 +32,7 @@ const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 var stats: RunStats
 var character: CharacterStats
 var save_data: SaveGame
+var spirit_root_badge: SpiritRootBadge
 
 
 func _ready() -> void:
@@ -143,6 +145,7 @@ func _setup_top_bar():
 	character.stats_changed.connect(health_ui.update_stats.bind(character))
 	health_ui.update_stats(character)
 	gold_ui.run_stats = stats
+	_setup_spirit_root_badge()
 	
 	relic_handler.add_relic(character.starting_relic)
 	Events.relic_tooltip_requested.connect(relic_tooltip.show_tooltip)
@@ -150,6 +153,16 @@ func _setup_top_bar():
 	deck_button.card_pile = character.deck
 	deck_view.card_pile = character.deck
 	deck_button.pressed.connect(deck_view.show_current_view.bind("牌组"))
+
+
+func _setup_spirit_root_badge() -> void:
+	if not spirit_root_badge:
+		spirit_root_badge = SPIRIT_ROOT_BADGE_SCENE.instantiate() as SpiritRootBadge
+		var bar_items := gold_ui.get_parent()
+		bar_items.add_child(spirit_root_badge)
+		bar_items.move_child(spirit_root_badge, gold_ui.get_index() + 1)
+
+	spirit_root_badge.character = character
 
 
 func _show_regular_battle_rewards() -> void:

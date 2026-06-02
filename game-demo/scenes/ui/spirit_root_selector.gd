@@ -12,6 +12,7 @@ var offered_roots: Array = []
 
 
 func _ready() -> void:
+	_polish_scene()
 	_roll_spirit_roots()
 	_setup_buttons()
 
@@ -36,11 +37,32 @@ func _setup_buttons() -> void:
 		child.queue_free()
 
 	for root in offered_roots:
+		var panel := PanelContainer.new()
+		panel.custom_minimum_size = Vector2(250, 220)
+		InkTheme.apply_panel(panel)
+		buttons.add_child(panel)
+
+		var content := VBoxContainer.new()
+		content.add_theme_constant_override("separation", 14)
+		panel.add_child(content)
+
 		var button := Button.new()
-		button.custom_minimum_size = Vector2(180, 96)
-		button.text = "%s灵根" % _get_element_name(root)
+		button.custom_minimum_size = Vector2(210, 72)
+		button.text = "%s灵根" % SpiritRootText.element_name(root)
+		InkTheme.apply_button(button, true)
+		button.add_theme_color_override("font_color", SpiritRootText.element_color(root))
 		button.pressed.connect(_on_root_selected.bind(root))
-		buttons.add_child(button)
+		content.add_child(button)
+
+		var effect := Label.new()
+		effect.text = SpiritRootText.perfect_effect(root)
+		effect.custom_minimum_size = Vector2(210, 104)
+		effect.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		effect.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		effect.add_theme_font_size_override("font_size", 18)
+		effect.add_theme_color_override("font_color", Color("eee7d2"))
+		content.add_child(effect)
 
 
 func _on_root_selected(root: Card.Element) -> void:
@@ -49,17 +71,8 @@ func _on_root_selected(root: Card.Element) -> void:
 	get_tree().change_scene_to_packed(RUN_SCENE)
 
 
-func _get_element_name(root: Card.Element) -> String:
-	match root:
-		Card.Element.METAL:
-			return "金"
-		Card.Element.WOOD:
-			return "木"
-		Card.Element.WATER:
-			return "水"
-		Card.Element.FIRE:
-			return "火"
-		Card.Element.EARTH:
-			return "土"
-		_:
-			return "无"
+func _polish_scene() -> void:
+	InkTheme.add_backdrop(self, "character")
+	$Background.hide()
+	InkTheme.apply_title(title, 56)
+	InkTheme.apply_body_label(description, 22)

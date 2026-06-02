@@ -20,8 +20,8 @@ func get_updated_tooltip(player_modifiers: ModifierHandler, enemy_modifiers: Mod
 func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
 	var total_damage := get_spirit_root_modified_value(base_damage)
 
-	for target in targets:
-		if target is Enemy and _has_bleed(target):
+	for hit_target in targets:
+		if hit_target is Enemy and _has_bleed(hit_target):
 			total_damage += get_spirit_root_modified_value(bonus_damage)
 			break
 

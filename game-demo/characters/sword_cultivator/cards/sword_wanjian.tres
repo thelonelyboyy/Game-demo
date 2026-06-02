@@ -18,5 +18,5 @@ exhausts = false
 upgrade_type = 2
 element = 1
 icon = ExtResource("2")
-tooltip_text = "[center]造成 %s 点基础伤害。每有 1 层劲气，额外造成 2 点伤害。[/center]"
+tooltip_text = "[center]造成 %s 点基础伤害。总伤害：%s。每有 1 层劲气，额外造成 2 点伤害。[/center]"
 sound = ExtResource("3")
