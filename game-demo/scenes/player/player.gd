@@ -2,6 +2,7 @@ class_name Player
 extends Node2D
 
 const WHITE_SPRITE_MATERIAL := preload("res://art/white_sprite_material.tres")
+const MAX_BATTLE_ART_HEIGHT := 34.0
 
 @export var stats: CharacterStats : set = set_character_stats
 
@@ -31,7 +32,21 @@ func update_player() -> void:
 		await ready
 
 	sprite_2d.texture = stats.art
+	_fit_sprite_to_battle_height()
 	update_stats()
+
+
+func _fit_sprite_to_battle_height() -> void:
+	sprite_2d.scale = Vector2.ONE
+	if not sprite_2d.texture:
+		return
+
+	var texture_size := sprite_2d.texture.get_size()
+	if texture_size.y <= MAX_BATTLE_ART_HEIGHT:
+		return
+
+	var art_scale := MAX_BATTLE_ART_HEIGHT / texture_size.y
+	sprite_2d.scale = Vector2.ONE * art_scale
 
 
 func update_stats() -> void:

@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CharacterStats" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/character_stats.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/tile_0090.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/beastmaster_portrait.png" id="2"]
 [ext_resource type="Resource" path="res://characters/beastmaster/beastmaster_starting_deck.tres" id="3"]
 [ext_resource type="Resource" path="res://characters/beastmaster/beastmaster_draftable_cards.tres" id="4"]
 [ext_resource type="Resource" path="res://relics/confusing_staff.tres" id="5"]
