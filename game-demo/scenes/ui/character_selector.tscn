@@ -79,15 +79,15 @@ autowrap_mode = 3
 
 [node name="CharacterPortrait" type="TextureRect" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 260)
+custom_minimum_size = Vector2(390, 390)
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 86.0
-offset_top = -380.0
-offset_right = 346.0
-offset_bottom = -120.0
+offset_left = 48.0
+offset_top = -500.0
+offset_right = 438.0
+offset_bottom = -110.0
 grow_vertical = 0
 texture = ExtResource("4_bt743")
 expand_mode = 1

@@ -12,6 +12,10 @@ extends Control
 @onready var element_tag: Label = $ElementTag
 
 
+func _ready() -> void:
+	ignore_mouse_input(self)
+
+
 func set_card(value: Card) -> void:
 	if not is_node_ready():
 		await ready
@@ -48,6 +52,14 @@ func _clean_card_text(value: String) -> String:
 	text = text.replace("[b]", "")
 	text = text.replace("[/b]", "")
 	return text.strip_edges()
+
+
+func ignore_mouse_input(node: Node) -> void:
+	if node is Control:
+		node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	for child in node.get_children():
+		ignore_mouse_input(child)
 
 
 func _get_element_color(element: Card.Element) -> Color:

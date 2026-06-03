@@ -3,6 +3,7 @@ extends Node2D
 
 const PIXEL_WORLD_SCALE := 5.0
 const SPIRIT_ROOT_HANDLER := preload("res://scenes/battle/spirit_root_handler.gd")
+const BATTLE_BACKGROUND := preload("res://test2.png")
 
 @export var battle_stats: BattleStats
 @export var char_stats: CharacterStats
@@ -116,9 +117,30 @@ func _setup_spirit_root_handler() -> void:
 func _setup_ink_backdrop() -> void:
 	var layer := CanvasLayer.new()
 	layer.name = "InkBattleBackdrop"
-	layer.layer = -10
+	layer.layer = -1
 	add_child(layer)
-	InkTheme.add_backdrop(layer, "battle")
+
+	var background := TextureRect.new()
+	background.name = "Background"
+	background.texture = BATTLE_BACKGROUND
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(background)
+	_fit_battle_background(background)
+	get_viewport().size_changed.connect(_fit_battle_background.bind(background))
+
+
+func _fit_battle_background(background: TextureRect) -> void:
+	if not is_instance_valid(background):
+		return
+
+	background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	background.offset_left = 0.0
+	background.offset_top = 0.0
+	background.offset_right = 0.0
+	background.offset_bottom = 0.0
+	background.size = get_viewport_rect().size
 
 
 func _prepare_combatant_presentation(world_node: Node, is_player := false) -> void:

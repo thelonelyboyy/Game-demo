@@ -5,6 +5,7 @@ const BODY_CULTIVATOR_STATS := preload("res://characters/body_cultivator/body_cu
 const SWORD_CULTIVATOR_STATS := preload("res://characters/sword_cultivator/sword_cultivator.tres")
 const DEMONIC_CULTIVATOR_STATS := preload("res://characters/demonic_cultivator/demonic_cultivator.tres")
 const BEASTMASTER_STATS := preload("res://characters/beastmaster/beastmaster.tres")
+const SELECTOR_BACKGROUND := preload("res://test1.png")
 
 @export var run_startup: RunStartup
 
@@ -51,9 +52,17 @@ func _on_beastmaster_button_pressed() -> void:
 	current_character = BEASTMASTER_STATS
 
 
+func _apply_custom_background() -> void:
+	var background := $Background as TextureRect
+	background.texture = SELECTOR_BACKGROUND
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	background.show()
+
+
 func _polish_scene() -> void:
-	InkTheme.add_backdrop(self, "character")
-	$Background.hide()
+	_apply_custom_background()
 	InkTheme.apply_title(title, 56)
 	InkTheme.apply_body_label(description, 24)
 	InkTheme.apply_button($StartButton, true)

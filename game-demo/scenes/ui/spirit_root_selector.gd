@@ -1,6 +1,7 @@
 extends Control
 
 const RUN_SCENE := preload("res://scenes/run/run.tscn")
+const SELECTOR_BACKGROUND := preload("res://test1.png")
 
 @export var run_startup: RunStartup
 
@@ -72,7 +73,15 @@ func _on_root_selected(root: Card.Element) -> void:
 
 
 func _polish_scene() -> void:
-	InkTheme.add_backdrop(self, "character")
-	$Background.hide()
+	_apply_custom_background()
 	InkTheme.apply_title(title, 56)
 	InkTheme.apply_body_label(description, 22)
+
+
+func _apply_custom_background() -> void:
+	var background := $Background as TextureRect
+	background.texture = SELECTOR_BACKGROUND
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	background.show()

@@ -1,7 +1,7 @@
 class_name Map
 extends Node2D
 
-const MAP_VISUAL_SCALE := 3.0
+const MAP_VISUAL_SCALE := 3.35
 const SCROLL_SPEED := 15
 const MAP_ROOM = preload("res://scenes/map/map_room.tscn")
 const MAP_LINE = preload("res://scenes/map/map_line.tscn")
@@ -83,11 +83,15 @@ func unlock_floor(which_floor: int = floors_climbed) -> void:
 		if map_room.room.row == which_floor:
 			map_room.available = true
 
+	_update_line_states()
+
 
 func unlock_next_rooms() -> void:
 	for map_room: MapRoom in rooms.get_children():
 		if last_room.next_rooms.has(map_room.room):
 			map_room.available = true
+
+	_update_line_states()
 
 
 func show_map() -> void:
@@ -121,10 +125,11 @@ func _connect_lines(room: Room) -> void:
 		new_map_line.add_point(room.position)
 		new_map_line.add_point(next.position)
 		new_map_line.texture = null
-		new_map_line.width = 2.35
-		new_map_line.default_color = Color(0.92, 0.78, 0.42, 0.78)
 		new_map_line.antialiased = true
+		new_map_line.set_meta("from_room", room)
+		new_map_line.set_meta("to_room", next)
 		lines.add_child(new_map_line)
+		_style_map_line(new_map_line, "normal")
 
 
 func _on_map_room_clicked(room: Room) -> void:
@@ -132,10 +137,13 @@ func _on_map_room_clicked(room: Room) -> void:
 		if map_room.room.row == room.row:
 			map_room.available = false
 
+	_update_line_states()
+
 
 func _on_map_room_selected(room: Room) -> void:
 	last_room = room
 	floors_climbed += 1
+	_update_line_states()
 	Events.map_exited.emit(room)
 
 
@@ -151,3 +159,38 @@ func is_final_floor_reached() -> bool:
 
 func _update_camera_limits() -> void:
 	camera_edge_y = MapGenerator.Y_DIST * maxi(get_floor_count() - 1, 0) * MAP_VISUAL_SCALE
+
+
+func _update_line_states() -> void:
+	for line: Line2D in lines.get_children():
+		var from_room := line.get_meta("from_room") as Room
+		var to_room := line.get_meta("to_room") as Room
+
+		if from_room and to_room and from_room.selected and to_room.selected:
+			_style_map_line(line, "selected")
+		elif last_room and from_room == last_room and last_room.next_rooms.has(to_room):
+			_style_map_line(line, "available")
+		elif _is_room_available(from_room):
+			_style_map_line(line, "available")
+		else:
+			_style_map_line(line, "normal")
+
+
+func _style_map_line(line: Line2D, state: String) -> void:
+	match state:
+		"selected":
+			line.width = 3.2
+			line.default_color = Color(1.0, 0.82, 0.32, 0.92)
+		"available":
+			line.width = 2.8
+			line.default_color = Color(0.95, 0.75, 0.36, 0.78)
+		_:
+			line.width = 1.75
+			line.default_color = Color(0.66, 0.56, 0.34, 0.42)
+
+
+func _is_room_available(room_to_check: Room) -> bool:
+	for map_room: MapRoom in rooms.get_children():
+		if map_room.room == room_to_check:
+			return map_room.available
+	return false

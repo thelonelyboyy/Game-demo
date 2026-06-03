@@ -2,7 +2,7 @@ class_name Player
 extends Node2D
 
 const WHITE_SPRITE_MATERIAL := preload("res://art/white_sprite_material.tres")
-const MAX_BATTLE_ART_HEIGHT := 34.0
+const MAX_BATTLE_ART_HEIGHT := 51.0
 
 @export var stats: CharacterStats : set = set_character_stats
 

@@ -75,30 +75,6 @@ custom_minimum_size = Vector2(70, 32)
 layout_mode = 2
 text = "全部"
 
-[node name="BodyFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(70, 32)
-layout_mode = 2
-text = "体修"
-
-[node name="SwordFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(70, 32)
-layout_mode = 2
-text = "剑修"
-
-[node name="DemonicFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(70, 32)
-layout_mode = 2
-text = "魔修"
-
-[node name="BeastFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(70, 32)
-layout_mode = 2
-text = "驭兽"
-
 [node name="CommonFilter" type="Button" parent="VBoxContainer/ClassFilterBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 32)

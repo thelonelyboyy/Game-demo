@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://4tj0qise1som"]
+[gd_scene load_steps=14 format=3 uid="uid://4tj0qise1som"]
 
 [ext_resource type="Script" uid="uid://dxshrpk7a4p53" path="res://scenes/ui/main_menu.gd" id="1_bck1p"]
 [ext_resource type="Texture2D" uid="uid://dpfqok8tuy4r7" path="res://art/tile_0084.png" id="1_uaqd2"]
@@ -118,25 +118,26 @@ scale = Vector2(10, 10)
 texture = ExtResource("7_beast")
 
 [node name="Bat" type="Sprite2D" parent="."]
-position = Vector2(1004, 500)
+position = Vector2(1823, 719)
 scale = Vector2(10, 10)
 texture = ExtResource("4_snr5i")
 flip_h = true
 
 [node name="Crab" type="Sprite2D" parent="."]
-position = Vector2(1050.0001, 635.00006)
+position = Vector2(1804, 867)
 scale = Vector2(10, 10)
 texture = ExtResource("5_pintp")
 flip_h = true
 
 [node name="Ghost" type="Sprite2D" parent="."]
-position = Vector2(1183, 515)
+position = Vector2(1821, 611.00006)
 scale = Vector2(10, 10)
 texture = ExtResource("6_6iwyb")
 flip_h = true
 
 [node name="CodexPanel" parent="." instance=ExtResource("8_codex")]
 visible = false
+layout_mode = 1
 
 [connection signal="pressed" from="VBoxContainer/Continue" to="." method="_on_continue_pressed"]
 [connection signal="pressed" from="VBoxContainer/NewRun" to="." method="_on_new_run_pressed"]
