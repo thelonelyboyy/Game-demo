@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CardFusionLibrary" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/card_fusion_library.gd" id="1"]
+[ext_resource type="Resource" path="res://fusion_recipes/strike_defend_recipe.tres" id="2"]
+[ext_resource type="Resource" path="res://fusion_recipes/flying_guard_recipe.tres" id="3"]
+[ext_resource type="Resource" path="res://fusion_recipes/blood_tiger_recipe.tres" id="4"]
+[ext_resource type="Resource" path="res://fusion_recipes/sword_rain_demon_flame_recipe.tres" id="5"]
+
+[resource]
+script = ExtResource("1")
+recipes = Array[Resource("res://custom_resources/card_fusion_recipe.gd")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5")])

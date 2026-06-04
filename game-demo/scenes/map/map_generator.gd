@@ -1,26 +1,32 @@
 class_name MapGenerator
 extends Node
 
-enum MapMode {TEST_LINEAR, ROGUELIKE}
+enum MapMode {TEST_LINEAR, ROGUELIKE, TEST_ELITE_LINEAR}
 
 const X_DIST := 45
 const Y_DIST := 40
 const PLACEMENT_RANDOMNESS := 4
 const FLOORS := 15
 const TEST_FLOORS := 5
+const TEST_ELITE_FLOORS := 6
 const MAP_WIDTH := 7
 const PATHS := 6
 const MONSTER_ROOM_WEIGHT := 12.0
+const ELITE_ROOM_WEIGHT := 2.4
 const EVENT_ROOM_WEIGHT := 5.0
 const SHOP_ROOM_WEIGHT := 2.5
 const CAMPFIRE_ROOM_WEIGHT := 4.0
+const ELITE_HEALTH_MULTIPLIER := 1.45
+const ELITE_DAMAGE_MULTIPLIER := 1.25
+const ELITE_GOLD_MULTIPLIER := 1.55
 
-@export var map_mode: MapMode = MapMode.TEST_LINEAR
+@export var map_mode: MapMode = MapMode.TEST_ELITE_LINEAR
 @export var battle_stats_pool: BattleStatsPool
 @export var event_room_pool: EventRoomPool
 
 var random_room_type_weights = {
 	Room.Type.MONSTER: 0.0,
+	Room.Type.ELITE: 0.0,
 	Room.Type.CAMPFIRE: 0.0,
 	Room.Type.SHOP: 0.0,
 	Room.Type.EVENT: 0.0
@@ -34,6 +40,8 @@ func generate_map() -> Array[Array]:
 
 	if map_mode == MapMode.TEST_LINEAR:
 		return _generate_test_linear_map()
+	if map_mode == MapMode.TEST_ELITE_LINEAR:
+		return _generate_test_elite_linear_map()
 
 	map_data = _generate_initial_grid(FLOORS)
 	var starting_points := _get_random_starting_points()
@@ -46,6 +54,7 @@ func generate_map() -> Array[Array]:
 	_setup_boss_room()
 	_setup_random_room_weights()
 	_setup_room_types()
+	_ensure_elite_room_exists()
 	
 	return map_data
 
@@ -74,6 +83,39 @@ func _generate_test_linear_map() -> Array[Array]:
 			room.event_scene = event_room_pool.get_random()
 
 		if i < TEST_FLOORS - 1:
+			var next_room := map_data[i + 1][middle] as Room
+			room.next_rooms.append(next_room)
+
+	return map_data
+
+
+func _generate_test_elite_linear_map() -> Array[Array]:
+	map_data = _generate_initial_grid(TEST_ELITE_FLOORS, false)
+	var middle := floori(MAP_WIDTH * 0.5)
+	var room_types := [
+		Room.Type.MONSTER,
+		Room.Type.ELITE,
+		Room.Type.CAMPFIRE,
+		Room.Type.SHOP,
+		Room.Type.EVENT,
+		Room.Type.BOSS,
+	]
+
+	for i in TEST_ELITE_FLOORS:
+		var room := map_data[i][middle] as Room
+		room.type = room_types[i]
+		room.position = Vector2(middle * X_DIST, i * -Y_DIST)
+
+		if room.type == Room.Type.MONSTER:
+			room.battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
+		elif room.type == Room.Type.ELITE:
+			_setup_elite_battle(room)
+		elif room.type == Room.Type.BOSS:
+			room.battle_stats = battle_stats_pool.get_random_battle_for_tier(2)
+		elif room.type == Room.Type.EVENT:
+			room.event_scene = event_room_pool.get_random()
+
+		if i < TEST_ELITE_FLOORS - 1:
 			var next_room := map_data[i + 1][middle] as Room
 			room.next_rooms.append(next_room)
 
@@ -178,8 +220,9 @@ func _setup_boss_room() -> void:
 
 func _setup_random_room_weights() -> void:
 	random_room_type_weights[Room.Type.MONSTER] = MONSTER_ROOM_WEIGHT
-	random_room_type_weights[Room.Type.CAMPFIRE] = MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT
-	random_room_type_weights[Room.Type.SHOP] = MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT + SHOP_ROOM_WEIGHT
+	random_room_type_weights[Room.Type.ELITE] = MONSTER_ROOM_WEIGHT + ELITE_ROOM_WEIGHT
+	random_room_type_weights[Room.Type.CAMPFIRE] = random_room_type_weights[Room.Type.ELITE] + CAMPFIRE_ROOM_WEIGHT
+	random_room_type_weights[Room.Type.SHOP] = random_room_type_weights[Room.Type.CAMPFIRE] + SHOP_ROOM_WEIGHT
 	random_room_type_weights[Room.Type.EVENT] = random_room_type_weights[Room.Type.SHOP] + EVENT_ROOM_WEIGHT
 	
 	random_room_type_total_weight = random_room_type_weights[Room.Type.EVENT]
@@ -214,26 +257,34 @@ func _set_room_randomly(room_to_set: Room) -> void:
 	var campfire_below_4 := true
 	var consecutive_campfire := true
 	var consecutive_shop := true
+	var consecutive_elite := true
+	var elite_too_early_or_late := true
 	var campfire_on_13 := true
 	
 	var type_candidate: Room.Type
 	
-	while campfire_below_4 or consecutive_campfire or consecutive_shop or campfire_on_13:
+	while campfire_below_4 or consecutive_campfire or consecutive_shop or consecutive_elite or elite_too_early_or_late or campfire_on_13:
 		type_candidate = _get_random_room_type_by_weight()
 		
 		var is_campfire := type_candidate == Room.Type.CAMPFIRE
 		var has_campfire_parent := _room_has_parent_of_type(room_to_set, Room.Type.CAMPFIRE)
 		var is_shop := type_candidate == Room.Type.SHOP
 		var has_shop_parent := _room_has_parent_of_type(room_to_set, Room.Type.SHOP)
+		var is_elite := type_candidate == Room.Type.ELITE
+		var has_elite_parent := _room_has_parent_of_type(room_to_set, Room.Type.ELITE)
 		
 		campfire_below_4 = is_campfire and room_to_set.row < 3
 		consecutive_campfire = is_campfire and has_campfire_parent
 		consecutive_shop = is_shop and has_shop_parent
+		consecutive_elite = is_elite and has_elite_parent
+		elite_too_early_or_late = is_elite and (room_to_set.row < 3 or room_to_set.row > 11)
 		campfire_on_13 = is_campfire and room_to_set.row == 12
 		
 	room_to_set.type = type_candidate
 
-	if type_candidate == Room.Type.MONSTER:
+	if type_candidate == Room.Type.ELITE:
+		_setup_elite_battle(room_to_set)
+	elif type_candidate == Room.Type.MONSTER:
 		var tier_for_monster_rooms := 0
 		
 		if room_to_set.row > 2:
@@ -243,6 +294,50 @@ func _set_room_randomly(room_to_set: Room) -> void:
 	
 	if type_candidate == Room.Type.EVENT:
 		room_to_set.event_scene = event_room_pool.get_random()
+
+
+func _setup_elite_battle(room: Room) -> void:
+	var battle_stats := battle_stats_pool.get_random_battle_for_tier(1)
+	if not battle_stats:
+		battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
+	if not battle_stats:
+		return
+
+	room.battle_stats = battle_stats.duplicate() as BattleStats
+	room.battle_stats.enemy_health_multiplier = ELITE_HEALTH_MULTIPLIER
+	room.battle_stats.enemy_damage_multiplier = ELITE_DAMAGE_MULTIPLIER
+	room.battle_stats.gold_reward_min = ceili(room.battle_stats.gold_reward_min * ELITE_GOLD_MULTIPLIER)
+	room.battle_stats.gold_reward_max = ceili(room.battle_stats.gold_reward_max * ELITE_GOLD_MULTIPLIER)
+
+
+func _ensure_elite_room_exists() -> void:
+	if _has_room_type(Room.Type.ELITE):
+		return
+
+	var candidates: Array[Room] = []
+	for row_index in range(3, 12):
+		for room: Room in map_data[row_index]:
+			if room.next_rooms.is_empty():
+				continue
+			if room.type == Room.Type.TREASURE or room.type == Room.Type.CAMPFIRE:
+				continue
+			candidates.append(room)
+
+	if candidates.is_empty():
+		return
+
+	var elite_room := RNG.array_pick_random(candidates) as Room
+	elite_room.type = Room.Type.ELITE
+	_setup_elite_battle(elite_room)
+
+
+func _has_room_type(type: Room.Type) -> bool:
+	for row: Array in map_data:
+		for room: Room in row:
+			if room.type == type:
+				return true
+
+	return false
 
 
 func _room_has_parent_of_type(room: Room, type: Room.Type) -> bool:

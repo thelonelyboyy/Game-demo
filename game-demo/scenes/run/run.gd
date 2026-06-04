@@ -8,6 +8,7 @@ const SHOP_SCENE := preload("res://scenes/shop/shop.tscn")
 const TREASURE_SCENE = preload("res://scenes/treasure/treasure.tscn")
 const WIN_SCREEN_SCENE := preload("res://scenes/win_screen/win_screen.tscn")
 const SPIRIT_ROOT_BADGE_SCENE := preload("res://scenes/ui/spirit_root_badge.tscn")
+const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 
 @export var run_startup: RunStartup
@@ -174,6 +175,17 @@ func _show_regular_battle_rewards() -> void:
 	reward_scene.add_card_reward()
 
 
+func _show_elite_battle_rewards() -> void:
+	var reward_scene := _change_view(BATTLE_REWARD_SCENE) as BattleReward
+	reward_scene.run_stats = stats
+	reward_scene.character_stats = character
+	reward_scene.relic_handler = relic_handler
+
+	reward_scene.add_gold_reward(map.last_room.battle_stats.roll_gold_reward())
+	reward_scene.add_relic_reward(RELIC_REWARD_POOL.get_random_available(character, relic_handler))
+	reward_scene.add_card_fusion_reward()
+
+
 func _on_battle_room_entered(room: Room) -> void:
 	var battle_scene: Battle = _change_view(BATTLE_SCENE) as Battle
 	battle_scene.char_stats = character
@@ -224,6 +236,8 @@ func _on_battle_won() -> void:
 		var win_screen := _change_view(WIN_SCREEN_SCENE) as WinScreen
 		win_screen.character = character
 		SaveGame.delete_data()
+	elif map.last_room and map.last_room.type == Room.Type.ELITE:
+		_show_elite_battle_rewards()
 	else:
 		_show_regular_battle_rewards()
 
@@ -233,6 +247,8 @@ func _on_map_exited(room: Room) -> void:
 	
 	match room.type:
 		Room.Type.MONSTER:
+			_on_battle_room_entered(room)
+		Room.Type.ELITE:
 			_on_battle_room_entered(room)
 		Room.Type.TREASURE:
 			_on_treasure_room_entered()

@@ -14,6 +14,7 @@ const ICONS := {
 	Room.Type.SHOP: [preload("res://art/map/map_shop.png"), ICON_SIZE],
 	Room.Type.BOSS: [preload("res://art/map/map_boss.png"), BOSS_ICON_SIZE],
 	Room.Type.EVENT: [preload("res://art/map/map_event.png"), ICON_SIZE],
+	Room.Type.ELITE: [preload("res://art/map/map_elite.png"), BOSS_ICON_SIZE],
 }
 
 @onready var sprite_2d: Sprite2D = $Visuals/Sprite2D
@@ -74,11 +75,20 @@ func _draw() -> void:
 	var border := Color("a58a4c")
 	var glow := Color(0.78, 0.58, 0.24, 0.20)
 
+	if room.type == Room.Type.ELITE:
+		fill = Color("21100f")
+		inner = Color("4a1a16")
+		border = Color("c99242")
+		glow = Color(0.86, 0.24, 0.13, 0.28)
+
 	if available:
 		fill = Color("2b1d0e")
 		inner = Color("4b3212")
 		border = Color("ffd35a")
 		glow = Color(1.0, 0.68, 0.20, 0.36)
+		if room.type == Room.Type.ELITE:
+			inner = Color("6b2218")
+			glow = Color(1.0, 0.33, 0.18, 0.38)
 	elif room.selected:
 		fill = Color("201b11")
 		inner = Color("3b3018")

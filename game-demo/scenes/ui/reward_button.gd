@@ -3,6 +3,7 @@ extends Button
 
 @export var reward_icon: Texture : set = set_reward_icon
 @export var reward_text: String : set = set_reward_text
+@export var auto_consume := true
 
 @onready var custom_icon: TextureRect = %CustomIcon
 @onready var custom_text: Label = %CustomText
@@ -27,4 +28,7 @@ func set_reward_text(new_text: String) -> void:
 
 
 func _on_pressed() -> void:
+	if not auto_consume:
+		return
+
 	queue_free()

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RelicRewardPool" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/relic_reward_pool.gd" id="1"]
+[ext_resource type="Resource" path="res://relics/explosive_barrel.tres" id="2"]
+[ext_resource type="Resource" path="res://relics/mana_potion.tres" id="3"]
+[ext_resource type="Resource" path="res://relics/reinforced_armor.tres" id="4"]
+[ext_resource type="Resource" path="res://relics/blinding_potion.tres" id="5"]
+[ext_resource type="Resource" path="res://relics/confusing_staff.tres" id="6"]
+[ext_resource type="Resource" path="res://relics/wooden_sword.tres" id="7"]
+[ext_resource type="Resource" path="res://relics/coupons.tres" id="8"]
+
+[resource]
+script = ExtResource("1")
+relics = Array[Resource("res://custom_resources/relic.gd")]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8")])

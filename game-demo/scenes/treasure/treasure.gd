@@ -2,6 +2,7 @@ class_name Treasure
 extends Control
 
 @export var treasure_relic_pool: Array[Relic]
+@export var relic_reward_pool: RelicRewardPool
 @export var relic_handler: RelicHandler
 @export var char_stats: CharacterStats
 
@@ -10,6 +11,10 @@ var found_relic: Relic
 
 
 func generate_relic() -> void:
+	if relic_reward_pool:
+		found_relic = relic_reward_pool.get_random_available(char_stats, relic_handler)
+		return
+
 	var available_relics := treasure_relic_pool.filter(
 		func(relic: Relic):
 			var can_appear := relic.can_appear_as_reward(char_stats)

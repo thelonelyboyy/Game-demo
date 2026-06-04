@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CardFusionRecipe" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/card_fusion_recipe.gd" id="1"]
+[ext_resource type="Resource" path="res://fusion_cards/attack_guard_unity.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+first_card_id = "strike"
+second_card_id = "defend"
+result_card = ExtResource("2")

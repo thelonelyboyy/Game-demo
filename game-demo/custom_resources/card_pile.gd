@@ -25,6 +25,16 @@ func add_card(card: Card) -> void:
 	card_pile_size_changed.emit(cards.size())
 
 
+func remove_card(card: Card) -> bool:
+	var index := cards.find(card)
+	if index == -1:
+		return false
+
+	cards.remove_at(index)
+	card_pile_size_changed.emit(cards.size())
+	return true
+
+
 func shuffle() -> void:
 	RNG.array_shuffle(cards)
 

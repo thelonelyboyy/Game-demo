@@ -22,9 +22,25 @@ func setup_enemies(battle_stats: BattleStats) -> void:
 	for new_enemy: Node2D in all_new_enemies.get_children():
 		var new_enemy_child := new_enemy.duplicate() as Enemy
 		add_child(new_enemy_child)
+		_apply_battle_modifiers(new_enemy_child, battle_stats)
 		new_enemy_child.status_handler.statuses_applied.connect(_on_enemy_statuses_applied.bind(new_enemy_child))
 		
 	all_new_enemies.queue_free()
+
+
+func _apply_battle_modifiers(enemy: Enemy, battle_stats: BattleStats) -> void:
+	if not enemy or not enemy.stats or not battle_stats:
+		return
+
+	if battle_stats.enemy_health_multiplier > 1.0:
+		enemy.stats.max_health = ceili(enemy.stats.max_health * battle_stats.enemy_health_multiplier)
+
+	if battle_stats.enemy_damage_multiplier > 1.0:
+		var damage_modifier := enemy.modifier_handler.get_modifier(Modifier.Type.DMG_DEALT)
+		if damage_modifier:
+			var value := ModifierValue.create_new_modifier("elite_battle", ModifierValue.Type.PERCENT_BASED)
+			value.percent_value = battle_stats.enemy_damage_multiplier - 1.0
+			damage_modifier.add_new_value(value)
 
 
 func reset_enemy_actions() -> void:

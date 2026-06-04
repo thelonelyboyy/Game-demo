@@ -24,6 +24,7 @@ const RARITY_COLORS := {
 @export var upgrade_type: UpgradeType = UpgradeType.NONE
 @export var upgraded := false
 @export var element: Element = Element.NONE
+@export var fusion_level := 0
 
 @export_group("Card Visuals")
 @export var display_name: String
@@ -72,7 +73,11 @@ func apply_effects(_targets: Array[Node], _modifiers: ModifierHandler) -> void:
 
 func get_display_name() -> String:
 	var base_name := display_name if not display_name.is_empty() else id.capitalize()
-	return "%s+" % base_name if upgraded else base_name
+	if upgraded:
+		base_name = "%s+" % base_name
+	if fusion_level > 0:
+		base_name = "%s·合炼%s" % [base_name, fusion_level]
+	return base_name
 
 
 func get_default_tooltip() -> String:

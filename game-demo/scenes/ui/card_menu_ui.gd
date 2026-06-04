@@ -11,6 +11,13 @@ const HOVER_STYLEBOX := preload("res://scenes/card_ui/card_hover_stylebox.tres")
 @onready var visuals: CardVisuals = $Visuals
 
 
+func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	gui_input.connect(_on_visuals_gui_input)
+	mouse_entered.connect(_on_visuals_mouse_entered)
+	mouse_exited.connect(_on_visuals_mouse_exited)
+
+
 func _on_visuals_gui_input(event: InputEvent) -> void:
 	if event.is_action_pressed("left_mouse"):
 		tooltip_requested.emit(card)

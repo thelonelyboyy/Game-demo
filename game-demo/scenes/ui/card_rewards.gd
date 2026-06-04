@@ -43,10 +43,12 @@ func _clear_rewards() -> void:
 	card_tooltip_popup.hide_tooltip()
 
 	selected_card = null
+	take_button.disabled = true
 
 
 func _show_tooltip(card: Card) -> void:
 	selected_card = card
+	take_button.disabled = selected_card == null
 	card_tooltip_popup.show_tooltip(card)
 
 
