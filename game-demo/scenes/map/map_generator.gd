@@ -19,6 +19,7 @@ const CAMPFIRE_ROOM_WEIGHT := 4.0
 const ELITE_HEALTH_MULTIPLIER := 1.45
 const ELITE_DAMAGE_MULTIPLIER := 1.25
 const ELITE_GOLD_MULTIPLIER := 1.55
+const ELITE_BATTLE := preload("res://battles/tier_1_bull_demon.tres")
 
 @export var map_mode: MapMode = MapMode.TEST_ELITE_LINEAR
 @export var battle_stats_pool: BattleStatsPool
@@ -297,7 +298,7 @@ func _set_room_randomly(room_to_set: Room) -> void:
 
 
 func _setup_elite_battle(room: Room) -> void:
-	var battle_stats := battle_stats_pool.get_random_battle_for_tier(1)
+	var battle_stats := ELITE_BATTLE as BattleStats
 	if not battle_stats:
 		battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
 	if not battle_stats:

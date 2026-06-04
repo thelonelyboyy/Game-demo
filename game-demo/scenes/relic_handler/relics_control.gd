@@ -1,14 +1,15 @@
 class_name RelicsControl
 extends Control
 
-const RELICS_PER_PAGE := 5
+const RELICS_PER_PAGE := 6
+const RELIC_SLOT_WIDTH := 62.0
 const TWEEN_SCROLL_DURATION := 0.2
 
 @export var left_button: TextureButton
 @export var right_button: TextureButton
 
 @onready var relics: HBoxContainer = %Relics
-@onready var page_width = self.custom_minimum_size.x
+@onready var page_width := RELICS_PER_PAGE * RELIC_SLOT_WIDTH
 
 var num_of_relics := 0
 var current_page := 1
@@ -44,7 +45,6 @@ func _tween_to(x_position: float) -> void:
 	if tween:
 		tween.kill()
 	
-	print(x_position)
 	tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(relics, "position:x", x_position, TWEEN_SCROLL_DURATION)
 

@@ -91,6 +91,7 @@ func _collect_enemies():
 	var enemy_paths = [
 		"res://enemies/bat/bat_enemy.tres",
 		"res://enemies/crab/crab_enemy.tres",
+		"res://enemies/bull_demon/bull_demon.tres",
 		"res://enemies/toxic_ghost/toxic_ghost.tres",
 	]
 	for path in enemy_paths:
@@ -273,23 +274,13 @@ func _show_enemy_detail(enemy_stats):
 
 
 func _enemy_display_name(enemy_stats):
-	if enemy_stats.max_health == 8 and enemy_stats.art == load("res://art/tile_0120.png"):
-		return "蝙蝠"
-	elif enemy_stats.max_health == 25 and enemy_stats.art == load("res://art/tile_0110.png"):
-		return "螃蟹"
-	elif enemy_stats.max_health == 40 and enemy_stats.art == load("res://art/tile_0108.png"):
-		return "毒魂"
+	if enemy_stats.display_name:
+		return enemy_stats.display_name
 	return "未知怪物"
 
 
 func _enemy_description(enemy_stats):
-	if enemy_stats.max_health == 8 and enemy_stats.art == load("res://art/tile_0120.png"):
-		return "成群出没的小型魔物，攻击快速但生命值较低。"
-	elif enemy_stats.max_health == 25 and enemy_stats.art == load("res://art/tile_0110.png"):
-		return "甲壳坚硬的海岸守卫者，擅长防御与反击。"
-	elif enemy_stats.max_health == 40 and enemy_stats.art == load("res://art/tile_0108.png"):
-		return "由瘴气凝聚而成的恶灵，带有致命毒素。"
-	return ""
+	return enemy_stats.description
 
 
 func _on_status_entry_input(event, status):

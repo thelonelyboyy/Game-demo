@@ -2,10 +2,13 @@
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_1akn0"]
 [ext_resource type="PackedScene" uid="uid://d3b23v3dpsd60" path="res://enemies/bat/bat_enemy_ai.tscn" id="1_oeu8d"]
-[ext_resource type="Texture2D" uid="uid://con6y7mc74c5a" path="res://art/tile_0120.png" id="1_xdrl7"]
+[ext_resource type="Texture2D" path="res://art/enemies/silver_moon_wolf.png" id="1_xdrl7"]
 
 [resource]
 script = ExtResource("1_1akn0")
+id = "silver_moon_wolf"
+display_name = "银月狼"
+description = "受月华侵染的山林妖狼，行动迅捷，常以冷冽爪风试探修士破绽。"
 ai = ExtResource("1_oeu8d")
 max_health = 8
 art = ExtResource("1_xdrl7")

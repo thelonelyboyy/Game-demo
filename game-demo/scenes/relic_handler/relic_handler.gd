@@ -1,16 +1,18 @@
 class_name RelicHandler
-extends HBoxContainer
+extends Control
 
 signal relics_activated(type: Relic.Type)
 
 const RELIC_APPLY_INTERVAL := 0.5
 const RELIC_UI = preload("res://scenes/relic_handler/relic_ui.tscn")
 
-@onready var relics_control: RelicsControl = $RelicsControl
-@onready var relics: HBoxContainer = %Relics
+@onready var relics: HFlowContainer = %Relics
 
 
 func _ready() -> void:
+	size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for relic_ui: RelicUI in relics.get_children():
+		relic_ui.free()
 	relics.child_exiting_tree.connect(_on_relics_child_exiting_tree)
 
 
