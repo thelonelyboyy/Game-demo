@@ -40,6 +40,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func generate_new_map() -> void:
 	floors_climbed = 0
+	last_room = null
+	camera_2d.position = Vector2.ZERO
 	map_data = map_generator.generate_map()
 	create_map()
 	_update_camera_limits()
@@ -51,6 +53,7 @@ func load_map(map: Array[Array], floors_completed: int, last_room_climbed: Room)
 	last_room = last_room_climbed
 	create_map()
 	_update_camera_limits()
+	camera_2d.position.y = clamp(camera_2d.position.y, -camera_edge_y, 0)
 	
 	if floors_climbed > 0:
 		unlock_next_rooms()
@@ -59,6 +62,8 @@ func load_map(map: Array[Array], floors_completed: int, last_room_climbed: Room)
 
 
 func create_map() -> void:
+	_clear_map_visuals()
+
 	for current_floor: Array in map_data:
 		for room: Room in current_floor:
 			if room.next_rooms.size() > 0:
@@ -151,6 +156,13 @@ func get_floor_count() -> int:
 	if map_data:
 		return map_data.size()
 	return MapGenerator.FLOORS
+
+
+func _clear_map_visuals() -> void:
+	for child: Node in rooms.get_children():
+		child.free()
+	for child: Node in lines.get_children():
+		child.free()
 
 
 func is_final_floor_reached() -> bool:

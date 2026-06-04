@@ -3,6 +3,7 @@ extends Node
 
 const BATTLE_SCENE := preload("res://scenes/battle/battle.tscn")
 const BATTLE_REWARD_SCENE := preload("res://scenes/battle_reward/battle_reward.tscn")
+const BLESSING_SCENE := preload("res://scenes/blessing/blessing.tscn")
 const CAMPFIRE_SCENE := preload("res://scenes/campfire/campfire.tscn")
 const SHOP_SCENE := preload("res://scenes/shop/shop.tscn")
 const TREASURE_SCENE = preload("res://scenes/treasure/treasure.tscn")
@@ -10,6 +11,7 @@ const WIN_SCREEN_SCENE := preload("res://scenes/win_screen/win_screen.tscn")
 const SPIRIT_ROOT_BADGE_SCENE := preload("res://scenes/ui/spirit_root_badge.tscn")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
+const TOTAL_CHAPTERS := 3
 
 @export var run_startup: RunStartup
 
@@ -34,6 +36,7 @@ var stats: RunStats
 var character: CharacterStats
 var save_data: SaveGame
 var spirit_root_badge: SpiritRootBadge
+var current_chapter := 1
 
 
 func _ready() -> void:
@@ -55,6 +58,7 @@ func _ready() -> void:
 
 func _start_run() -> void:
 	stats = RunStats.new()
+	current_chapter = 1
 	
 	_setup_event_connections()
 	_setup_top_bar()
@@ -78,6 +82,7 @@ func _save_run(was_on_map: bool) -> void:
 	save_data.last_room = map.last_room
 	save_data.map_data = map.map_data.duplicate()
 	save_data.floors_climbed = map.floors_climbed
+	save_data.current_chapter = current_chapter
 	save_data.was_on_map = was_on_map
 	save_data.save_data()
 
@@ -89,6 +94,7 @@ func _load_run() -> void:
 	RNG.set_from_save_data(save_data.rng_seed, save_data.rng_state)
 	stats = save_data.run_stats
 	character = save_data.char_stats
+	current_chapter = maxi(save_data.current_chapter, 1)
 	if save_data.spirit_root != Card.Element.NONE:
 		character.spirit_root = save_data.spirit_root
 	character.deck = save_data.current_deck
@@ -119,8 +125,12 @@ func _show_map() -> void:
 	if current_view.get_child_count() > 0:
 		current_view.get_child(0).queue_free()
 
+	get_tree().paused = false
 	map.show_map()
-	map.unlock_next_rooms()
+	if map.last_room:
+		map.unlock_next_rooms()
+	else:
+		map.unlock_floor(0)
 	
 	_save_run(true)
 
@@ -133,6 +143,7 @@ func _setup_event_connections() -> void:
 	Events.shop_exited.connect(_show_map)
 	Events.treasure_room_exited.connect(_on_treasure_room_exited)
 	Events.event_room_exited.connect(_show_map)
+	Events.blessing_exited.connect(_show_map)
 	
 	battle_button.pressed.connect(_change_view.bind(BATTLE_SCENE))
 	campfire_button.pressed.connect(_change_view.bind(CAMPFIRE_SCENE))
@@ -231,15 +242,30 @@ func _on_event_room_entered(room: Room) -> void:
 	event_room.setup()
 
 
+func _on_blessing_room_entered() -> void:
+	var blessing := _change_view(BLESSING_SCENE) as Blessing
+	blessing.setup(character, stats, current_chapter)
+
+
 func _on_battle_won() -> void:
 	if map.is_final_floor_reached():
-		var win_screen := _change_view(WIN_SCREEN_SCENE) as WinScreen
-		win_screen.character = character
-		SaveGame.delete_data()
+		if current_chapter >= TOTAL_CHAPTERS:
+			var win_screen := _change_view(WIN_SCREEN_SCENE) as WinScreen
+			win_screen.character = character
+			SaveGame.delete_data()
+		else:
+			_advance_to_next_chapter()
 	elif map.last_room and map.last_room.type == Room.Type.ELITE:
 		_show_elite_battle_rewards()
 	else:
 		_show_regular_battle_rewards()
+
+
+func _advance_to_next_chapter() -> void:
+	current_chapter += 1
+	map.generate_new_map()
+	map.unlock_floor(0)
+	_show_map()
 
 
 func _on_map_exited(room: Room) -> void:
@@ -260,3 +286,5 @@ func _on_map_exited(room: Room) -> void:
 			_on_battle_room_entered(room)
 		Room.Type.EVENT:
 			_on_event_room_entered(room)
+		Room.Type.BLESSING:
+			_on_blessing_room_entered()

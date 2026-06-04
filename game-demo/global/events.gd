@@ -51,3 +51,6 @@ signal relic_tooltip_requested(relic: Relic)
 
 # Random Event room-related events
 signal event_room_exited
+
+# Blessing room-related events
+signal blessing_exited

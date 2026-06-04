@@ -7,8 +7,8 @@ const X_DIST := 45
 const Y_DIST := 40
 const PLACEMENT_RANDOMNESS := 4
 const FLOORS := 15
-const TEST_FLOORS := 5
-const TEST_ELITE_FLOORS := 6
+const TEST_FLOORS := 6
+const TEST_ELITE_FLOORS := 7
 const MAP_WIDTH := 7
 const PATHS := 6
 const MONSTER_ROOM_WEIGHT := 12.0
@@ -28,6 +28,7 @@ const ELITE_BATTLE := preload("res://battles/tier_1_bull_demon.tres")
 var random_room_type_weights = {
 	Room.Type.MONSTER: 0.0,
 	Room.Type.ELITE: 0.0,
+	Room.Type.BLESSING: 0.0,
 	Room.Type.CAMPFIRE: 0.0,
 	Room.Type.SHOP: 0.0,
 	Room.Type.EVENT: 0.0
@@ -56,6 +57,7 @@ func generate_map() -> Array[Array]:
 	_setup_random_room_weights()
 	_setup_room_types()
 	_ensure_elite_room_exists()
+	_prepend_blessing_room()
 	
 	return map_data
 
@@ -64,6 +66,7 @@ func _generate_test_linear_map() -> Array[Array]:
 	map_data = _generate_initial_grid(TEST_FLOORS, false)
 	var middle := floori(MAP_WIDTH * 0.5)
 	var room_types := [
+		Room.Type.BLESSING,
 		Room.Type.MONSTER,
 		Room.Type.CAMPFIRE,
 		Room.Type.SHOP,
@@ -94,6 +97,7 @@ func _generate_test_elite_linear_map() -> Array[Array]:
 	map_data = _generate_initial_grid(TEST_ELITE_FLOORS, false)
 	var middle := floori(MAP_WIDTH * 0.5)
 	var room_types := [
+		Room.Type.BLESSING,
 		Room.Type.MONSTER,
 		Room.Type.ELITE,
 		Room.Type.CAMPFIRE,
@@ -295,6 +299,35 @@ func _set_room_randomly(room_to_set: Room) -> void:
 	
 	if type_candidate == Room.Type.EVENT:
 		room_to_set.event_scene = event_room_pool.get_random()
+
+
+func _prepend_blessing_room() -> void:
+	if map_data.is_empty():
+		return
+
+	for row: Array in map_data:
+		for room: Room in row:
+			room.row += 1
+			room.position.y -= Y_DIST
+
+	var middle := floori(MAP_WIDTH * 0.5)
+	var blessing_row: Array[Room] = []
+	for column in MAP_WIDTH:
+		var room := Room.new()
+		room.row = 0
+		room.column = column
+		room.position = Vector2(column * X_DIST, 0)
+		room.next_rooms = []
+
+		if column == middle:
+			room.type = Room.Type.BLESSING
+			for first_room: Room in map_data[0]:
+				if first_room.next_rooms.size() > 0:
+					room.next_rooms.append(first_room)
+
+		blessing_row.append(room)
+
+	map_data.insert(0, blessing_row)
 
 
 func _setup_elite_battle(room: Room) -> void:
