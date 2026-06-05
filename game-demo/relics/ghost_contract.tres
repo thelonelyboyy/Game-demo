@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="TimingStatusRelic" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/status_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/phase4/ghost_contract.png" id="2"]
+[ext_resource type="Resource" path="res://statuses/soul_mark.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "鬼契"
+id = "ghost_contract"
+type = 1
+character_type = 0
+starter_relic = false
+icon = ExtResource("2")
+tooltip = "鬼契\n战斗开始时，给予所有敌人 1 层魂印。"
+status = ExtResource("3")
+stacks = 1
+target_mode = 1

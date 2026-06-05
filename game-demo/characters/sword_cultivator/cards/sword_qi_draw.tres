@@ -17,6 +17,7 @@ cost = 0
 exhausts = false
 upgrade_type = 1
 element = 1
+mechanic_tags = PackedStringArray("过牌")
 icon = ExtResource("2")
 tooltip_text = "[center]抽 %s 张牌，弃 %s 张随机手牌。[/center]"
 sound = ExtResource("3")

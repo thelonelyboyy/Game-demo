@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="GoldBodyStatus" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://statuses/gold_body.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0127.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "gold_body"
+type = 2
+stack_type = 1
+can_expire = false
+stacks = 1
+icon = ExtResource("2")
+tooltip = "金身：受到的伤害减少 %s 点。"

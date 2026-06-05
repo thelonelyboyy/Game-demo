@@ -47,20 +47,22 @@ func end_turn() -> void:
 	relics.activate_relics_by_type(Relic.Type.END_OF_TURN)
 
 
-func draw_card() -> void:
+func draw_card(is_start_of_turn_draw := false) -> void:
 	reshuffle_deck_from_discard()
 	var card := character.draw_pile.draw_card()
 	if not card:
 		return
 	hand.add_card(card)
 	Events.card_drawn.emit(card)
+	if not is_start_of_turn_draw:
+		Events.card_extra_drawn.emit(card)
 	reshuffle_deck_from_discard()
 
 
 func draw_cards(amount: int, is_start_of_turn_draw: bool = false) -> void:
 	var tween := create_tween()
 	for i in range(amount):
-		tween.tween_callback(draw_card)
+		tween.tween_callback(draw_card.bind(is_start_of_turn_draw))
 		tween.tween_interval(HAND_DRAW_INTERVAL)
 	
 	tween.finished.connect(

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_spirit_net.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/block.ogg" id="3"]
+
+[resource]
+script = ExtResource("1")
+exposed_duration = 1
+soul_mark_stacks = 1
+effect_text = "施加 {soul_mark} 层魂印和 {exposed} 回合破绽。"
+id = "demon_spirit_net"
+type = 1
+rarity = 0
+target = 1
+cost = 1
+upgrade_type = 1
+element = 2
+profession = 3
+mechanic_tags = PackedStringArray("魂印")
+display_name = "缚魂网"
+icon = ExtResource("2")
+sound = ExtResource("3")

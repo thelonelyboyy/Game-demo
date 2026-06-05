@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BeastBellRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/beast_bell.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0122.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "百兽铃"
+id = "beast_bell"
+type = 1
+character_type = 0
+starter_relic = true
+icon = ExtResource("2")
+tooltip = "战斗开始时，获得1层灵兽。"

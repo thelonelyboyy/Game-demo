@@ -3,6 +3,7 @@ extends Node2D
 
 const PIXEL_WORLD_SCALE := 5.0
 const SPIRIT_ROOT_HANDLER := preload("res://scenes/battle/spirit_root_handler.gd")
+const CLASS_MECHANIC_HANDLER := preload("res://scenes/battle/class_mechanic_handler.gd")
 const BATTLE_BACKGROUND := preload("res://test2.png")
 
 @export var battle_stats: BattleStats
@@ -17,6 +18,7 @@ const BATTLE_BACKGROUND := preload("res://test2.png")
 
 var pixel_world: Node2D
 var spirit_root_handler: SpiritRootHandler
+var class_mechanic_handler: ClassMechanicHandler
 
 
 func _ready() -> void:
@@ -39,6 +41,7 @@ func start_battle() -> void:
 	player_handler.relics = relics
 	enemy_handler.setup_enemies(battle_stats)
 	_setup_spirit_root_handler()
+	_setup_class_mechanic_handler()
 	_prepare_world_ui()
 	enemy_handler.reset_enemy_actions()
 	
@@ -112,6 +115,14 @@ func _setup_spirit_root_handler() -> void:
 		add_child(spirit_root_handler)
 
 	spirit_root_handler.setup(char_stats, player_handler, player, enemy_handler)
+
+
+func _setup_class_mechanic_handler() -> void:
+	if not class_mechanic_handler:
+		class_mechanic_handler = CLASS_MECHANIC_HANDLER.new() as ClassMechanicHandler
+		add_child(class_mechanic_handler)
+
+	class_mechanic_handler.setup(char_stats, player, player_handler, enemy_handler)
 
 
 func _setup_ink_backdrop() -> void:

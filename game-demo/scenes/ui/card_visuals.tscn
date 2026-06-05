@@ -116,14 +116,14 @@ scroll_active = false
 
 [node name="Rarity" type="TextureRect" parent="."]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -22.0
-offset_top = 42.0
-offset_right = -8.0
-offset_bottom = 56.0
-grow_horizontal = 0
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -13.0
+offset_top = 126.0
+offset_right = 13.0
+offset_bottom = 152.0
+grow_horizontal = 2
 texture = ExtResource("4_w0uhs")
 expand_mode = 1
 stretch_mode = 5

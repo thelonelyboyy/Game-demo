@@ -10,7 +10,7 @@ func get_tooltip() -> String:
 
 func apply_status(target: Node) -> void:
 	var status_effect := StatusEffect.new()
-	var muscle := MUSCLE_STATUS.duplicate()
+	var muscle := MUSCLE_STATUS.duplicate() as Status
 	muscle.stacks = stacks
 	status_effect.status = muscle
 	status_effect.execute([target])

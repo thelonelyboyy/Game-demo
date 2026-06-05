@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SoulMarkStatus" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://statuses/soul_mark.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0108.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "soul_mark"
+type = 1
+stack_type = 1
+can_expire = false
+stacks = 1
+icon = ExtResource("2")
+tooltip = "魂印：回合结束时受到 %s 层魂印伤害；死亡时为魔修回复生命。"

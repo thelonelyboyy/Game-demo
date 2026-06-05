@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/cards/beastmaster/beast_fang_chain.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/slash.ogg" id="3"]
+
+[resource]
+script = ExtResource("1")
+base_damage = 10
+effect_text = "造成 {damage} 点伤害。"
+id = "beast_fang_chain"
+type = 0
+rarity = 1
+target = 1
+cost = 1
+upgrade_type = 1
+element = 1
+profession = 4
+mechanic_tags = PackedStringArray("兽群", "兽系")
+display_name = "连牙"
+icon = ExtResource("2")
+sound = ExtResource("3")

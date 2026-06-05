@@ -33,7 +33,7 @@ func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
 	damage_effect.execute(targets)
 
 	var status_effect := StatusEffect.new()
-	var bleed := BLEED_STATUS.duplicate()
+	var bleed := BLEED_STATUS.duplicate() as Status
 	bleed.duration = get_spirit_root_modified_value(bleed_duration)
 	status_effect.status = bleed
 	status_effect.execute(targets)

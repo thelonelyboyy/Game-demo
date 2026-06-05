@@ -141,7 +141,7 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 		return
 	
 	sprite_2d.material = WHITE_SPRITE_MATERIAL
-	var modified_damage := modifier_handler.get_modified_value(damage, which_modifier)
+	var modified_damage := maxi(0, modifier_handler.get_modified_value(damage, which_modifier))
 	
 	var tween := create_tween()
 	tween.tween_callback(Shaker.shake.bind(self, 16, 0.15))

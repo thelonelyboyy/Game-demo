@@ -51,6 +51,12 @@ custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 text = "卡牌"
 
+[node name="RelicsTab" type="Button" parent="VBoxContainer/TabBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "法宝"
+
 [node name="EnemiesTab" type="Button" parent="VBoxContainer/TabBar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)

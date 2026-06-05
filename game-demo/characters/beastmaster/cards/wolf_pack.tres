@@ -8,7 +8,8 @@
 script = ExtResource("1")
 base_damage = 3
 cards_to_draw = 1
-effect_text = "对所有敌人造成 {damage} 点伤害，抽 {draw} 张牌。"
+beast_pack_stacks = 1
+effect_text = "对所有敌人造成 {damage} 点伤害，抽 {draw} 张牌，获得 {beast_pack} 层兽群。"
 id = "wolf_pack"
 type = 0
 rarity = 1
@@ -16,6 +17,7 @@ target = 2
 cost = 2
 upgrade_type = 2
 element = 2
+mechanic_tags = PackedStringArray("兽群", "兽系")
 display_name = "群狼逐月"
 icon = ExtResource("2")
 sound = ExtResource("3")

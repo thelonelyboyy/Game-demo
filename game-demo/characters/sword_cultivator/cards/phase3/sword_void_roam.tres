@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/cards/sword_cultivator/sword_void_roam.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/axe.ogg" id="3"]
+
+[resource]
+script = ExtResource("1")
+base_damage = 8
+cards_to_draw = 3
+qi_flow_stacks = 1
+effect_text = "造成 {damage} 点伤害，抽 {draw} 张牌，获得 {qi} 层灵息。"
+id = "sword_void_roam"
+type = 0
+rarity = 3
+target = 1
+cost = 2
+upgrade_type = 1
+element = 1
+profession = 2
+mechanic_tags = PackedStringArray("过牌")
+display_name = "太虚游剑"
+icon = ExtResource("2")
+sound = ExtResource("3")

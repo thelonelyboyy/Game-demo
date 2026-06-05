@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/cards/sword_cultivator/sword_marrow_forge.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/block.ogg" id="3"]
+
+[resource]
+script = ExtResource("1")
+base_block = 8
+forge_sword_stacks = 1
+effect_text = "获得 {block} 点护体和 {forge} 层铸剑。"
+id = "sword_marrow_forge"
+type = 1
+rarity = 1
+target = 0
+cost = 1
+upgrade_type = 1
+element = 3
+profession = 2
+mechanic_tags = PackedStringArray("铸剑")
+display_name = "洗髓铸刃"
+icon = ExtResource("2")
+sound = ExtResource("3")

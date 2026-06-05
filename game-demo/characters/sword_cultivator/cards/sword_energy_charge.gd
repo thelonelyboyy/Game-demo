@@ -24,7 +24,7 @@ func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	block_effect.execute(player_targets)
 
 	var status_effect := StatusEffect.new()
-	var charge := ENERGY_CHARGE_STATUS.duplicate()
+	var charge := ENERGY_CHARGE_STATUS.duplicate() as Status
 	charge.stacks = get_spirit_root_modified_value(charge_stacks)
 	status_effect.status = charge
 	status_effect.execute(player_targets)

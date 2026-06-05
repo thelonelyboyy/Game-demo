@@ -53,6 +53,15 @@ func add_status(status: Status) -> void:
 	# If it's stackable, stack it
 	if status.stack_type == Status.StackType.INTENSITY:
 		_get_status(status.id).stacks += status.stacks
+
+
+func get_status(id: String) -> Status:
+	return _get_status(id)
+
+
+func get_status_stacks(id: String) -> int:
+	var status := _get_status(id)
+	return status.stacks if status else 0
 	
 
 func _has_status(id: String) -> bool:

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ForgeSwordStatus" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://statuses/forge_sword.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0099.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "forge_sword"
+type = 2
+stack_type = 1
+can_expire = false
+stacks = 1
+icon = ExtResource("2")
+tooltip = "铸剑：当前有 %s 层。部分剑修牌会获得额外收益。"

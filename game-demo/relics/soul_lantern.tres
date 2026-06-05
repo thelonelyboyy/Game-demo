@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="SoulLanternRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/soul_lantern.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0108.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "残魂灯"
+id = "soul_lantern"
+type = 1
+character_type = 0
+starter_relic = true
+icon = ExtResource("2")
+tooltip = "战斗开始时，给随机敌人施加1层魂印。"

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardPlayHealRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/card_play_heal_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/phase4/wood_earth_seed.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "青木息壤"
+id = "wood_earth_seed"
+type = 4
+character_type = 0
+starter_relic = false
+icon = ExtResource("2")
+tooltip = "青木息壤\n每回合第一次打出木或土属性牌时，回复 1 点生命。"
+match_elements = PackedInt32Array(2, 5)
+heal_amount = 1
+once_per_turn = true

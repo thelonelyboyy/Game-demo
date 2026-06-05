@@ -11,6 +11,12 @@ const CARD_ICON := preload("res://art/rarity.png")
 const FUSION_ICON := preload("res://art/map/map_elite.png")
 const FUSION_TEXT := "卡牌融合"
 const CARD_TEXT := "择取新术法"
+const REWARD_RARITY_ORDER := [
+	Card.Rarity.COMMON,
+	Card.Rarity.UNCOMMON,
+	Card.Rarity.RARE,
+	Card.Rarity.MYTHIC,
+]
 
 @export var run_stats: RunStats
 @export var character_stats: CharacterStats
@@ -25,7 +31,8 @@ var active_card_fusion: CardFusion
 var card_rarity_weights := {
 	Card.Rarity.COMMON: 0.0,
 	Card.Rarity.UNCOMMON: 0.0,
-	Card.Rarity.RARE: 0.0
+	Card.Rarity.RARE: 0.0,
+	Card.Rarity.MYTHIC: 0.0,
 }
 
 
@@ -92,18 +99,27 @@ func _generate_card_reward_choices() -> Array[Card]:
 
 	for i in run_stats.card_rewards:
 		_setup_card_chances()
-		var roll := RNG.instance.randf_range(0.0, card_reward_total_weight)
+		var picked_card := _pick_reward_card(available_cards)
+		if not picked_card:
+			break
 
-		for rarity: Card.Rarity in card_rarity_weights:
-			if card_rarity_weights[rarity] > roll:
-				_modify_weights(rarity)
-				var picked_card := _get_random_available_card(available_cards, rarity)
-				picked_card.bind_spirit_root_owner(character_stats)
-				card_reward_array.append(picked_card)
-				available_cards.erase(picked_card)
-				break
+		picked_card.bind_spirit_root_owner(character_stats)
+		card_reward_array.append(picked_card)
+		available_cards.erase(picked_card)
 
 	return card_reward_array
+
+
+func _pick_reward_card(available_cards: Array[Card]) -> Card:
+	if available_cards.is_empty():
+		return null
+
+	var roll := RNG.instance.randf_range(0.0, card_reward_total_weight)
+	for rarity in REWARD_RARITY_ORDER:
+		if card_rarity_weights[rarity] > roll:
+			return _get_random_available_card(available_cards, rarity)
+
+	return _get_random_available_card(available_cards, Card.Rarity.COMMON)
 
 
 func _show_card_fusion(fusion_reward: RewardButton) -> void:
@@ -119,17 +135,11 @@ func _show_card_fusion(fusion_reward: RewardButton) -> void:
 
 
 func _setup_card_chances() -> void:
-	card_reward_total_weight = run_stats.common_weight + run_stats.uncommon_weight + run_stats.rare_weight
+	card_reward_total_weight = run_stats.common_weight + run_stats.uncommon_weight + run_stats.rare_weight + run_stats.mythic_weight
 	card_rarity_weights[Card.Rarity.COMMON] = run_stats.common_weight
 	card_rarity_weights[Card.Rarity.UNCOMMON] = run_stats.common_weight + run_stats.uncommon_weight
-	card_rarity_weights[Card.Rarity.RARE] = card_reward_total_weight
-
-
-func _modify_weights(rarity_rolled: Card.Rarity) -> void:
-	if rarity_rolled == Card.Rarity.RARE:
-		run_stats.rare_weight = RunStats.BASE_RARE_WEIGHT
-	else:
-		run_stats.rare_weight = clampf(run_stats.rare_weight + 0.3, run_stats.BASE_RARE_WEIGHT, 5.0)
+	card_rarity_weights[Card.Rarity.RARE] = run_stats.common_weight + run_stats.uncommon_weight + run_stats.rare_weight
+	card_rarity_weights[Card.Rarity.MYTHIC] = card_reward_total_weight
 
 
 func _get_random_available_card(available_cards: Array[Card], with_rarity: Card.Rarity) -> Card:
@@ -137,6 +147,12 @@ func _get_random_available_card(available_cards: Array[Card], with_rarity: Card.
 		func(card: Card):
 			return card.rarity == with_rarity
 	)
+
+	if all_possible_cards.is_empty():
+		all_possible_cards = available_cards.filter(
+			func(card: Card):
+				return card.rarity != Card.Rarity.MYTHIC
+		)
 	if all_possible_cards.is_empty():
 		all_possible_cards = available_cards
 

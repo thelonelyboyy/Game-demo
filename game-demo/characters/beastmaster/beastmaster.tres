@@ -4,12 +4,12 @@
 [ext_resource type="Texture2D" path="res://art/beastmaster_portrait.png" id="2"]
 [ext_resource type="Resource" path="res://characters/beastmaster/beastmaster_starting_deck.tres" id="3"]
 [ext_resource type="Resource" path="res://characters/beastmaster/beastmaster_draftable_cards.tres" id="4"]
-[ext_resource type="Resource" path="res://relics/confusing_staff.tres" id="5"]
+[ext_resource type="Resource" path="res://relics/beast_bell.tres" id="5"]
 
 [resource]
 script = ExtResource("1")
 character_name = "驭兽师"
-description = "灵兽相伴，攻守轮转。擅长抽牌、护体与稳定群攻。"
+description = "灵兽相伴，攻守轮转。擅长灵兽与兽群，依靠连携压制敌人。"
 portrait = ExtResource("2")
 starting_deck = ExtResource("3")
 draftable_cards = ExtResource("4")

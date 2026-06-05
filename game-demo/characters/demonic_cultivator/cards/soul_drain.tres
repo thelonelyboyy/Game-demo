@@ -8,7 +8,8 @@
 script = ExtResource("1")
 base_damage = 5
 base_block = 3
-effect_text = "造成 {damage} 点伤害，获得 {block} 点护体。"
+soul_mark_stacks = 1
+effect_text = "造成 {damage} 点伤害，获得 {block} 点护体，并施加 {soul_mark} 层魂印。"
 id = "soul_drain"
 type = 0
 rarity = 0
@@ -16,6 +17,7 @@ target = 1
 cost = 1
 upgrade_type = 1
 element = 4
+mechanic_tags = PackedStringArray("魂印")
 display_name = "摄魂"
 icon = ExtResource("2")
 sound = ExtResource("3")

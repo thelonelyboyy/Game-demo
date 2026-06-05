@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/cards/body_cultivator/body_red_marrow.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/slash.ogg" id="3"]
+
+[resource]
+script = ExtResource("1")
+base_damage = 5
+self_damage = 1
+effect_text = "失去 {self_damage} 点生命，造成 {damage} 点伤害。"
+id = "body_red_marrow"
+type = 0
+rarity = 0
+target = 1
+cost = 0
+upgrade_type = 1
+element = 4
+profession = 1
+mechanic_tags = PackedStringArray("血炼")
+display_name = "赤髓劲"
+icon = ExtResource("2")
+sound = ExtResource("3")

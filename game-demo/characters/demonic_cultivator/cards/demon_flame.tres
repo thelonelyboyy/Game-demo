@@ -16,6 +16,7 @@ target = 2
 cost = 2
 upgrade_type = 2
 element = 4
+mechanic_tags = PackedStringArray("献祭")
 display_name = "魔焰焚心"
 icon = ExtResource("2")
 sound = ExtResource("3")

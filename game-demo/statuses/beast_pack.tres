@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BeastPackStatus" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://statuses/beast_pack.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0121.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "beast_pack"
+type = 2
+stack_type = 1
+can_expire = false
+stacks = 1
+icon = ExtResource("2")
+tooltip = "兽群：本场战斗已形成 %s 层兽群连携。"

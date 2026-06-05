@@ -16,6 +16,7 @@ target = 1
 cost = 2
 upgrade_type = 2
 element = 5
+mechanic_tags = PackedStringArray("金身")
 display_name = "崩山掌"
 icon = ExtResource("2")
 sound = ExtResource("3")

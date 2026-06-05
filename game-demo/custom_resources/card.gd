@@ -2,15 +2,40 @@ class_name Card
 extends Resource
 
 enum Type {ATTACK, SKILL, POWER}
-enum Rarity {COMMON, UNCOMMON, RARE}
+enum Rarity {COMMON, UNCOMMON, RARE, MYTHIC}
 enum Target {SELF, SINGLE_ENEMY, ALL_ENEMIES, EVERYONE}
 enum UpgradeType {NONE, STAT_BOOST, COST_REDUCTION}
 enum Element {NONE, METAL, WOOD, WATER, FIRE, EARTH}
+enum Profession {COMMON, BODY, SWORD, DEMONIC, BEASTMASTER}
 
 const RARITY_COLORS := {
-	Card.Rarity.COMMON: Color("2f3430"),
-	Card.Rarity.UNCOMMON: Color("2f6f73"),
-	Card.Rarity.RARE: Color("c79a3b"),
+	Card.Rarity.COMMON: Color("e8e1cc"),
+	Card.Rarity.UNCOMMON: Color("4c9fd6"),
+	Card.Rarity.RARE: Color("d7a93f"),
+	Card.Rarity.MYTHIC: Color("7a3a18"),
+}
+
+const RARITY_NAMES := {
+	Card.Rarity.COMMON: "白卡",
+	Card.Rarity.UNCOMMON: "蓝卡",
+	Card.Rarity.RARE: "金卡",
+	Card.Rarity.MYTHIC: "暗金卡",
+}
+
+const PROFESSION_COLORS := {
+	Card.Profession.COMMON: Color("645f4e"),
+	Card.Profession.BODY: Color("8f3d32"),
+	Card.Profession.SWORD: Color("2e718b"),
+	Card.Profession.DEMONIC: Color("6f2b49"),
+	Card.Profession.BEASTMASTER: Color("2f7a55"),
+}
+
+const PROFESSION_NAMES := {
+	Card.Profession.COMMON: "通用",
+	Card.Profession.BODY: "体修",
+	Card.Profession.SWORD: "剑修",
+	Card.Profession.DEMONIC: "魔修",
+	Card.Profession.BEASTMASTER: "驭兽师",
 }
 
 @export_group("Card Attributes")
@@ -25,6 +50,8 @@ const RARITY_COLORS := {
 @export var upgraded := false
 @export var element: Element = Element.NONE
 @export var fusion_level := 0
+@export var profession: Profession = Profession.COMMON
+@export var mechanic_tags := PackedStringArray()
 
 @export_group("Card Visuals")
 @export var display_name: String
@@ -78,6 +105,34 @@ func get_display_name() -> String:
 	if fusion_level > 0:
 		base_name = "%s·合炼%s" % [base_name, fusion_level]
 	return base_name
+
+
+func get_rarity_name() -> String:
+	return RARITY_NAMES.get(rarity, "白卡")
+
+
+func get_profession() -> Profession:
+	if profession != Profession.COMMON:
+		return profession
+
+	var path := resource_path
+	if path.contains("body_cultivator"):
+		return Profession.BODY
+	if path.contains("sword_cultivator"):
+		return Profession.SWORD
+	if path.contains("demonic_cultivator"):
+		return Profession.DEMONIC
+	if path.contains("beastmaster"):
+		return Profession.BEASTMASTER
+	return Profession.COMMON
+
+
+func get_profession_name() -> String:
+	return PROFESSION_NAMES.get(get_profession(), "通用")
+
+
+func get_profession_color() -> Color:
+	return PROFESSION_COLORS.get(get_profession(), PROFESSION_COLORS[Profession.COMMON])
 
 
 func get_default_tooltip() -> String:

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BlockRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/block_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/phase4/ink_guard_talisman.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "墨甲符"
+id = "ink_guard_talisman"
+type = 1
+character_type = 0
+starter_relic = false
+icon = ExtResource("2")
+tooltip = "墨甲符\n战斗开始时，获得 6 点护体。"
+block_amount = 6

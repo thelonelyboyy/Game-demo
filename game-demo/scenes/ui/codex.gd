@@ -1,10 +1,12 @@
 extends Control
 
 const CARD_MENU_UI_SCENE := preload("res://scenes/ui/card_menu_ui.tscn")
+const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
 
-enum Tab {CARDS, ENEMIES, STATUSES}
+enum Tab {CARDS, RELICS, ENEMIES, STATUSES}
 
 @onready var cards_tab: Button = %CardsTab
+@onready var relics_tab: Button = %RelicsTab
 @onready var enemies_tab: Button = %EnemiesTab
 @onready var statuses_tab: Button = %StatusesTab
 @onready var class_filter_bar: HBoxContainer = %ClassFilterBar
@@ -19,12 +21,14 @@ enum Tab {CARDS, ENEMIES, STATUSES}
 var current_tab = Tab.CARDS
 var current_class_filter = "全部"
 var cards_by_class = {}
+var all_relics: Array = []
 var all_enemies = []
 var all_statuses = []
 
 
 func _ready():
 	cards_tab.pressed.connect(_show_tab.bind(Tab.CARDS))
+	relics_tab.pressed.connect(_show_tab.bind(Tab.RELICS))
 	enemies_tab.pressed.connect(_show_tab.bind(Tab.ENEMIES))
 	statuses_tab.pressed.connect(_show_tab.bind(Tab.STATUSES))
 	back_button.pressed.connect(_on_back_pressed)
@@ -67,6 +71,7 @@ func _update_class_filter_buttons():
 
 func _collect_all_data():
 	_collect_cards()
+	all_relics = _collect_relics()
 	all_enemies = _collect_enemies()
 	all_statuses = _collect_statuses()
 
@@ -84,6 +89,35 @@ func _collect_cards():
 		var cards = _load_resources_in_dir("res://characters/%s/cards/" % dir)
 		cards_by_class[cls_name] = cards
 	cards_by_class["通用"] = _load_resources_in_dir("res://common_cards/")
+
+
+func _collect_relics() -> Array:
+	var result: Array = []
+	var seen_ids := {}
+
+	for relic in RELIC_REWARD_POOL.relics:
+		_append_codex_relic(relic, result, seen_ids)
+
+	var starter_relic_paths := [
+		"res://characters/body_cultivator/body_cultivator.tres",
+		"res://characters/sword_cultivator/sword_cultivator.tres",
+		"res://characters/demonic_cultivator/demonic_cultivator.tres",
+		"res://characters/beastmaster/beastmaster.tres",
+	]
+	for path: String in starter_relic_paths:
+		var character := load(path) as CharacterStats
+		if character and character.starting_relic:
+			_append_codex_relic(character.starting_relic, result, seen_ids)
+
+	return result
+
+
+func _append_codex_relic(relic, result: Array, seen_ids: Dictionary) -> void:
+	if not relic or seen_ids.has(relic.id):
+		return
+
+	seen_ids[relic.id] = true
+	result.append(relic)
 
 
 func _collect_enemies():
@@ -104,7 +138,8 @@ func _collect_enemies():
 func _collect_statuses():
 	var result = []
 	var status_names = ["exposed", "muscle", "qi_flow", "true_strength_form",
-						"bleed", "sword_intent", "energy_charge", "sword_guard", "true_essence"]
+						"bleed", "sword_intent", "energy_charge", "sword_guard", "true_essence",
+						"forge_sword", "gold_body", "soul_mark", "spirit_beast", "beast_pack"]
 	for status_id in status_names:
 		var res = load("res://statuses/%s.tres" % status_id)
 		if res is Status:
@@ -120,8 +155,15 @@ func _load_resources_in_dir(path):
 	dir.list_dir_begin()
 	var file_name = dir.get_next()
 	while file_name != "":
-		if file_name.ends_with(".tres"):
-			var res = load(path + file_name)
+		if file_name.begins_with("."):
+			file_name = dir.get_next()
+			continue
+
+		var resource_path: String = path.path_join(file_name)
+		if dir.current_is_dir():
+			result.append_array(_load_resources_in_dir(resource_path))
+		elif file_name.ends_with(".tres"):
+			var res = load(resource_path)
 			if res is Card:
 				result.append(res)
 		file_name = dir.get_next()
@@ -138,6 +180,8 @@ func _show_tab(tab):
 	match tab:
 		Tab.CARDS:
 			_populate_cards()
+		Tab.RELICS:
+			_populate_relics()
 		Tab.ENEMIES:
 			_populate_enemies()
 		Tab.STATUSES:
@@ -146,6 +190,7 @@ func _show_tab(tab):
 
 func _update_tab_buttons():
 	cards_tab.button_pressed = current_tab == Tab.CARDS
+	relics_tab.button_pressed = current_tab == Tab.RELICS
 	enemies_tab.button_pressed = current_tab == Tab.ENEMIES
 	statuses_tab.button_pressed = current_tab == Tab.STATUSES
 
@@ -182,6 +227,17 @@ func _populate_enemies():
 		var enemy_name = _enemy_display_name(enemy_stats)
 		var entry = _create_entry(enemy_stats.art, enemy_name)
 		entry.gui_input.connect(_on_enemy_entry_input.bind(enemy_stats))
+		content_grid.add_child(entry)
+
+
+func _populate_relics():
+	content_grid.columns = 5
+	for relic in all_relics:
+		if not relic:
+			continue
+
+		var entry = _create_entry(relic.icon, relic.relic_name)
+		entry.gui_input.connect(_on_relic_entry_input.bind(relic))
 		content_grid.add_child(entry)
 
 
@@ -229,6 +285,11 @@ func _status_display_name(id):
 		"energy_charge": return "凝气"
 		"sword_guard": return "剑阵"
 		"true_essence": return "真元"
+		"forge_sword": return "铸剑"
+		"gold_body": return "金身"
+		"soul_mark": return "魂印"
+		"spirit_beast": return "灵兽"
+		"beast_pack": return "兽群"
 		_: return id
 
 
@@ -236,6 +297,18 @@ func _show_card_detail(card):
 	detail_icon.texture = card.icon
 	detail_title.text = card.get_display_name()
 	detail_text.text = _format_card_detail(card)
+	detail_panel.show()
+
+
+func _on_relic_entry_input(event, relic):
+	if event.is_action_pressed("left_mouse"):
+		_show_relic_detail(relic)
+
+
+func _show_relic_detail(relic):
+	detail_icon.texture = relic.icon
+	detail_title.text = relic.relic_name
+	detail_text.text = "[center]%s[/center]" % relic.get_tooltip()
 	detail_panel.show()
 
 
@@ -250,6 +323,7 @@ func _format_card_detail(card):
 		Card.Rarity.COMMON: text += "  |  普通"
 		Card.Rarity.UNCOMMON: text += "  |  稀有"
 		Card.Rarity.RARE: text += "  |  传说"
+		Card.Rarity.MYTHIC: text += "  |  暗金"
 
 	text += "  |  %s 费 | 元素：%s\n\n" % [card.cost, card.get_element_name()]
 

@@ -4,12 +4,12 @@
 [ext_resource type="Texture2D" path="res://art/sword_cultivator_portrait.png" id="2"]
 [ext_resource type="Resource" path="res://characters/sword_cultivator/sword_cultivator_starting_deck.tres" id="3"]
 [ext_resource type="Resource" path="res://characters/sword_cultivator/sword_cultivator_draftable_cards.tres" id="4"]
-[ext_resource type="Resource" path="res://relics/wooden_sword.tres" id="5"]
+[ext_resource type="Resource" path="res://relics/qingfeng_sword_box.tres" id="5"]
 
 [resource]
 script = ExtResource("1")
 character_name = "剑修"
-description = "一念起剑，轻灵迅捷。擅长抽牌、破绽与群体剑雨。"
+description = "一念起剑，轻灵迅捷。擅长过牌与铸剑，越打越锋利。"
 portrait = ExtResource("2")
 starting_deck = ExtResource("3")
 draftable_cards = ExtResource("4")

@@ -10,7 +10,7 @@ func apply_status(target: Node) -> void:
 	print("applied true str form")
 	
 	var status_effect := StatusEffect.new()
-	var muscle := MUSCLE_STATUS.duplicate()
+	var muscle := MUSCLE_STATUS.duplicate() as Status
 	muscle.stacks = stacks_per_turn
 	status_effect.status = muscle
 	status_effect.execute([target])

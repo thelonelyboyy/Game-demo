@@ -18,7 +18,7 @@ func apply_effects(targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	var player_targets := tree.get_nodes_in_group("player")
 
 	var status_effect := StatusEffect.new()
-	var guard := SWORD_GUARD_STATUS.duplicate()
+	var guard := SWORD_GUARD_STATUS.duplicate() as Status
 	guard.stacks = get_spirit_root_modified_value(guard_stacks)
 	status_effect.status = guard
 	status_effect.execute(player_targets)

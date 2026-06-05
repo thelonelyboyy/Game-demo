@@ -101,7 +101,7 @@ func _trigger_fire(card: Card) -> void:
 
 func _apply_status_to_player(status_resource: Status, stacks: int) -> void:
 	var status_effect := StatusEffect.new()
-	var status := status_resource.duplicate()
+	var status := status_resource.duplicate() as Status
 	status.stacks = stacks
 	status_effect.status = status
 	status_effect.execute([player])

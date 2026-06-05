@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="XuanguTalismanRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/xuangu_talisman.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/tile_0074.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "玄骨护符"
+id = "xuangu_talisman"
+type = 1
+character_type = 0
+starter_relic = true
+icon = ExtResource("2")
+tooltip = "每场战斗第一次失去生命后，获得6点护体。"

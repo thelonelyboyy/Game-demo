@@ -4,12 +4,12 @@
 [ext_resource type="Texture2D" path="res://art/demonic_cultivator_portrait.png" id="2"]
 [ext_resource type="Resource" path="res://characters/demonic_cultivator/demonic_cultivator_starting_deck.tres" id="3"]
 [ext_resource type="Resource" path="res://characters/demonic_cultivator/demonic_cultivator_draftable_cards.tres" id="4"]
-[ext_resource type="Resource" path="res://relics/mana_potion.tres" id="5"]
+[ext_resource type="Resource" path="res://relics/soul_lantern.tres" id="5"]
 
 [resource]
 script = ExtResource("1")
 character_name = "魔修"
-description = "以伤换势，爆发凶狠。低费用、高风险，善用生命换节奏。"
+description = "以伤换势，狠厉诡谲。擅长献祭与魂印，用生命换取爆发。"
 portrait = ExtResource("2")
 starting_deck = ExtResource("3")
 draftable_cards = ExtResource("4")

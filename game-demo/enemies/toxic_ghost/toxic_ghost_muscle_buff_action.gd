@@ -23,7 +23,7 @@ func perform_action() -> void:
 	
 	usages += 1
 	var status_effect := StatusEffect.new()
-	var muscle := MUSCLE_STATUS.duplicate()
+	var muscle := MUSCLE_STATUS.duplicate() as Status
 	muscle.stacks = stacks_per_action
 	status_effect.status = muscle
 	status_effect.execute([enemy])
