@@ -114,9 +114,9 @@ func _get_available_shop_cards() -> Array[Card]:
 	var result := _dedupe_cards_by_id(char_stats.draftable_cards.duplicate_cards())
 
 	for common_card: Card in COMMON_SHOP_CARDS:
-		var duplicate := common_card.duplicate(true) as Card
-		if duplicate:
-			result.append(duplicate)
+		var card_copy := common_card.duplicate(true) as Card
+		if card_copy:
+			result.append(card_copy)
 
 	return _dedupe_cards_by_id(result)
 

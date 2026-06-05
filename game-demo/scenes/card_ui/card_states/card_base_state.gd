@@ -12,7 +12,6 @@ func enter() -> void:
 
 	card_ui.card_visuals.apply_normal_style()
 	card_ui.reparent_requested.emit(card_ui)
-	card_ui.pivot_offset = Vector2.ZERO
 	Events.tooltip_hide_requested.emit()
 
 
@@ -32,6 +31,8 @@ func on_mouse_entered() -> void:
 		return
 
 	card_ui.card_visuals.apply_hover_style()
+	if card_ui.parent and card_ui.parent.has_method("focus_card"):
+		card_ui.parent.focus_card(card_ui)
 	card_ui.request_tooltip()
 
 
@@ -42,4 +43,6 @@ func on_mouse_exited() -> void:
 		return
 
 	card_ui.card_visuals.apply_normal_style()
+	if card_ui.parent and card_ui.parent.has_method("clear_card_focus"):
+		card_ui.parent.clear_card_focus(card_ui)
 	Events.tooltip_hide_requested.emit()

@@ -15,6 +15,7 @@ func setup_enemies(battle_stats: BattleStats) -> void:
 		return
 	
 	for enemy: Enemy in get_children():
+		remove_child(enemy)
 		enemy.queue_free()
 	
 	var all_new_enemies := battle_stats.enemies.instantiate()

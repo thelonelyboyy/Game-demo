@@ -2,6 +2,8 @@ extends CardState
 
 
 func enter() -> void:
+	if card_ui.parent and card_ui.parent.has_method("clear_card_focus"):
+		card_ui.parent.clear_card_focus(card_ui)
 	card_ui.drop_point_detector.monitoring = true
 	card_ui.original_index = card_ui.get_index()
 

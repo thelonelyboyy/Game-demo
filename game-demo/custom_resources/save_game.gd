@@ -2,6 +2,16 @@ class_name SaveGame
 extends Resource
 
 const SAVE_PATH := "user://savegame.tres"
+const MIGRATED_CARD_PATHS := {
+	"sword_blood_curse": "res://characters/sword_cultivator/cards/sword_blood_curse.tres",
+	"sword_energy_charge": "res://characters/sword_cultivator/cards/sword_energy_charge.tres",
+	"sword_guard_formation": "res://characters/sword_cultivator/cards/sword_guard_formation.tres",
+	"sword_nurture": "res://characters/sword_cultivator/cards/sword_nurture.tres",
+	"sword_qi_draw": "res://characters/sword_cultivator/cards/sword_qi_draw.tres",
+	"sword_star_shatter": "res://characters/sword_cultivator/cards/sword_star_shatter.tres",
+	"sword_wanjian": "res://characters/sword_cultivator/cards/sword_wanjian.tres",
+	"toxin": "res://common_cards/toxin.tres",
+}
 
 @export var rng_seed: int
 @export var rng_state: int
@@ -25,7 +35,10 @@ func save_data() -> void:
 
 static func load_data() -> SaveGame:
 	if FileAccess.file_exists(SAVE_PATH):
-		return ResourceLoader.load(SAVE_PATH) as SaveGame
+		var save := ResourceLoader.load(SAVE_PATH) as SaveGame
+		if save:
+			save._migrate_card_resources()
+		return save
 	
 	return null
 
@@ -33,3 +46,45 @@ static func load_data() -> SaveGame:
 static func delete_data() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(SAVE_PATH)
+
+
+func _migrate_card_resources() -> void:
+	if current_deck:
+		_migrate_card_pile(current_deck)
+
+	if char_stats:
+		_migrate_card_pile(char_stats.deck)
+		_migrate_card_pile(char_stats.draw_pile)
+		_migrate_card_pile(char_stats.discard)
+
+
+func _migrate_card_pile(card_pile: CardPile) -> void:
+	if not card_pile:
+		return
+
+	for i: int in range(card_pile.cards.size()):
+		var card := card_pile.cards[i]
+		var migrated_card := _migrate_card(card)
+		if migrated_card:
+			card_pile.cards[i] = migrated_card
+
+
+func _migrate_card(card: Card) -> Card:
+	if not card or not MIGRATED_CARD_PATHS.has(card.id):
+		return null
+
+	var script := card.get_script() as Script
+	if script and script.resource_path == "res://custom_resources/cultivation_card.gd":
+		return null
+
+	var card_resource := ResourceLoader.load(MIGRATED_CARD_PATHS[card.id]) as Card
+	if not card_resource:
+		return null
+
+	var migrated_card := card_resource.duplicate(true) as Card
+	migrated_card.cost = card.cost
+	migrated_card.upgraded = card.upgraded
+	migrated_card.element = card.element
+	migrated_card.fusion_level = card.fusion_level
+	migrated_card.temporary_cost_reduction = card.temporary_cost_reduction
+	return migrated_card

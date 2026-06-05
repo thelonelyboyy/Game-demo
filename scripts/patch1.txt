@@ -1,8 +1,0 @@
-﻿*** Begin Patch
-*** Update File: E:\code\game-demo\game-demo\characters\warrior\cards\warrior_angry_anvil.gd
-@@
--var base_block := 7
--var exhaust_amount := 1
-+@export var base_block := 7
-+@export var exhaust_amount := 1
-*** End Patch

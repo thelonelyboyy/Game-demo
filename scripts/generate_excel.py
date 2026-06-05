@@ -99,36 +99,10 @@ cards = [
      2, False, 4, 0, 0, 0, 0, 0, 0, 0,
      "对所有敌人造成 {damage} 点伤害。", "CultivationCard", "tile_0118.png", "slash.ogg"],
 
-    # Warrior
-    ["warrior_angry_anvil", "怒砧", "warrior", "SKILL", "UNCOMMON", "SELF",
-     1, False, 0, 7, 0, 0, 0, 0, 0, 0,
-     "获得 {block} 点护体，随机消耗 1 张手牌。", "WarriorCard", "tile_0074.png", "block.ogg"],
-    ["warrior_axe_attack", "斧劈", "warrior", "ATTACK", "COMMON", "SINGLE_ENEMY",
-     1, False, 6, 0, 0, 0, 0, 0, 0, 0,
-     "造成 {damage} 点伤害。", "WarriorCard", "tile_0119.png", "axe.ogg"],
-    ["warrior_big_slam", "重击", "warrior", "ATTACK", "UNCOMMON", "SINGLE_ENEMY",
-     2, True, 4, 0, 0, 0, 0, 2, 0, 0,
-     "造成 {damage} 点伤害，并施加 {exposed} 回合破绽。", "WarriorCard", "tile_0117.png", "slash.ogg"],
-    ["warrior_block", "格挡", "warrior", "SKILL", "COMMON", "SELF",
-     1, False, 0, 5, 0, 0, 0, 0, 0, 0,
-     "获得 {block} 点护体。", "WarriorCard", "tile_0102.png", "block.ogg"],
-    ["warrior_sharp_knife", "磨刃", "warrior", "ATTACK", "RARE", "SINGLE_ENEMY",
-     1, False, 6, 0, 0, 0, 0, 0, 0, 4,
-     "造成 {damage} 点伤害。本场战斗此牌伤害 +{extra}。", "WarriorCard", "tile_0105.png", "slash.ogg"],
-    ["warrior_slash", "横扫", "warrior", "ATTACK", "COMMON", "ALL_ENEMIES",
-     2, False, 4, 0, 0, 0, 0, 0, 0, 0,
-     "对所有敌人造成 {damage} 点伤害。", "WarriorCard", "tile_0118.png", "slash.ogg"],
-    ["warrior_trickster", "佯攻", "warrior", "SKILL", "UNCOMMON", "SELF",
-     0, False, 0, 2, 1, 0, 0, 0, 0, 0,
-     "获得 {block} 点护体，抽 1 张牌。", "WarriorCard", "tile_0101.png", "enemy_block.ogg"],
-    ["warrior_true_strength", "真武形", "warrior", "POWER", "RARE", "SELF",
-     3, False, 0, 0, 0, 0, 0, 0, 0, 0,
-     "回合开始时，获得 2 层劲气。", "WarriorCard", "tile_0127.png", "true_strength.ogg"],
-
     # Common
     ["toxin", "浊气", "common", "SKILL", "COMMON", "SELF",
      1, True, 0, 0, 0, 0, 0, 0, 0, 0,
-     "拖慢你的行动。", "Card", "tile_0114.png", "true_strength.ogg"],
+     "拖慢你的行动。", "CultivationCard", "tile_0114.png", "true_strength.ogg"],
 ]
 
 for row_idx, card in enumerate(cards, 2):
@@ -173,7 +147,7 @@ dv_target.errorTitle = "Invalid Target"
 ws.add_data_validation(dv_target)
 dv_target.add(f"F2:F{len(cards)+1}")
 
-chars = "beastmaster,body_cultivator,demonic_cultivator,sword_cultivator,warrior,common"
+chars = "beastmaster,body_cultivator,demonic_cultivator,sword_cultivator,common"
 dv_char = DataValidation(type="list", formula1=f'"{chars}"', allow_blank=True)
 dv_char.error = "Please select a valid character"
 dv_char.errorTitle = "Invalid Character"
@@ -199,9 +173,9 @@ notes = [
     ["Qi Flow Stacks", "Qi Flow status stacks", "Qi converts to Muscle at turn start"],
     ["Exposed Duration", "Exposed debuff turns", "Exposed = take more damage"],
     ["Self Damage", "HP lost when used", "0 = no self damage"],
-    ["Extra Damage", "Extra damage (磨刃 only)", "Only for warrior_sharp_knife"],
+    ["Extra Damage", "Extra damage", "Reserved for specialized effects"],
     ["Effect Text", "Description with {placeholders}", "{damage} {block} {draw} {muscle} {qi} {exposed} {self_damage} {extra}"],
-    ["Script Class", "Godot script class", "CultivationCard / WarriorCard / Card"],
+    ["Script Class", "Godot script class", "CultivationCard / Card"],
     ["Icon", "Icon texture file", "Relative to res://art/"],
     ["Sound", "Sound effect file", "Relative to res://art/"],
 ]

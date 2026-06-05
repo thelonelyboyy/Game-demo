@@ -1,23 +1,42 @@
-[gd_resource type="Resource" script_class="Card" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=10 format=3]
 
-[ext_resource type="Script" path="res://characters/sword_cultivator/cards/sword_blood_curse.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/tile_0092.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/slash.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_damage_effect.gd" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="4"]
+[ext_resource type="Resource" path="res://statuses/bleed.tres" id="5"]
+[ext_resource type="Texture2D" path="res://art/tile_0092.png" id="6"]
+[ext_resource type="AudioStream" path="res://art/slash.ogg" id="7"]
+
+[sub_resource type="Resource" id="Resource_self_damage"]
+script = ExtResource("2")
+amount = 3
+affected_by_spirit_root = false
+description_template = "失去 {amount} 点生命。"
+
+[sub_resource type="Resource" id="Resource_damage"]
+script = ExtResource("3")
+amount = 6
+description_template = "造成 {amount} 点伤害。"
+
+[sub_resource type="Resource" id="Resource_bleed"]
+script = ExtResource("4")
+amount = 2
+description_template = "施加 {amount} 回合流血。"
+status = ExtResource("5")
+target_mode = 0
+use_duration = true
 
 [resource]
 script = ExtResource("1")
-base_damage = 6
-self_damage = 3
-bleed_duration = 2
+configured_effects = Array[Resource]([SubResource("Resource_self_damage"), SubResource("Resource_damage"), SubResource("Resource_bleed")])
 id = "sword_blood_curse"
-display_name = "血祭剑咒"
 type = 0
 rarity = 1
 target = 1
 cost = 0
-exhausts = false
 upgrade_type = 1
 element = 1
-icon = ExtResource("2")
-tooltip_text = "[center]失去 %s 点生命，造成 %s 点伤害，施加 %s 回合流血。[/center]"
-sound = ExtResource("3")
+display_name = "血祭剑咒"
+icon = ExtResource("6")
+sound = ExtResource("7")

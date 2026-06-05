@@ -5,6 +5,11 @@ const PIXEL_WORLD_SCALE := 5.0
 const SPIRIT_ROOT_HANDLER := preload("res://scenes/battle/spirit_root_handler.gd")
 const CLASS_MECHANIC_HANDLER := preload("res://scenes/battle/class_mechanic_handler.gd")
 const BATTLE_BACKGROUND := preload("res://test2.png")
+const PLAYER_SCREEN_ANCHOR := Vector2(0.22, 0.50)
+const ENEMY_SINGLE_SCREEN_ANCHOR := Vector2(0.74, 0.50)
+const ENEMY_ROW_START_RATIO := 0.61
+const ENEMY_ROW_END_RATIO := 0.84
+const ENEMY_GROUND_RATIO := 0.50
 
 @export var battle_stats: BattleStats
 @export var char_stats: CharacterStats
@@ -40,6 +45,7 @@ func start_battle() -> void:
 	player.stats = char_stats
 	player_handler.relics = relics
 	enemy_handler.setup_enemies(battle_stats)
+	_arrange_combatants()
 	_setup_spirit_root_handler()
 	_setup_class_mechanic_handler()
 	_prepare_world_ui()
@@ -94,7 +100,7 @@ func _setup_pixel_world() -> void:
 func _prepare_world_ui() -> void:
 	_prepare_combatant_presentation(player, true)
 	_prepare_scaled_node_ui(player)
-	for enemy: Enemy in enemy_handler.get_children():
+	for enemy: Enemy in _get_live_enemies():
 		_prepare_combatant_presentation(enemy, false)
 		_prepare_scaled_node_ui(enemy)
 
@@ -107,6 +113,48 @@ func _prepare_scaled_node_ui(world_node: Node) -> void:
 		var ui_node := world_node.get_node_or_null(ui_name) as Control
 		if ui_node:
 			ui_node.scale = Vector2.ONE / PIXEL_WORLD_SCALE
+
+
+func _arrange_combatants() -> void:
+	var viewport_size := get_viewport_rect().size
+	if viewport_size == Vector2.ZERO:
+		viewport_size = Vector2(1920.0, 1080.0)
+
+	player.position = _screen_to_world(viewport_size * PLAYER_SCREEN_ANCHOR)
+
+	var enemies := _get_live_enemies()
+	var enemy_count := enemies.size()
+	if enemy_count == 0:
+		return
+
+	if enemy_count == 1:
+		var enemy := enemies[0] as Node2D
+		enemy.position = _screen_to_world(viewport_size * ENEMY_SINGLE_SCREEN_ANCHOR)
+		return
+
+	var enemy_y := viewport_size.y * ENEMY_GROUND_RATIO
+	for enemy_index in enemy_count:
+		var enemy := enemies[enemy_index] as Node2D
+		var progress := float(enemy_index) / float(enemy_count - 1)
+		var screen_x := lerpf(
+			viewport_size.x * ENEMY_ROW_START_RATIO,
+			viewport_size.x * ENEMY_ROW_END_RATIO,
+			progress
+		)
+		var depth_offset := (absf(progress - 0.5) - 0.5) * 34.0
+		enemy.position = _screen_to_world(Vector2(screen_x, enemy_y + depth_offset))
+
+
+func _screen_to_world(screen_position: Vector2) -> Vector2:
+	return screen_position / PIXEL_WORLD_SCALE
+
+
+func _get_live_enemies() -> Array[Enemy]:
+	var enemies: Array[Enemy] = []
+	for child in enemy_handler.get_children():
+		if child is Enemy and not child.is_queued_for_deletion():
+			enemies.append(child)
+	return enemies
 
 
 func _setup_spirit_root_handler() -> void:
@@ -154,7 +202,7 @@ func _fit_battle_background(background: TextureRect) -> void:
 	background.size = get_viewport_rect().size
 
 
-func _prepare_combatant_presentation(world_node: Node, is_player := false) -> void:
+func _prepare_combatant_presentation(world_node: Node, _is_player := false) -> void:
 	if not world_node or world_node.has_node("InkStand"):
 		return
 
@@ -170,25 +218,11 @@ func _prepare_combatant_presentation(world_node: Node, is_player := false) -> vo
 
 	var shadow := Polygon2D.new()
 	shadow.polygon = PackedVector2Array([
-		Vector2(-18, 18),
-		Vector2(18, 18),
-		Vector2(28, 25),
-		Vector2(8, 31),
-		Vector2(-24, 28),
+		Vector2(-24, 18),
+		Vector2(22, 18),
+		Vector2(32, 24),
+		Vector2(10, 30),
+		Vector2(-30, 27),
 	])
-	shadow.color = Color(0, 0, 0, 0.38)
+	shadow.color = Color(0, 0, 0, 0.28)
 	stand.add_child(shadow)
-
-	var ring := Line2D.new()
-	ring.closed = true
-	ring.width = 1.0
-	ring.default_color = Color(0.76, 0.62, 0.34, 0.54) if is_player else Color(0.62, 0.25, 0.22, 0.62)
-	ring.points = PackedVector2Array([
-		Vector2(-22, 19),
-		Vector2(-8, 12),
-		Vector2(16, 13),
-		Vector2(26, 20),
-		Vector2(9, 28),
-		Vector2(-16, 27),
-	])
-	stand.add_child(ring)

@@ -59,7 +59,7 @@ func _polish_ui() -> void:
 	hand_band.anchor_right = 1.0
 	hand_band.anchor_top = 1.0
 	hand_band.anchor_bottom = 1.0
-	hand_band.offset_top = -272.0
+	hand_band.offset_top = -252.0
 	add_child(hand_band)
 	move_child(hand_band, 1)
 

@@ -1,8 +1,6 @@
 ﻿#!/usr/bin/env python3
 """
 Regenerate Godot .tres card files from cards_config.xlsx.
-Also updates warrior .gd files to use @export vars for configurable values.
-
 Usage: python regenerate_cards.py [--dry-run]
 """
 
@@ -22,30 +20,6 @@ SCRIPT_CLASS_MAP = {
     "CultivationCard": "res://custom_resources/cultivation_card.gd",
     "Card": "res://custom_resources/card.gd",
 }
-
-WARRIOR_GD_PATHS = {
-    "warrior_angry_anvil": "characters/warrior/cards/warrior_angry_anvil.gd",
-    "warrior_axe_attack": "characters/warrior/cards/warrior_axe_attack.gd",
-    "warrior_big_slam": "characters/warrior/cards/warrior_big_slam.gd",
-    "warrior_block": "characters/warrior/cards/warrior_block.gd",
-    "warrior_sharp_knife": "characters/warrior/cards/warrior_sharp_knife.gd",
-    "warrior_slash": "characters/warrior/cards/warrior_slash.gd",
-    "warrior_trickster": "characters/warrior/cards/warrior_trickster.gd",
-    "warrior_true_strength": "characters/warrior/cards/warrior_true_strength.gd",
-}
-
-# Warrior exported vars mapping: (excel_key, tres_field_name)
-WARRIOR_EXPORTED_VARS = [
-    ("base_damage", "base_damage"),
-    ("base_block", "base_block"),
-    ("exposed_duration", "exposed_duration"),
-    ("self_damage", "self_damage"),
-    ("extra_damage", "extra_damage_after_use"),
-    ("cards_to_draw", "cards_to_draw"),
-    ("muscle_stacks", "muscle_stacks"),
-    ("qi_flow_stacks", "qi_flow_stacks"),
-]
-
 
 def get_tres_output_path(card_id, character):
     if character == "common":
@@ -115,70 +89,6 @@ def generate_cultivation_tres(card_data):
 
     if card_data.get("sound"):
         sound_id = 2 if not card_data.get("icon") else 3
-        lines.append(f'sound = ExtResource("{sound_id}")')
-
-    return "\n".join(lines) + "\n"
-
-
-def generate_warrior_tres(card_data):
-    card_id = card_data["id"]
-    gd_rel_path = WARRIOR_GD_PATHS.get(card_id, "")
-
-    load_steps = 2
-    ext_resources = []
-    next_ext_id = 1
-
-    ext_resources.append(('type="Script"', f'path="res://{gd_rel_path}"', f'id="{next_ext_id}"'))
-    next_ext_id += 1
-    load_steps += 1
-
-    if card_data.get("icon"):
-        ext_resources.append(('type="Texture2D"', f'path="res://art/{card_data["icon"]}"', f'id="{next_ext_id}"'))
-        next_ext_id += 1
-        load_steps += 1
-
-    if card_data.get("sound"):
-        ext_resources.append(('type="AudioStream"', f'path="res://art/{card_data["sound"]}"', f'id="{next_ext_id}"'))
-        next_ext_id += 1
-        load_steps += 1
-
-    lines = [f'[gd_resource type="Resource" script_class="Card" load_steps={load_steps} format=3]']
-    lines.append("")
-
-    for res in ext_resources:
-        lines.append(f'[ext_resource {" ".join(res)}]')
-
-    lines.append("")
-    lines.append("[resource]")
-    lines.append('script = ExtResource("1")')
-
-    # Write exported warrior vars from Excel (non-zero values)
-    for excel_key, tres_key in WARRIOR_EXPORTED_VARS:
-        val = card_data.get(excel_key, 0)
-        if val and val != 0:
-            lines.append(f"{tres_key} = {val}")
-
-    lines.append(f'id = "{card_data["id"]}"')
-    lines.append(f'display_name = "{card_data["display_name"]}"')
-    lines.append(f"type = {TYPE_MAP[card_data['card_type']]}")
-    lines.append(f"rarity = {RARITY_MAP[card_data['rarity']]}")
-    lines.append(f"target = {TARGET_MAP[card_data['target']]}")
-    lines.append(f'cost = {card_data["cost"]}')
-
-    if card_data.get("exhausts"):
-        lines.append("exhausts = true")
-    else:
-        lines.append("exhausts = false")
-
-    if card_data.get("icon"):
-        lines.append('icon = ExtResource("2")')
-
-    tt = card_data.get("effect_text", "")
-    escaped = tt.replace('"', '\\"')
-    lines.append(f'tooltip_text = "[center]{escaped}[/center]"')
-
-    if card_data.get("sound"):
-        sound_id = 3 if card_data.get("icon") else 2
         lines.append(f'sound = ExtResource("{sound_id}")')
 
     return "\n".join(lines) + "\n"
@@ -292,8 +202,6 @@ def main():
 
         if script_class == "CultivationCard":
             content = generate_cultivation_tres(card)
-        elif script_class == "WarriorCard":
-            content = generate_warrior_tres(card)
         else:
             content = generate_base_card_tres(card)
 

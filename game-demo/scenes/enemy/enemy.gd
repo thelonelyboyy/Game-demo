@@ -3,9 +3,12 @@ extends Area2D
 
 const ARROW_OFFSET := 5
 const WHITE_SPRITE_MATERIAL := preload("res://art/white_sprite_material.tres")
-const DEFAULT_ART_MAX_SIZE := 44.0
-const ELITE_ART_MAX_SIZE := 58.0
-const BOSS_ART_MAX_SIZE := 70.0
+const DEFAULT_ART_MAX_SIZE := 88.0
+const ELITE_ART_MAX_SIZE := 116.0
+const BOSS_ART_MAX_SIZE := 140.0
+const TARGET_HIGHLIGHT_PADDING := Vector2(5.0, 4.0)
+const TARGET_CORNER_MIN_LENGTH := 6.0
+const TARGET_CORNER_MAX_LENGTH := 13.0
 
 @export var stats: EnemyStats : set = set_enemy_stats
 
@@ -19,11 +22,14 @@ const BOSS_ART_MAX_SIZE := 70.0
 
 var enemy_action_picker: EnemyActionPicker
 var current_action: EnemyAction : set = set_current_action
+var target_highlight: Node2D
+var target_highlight_lines: Array[Line2D] = []
 
 
 func _ready() -> void:
 	if collision_shape.shape:
 		collision_shape.shape = collision_shape.shape.duplicate()
+	_setup_target_highlight()
 	status_handler.status_owner = self
 
 
@@ -105,6 +111,7 @@ func _fit_sprite_and_overlays() -> void:
 	intent_ui.position = Vector2(-20.0, -visible_size.y * 0.5 - 18.0)
 	stats_ui.position = Vector2(-45.0, visible_size.y * 0.5 + 5.0)
 	status_handler.position = Vector2(-27.0, visible_size.y * 0.5 + 24.0)
+	_update_target_highlight(visible_size)
 
 	var rectangle := collision_shape.shape as RectangleShape2D
 	if rectangle:
@@ -159,8 +166,61 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 
 
 func _on_area_entered(_area: Area2D) -> void:
-	arrow.show()
+	if target_highlight:
+		target_highlight.show()
 
 
 func _on_area_exited(_area: Area2D) -> void:
-	arrow.hide()
+	if target_highlight:
+		target_highlight.hide()
+
+
+func _setup_target_highlight() -> void:
+	target_highlight = Node2D.new()
+	target_highlight.name = "TargetHighlight"
+	target_highlight.z_index = 20
+	target_highlight.hide()
+	add_child(target_highlight)
+
+	for i in range(8):
+		var corner_line := Line2D.new()
+		corner_line.width = 0.85
+		corner_line.default_color = Color(1.0, 0.86, 0.34, 0.50)
+		corner_line.antialiased = true
+		target_highlight.add_child(corner_line)
+		target_highlight_lines.append(corner_line)
+
+
+func _update_target_highlight(visible_size: Vector2) -> void:
+	if not target_highlight or target_highlight_lines.size() < 8:
+		return
+
+	var half_size := visible_size * 0.5 + TARGET_HIGHLIGHT_PADDING
+	var corner_length := clampf(
+		minf(visible_size.x, visible_size.y) * 0.18,
+		TARGET_CORNER_MIN_LENGTH,
+		TARGET_CORNER_MAX_LENGTH
+	)
+	var left := -half_size.x
+	var right := half_size.x
+	var top := -half_size.y
+	var bottom := half_size.y
+
+	_set_corner_line(0, Vector2(left, top), Vector2(left + corner_length, top))
+	_set_corner_line(1, Vector2(left, top), Vector2(left, top + corner_length))
+	_set_corner_line(2, Vector2(right, top), Vector2(right - corner_length, top))
+	_set_corner_line(3, Vector2(right, top), Vector2(right, top + corner_length))
+	_set_corner_line(4, Vector2(right, bottom), Vector2(right - corner_length, bottom))
+	_set_corner_line(5, Vector2(right, bottom), Vector2(right, bottom - corner_length))
+	_set_corner_line(6, Vector2(left, bottom), Vector2(left + corner_length, bottom))
+	_set_corner_line(7, Vector2(left, bottom), Vector2(left, bottom - corner_length))
+
+
+func _set_corner_line(index: int, from: Vector2, to: Vector2) -> void:
+	target_highlight_lines[index].points = PackedVector2Array([from, to])
+
+
+func get_target_anchor_global_position() -> Vector2:
+	if sprite_2d:
+		return sprite_2d.global_position
+	return global_position

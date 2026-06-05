@@ -1,22 +1,33 @@
-[gd_resource type="Resource" script_class="Card" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://characters/sword_cultivator/cards/sword_energy_charge.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/tile_0128.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/block.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_block_effect.gd" id="2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="3"]
+[ext_resource type="Resource" path="res://statuses/energy_charge.tres" id="4"]
+[ext_resource type="Texture2D" path="res://art/tile_0128.png" id="5"]
+[ext_resource type="AudioStream" path="res://art/block.ogg" id="6"]
+
+[sub_resource type="Resource" id="Resource_block"]
+script = ExtResource("2")
+amount = 4
+description_template = "获得 {amount} 点护体。"
+
+[sub_resource type="Resource" id="Resource_energy_charge"]
+script = ExtResource("3")
+amount = 1
+description_template = "获得 {amount} 层凝气。"
+status = ExtResource("4")
 
 [resource]
 script = ExtResource("1")
-base_block = 4
-charge_stacks = 1
+configured_effects = Array[Resource]([SubResource("Resource_block"), SubResource("Resource_energy_charge")])
 id = "sword_energy_charge"
-display_name = "凝气术"
 type = 1
 rarity = 0
 target = 0
 cost = 1
-exhausts = false
 upgrade_type = 1
 element = 1
-icon = ExtResource("2")
-tooltip_text = "[center]获得 %s 点护体，获得 %s 层凝气。[/center]"
-sound = ExtResource("3")
+display_name = "凝气术"
+icon = ExtResource("5")
+sound = ExtResource("6")
