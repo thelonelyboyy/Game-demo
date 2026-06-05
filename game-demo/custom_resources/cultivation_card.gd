@@ -27,12 +27,20 @@ const BEAST_PACK_STATUS = preload("res://statuses/beast_pack.tres")
 @export var beast_pack_stacks := 0
 @export_multiline var effect_text := ""
 
+@export_group("Configured Effects")
+@export var configured_effects: Array[Resource] = []
+
 
 func get_default_tooltip() -> String:
+	if _has_configured_effects():
+		return _build_configured_tooltip()
 	return _build_tooltip(get_spirit_root_modified_value(base_damage))
 
 
 func get_updated_tooltip(player_modifiers: ModifierHandler, enemy_modifiers: ModifierHandler) -> String:
+	if _has_configured_effects():
+		return _build_configured_tooltip(player_modifiers, enemy_modifiers)
+
 	var modified_damage := get_spirit_root_modified_value(base_damage)
 	if base_damage > 0 and player_modifiers:
 		modified_damage = player_modifiers.get_modified_value(modified_damage, Modifier.Type.DMG_DEALT)
@@ -44,6 +52,12 @@ func get_updated_tooltip(player_modifiers: ModifierHandler, enemy_modifiers: Mod
 
 
 func apply_effects(targets: Array[Node], modifiers: ModifierHandler) -> void:
+	if _has_configured_effects():
+		for effect in configured_effects:
+			if effect:
+				effect.execute(self, targets, modifiers)
+		return
+
 	var tree := _get_tree_from_targets(targets)
 	if not tree:
 		return
@@ -132,6 +146,28 @@ func _build_tooltip(damage: int) -> String:
 	return "[center][b]%s[/b]\n%s[/center]" % [get_display_name(), text]
 
 
+func _build_configured_tooltip(player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
+	var lines: PackedStringArray = []
+	for effect in configured_effects:
+		if not effect:
+			continue
+		var line: String = effect.get_description(self, player_modifiers, enemy_modifiers)
+		if not line.is_empty():
+			lines.append(line)
+
+	var text := "\n".join(lines)
+	if text.is_empty() and not effect_text.is_empty():
+		text = effect_text
+	return "[center][b]%s[/b]\n%s[/center]" % [get_display_name(), text]
+
+
+func _has_configured_effects() -> bool:
+	for effect in configured_effects:
+		if effect:
+			return true
+	return false
+
+
 func _get_tree_from_targets(targets: Array[Node]) -> SceneTree:
 	if not targets.is_empty() and targets[0]:
 		return targets[0].get_tree()
@@ -191,6 +227,10 @@ func _consume_forge_damage(player_targets: Array[Node]) -> int:
 
 
 func _upgrade_values() -> void:
+	for effect in configured_effects:
+		if effect:
+			effect.upgrade_values()
+
 	base_damage = _upgrade_number(base_damage)
 	base_block = _upgrade_number(base_block)
 	cards_to_draw = _upgrade_number(cards_to_draw)
@@ -206,6 +246,13 @@ func _upgrade_values() -> void:
 
 
 func get_spirit_root_primary_value() -> int:
+	if _has_configured_effects():
+		var configured_result := 0
+		for effect in configured_effects:
+			if effect:
+				configured_result = maxi(configured_result, effect.get_primary_value(self))
+		return configured_result
+
 	var values := [
 		get_spirit_root_modified_value(base_damage),
 		get_spirit_root_modified_value(base_block),

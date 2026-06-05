@@ -48,6 +48,45 @@ func play() -> void:
 	queue_free()
 
 
+func is_outside_hand_area() -> bool:
+	if not parent:
+		return true
+
+	var hand_rect := Rect2(parent.global_position, parent.size)
+	return not hand_rect.has_point(get_global_mouse_position())
+
+
+func can_auto_release_without_target() -> bool:
+	if not card or not is_outside_hand_area():
+		return false
+
+	if not card.is_single_targeted():
+		return true
+
+	var enemies := get_tree().get_nodes_in_group("enemies")
+	if enemies.size() == 1 and enemies[0] is Enemy:
+		return true
+
+	return card.type != Card.Type.ATTACK and enemies.size() == 1
+
+
+func prepare_auto_release_targets() -> bool:
+	if not card:
+		return false
+
+	if not card.is_single_targeted():
+		targets.clear()
+		return true
+
+	var enemies := get_tree().get_nodes_in_group("enemies")
+	if enemies.size() == 1 and enemies[0] is Enemy:
+		targets.clear()
+		targets.append(enemies[0])
+		return true
+
+	return false
+
+
 func get_active_enemy_modifiers() -> ModifierHandler:
 	if targets.is_empty() or targets.size() > 1 or not targets[0] is Enemy:
 		return null

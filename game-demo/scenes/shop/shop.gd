@@ -9,6 +9,8 @@ const COMMON_SHOP_CARDS := [
 	preload("res://common_cards/strike.tres"),
 	preload("res://common_cards/defend.tres"),
 	preload("res://common_cards/toxin.tres"),
+	preload("res://common_cards/ink_flow_slash.tres"),
+	preload("res://common_cards/muscle_resonance_strike.tres"),
 ]
 
 const SHOP_CARD_COUNT := 6
@@ -23,6 +25,7 @@ const MYTHIC_SHOP_CHANCE := 0.02
 @onready var ui_layer: CanvasLayer = $UILayer
 @onready var cards: HBoxContainer = %Cards
 @onready var relics: HBoxContainer = %Relics
+@onready var back_button: Button = $UILayer/BackButton
 @onready var remove_card_button: Button = %RemoveCardButton
 @onready var shop_keeper_animation: AnimationPlayer = %ShopkeeperAnimation
 @onready var blink_timer: Timer = %BlinkTimer
@@ -35,6 +38,10 @@ var remove_service_used := false
 
 
 func _ready() -> void:
+	ui_layer.move_child(back_button, ui_layer.get_child_count() - 1)
+	if not back_button.pressed.is_connected(_on_back_button_pressed):
+		back_button.pressed.connect(_on_back_button_pressed)
+
 	for shop_card: ShopCard in cards.get_children():
 		shop_card.queue_free()
 
@@ -107,7 +114,7 @@ func _get_available_shop_cards() -> Array[Card]:
 	var result := _dedupe_cards_by_id(char_stats.draftable_cards.duplicate_cards())
 
 	for common_card: Card in COMMON_SHOP_CARDS:
-		var duplicate := common_card.duplicate() as Card
+		var duplicate := common_card.duplicate(true) as Card
 		if duplicate:
 			result.append(duplicate)
 

@@ -68,10 +68,14 @@ func is_single_targeted() -> bool:
 
 
 func _get_targets(targets: Array[Node]) -> Array[Node]:
-	if not targets:
-		return []
+	var tree: SceneTree
+	if not targets.is_empty() and targets[0]:
+		tree = targets[0].get_tree()
+	else:
+		tree = Engine.get_main_loop() as SceneTree
 
-	var tree := targets[0].get_tree()
+	if not tree:
+		return []
 
 	match target:
 		Target.SELF:

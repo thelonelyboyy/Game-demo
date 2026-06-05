@@ -81,7 +81,7 @@ func _get_selected_card_text(card: Card) -> String:
 
 
 func _get_upgrade_preview(card: Card) -> String:
-	var preview := card.duplicate() as Card
+	var preview := card.duplicate(true) as Card
 	if not preview or not preview.upgrade():
 		return ""
 

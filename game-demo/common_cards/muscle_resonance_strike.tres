@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_damage_effect.gd" id="2"]
+[ext_resource type="Texture2D" path="res://art/tile_0118.png" id="3"]
+[ext_resource type="AudioStream" path="res://art/slash.ogg" id="4"]
+
+[sub_resource type="Resource" id="Resource_damage"]
+script = ExtResource("2")
+amount = 4
+description_template = "造成 {amount} 点伤害。"
+
+[sub_resource type="Resource" id="Resource_bonus_damage"]
+script = ExtResource("2")
+amount = 4
+affected_by_spirit_root = false
+require_condition = true
+condition_type = 4
+condition_status_id = "muscle"
+description_template = "若拥有劲气，额外造成 {amount} 点伤害。"
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("Resource_damage"), SubResource("Resource_bonus_damage")])
+id = "muscle_resonance_strike"
+type = 0
+rarity = 0
+target = 1
+cost = 1
+upgrade_type = 1
+element = 0
+profession = 0
+mechanic_tags = PackedStringArray("示例")
+display_name = "劲气共鸣"
+icon = ExtResource("3")
+sound = ExtResource("4")
