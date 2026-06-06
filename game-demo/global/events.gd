@@ -17,6 +17,7 @@ signal player_hand_discarded
 signal player_turn_started
 signal player_turn_ended
 signal player_hit
+signal player_self_damaged(amount: int)
 signal player_died
 
 # Enemy-related events
@@ -39,6 +40,8 @@ signal shop_card_bought(card: Card, gold_cost: int)
 signal shop_exited
 
 # Campfire-related events
+signal campfire_rested(character: CharacterStats, heal_amount: int)
+signal campfire_card_upgraded(character: CharacterStats, card: Card)
 signal campfire_exited
 
 # Battle Reward-related events
@@ -51,6 +54,7 @@ signal treasure_room_exited(found_relic: Relic)
 signal relic_tooltip_requested(relic: Relic)
 
 # Random Event room-related events
+signal event_choice_resolved(effect: String, amount: int, character: CharacterStats, run_stats: RunStats)
 signal event_room_exited
 
 # Blessing room-related events

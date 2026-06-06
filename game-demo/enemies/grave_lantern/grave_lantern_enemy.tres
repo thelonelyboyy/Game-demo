@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
+[ext_resource type="Texture2D" path="res://art/enemies/bone_dragon.png" id="2_art"]
+[ext_resource type="PackedScene" path="res://enemies/toxic_ghost/toxic_ghost_ai.tscn" id="3_ai"]
+
+[resource]
+script = ExtResource("1_stats")
+id = "grave_lantern"
+display_name = "幽冢灯"
+description = "墓道里飘出的魂灯，会借阴火强化自身。"
+ai = ExtResource("3_ai")
+max_health = 24
+art = ExtResource("2_art")

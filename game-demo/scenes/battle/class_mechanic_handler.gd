@@ -3,6 +3,8 @@ extends Node
 
 const FORGE_SWORD_STATUS = preload("res://statuses/forge_sword.tres")
 const BEAST_PACK_STATUS = preload("res://statuses/beast_pack.tres")
+const GOLD_BODY_STATUS = preload("res://statuses/gold_body.tres")
+const MUSCLE_STATUS = preload("res://statuses/muscle.tres")
 
 const SOUL_MARK_HEAL_PER_STACK := 1
 
@@ -45,6 +47,12 @@ func _on_card_played(card: Card) -> void:
 
 	if _has_tag(card, "铸剑"):
 		_add_status_to_player(FORGE_SWORD_STATUS, 1)
+
+	if _has_tag(card, "金身"):
+		_add_status_to_player(GOLD_BODY_STATUS, 1)
+
+	if _has_tag(card, "血炼") and player.stats.health <= ceili(player.stats.max_health * 0.5):
+		_add_status_to_player(MUSCLE_STATUS, 1)
 
 
 func _on_enemy_died(enemy: Enemy) -> void:

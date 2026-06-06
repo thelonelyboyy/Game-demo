@@ -1,12 +1,17 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/tile_0129.png" id="2"]
 [ext_resource type="AudioStream" path="res://art/block.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_block_effect.gd" id="auto_effect_block"]
+
+[sub_resource type="Resource" id="AutoEffect_1_block"]
+script = ExtResource("auto_effect_block")
+amount = 7
 
 [resource]
 script = ExtResource("1")
-base_block = 7
+configured_effects = Array[Resource]([SubResource("AutoEffect_1_block")])
 effect_text = "获得 {block} 点护体。"
 id = "turtle_shell"
 type = 1

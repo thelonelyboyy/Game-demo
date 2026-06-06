@@ -16,12 +16,18 @@ func set_status(new_status: Status) -> void:
 	icon.texture = status.icon
 	duration.visible = status.stack_type == Status.StackType.DURATION
 	stacks.visible = status.stack_type == Status.StackType.INTENSITY
-	custom_minimum_size = icon.size
+	custom_minimum_size = icon.custom_minimum_size
 	
 	if duration.visible:
-		custom_minimum_size = duration.size + duration.position
+		custom_minimum_size = Vector2(
+			maxf(custom_minimum_size.x, duration.position.x + duration.size.x),
+			maxf(custom_minimum_size.y, duration.position.y + duration.size.y)
+		)
 	elif stacks.visible:
-		custom_minimum_size = stacks.size + stacks.position
+		custom_minimum_size = Vector2(
+			maxf(custom_minimum_size.x, stacks.position.x + stacks.size.x),
+			maxf(custom_minimum_size.y, stacks.position.y + stacks.size.y)
+		)
 	
 	if not status.status_changed.is_connected(_on_status_changed):
 		status.status_changed.connect(_on_status_changed)

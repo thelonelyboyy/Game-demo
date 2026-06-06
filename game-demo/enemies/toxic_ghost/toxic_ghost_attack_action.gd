@@ -25,7 +25,7 @@ func perform_action() -> void:
 	
 	tween.tween_property(enemy, "global_position", end, 0.4)
 	tween.tween_callback(damage_effect.execute.bind(target_array))
-	tween.tween_callback(player.stats.draw_pile.add_card.bind(TOXIN.duplicate()))
+	tween.tween_callback(_add_toxin_to_draw_pile.bind(player))
 	tween.tween_interval(0.25)
 	tween.tween_property(enemy, "global_position", start, 0.4)
 	
@@ -43,4 +43,11 @@ func update_intent_text() -> void:
 	var modified_dmg := player.modifier_handler.get_modified_value(damage, Modifier.Type.DMG_TAKEN)
 	var final_dmg := enemy.modifier_handler.get_modified_value(modified_dmg, Modifier.Type.DMG_DEALT)
 	intent.current_text = intent.base_text % final_dmg
+
+
+func _add_toxin_to_draw_pile(player: Player) -> void:
+	if not player or not player.stats or not player.stats.draw_pile:
+		return
+
+	player.stats.draw_pile.add_card(TOXIN.duplicate())
 

@@ -35,7 +35,7 @@ func save_data() -> void:
 
 static func load_data() -> SaveGame:
 	if FileAccess.file_exists(SAVE_PATH):
-		var save := ResourceLoader.load(SAVE_PATH) as SaveGame
+		var save := ResourceLoader.load(SAVE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as SaveGame
 		if save:
 			save._migrate_card_resources()
 		return save

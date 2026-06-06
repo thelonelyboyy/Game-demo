@@ -1,13 +1,23 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_life_for_mana.png" id="2"]
 [ext_resource type="AudioStream" path="res://art/block.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="auto_effect_draw"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
+
+[sub_resource type="Resource" id="AutoEffect_1_draw"]
+script = ExtResource("auto_effect_draw")
+amount = 1
+
+[sub_resource type="Resource" id="AutoEffect_2_self_damage"]
+script = ExtResource("auto_effect_self_damage")
+amount = 2
+affected_by_spirit_root = false
 
 [resource]
 script = ExtResource("1")
-cards_to_draw = 1
-self_damage = 2
+configured_effects = Array[Resource]([SubResource("AutoEffect_1_draw"), SubResource("AutoEffect_2_self_damage")])
 effect_text = "失去 {self_damage} 点生命，抽 {draw} 张牌。"
 id = "demon_life_for_mana"
 type = 1

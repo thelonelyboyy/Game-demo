@@ -2,7 +2,7 @@ class_name Relic
 extends Resource
 
 enum Type {START_OF_TURN, START_OF_COMBAT, END_OF_TURN, END_OF_COMBAT, EVENT_BASED}
-enum CharacterType {ALL, ASSASSIN, WARRIOR, WIZARD}
+enum CharacterType {ALL, BODY, SWORD, DEMONIC, BEASTMASTER}
 
 @export var relic_name: String
 @export var id: String
@@ -38,8 +38,26 @@ func can_appear_as_reward(character: CharacterStats) -> bool:
 
 	if character_type == CharacterType.ALL:
 		return true
-		
-	var relic_char_name: String = CharacterType.keys()[character_type].to_lower()
-	var char_name := character.character_name.to_lower()
-	
-	return relic_char_name == char_name
+
+	return character_type == _get_character_type(character)
+
+
+func _get_character_type(character: CharacterStats) -> CharacterType:
+	if not character:
+		return CharacterType.ALL
+
+	var source_path := character.resource_path
+	if source_path.is_empty() and character.draftable_cards:
+		source_path = character.draftable_cards.resource_path
+	if source_path.is_empty() and character.starting_deck:
+		source_path = character.starting_deck.resource_path
+
+	if source_path.contains("body_cultivator"):
+		return CharacterType.BODY
+	if source_path.contains("sword_cultivator"):
+		return CharacterType.SWORD
+	if source_path.contains("demonic_cultivator"):
+		return CharacterType.DEMONIC
+	if source_path.contains("beastmaster"):
+		return CharacterType.BEASTMASTER
+	return CharacterType.ALL

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
+[ext_resource type="Texture2D" path="res://art/enemies/bone_dragon.png" id="2_art"]
+[ext_resource type="PackedScene" path="res://enemies/toxic_ghost/toxic_ghost_ai.tscn" id="3_ai"]
+
+[resource]
+script = ExtResource("1_stats")
+id = "shadow_reaper"
+display_name = "摄魂影"
+description = "从阴影里凝成的修罗影，擅长拖慢牌序。"
+ai = ExtResource("3_ai")
+max_health = 46
+art = ExtResource("2_art")

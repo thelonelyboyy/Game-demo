@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemy/enemy.tscn" id="1_enemy"]
+[ext_resource type="Resource" path="res://enemies/mist_wolf/mist_wolf_enemy.tres" id="2_stats"]
+[ext_resource type="Resource" path="res://enemies/ash_imp/ash_imp_enemy.tres" id="3_stats"]
+[ext_resource type="Resource" path="res://enemies/venom_moth/venom_moth_enemy.tres" id="4_stats"]
+
+[node name="Enemies" type="Node2D"]
+
+[node name="Enemy1" parent="." instance=ExtResource("1_enemy")]
+position = Vector2(226, 128)
+stats = ExtResource("2_stats")
+
+[node name="Enemy2" parent="." instance=ExtResource("1_enemy")]
+position = Vector2(284, 120)
+stats = ExtResource("3_stats")
+
+[node name="Enemy3" parent="." instance=ExtResource("1_enemy")]
+position = Vector2(340, 126)
+stats = ExtResource("4_stats")

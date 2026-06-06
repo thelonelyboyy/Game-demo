@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BattleStats" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/battle_stats.gd" id="1_stats"]
+[ext_resource type="PackedScene" path="res://battles/demo_e_jade_wyrm.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_stats")
+battle_tier = 1
+weight = 1.00
+gold_reward_min = 112
+gold_reward_max = 145
+enemy_health_multiplier = 1.00
+enemy_damage_multiplier = 1.12
+enemies = ExtResource("2_scene")

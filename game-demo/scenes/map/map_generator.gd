@@ -290,12 +290,7 @@ func _set_room_randomly(room_to_set: Room) -> void:
 	if type_candidate == Room.Type.ELITE:
 		_setup_elite_battle(room_to_set)
 	elif type_candidate == Room.Type.MONSTER:
-		var tier_for_monster_rooms := 0
-		
-		if room_to_set.row > 2:
-			tier_for_monster_rooms = 1
-			
-		room_to_set.battle_stats = battle_stats_pool.get_random_battle_for_tier(tier_for_monster_rooms)
+		room_to_set.battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
 	
 	if type_candidate == Room.Type.EVENT:
 		room_to_set.event_scene = event_room_pool.get_random()
@@ -331,7 +326,9 @@ func _prepend_blessing_room() -> void:
 
 
 func _setup_elite_battle(room: Room) -> void:
-	var battle_stats := ELITE_BATTLE as BattleStats
+	var battle_stats := battle_stats_pool.get_random_battle_for_tier(1)
+	if not battle_stats:
+		battle_stats = ELITE_BATTLE as BattleStats
 	if not battle_stats:
 		battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
 	if not battle_stats:

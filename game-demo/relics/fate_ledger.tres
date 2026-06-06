@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EventChoiceRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/event_choice_relic.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/relics/phase4/star_compass.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+relic_name = "命簿残页"
+id = "fate_ledger"
+type = 4
+character_type = 0
+starter_relic = false
+icon = ExtResource("2_icon")
+tooltip = "每次完成事件选择后，获得 8 灵石。"
+reward_mode = 0
+amount = 8
+require_costly_choice = false

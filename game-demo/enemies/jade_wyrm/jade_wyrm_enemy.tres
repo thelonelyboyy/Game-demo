@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
+[ext_resource type="Texture2D" path="res://art/enemies/bone_dragon.png" id="2_art"]
+[ext_resource type="PackedScene" path="res://enemies/crab/crab_enemy_ai.tscn" id="3_ai"]
+
+[resource]
+script = ExtResource("1_stats")
+id = "jade_wyrm"
+display_name = "碧鳞蛟"
+description = "未化龙的碧鳞蛟，攻势与鳞甲同样棘手。"
+ai = ExtResource("3_ai")
+max_health = 58
+art = ExtResource("2_art")

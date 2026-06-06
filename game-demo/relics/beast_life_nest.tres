@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CardPlayHealRelic" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/card_play_heal_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/phase4/beast_jade_whistle.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "灵巢"
+id = "beast_life_nest"
+type = 4
+character_type = 4
+icon = ExtResource("2")
+tooltip = "驭兽师专属。每回合第一次打出驭兽牌时，回复 2 点生命。"
+match_profession = 4
+heal_amount = 2
+once_per_turn = true

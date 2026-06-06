@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BattleStats" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/battle_stats.gd" id="1_stats"]
+[ext_resource type="PackedScene" path="res://battles/demo_n_storm_hawk.tscn" id="2_scene"]
+
+[resource]
+script = ExtResource("1_stats")
+battle_tier = 0
+weight = 1.50
+gold_reward_min = 50
+gold_reward_max = 64
+enemy_health_multiplier = 1.00
+enemy_damage_multiplier = 1.00
+enemies = ExtResource("2_scene")

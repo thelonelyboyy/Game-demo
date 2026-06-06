@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://test_data/run_flow_smoke.gd" id="1_script"]
+
+[node name="RunFlowSmoke" type="Node"]
+script = ExtResource("1_script")

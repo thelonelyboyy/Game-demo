@@ -24,12 +24,15 @@ const ENEMY_GROUND_RATIO := 0.50
 var pixel_world: Node2D
 var spirit_root_handler: SpiritRootHandler
 var class_mechanic_handler: ClassMechanicHandler
+var battle_active := false
+var victory_resolving := false
 
 
 func _ready() -> void:
 	_setup_ink_backdrop()
 	_setup_pixel_world()
 	enemy_handler.child_order_changed.connect(_on_enemies_child_order_changed)
+	Events.enemy_died.connect(_on_enemy_died_for_victory)
 	Events.enemy_turn_ended.connect(_on_enemy_turn_ended)
 	
 	Events.player_turn_ended.connect(player_handler.end_turn)
@@ -39,6 +42,8 @@ func _ready() -> void:
 
 func start_battle() -> void:
 	get_tree().paused = false
+	battle_active = false
+	victory_resolving = false
 	MusicPlayer.play(music, true)
 	
 	battle_ui.char_stats = char_stats
@@ -51,12 +56,27 @@ func start_battle() -> void:
 	_prepare_world_ui()
 	enemy_handler.reset_enemy_actions()
 	
-	relics.relics_activated.connect(_on_relics_activated)
+	if not relics.relics_activated.is_connected(_on_relics_activated):
+		relics.relics_activated.connect(_on_relics_activated)
+	battle_active = true
 	relics.activate_relics_by_type(Relic.Type.START_OF_COMBAT)
 
 
 func _on_enemies_child_order_changed() -> void:
-	if enemy_handler.get_child_count() == 0 and is_instance_valid(relics):
+	_check_for_battle_victory.call_deferred()
+
+
+func _on_enemy_died_for_victory(_enemy: Enemy) -> void:
+	_check_for_battle_victory.call_deferred()
+
+
+func _check_for_battle_victory() -> void:
+	if not battle_active or victory_resolving or not is_inside_tree():
+		return
+
+	if _get_live_enemies().is_empty() and is_instance_valid(relics):
+		victory_resolving = true
+		battle_active = false
 		relics.activate_relics_by_type(Relic.Type.END_OF_COMBAT)
 
 
@@ -66,6 +86,7 @@ func _on_enemy_turn_ended() -> void:
 
 
 func _on_player_died() -> void:
+	battle_active = false
 	Events.battle_over_screen_requested.emit("渡劫失败", BattleOverPanel.Type.LOSE)
 	SaveGame.delete_data()
 
@@ -77,6 +98,25 @@ func _on_relics_activated(type: Relic.Type) -> void:
 			battle_ui.initialize_card_pile_ui()
 		Relic.Type.END_OF_COMBAT:
 			Events.battle_over_screen_requested.emit("战斗胜利", BattleOverPanel.Type.WIN)
+
+
+func _exit_tree() -> void:
+	battle_active = false
+	victory_resolving = false
+	if enemy_handler and enemy_handler.child_order_changed.is_connected(_on_enemies_child_order_changed):
+		enemy_handler.child_order_changed.disconnect(_on_enemies_child_order_changed)
+	if Events.enemy_died.is_connected(_on_enemy_died_for_victory):
+		Events.enemy_died.disconnect(_on_enemy_died_for_victory)
+	if Events.enemy_turn_ended.is_connected(_on_enemy_turn_ended):
+		Events.enemy_turn_ended.disconnect(_on_enemy_turn_ended)
+	if Events.player_turn_ended.is_connected(player_handler.end_turn):
+		Events.player_turn_ended.disconnect(player_handler.end_turn)
+	if Events.player_hand_discarded.is_connected(enemy_handler.start_turn):
+		Events.player_hand_discarded.disconnect(enemy_handler.start_turn)
+	if Events.player_died.is_connected(_on_player_died):
+		Events.player_died.disconnect(_on_player_died)
+	if relics and relics.relics_activated.is_connected(_on_relics_activated):
+		relics.relics_activated.disconnect(_on_relics_activated)
 
 
 func _setup_pixel_world() -> void:
@@ -113,6 +153,9 @@ func _prepare_scaled_node_ui(world_node: Node) -> void:
 		var ui_node := world_node.get_node_or_null(ui_name) as Control
 		if ui_node:
 			ui_node.scale = Vector2.ONE / PIXEL_WORLD_SCALE
+
+	if world_node.has_method("refresh_battle_overlays"):
+		world_node.call("refresh_battle_overlays")
 
 
 func _arrange_combatants() -> void:
@@ -199,7 +242,6 @@ func _fit_battle_background(background: TextureRect) -> void:
 	background.offset_top = 0.0
 	background.offset_right = 0.0
 	background.offset_bottom = 0.0
-	background.size = get_viewport_rect().size
 
 
 func _prepare_combatant_presentation(world_node: Node, _is_player := false) -> void:

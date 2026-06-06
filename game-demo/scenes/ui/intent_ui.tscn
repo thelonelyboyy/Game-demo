@@ -4,19 +4,17 @@
 [ext_resource type="Texture2D" uid="uid://bq4im540nk025" path="res://art/tile_0106.png" id="1_giyx2"]
 
 [node name="IntentUI" type="HBoxContainer"]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 14.0
-grow_horizontal = 2
-theme_override_constants/separation = 0
+custom_minimum_size = Vector2(68, 30)
+offset_left = -34.0
+offset_right = 34.0
+offset_bottom = 30.0
+mouse_filter = 2
+theme_override_constants/separation = 3
 alignment = 1
 script = ExtResource("1_aarbb")
 
 [node name="Icon" type="TextureRect" parent="."]
-custom_minimum_size = Vector2(14, 14)
+custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 texture = ExtResource("1_giyx2")
 expand_mode = 1
@@ -26,5 +24,10 @@ stretch_mode = 5
 layout_mode = 2
 size_flags_vertical = 1
 text = "7"
+theme_override_colors/font_color = Color(1, 0.94, 0.76, 1)
+theme_override_colors/font_shadow_color = Color(0.10, 0.02, 0.04, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 vertical_alignment = 1

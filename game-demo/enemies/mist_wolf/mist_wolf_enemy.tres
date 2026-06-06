@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
+[ext_resource type="Texture2D" path="res://art/enemies/silver_moon_wolf.png" id="2_art"]
+[ext_resource type="PackedScene" path="res://enemies/bat/bat_enemy_ai.tscn" id="3_ai"]
+
+[resource]
+script = ExtResource("1_stats")
+id = "mist_wolf"
+display_name = "雾隐狼"
+description = "藏在云海边缘的灵狼，习惯用连扑试探修士破绽。"
+ai = ExtResource("3_ai")
+max_health = 14
+art = ExtResource("2_art")

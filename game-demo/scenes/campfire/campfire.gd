@@ -19,7 +19,10 @@ func _ready() -> void:
 
 func _on_rest_button_pressed() -> void:
 	_set_action_buttons_disabled(true)
-	char_stats.heal(ceili(char_stats.max_health * 0.3))
+	var heal_amount := ceili(char_stats.max_health * 0.3)
+	var initial_health := char_stats.health
+	char_stats.heal(heal_amount)
+	Events.campfire_rested.emit(char_stats, maxi(0, char_stats.health - initial_health))
 	animation_player.play("fade_out")
 
 
@@ -35,7 +38,10 @@ func _on_upgrade_button_pressed() -> void:
 	active_card_upgrade.card_upgraded.connect(_on_card_upgraded)
 
 
-func _on_card_upgraded(_card: Card) -> void:
+func _on_card_upgraded(card: Card) -> void:
+	if card:
+		Events.campfire_card_upgraded.emit(char_stats, card)
+
 	if active_card_upgrade:
 		active_card_upgrade.queue_free()
 		active_card_upgrade = null

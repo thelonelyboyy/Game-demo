@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
+[ext_resource type="Texture2D" path="res://art/enemies/bull_demon.png" id="2_art"]
+[ext_resource type="PackedScene" path="res://enemies/toxic_ghost/toxic_ghost_ai.tscn" id="3_ai"]
+
+[resource]
+script = ExtResource("1_stats")
+id = "black_lotus_matriarch"
+display_name = "黑莲圣母"
+description = "黑莲业火化身的首领，擅长在消耗战中压垮修士。"
+ai = ExtResource("3_ai")
+max_health = 96
+art = ExtResource("2_art")

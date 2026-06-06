@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardPlayDamageRelic" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/card_play_damage_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/phase4/metal_edge_ring.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "剑鸣玉坠"
+id = "sword_resonance_charm"
+type = 4
+character_type = 2
+icon = ExtResource("2")
+tooltip = "剑修专属。每回合第一次打出剑修牌时，对随机敌人造成 3 点伤害。"
+match_profession = 2
+damage_amount = 3
+target_mode = 1
+once_per_turn = true

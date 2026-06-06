@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CardPlayStatusRelic" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/card_play_status_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/phase4/ghost_contract.png" id="2"]
+[ext_resource type="Resource" path="res://statuses/soul_mark.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "魔心印"
+id = "demon_heart_seal"
+type = 4
+character_type = 3
+icon = ExtResource("2")
+tooltip = "魔修专属。每回合第一次打出魔修牌时，给随机敌人 1 层魂印。"
+match_profession = 3
+status = ExtResource("3")
+stacks = 1
+target_mode = 2
+once_per_turn = true

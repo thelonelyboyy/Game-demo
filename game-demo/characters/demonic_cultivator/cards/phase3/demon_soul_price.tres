@@ -1,14 +1,35 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_soul_price.png" id="2"]
 [ext_resource type="AudioStream" path="res://art/true_strength.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
+[ext_resource type="Resource" path="res://statuses/muscle.tres" id="auto_status_muscle"]
+[ext_resource type="Resource" path="res://statuses/qi_flow.tres" id="auto_status_qi_flow"]
+
+[sub_resource type="Resource" id="AutoEffect_1_self_damage"]
+script = ExtResource("auto_effect_self_damage")
+amount = 5
+affected_by_spirit_root = false
+
+[sub_resource type="Resource" id="AutoEffect_2_status"]
+script = ExtResource("auto_effect_status")
+status = ExtResource("auto_status_muscle")
+target_mode = 1
+use_duration = false
+amount = 2
+
+[sub_resource type="Resource" id="AutoEffect_3_status"]
+script = ExtResource("auto_effect_status")
+status = ExtResource("auto_status_qi_flow")
+target_mode = 1
+use_duration = false
+amount = 1
 
 [resource]
 script = ExtResource("1")
-muscle_stacks = 2
-qi_flow_stacks = 1
-self_damage = 5
+configured_effects = Array[Resource]([SubResource("AutoEffect_1_self_damage"), SubResource("AutoEffect_2_status"), SubResource("AutoEffect_3_status")])
 effect_text = "失去 {self_damage} 点生命，获得 {muscle} 层劲气和 {qi} 层灵息。"
 id = "demon_soul_price"
 type = 2

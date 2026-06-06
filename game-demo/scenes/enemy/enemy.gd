@@ -9,6 +9,9 @@ const BOSS_ART_MAX_SIZE := 140.0
 const TARGET_HIGHLIGHT_PADDING := Vector2(5.0, 4.0)
 const TARGET_CORNER_MIN_LENGTH := 6.0
 const TARGET_CORNER_MAX_LENGTH := 13.0
+const HEALTH_BAR_HALF_WIDTH := 88.0
+const STATUS_ROW_HALF_WIDTH := 20.0
+const INTENT_HALF_WIDTH := 34.0
 
 @export var stats: EnemyStats : set = set_enemy_stats
 
@@ -24,6 +27,7 @@ var enemy_action_picker: EnemyActionPicker
 var current_action: EnemyAction : set = set_current_action
 var target_highlight: Node2D
 var target_highlight_lines: Array[Line2D] = []
+var sprite_visible_size := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -107,10 +111,9 @@ func _fit_sprite_and_overlays() -> void:
 	sprite_2d.scale = Vector2.ONE * sprite_scale
 
 	var visible_size := texture_size * sprite_scale
+	sprite_visible_size = visible_size
 	arrow.position = Vector2.RIGHT * (visible_size.x * 0.5 + ARROW_OFFSET)
-	intent_ui.position = Vector2(-20.0, -visible_size.y * 0.5 - 18.0)
-	stats_ui.position = Vector2(-45.0, visible_size.y * 0.5 + 5.0)
-	status_handler.position = Vector2(-27.0, visible_size.y * 0.5 + 24.0)
+	refresh_battle_overlays()
 	_update_target_highlight(visible_size)
 
 	var rectangle := collision_shape.shape as RectangleShape2D
@@ -126,12 +129,40 @@ func _get_target_art_max_size() -> float:
 		return DEFAULT_ART_MAX_SIZE
 
 	match stats.id:
-		"bull_demon":
-			return ELITE_ART_MAX_SIZE
-		"bone_dragon":
+		"bone_dragon", "black_lotus_matriarch", "sky_palace_guardian", "abyssal_sword_soul", "eclipse_tyrant":
 			return BOSS_ART_MAX_SIZE
+		"bull_demon", "iron_golem", "blood_tiger", "thunder_roc", "shadow_reaper", "jade_wyrm":
+			return ELITE_ART_MAX_SIZE
 		_:
 			return DEFAULT_ART_MAX_SIZE
+
+
+func refresh_battle_overlays() -> void:
+	if sprite_visible_size == Vector2.ZERO:
+		return
+
+	var stats_scale := _control_scale(stats_ui)
+	var status_scale := _control_scale(status_handler)
+	var intent_scale := _control_scale(intent_ui)
+
+	intent_ui.position = Vector2(
+		-INTENT_HALF_WIDTH * intent_scale,
+		-sprite_visible_size.y * 0.33 - 24.0 * intent_scale
+	)
+	stats_ui.position = Vector2(
+		-HEALTH_BAR_HALF_WIDTH * stats_scale,
+		sprite_visible_size.y * 0.5 + 8.0 * stats_scale
+	)
+	status_handler.position = Vector2(
+		-STATUS_ROW_HALF_WIDTH * status_scale,
+		stats_ui.position.y + 27.0 * status_scale
+	)
+
+
+func _control_scale(control: Control) -> float:
+	if not control:
+		return 1.0
+	return maxf(control.scale.x, 0.001)
 
 
 func do_turn() -> void:

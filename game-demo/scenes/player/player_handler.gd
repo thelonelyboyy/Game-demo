@@ -17,38 +17,64 @@ const HAND_DISCARD_INTERVAL := 0.25
 @export var hand: Hand
 
 var character: CharacterStats
+var battle_running := false
+var draw_tween: Tween
+var discard_tween: Tween
 
 
 func _ready() -> void:
-	Events.card_played.connect(_on_card_played)
+	if not Events.card_played.is_connected(_on_card_played):
+		Events.card_played.connect(_on_card_played)
 
 
 func start_battle(char_stats: CharacterStats) -> void:
+	if not char_stats or not char_stats.deck:
+		return
+
 	character = char_stats
 	character.draw_pile = character.deck.custom_duplicate()
 	character.draw_pile.bind_cards_to_owner(character)
 	character.draw_pile.shuffle()
 	character.discard = CardPile.new()
 	character.discard.bind_cards_to_owner(character)
-	relics.relics_activated.connect(_on_relics_activated)
-	player.status_handler.statuses_applied.connect(_on_statuses_applied)
+	battle_running = true
+
+	if relics and not relics.relics_activated.is_connected(_on_relics_activated):
+		relics.relics_activated.connect(_on_relics_activated)
+	if player and player.status_handler and not player.status_handler.statuses_applied.is_connected(_on_statuses_applied):
+		player.status_handler.statuses_applied.connect(_on_statuses_applied)
 	start_turn()
 
 
 func start_turn() -> void:
+	if not _can_use_card_piles():
+		return
+
 	character.block = 0
 	character.reset_mana()
 	Events.player_turn_started.emit()
-	relics.activate_relics_by_type(Relic.Type.START_OF_TURN)
+	if relics:
+		relics.activate_relics_by_type(Relic.Type.START_OF_TURN)
 
 
 func end_turn() -> void:
-	hand.disable_hand()
-	relics.activate_relics_by_type(Relic.Type.END_OF_TURN)
+	if not battle_running:
+		return
+
+	if hand:
+		hand.disable_hand()
+	if relics:
+		relics.activate_relics_by_type(Relic.Type.END_OF_TURN)
 
 
 func draw_card(is_start_of_turn_draw := false) -> void:
+	if not _can_use_card_piles() or not hand:
+		return
+
 	reshuffle_deck_from_discard()
+	if not character.draw_pile or character.draw_pile.empty():
+		return
+
 	var card := character.draw_pile.draw_card()
 	if not card:
 		return
@@ -60,39 +86,55 @@ func draw_card(is_start_of_turn_draw := false) -> void:
 
 
 func draw_cards(amount: int, is_start_of_turn_draw: bool = false) -> void:
-	var tween := create_tween()
+	if not _can_use_card_piles() or amount <= 0:
+		if is_start_of_turn_draw and battle_running:
+			Events.player_hand_drawn.emit()
+		return
+
+	draw_tween = create_tween()
 	for i in range(amount):
-		tween.tween_callback(draw_card.bind(is_start_of_turn_draw))
-		tween.tween_interval(HAND_DRAW_INTERVAL)
+		draw_tween.tween_callback(draw_card.bind(is_start_of_turn_draw))
+		draw_tween.tween_interval(HAND_DRAW_INTERVAL)
 	
-	tween.finished.connect(
+	draw_tween.finished.connect(
 		func(): 
-			hand.enable_hand()
+			if not battle_running:
+				return
+			if hand:
+				hand.enable_hand()
 			if is_start_of_turn_draw:
 				Events.player_hand_drawn.emit()
 	)
 
 
 func discard_cards() -> void:
+	if not _can_use_card_piles() or not hand:
+		return
+
 	if hand.get_child_count() == 0:
 		character.reset_temporary_card_costs()
 		Events.player_hand_discarded.emit()
 		return
 
-	var tween := create_tween()
+	discard_tween = create_tween()
 	for card_ui: CardUI in hand.get_children():
-		tween.tween_callback(character.discard.add_card.bind(card_ui.card))
-		tween.tween_callback(hand.discard_card.bind(card_ui))
-		tween.tween_interval(HAND_DISCARD_INTERVAL)
+		discard_tween.tween_callback(character.discard.add_card.bind(card_ui.card))
+		discard_tween.tween_callback(hand.discard_card.bind(card_ui))
+		discard_tween.tween_interval(HAND_DISCARD_INTERVAL)
 	
-	tween.finished.connect(
+	discard_tween.finished.connect(
 		func():
+			if not battle_running:
+				return
 			character.reset_temporary_card_costs()
 			Events.player_hand_discarded.emit()
 	)
 
 
 func reshuffle_deck_from_discard() -> void:
+	if not _can_use_card_piles():
+		return
+
 	if not character.draw_pile.empty():
 		return
 
@@ -103,6 +145,8 @@ func reshuffle_deck_from_discard() -> void:
 
 
 func _on_card_played(card: Card) -> void:
+	if not battle_running or not character or not character.discard or not card:
+		return
 	if card.exhausts or card.type == Card.Type.POWER:
 		return
 	
@@ -110,6 +154,9 @@ func _on_card_played(card: Card) -> void:
 
 
 func _on_statuses_applied(type: Status.Type) -> void:
+	if not battle_running or not character:
+		return
+
 	match type:
 		Status.Type.START_OF_TURN:
 			draw_cards(character.cards_per_turn, true)
@@ -118,8 +165,34 @@ func _on_statuses_applied(type: Status.Type) -> void:
 
 
 func _on_relics_activated(type: Relic.Type) -> void:
+	if not battle_running or not player or not player.status_handler:
+		return
+
 	match type:
 		Relic.Type.START_OF_TURN:
 			player.status_handler.apply_statuses_by_type(Status.Type.START_OF_TURN)
 		Relic.Type.END_OF_TURN:
 			player.status_handler.apply_statuses_by_type(Status.Type.END_OF_TURN)
+
+
+func _exit_tree() -> void:
+	battle_running = false
+	if draw_tween and draw_tween.is_running():
+		draw_tween.kill()
+	if discard_tween and discard_tween.is_running():
+		discard_tween.kill()
+	if Events.card_played.is_connected(_on_card_played):
+		Events.card_played.disconnect(_on_card_played)
+	if relics and relics.relics_activated.is_connected(_on_relics_activated):
+		relics.relics_activated.disconnect(_on_relics_activated)
+	if player and player.status_handler and player.status_handler.statuses_applied.is_connected(_on_statuses_applied):
+		player.status_handler.statuses_applied.disconnect(_on_statuses_applied)
+
+
+func _can_use_card_piles() -> bool:
+	return (
+		battle_running
+		and character != null
+		and character.draw_pile != null
+		and character.discard != null
+	)

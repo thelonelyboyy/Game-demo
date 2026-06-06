@@ -1,13 +1,29 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/cards/sword_cultivator/sword_blade_embryo.png" id="2"]
 [ext_resource type="AudioStream" path="res://art/true_strength.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
+[ext_resource type="Resource" path="res://statuses/qi_flow.tres" id="auto_status_qi_flow"]
+[ext_resource type="Resource" path="res://statuses/forge_sword.tres" id="auto_status_forge_sword"]
+
+[sub_resource type="Resource" id="AutoEffect_1_status"]
+script = ExtResource("auto_effect_status")
+status = ExtResource("auto_status_qi_flow")
+target_mode = 1
+use_duration = false
+amount = 1
+
+[sub_resource type="Resource" id="AutoEffect_2_status"]
+script = ExtResource("auto_effect_status")
+status = ExtResource("auto_status_forge_sword")
+target_mode = 1
+use_duration = false
+amount = 1
 
 [resource]
 script = ExtResource("1")
-qi_flow_stacks = 1
-forge_sword_stacks = 1
+configured_effects = Array[Resource]([SubResource("AutoEffect_1_status"), SubResource("AutoEffect_2_status")])
 effect_text = "获得 {forge} 层铸剑和 {qi} 层灵息。"
 id = "sword_blade_embryo"
 type = 2

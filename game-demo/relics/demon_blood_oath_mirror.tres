@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SelfDamageRelic" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/self_damage_relic.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://art/relics/phase4/blood_jade.png" id="2_icon"]
+[ext_resource type="Resource" path="res://statuses/muscle.tres" id="3_status"]
+
+[resource]
+script = ExtResource("1_script")
+relic_name = "血誓镜"
+id = "demon_blood_oath_mirror"
+type = 4
+character_type = 3
+starter_relic = false
+icon = ExtResource("2_icon")
+tooltip = "魔修专属。每回合第一次因自己的卡牌失去生命后，获得 1 层劲气。"
+reward_mode = 4
+amount = 1
+minimum_damage = 1
+status = ExtResource("3_status")
+once_per_turn = true

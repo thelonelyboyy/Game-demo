@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
+[ext_resource type="Texture2D" path="res://art/enemies/dark_eagle.png" id="2_art"]
+[ext_resource type="PackedScene" path="res://enemies/bat/bat_enemy_ai.tscn" id="3_ai"]
+
+[resource]
+script = ExtResource("1_stats")
+id = "thunder_roc"
+display_name = "劫雷鹏"
+description = "沐浴雷劫的巨鹏，会用高速连击撕开护体。"
+ai = ExtResource("3_ai")
+max_health = 50
+art = ExtResource("2_art")

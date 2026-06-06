@@ -1,29 +1,95 @@
-[gd_scene load_steps=5 format=3 uid="uid://ph0oi5od64u5"]
+[gd_scene load_steps=4 format=3 uid="uid://ph0oi5od64u5"]
 
 [ext_resource type="Theme" uid="uid://c8cqncsqlplyu" path="res://main_theme.tres" id="1_6mdvy"]
 [ext_resource type="Texture2D" uid="uid://oe7v35ii8vrs" path="res://art/tile_0102.png" id="2_3xkif"]
 [ext_resource type="Script" path="res://scenes/ui/stats_ui.gd" id="2_t62e8"]
-[ext_resource type="PackedScene" uid="uid://b3dkx1dqlo0eo" path="res://scenes/ui/health_ui.tscn" id="4_mspg2"]
 
-[node name="StatsUI" type="HBoxContainer"]
+[node name="StatsUI" type="Control"]
+custom_minimum_size = Vector2(176, 42)
+offset_left = -88.0
+offset_right = 88.0
+offset_bottom = 42.0
+mouse_filter = 2
+theme = ExtResource("1_6mdvy")
+script = ExtResource("2_t62e8")
+
+[node name="HealthBarShadow" type="ColorRect" parent="."]
+layout_mode = 1
+offset_left = 4.0
+offset_top = 11.0
+offset_right = 174.0
+offset_bottom = 24.0
+color = Color(0, 0, 0, 0.42)
+
+[node name="HealthBarBack" type="ColorRect" parent="."]
+layout_mode = 1
+offset_left = 5.0
+offset_top = 8.0
+offset_right = 171.0
+offset_bottom = 20.0
+color = Color(0.08, 0.10, 0.09, 0.88)
+
+[node name="HealthBarFill" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 9.0
+offset_top = 10.0
+offset_right = 167.0
+offset_bottom = 18.0
+color = Color(0.95, 0.05, 0.06, 0.98)
+
+[node name="HealthBarHighlight" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 168.0
+offset_bottom = 10.0
+color = Color(1, 0.42, 0.36, 0.95)
+
+[node name="HealthBarLowLine" type="ColorRect" parent="."]
+layout_mode = 1
+offset_left = 7.0
+offset_top = 19.0
+offset_right = 169.0
+offset_bottom = 22.0
+color = Color(0.33, 0.01, 0.01, 0.95)
+
+[node name="HealthLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -45.0
-offset_right = 45.0
-offset_bottom = 16.0
+offset_left = -82.0
+offset_top = -7.0
+offset_right = 82.0
+offset_bottom = 29.0
 grow_horizontal = 2
-theme = ExtResource("1_6mdvy")
-alignment = 1
-script = ExtResource("2_t62e8")
+text = "70/70"
+theme_override_colors/font_color = Color(1, 0.96, 0.88, 1)
+theme_override_colors/font_shadow_color = Color(0.32, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Block" type="HBoxContainer" parent="."]
-layout_mode = 2
-theme_override_constants/separation = 0
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+offset_left = 66.0
+offset_top = 25.0
+offset_right = 110.0
+offset_bottom = 43.0
+theme_override_constants/separation = 1
 
 [node name="BlockImage" type="TextureRect" parent="Block"]
 layout_mode = 2
+custom_minimum_size = Vector2(16, 16)
 texture = ExtResource("2_3xkif")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="BlockLabel" type="Label" parent="Block"]
@@ -31,8 +97,10 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 1
 text = "6"
+theme_override_colors/font_color = Color(0.9, 0.96, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.02, 0.05, 0.08, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="Health" parent="." instance=ExtResource("4_mspg2")]
-layout_mode = 2

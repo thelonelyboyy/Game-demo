@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+"""Run Godot headless smoke checks and fail only on actionable load/script errors."""
+
+from __future__ import annotations
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = REPO_ROOT / "game-demo"
+DEFAULT_GODOT = Path(
+    r"F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe"
+)
+
+CHECKS = [
+    {"name": "main", "args": [], "quit": True},
+    {"name": "battle", "args": ["res://scenes/battle/battle.tscn"], "quit": True},
+    {"name": "map", "args": ["res://scenes/map/map.tscn"], "quit": True},
+    {"name": "run-flow", "args": ["res://test_data/run_flow_smoke.tscn"], "quit": False, "required_marker": "RUN_FLOW_SMOKE_OK"},
+    {"name": "boss-battle", "args": ["res://test_data/boss_battle_smoke.tscn"], "quit": False, "required_marker": "BOSS_BATTLE_SMOKE_OK"},
+]
+CHECK_TIMEOUT_SECONDS = 60
+
+IGNORED_ERROR_FRAGMENTS = [
+    "ObjectDB instances leaked at exit",
+    "resources still in use at exit",
+    "Resource still in use: res://custom_resources/room.gd",
+    "RID allocations of type",
+    "were leaked at exit",
+]
+
+FATAL_FRAGMENTS = [
+    "SCRIPT ERROR:",
+    "Parse Error:",
+    "Failed loading resource:",
+    "Failed to load script",
+    "ERROR:",
+]
+
+
+def is_ignored_error(line: str) -> bool:
+    return any(fragment in line for fragment in IGNORED_ERROR_FRAGMENTS)
+
+
+def find_fatal_lines(output: str) -> list[str]:
+    fatal: list[str] = []
+    for line in output.splitlines():
+        if is_ignored_error(line):
+            continue
+        if any(fragment in line for fragment in FATAL_FRAGMENTS):
+            fatal.append(line)
+    return fatal
+
+
+def run_check(godot: Path, check: dict) -> tuple[bool, str]:
+    name = str(check["name"])
+    extra_args = list(check["args"])
+    command = [str(godot), "--headless", "--path", str(PROJECT_ROOT), *extra_args]
+    if check.get("quit", True):
+        command.append("--quit")
+    try:
+        completed = subprocess.run(
+            command,
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=CHECK_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired as error:
+        stdout = error.stdout or ""
+        stderr = error.stderr or ""
+        output = stdout + stderr
+        fatal_lines = find_fatal_lines(output)
+        details = "\n".join(fatal_lines[:40]) if fatal_lines else output[-2000:]
+        return False, f"{name}: failed\nTimed out after {CHECK_TIMEOUT_SECONDS}s\n{details}"
+
+    output = completed.stdout + completed.stderr
+    fatal_lines = find_fatal_lines(output)
+    if fatal_lines:
+        details = "\n".join(fatal_lines[:40])
+        return False, f"{name}: failed\n{details}"
+    marker = check.get("required_marker")
+    if marker and marker not in output:
+        return False, f"{name}: failed\nMissing marker: {marker}"
+    return True, f"{name}: ok"
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--godot", type=Path, default=DEFAULT_GODOT)
+    args = parser.parse_args()
+
+    if not args.godot.exists():
+        print(f"Godot executable not found: {args.godot}", file=sys.stderr)
+        return 2
+
+    all_ok = True
+    for check in CHECKS:
+        ok, message = run_check(args.godot, check)
+        print(message)
+        all_ok = all_ok and ok
+
+    return 0 if all_ok else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

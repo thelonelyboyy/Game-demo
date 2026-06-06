@@ -1,13 +1,25 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/cards/sword_cultivator/sword_temper_edge.png" id="2"]
 [ext_resource type="AudioStream" path="res://art/slash.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/consume_status_effect.gd" id="auto_effect_consume_status"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_damage_effect.gd" id="auto_effect_damage"]
+
+[sub_resource type="Resource" id="AutoEffect_1_damage"]
+script = ExtResource("auto_effect_damage")
+amount = 6
+
+[sub_resource type="Resource" id="AutoEffect_2_consume_status"]
+script = ExtResource("auto_effect_consume_status")
+status_id = "forge_sword"
+consume_all = true
+value_per_stack = 1
+convert_to = 0
 
 [resource]
 script = ExtResource("1")
-base_damage = 6
-consume_forge_for_damage = true
+configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_consume_status")])
 effect_text = "造成 {damage} 点伤害。消耗所有铸剑，每层额外造成 1 点伤害。"
 id = "sword_temper_edge"
 type = 0

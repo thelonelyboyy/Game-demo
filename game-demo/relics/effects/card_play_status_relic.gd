@@ -5,6 +5,7 @@ enum TargetMode {PLAYER, ALL_ENEMIES, RANDOM_ENEMY}
 
 @export var match_tags := PackedStringArray()
 @export var match_element := Card.Element.NONE
+@export var match_profession := Card.Profession.COMMON
 @export var status: Status
 @export var stacks := 1
 @export var target_mode := TargetMode.PLAYER
@@ -55,12 +56,14 @@ func _on_card_played(card: Card) -> void:
 func _matches_card(card: Card) -> bool:
 	if not card:
 		return false
+	if match_profession != Card.Profession.COMMON and card.get_profession() == match_profession:
+		return true
 	if match_element != Card.Element.NONE and card.element == match_element:
 		return true
 	for tag: String in match_tags:
 		if card.mechanic_tags.has(tag):
 			return true
-	return match_element == Card.Element.NONE and match_tags.is_empty()
+	return match_profession == Card.Profession.COMMON and match_element == Card.Element.NONE and match_tags.is_empty()
 
 
 func _get_targets() -> Array[Node]:

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="TimingStatusRelic" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/status_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/phase4/stone_heart_bell.png" id="2"]
+[ext_resource type="Resource" path="res://statuses/gold_body.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "金皮印"
+id = "body_goldskin_seal"
+type = 1
+character_type = 1
+icon = ExtResource("2")
+tooltip = "体修专属。战斗开始时，获得 1 层金身。"
+status = ExtResource("3")
+stacks = 1
+target_mode = 0

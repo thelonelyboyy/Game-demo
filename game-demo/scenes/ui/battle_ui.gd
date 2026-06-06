@@ -52,17 +52,6 @@ func _polish_ui() -> void:
 	add_child(top_band)
 	move_child(top_band, 0)
 
-	var hand_band := ColorRect.new()
-	hand_band.name = "HandInkBand"
-	hand_band.color = Color(0.055, 0.050, 0.043, 0.82)
-	hand_band.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hand_band.anchor_right = 1.0
-	hand_band.anchor_top = 1.0
-	hand_band.anchor_bottom = 1.0
-	hand_band.offset_top = -252.0
-	add_child(hand_band)
-	move_child(hand_band, 1)
-
 	InkTheme.apply_button(end_turn_button, true)
 	InkTheme.apply_panel(mana_ui)
 	draw_pile_button.modulate = Color(0.95, 0.86, 0.62, 0.96)
