@@ -16,6 +16,7 @@ DEFAULT_GODOT = Path(
 
 CHECKS = [
     {"name": "main", "args": [], "quit": True},
+    {"name": "character-selector", "args": ["res://scenes/ui/character_selector.tscn"], "quit": True},
     {"name": "battle", "args": ["res://scenes/battle/battle.tscn"], "quit": True},
     {"name": "map", "args": ["res://scenes/map/map.tscn"], "quit": True},
     {"name": "run-flow", "args": ["res://test_data/run_flow_smoke.tscn"], "quit": False, "required_marker": "RUN_FLOW_SMOKE_OK"},

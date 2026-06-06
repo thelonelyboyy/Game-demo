@@ -1,33 +1,57 @@
-[gd_scene load_steps=13 format=3 uid="uid://d2f6dhxp12xvl"]
+[gd_scene load_steps=11 format=3 uid="uid://d2f6dhxp12xvl"]
 
 [ext_resource type="Script" path="res://scenes/ui/character_selector.gd" id="1_lqh53"]
 [ext_resource type="Resource" uid="uid://bd874b0h1q8n1" path="res://scenes/run/run_startup.tres" id="2_rlyfg"]
-[ext_resource type="Texture2D" uid="uid://cqcal03735mv8" path="res://art/tile_0118.png" id="3_pty20"]
-[ext_resource type="Texture2D" uid="uid://pgj8vfpj6tc5" path="res://art/tile_0130.png" id="4_20uvy"]
-[ext_resource type="Texture2D" uid="uid://cpydvk8mq66o5" path="res://art/tile_0087.png" id="4_bt743"]
-[ext_resource type="Texture2D" uid="uid://bfvi02kojsa00" path="res://art/tile_0103.png" id="5_56ldk"]
-[ext_resource type="Texture2D" path="res://art/tile_0090.png" id="6_beast"]
+[ext_resource type="Theme" uid="uid://c8cqncsqlplyu" path="res://main_theme.tres" id="3_theme"]
+[ext_resource type="Texture2D" uid="uid://d0edy7thj8ce6" path="res://art/heart.png" id="4_heart"]
+[ext_resource type="Texture2D" uid="uid://dhmtctwb5ymhc" path="res://art/gold.png" id="5_gold"]
 
-[sub_resource type="Gradient" id="Gradient_7af3e"]
-colors = PackedColorArray(0.12, 0.12, 0.12, 1, 0.05, 0.05, 0.05, 1)
+[sub_resource type="ButtonGroup" id="ButtonGroup_characters"]
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_1kxac"]
-gradient = SubResource("Gradient_7af3e")
-width = 50
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+line_spacing = 8.0
+font_size = 76
+font_color = Color(0.952941, 0.784314, 0.294118, 1)
+shadow_size = 6
+shadow_color = Color(0, 0, 0, 0.74)
 
-[sub_resource type="LabelSettings" id="LabelSettings_rnxpd"]
-line_spacing = 10.0
-font_size = 52
-shadow_size = 4
-shadow_color = Color(0, 0, 0, 0.5)
+[sub_resource type="LabelSettings" id="LabelSettings_body"]
+line_spacing = 8.0
+font_size = 25
+font_color = Color(0.94, 0.89, 0.78, 1)
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.62)
 
-[sub_resource type="LabelSettings" id="LabelSettings_aveil"]
-line_spacing = 6.0
-font_size = 26
-shadow_size = 4
-shadow_color = Color(0, 0, 0, 0.5)
+[sub_resource type="LabelSettings" id="LabelSettings_small"]
+line_spacing = 4.0
+font_size = 18
+font_color = Color(0.94, 0.89, 0.78, 1)
+shadow_size = 2
+shadow_color = Color(0, 0, 0, 0.65)
 
-[sub_resource type="ButtonGroup" id="ButtonGroup_2s2at"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info"]
+bg_color = Color(0.06, 0.045, 0.035, 0.56)
+border_width_left = 0
+border_width_top = 0
+border_width_right = 0
+border_width_bottom = 0
+corner_radius_top_left = 4
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 4
+content_margin_left = 40.0
+content_margin_top = 30.0
+content_margin_right = 34.0
+content_margin_bottom = 30.0
+shadow_color = Color(0, 0, 0, 0.34)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bottom"]
+bg_color = Color(0, 0, 0, 0.26)
+border_width_left = 0
+border_width_top = 0
+border_width_right = 0
+border_width_bottom = 0
 
 [node name="CharacterSelector" type="Control"]
 layout_mode = 3
@@ -36,6 +60,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("3_theme")
 script = ExtResource("1_lqh53")
 run_startup = ExtResource("2_rlyfg")
 
@@ -46,54 +71,343 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = SubResource("GradientTexture1D_1kxac")
+mouse_filter = 2
 
-[node name="CharacterText" type="VBoxContainer" parent="."]
+[node name="AccentTint" type="ColorRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -420.0
-offset_top = 72.0
-offset_right = 420.0
-offset_bottom = 190.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.55, 0.22, 0.06, 0.28)
 
-[node name="Title" type="Label" parent="CharacterText"]
+[node name="Vignette" type="ColorRect" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
-text = "体修"
-label_settings = SubResource("LabelSettings_rnxpd")
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
-
-[node name="Description" type="Label" parent="CharacterText"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "以血肉为炉，拳掌破山。高生命，高护体，越战越强。"
-label_settings = SubResource("LabelSettings_aveil")
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.09, 0.05, 0.02, 0.34)
 
 [node name="CharacterPortrait" type="TextureRect" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(390, 390)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 780.0
+offset_top = 36.0
+offset_right = -58.0
+offset_bottom = -174.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 230.0
+offset_top = -210.0
+offset_right = 910.0
+offset_bottom = 150.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_info")
+
+[node name="CharacterText" type="VBoxContainer" parent="InfoPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Subtitle" type="Label" parent="InfoPanel/CharacterText"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "金身炼体 · 稳扎稳打"
+label_settings = SubResource("LabelSettings_body")
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Title" type="Label" parent="InfoPanel/CharacterText"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "体修"
+label_settings = SubResource("LabelSettings_title")
+vertical_alignment = 1
+
+[node name="StatsRow" type="HBoxContainer" parent="InfoPanel/CharacterText"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="HealthBox" type="HBoxContainer" parent="InfoPanel/CharacterText/StatsRow"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HealthIcon" type="TextureRect" parent="InfoPanel/CharacterText/StatsRow/HealthBox"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+texture = ExtResource("4_heart")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HealthValue" type="Label" parent="InfoPanel/CharacterText/StatsRow/HealthBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 34)
+layout_mode = 2
+text = "42/42"
+label_settings = SubResource("LabelSettings_body")
+vertical_alignment = 1
+autowrap_mode = 0
+
+[node name="GoldBox" type="HBoxContainer" parent="InfoPanel/CharacterText/StatsRow"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="GoldIcon" type="TextureRect" parent="InfoPanel/CharacterText/StatsRow/GoldBox"]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+texture = ExtResource("5_gold")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GoldValue" type="Label" parent="InfoPanel/CharacterText/StatsRow/GoldBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 34)
+layout_mode = 2
+text = "99"
+label_settings = SubResource("LabelSettings_body")
+vertical_alignment = 1
+autowrap_mode = 0
+
+[node name="Description" type="Label" parent="InfoPanel/CharacterText"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "以血肉为炉，拳掌破山。擅长护体、回血与承伤反击，越战越硬。"
+label_settings = SubResource("LabelSettings_body")
+autowrap_mode = 3
+
+[node name="RelicRow" type="HBoxContainer" parent="InfoPanel/CharacterText"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="RelicIcon" type="TextureRect" parent="InfoPanel/CharacterText/RelicRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RelicText" type="VBoxContainer" parent="InfoPanel/CharacterText/RelicRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="RelicName" type="Label" parent="InfoPanel/CharacterText/RelicRow/RelicText"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "玄骨符"
+label_settings = SubResource("LabelSettings_body")
+vertical_alignment = 1
+
+[node name="RelicDescription" type="Label" parent="InfoPanel/CharacterText/RelicRow/RelicText"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "战斗开始时稳住护体根基，让你能放心吃下第一波攻势。"
+label_settings = SubResource("LabelSettings_small")
+autowrap_mode = 3
+
+[node name="BottomBand" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -205.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bottom")
+
+[node name="CharacterButtons" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -235.0
+offset_top = -154.0
+offset_right = 235.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 18
+
+[node name="BodyCultivatorButton" type="Button" parent="CharacterButtons"]
+custom_minimum_size = Vector2(92, 122)
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_characters")
+
+[node name="Icon" type="TextureRect" parent="CharacterButtons/BodyCultivatorButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Name" type="Label" parent="CharacterButtons/BodyCultivatorButton"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "体修"
+label_settings = SubResource("LabelSettings_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SwordCultivatorButton" type="Button" parent="CharacterButtons"]
+custom_minimum_size = Vector2(92, 122)
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_characters")
+
+[node name="Icon" type="TextureRect" parent="CharacterButtons/SwordCultivatorButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Name" type="Label" parent="CharacterButtons/SwordCultivatorButton"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "剑修"
+label_settings = SubResource("LabelSettings_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DemonicCultivatorButton" type="Button" parent="CharacterButtons"]
+custom_minimum_size = Vector2(92, 122)
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_characters")
+
+[node name="Icon" type="TextureRect" parent="CharacterButtons/DemonicCultivatorButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Name" type="Label" parent="CharacterButtons/DemonicCultivatorButton"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "魔修"
+label_settings = SubResource("LabelSettings_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BeastmasterButton" type="Button" parent="CharacterButtons"]
+custom_minimum_size = Vector2(92, 122)
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_characters")
+
+[node name="Icon" type="TextureRect" parent="CharacterButtons/BeastmasterButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Name" type="Label" parent="CharacterButtons/BeastmasterButton"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "驭兽"
+label_settings = SubResource("LabelSettings_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BackButton" type="Button" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 48.0
-offset_top = -500.0
-offset_right = 438.0
-offset_bottom = -110.0
+offset_left = 28.0
+offset_top = -104.0
+offset_right = 188.0
+offset_bottom = -42.0
 grow_vertical = 0
-texture = ExtResource("4_bt743")
-expand_mode = 1
-stretch_mode = 5
+text = "返回"
 
 [node name="StartButton" type="Button" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -101,122 +415,15 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -270.0
-offset_top = -112.0
+offset_top = -104.0
 offset_right = -48.0
-offset_bottom = -52.0
+offset_bottom = -42.0
 grow_horizontal = 0
 grow_vertical = 0
 text = "入山"
 
-[node name="CharacterButtons" type="HBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -330.0
-offset_top = 70.0
-offset_right = 330.0
-offset_bottom = 190.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 36
-
-[node name="BodyCultivatorButton" type="Button" parent="CharacterButtons"]
-custom_minimum_size = Vector2(120, 120)
-layout_mode = 2
-toggle_mode = true
-button_pressed = true
-button_group = SubResource("ButtonGroup_2s2at")
-
-[node name="Icon" type="TextureRect" parent="CharacterButtons/BodyCultivatorButton"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -42.0
-offset_top = -42.0
-offset_right = 42.0
-offset_bottom = 42.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("3_pty20")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="SwordCultivatorButton" type="Button" parent="CharacterButtons"]
-custom_minimum_size = Vector2(120, 120)
-layout_mode = 2
-toggle_mode = true
-button_group = SubResource("ButtonGroup_2s2at")
-
-[node name="Icon" type="TextureRect" parent="CharacterButtons/SwordCultivatorButton"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -42.0
-offset_top = -42.0
-offset_right = 42.0
-offset_bottom = 42.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("4_20uvy")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="DemonicCultivatorButton" type="Button" parent="CharacterButtons"]
-custom_minimum_size = Vector2(120, 120)
-layout_mode = 2
-toggle_mode = true
-button_group = SubResource("ButtonGroup_2s2at")
-
-[node name="Icon" type="TextureRect" parent="CharacterButtons/DemonicCultivatorButton"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -42.0
-offset_top = -42.0
-offset_right = 42.0
-offset_bottom = 42.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("5_56ldk")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BeastmasterButton" type="Button" parent="CharacterButtons"]
-custom_minimum_size = Vector2(120, 120)
-layout_mode = 2
-toggle_mode = true
-button_group = SubResource("ButtonGroup_2s2at")
-
-[node name="Icon" type="TextureRect" parent="CharacterButtons/BeastmasterButton"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -42.0
-offset_top = -42.0
-offset_right = 42.0
-offset_bottom = 42.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("6_beast")
-expand_mode = 1
-stretch_mode = 5
-
 [connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="CharacterButtons/BodyCultivatorButton" to="." method="_on_body_cultivator_button_pressed"]
 [connection signal="pressed" from="CharacterButtons/SwordCultivatorButton" to="." method="_on_sword_cultivator_button_pressed"]
 [connection signal="pressed" from="CharacterButtons/DemonicCultivatorButton" to="." method="_on_demonic_cultivator_button_pressed"]
