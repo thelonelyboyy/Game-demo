@@ -21,7 +21,7 @@ const ELITE_DAMAGE_MULTIPLIER := 1.25
 const ELITE_GOLD_MULTIPLIER := 1.55
 const ELITE_BATTLE := preload("res://battles/tier_1_bull_demon.tres")
 
-@export var map_mode: MapMode = MapMode.TEST_ELITE_LINEAR
+@export var map_mode: MapMode = MapMode.ROGUELIKE
 @export var battle_stats_pool: BattleStatsPool
 @export var event_room_pool: EventRoomPool
 

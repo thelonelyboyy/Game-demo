@@ -5,6 +5,8 @@ extends PanelContainer
 
 var icon_label: Label
 var name_label: Label
+var connected_character: CharacterStats
+var connected_deck: CardPile
 
 
 func _ready() -> void:
@@ -34,9 +36,34 @@ func _ready() -> void:
 
 
 func set_character(new_character: CharacterStats) -> void:
+	_disconnect_character_signals()
 	character = new_character
+	_connect_character_signals()
 	if is_node_ready():
 		_refresh()
+
+
+func _connect_character_signals() -> void:
+	connected_character = character
+	if connected_character and not connected_character.stats_changed.is_connected(_refresh):
+		connected_character.stats_changed.connect(_refresh)
+
+	connected_deck = connected_character.deck if connected_character else null
+	if connected_deck and not connected_deck.card_pile_size_changed.is_connected(_on_deck_changed):
+		connected_deck.card_pile_size_changed.connect(_on_deck_changed)
+
+
+func _disconnect_character_signals() -> void:
+	if connected_character and connected_character.stats_changed.is_connected(_refresh):
+		connected_character.stats_changed.disconnect(_refresh)
+	if connected_deck and connected_deck.card_pile_size_changed.is_connected(_on_deck_changed):
+		connected_deck.card_pile_size_changed.disconnect(_on_deck_changed)
+	connected_character = null
+	connected_deck = null
+
+
+func _on_deck_changed(_cards_amount: int) -> void:
+	_refresh()
 
 
 func _refresh() -> void:
@@ -58,3 +85,7 @@ func _refresh() -> void:
 		character.count_spirit_root_cards(),
 	]
 	tooltip_text = SpiritRootText.status_tooltip(character)
+
+
+func _exit_tree() -> void:
+	_disconnect_character_signals()
