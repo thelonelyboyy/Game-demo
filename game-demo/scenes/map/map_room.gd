@@ -4,18 +4,18 @@ extends Area2D
 signal clicked(room: Room)
 signal selected(room: Room)
 
-const ICON_SIZE := 20.0
-const BOSS_ICON_SIZE := 23.0
+const NORMAL_TEXTURE_SIZE := 38.0
+const LARGE_TEXTURE_SIZE := 44.0
 const ICONS := {
-	Room.Type.NOT_ASSIGNED: [null, ICON_SIZE],
-	Room.Type.MONSTER: [preload("res://art/map/map_monster.png"), ICON_SIZE],
-	Room.Type.TREASURE: [preload("res://art/map/map_treasure.png"), ICON_SIZE],
-	Room.Type.CAMPFIRE: [preload("res://art/map/map_campfire.png"), ICON_SIZE],
-	Room.Type.SHOP: [preload("res://art/map/map_shop.png"), ICON_SIZE],
-	Room.Type.BOSS: [preload("res://art/map/map_boss.png"), BOSS_ICON_SIZE],
-	Room.Type.EVENT: [preload("res://art/map/map_event.png"), ICON_SIZE],
-	Room.Type.ELITE: [preload("res://art/map/map_elite.png"), BOSS_ICON_SIZE],
-	Room.Type.BLESSING: [preload("res://art/map/map_event.png"), BOSS_ICON_SIZE],
+	Room.Type.NOT_ASSIGNED: preload("res://art/map/nodes/map_node_unknown.png"),
+	Room.Type.MONSTER: preload("res://art/map/nodes/map_node_monster.png"),
+	Room.Type.TREASURE: preload("res://art/map/nodes/map_node_treasure.png"),
+	Room.Type.CAMPFIRE: preload("res://art/map/nodes/map_node_campfire.png"),
+	Room.Type.SHOP: preload("res://art/map/nodes/map_node_shop.png"),
+	Room.Type.BOSS: preload("res://art/map/nodes/map_node_boss.png"),
+	Room.Type.EVENT: preload("res://art/map/nodes/map_node_unknown.png"),
+	Room.Type.ELITE: preload("res://art/map/nodes/map_node_elite.png"),
+	Room.Type.BLESSING: preload("res://art/map/nodes/map_node_blessing.png"),
 }
 
 @onready var sprite_2d: Sprite2D = $Visuals/Sprite2D
@@ -28,6 +28,7 @@ var room: Room : set = set_room
 
 func set_available(new_value: bool) -> void:
 	available = new_value
+	_refresh_visual_state()
 	queue_redraw()
 
 	if available:
@@ -42,79 +43,52 @@ func set_room(new_data: Room) -> void:
 	line_2d.rotation_degrees = randi_range(0, 360)
 	_apply_room_icon()
 	line_2d.hide()
+	_refresh_visual_state()
 	queue_redraw()
 
 
 func show_selected() -> void:
+	_refresh_visual_state()
 	queue_redraw()
 
 
 func _apply_room_icon() -> void:
-	var icon_data: Array = ICONS.get(room.type, ICONS[Room.Type.NOT_ASSIGNED])
-	var texture := icon_data[0] as Texture2D
-	var target_size: float = icon_data[1]
-
+	var texture := ICONS.get(room.type, ICONS[Room.Type.NOT_ASSIGNED]) as Texture2D
 	sprite_2d.texture = texture
 	sprite_2d.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	sprite_2d.visible = texture != null
-	sprite_2d.modulate = Color(1.0, 0.92, 0.72, 0.96)
+	sprite_2d.show()
 
-	if not texture:
+	var target_size := LARGE_TEXTURE_SIZE if _is_large_room() else NORMAL_TEXTURE_SIZE
+	var max_edge := maxf(texture.get_width(), texture.get_height())
+	sprite_2d.scale = Vector2.ONE * (target_size / max_edge)
+
+
+func _refresh_visual_state() -> void:
+	if not room or not sprite_2d:
 		return
 
-	var texture_size := texture.get_size()
-	var max_edge := maxf(texture_size.x, texture_size.y)
-	sprite_2d.scale = Vector2.ONE * (target_size / max_edge)
+	if available:
+		sprite_2d.modulate = Color(1.08, 1.06, 0.96, 1.0)
+	elif room.selected:
+		sprite_2d.modulate = Color(0.96, 0.91, 0.80, 0.96)
+	else:
+		sprite_2d.modulate = Color(0.76, 0.70, 0.62, 0.95)
 
 
 func _draw() -> void:
 	if not room:
 		return
 
-	var fill := Color("15120d")
-	var inner := Color("2a2114")
-	var border := Color("a58a4c")
-	var glow := Color(0.78, 0.58, 0.24, 0.20)
-
-	if room.type == Room.Type.ELITE:
-		fill = Color("21100f")
-		inner = Color("4a1a16")
-		border = Color("c99242")
-		glow = Color(0.86, 0.24, 0.13, 0.28)
-	elif room.type == Room.Type.BLESSING:
-		fill = Color("161c20")
-		inner = Color("263341")
-		border = Color("d7c78b")
-		glow = Color(0.72, 0.84, 1.0, 0.26)
-
 	if available:
-		fill = Color("2b1d0e")
-		inner = Color("4b3212")
-		border = Color("ffd35a")
-		glow = Color(1.0, 0.68, 0.20, 0.36)
-		if room.type == Room.Type.ELITE:
-			inner = Color("6b2218")
-			glow = Color(1.0, 0.33, 0.18, 0.38)
-		elif room.type == Room.Type.BLESSING:
-			inner = Color("324961")
-			glow = Color(0.72, 0.88, 1.0, 0.42)
+		draw_circle(Vector2.ZERO, 22.5, Color(0.74, 0.94, 1.0, 0.20))
+		draw_arc(Vector2.ZERO, 20.0, -0.25, TAU - 0.25, 80, Color(0.86, 0.96, 1.0, 0.72), 2.0, true)
 	elif room.selected:
-		fill = Color("201b11")
-		inner = Color("3b3018")
-		border = Color("dfbd67")
-		glow = Color(0.86, 0.68, 0.35, 0.28)
+		draw_circle(Vector2.ZERO, 20.0, Color(0.86, 0.70, 0.34, 0.16))
+		draw_arc(Vector2.ZERO, 17.5, 0.0, TAU, 72, Color(0.95, 0.80, 0.42, 0.55), 1.6, true)
 
-	draw_circle(Vector2(3, 4), 18.5, Color(0, 0, 0, 0.48))
-	draw_circle(Vector2.ZERO, 17.0, glow)
-	draw_circle(Vector2.ZERO, 14.0, fill)
-	draw_arc(Vector2.ZERO, 14.5, 0.0, TAU, 64, Color(0, 0, 0, 0.58), 3.2, true)
-	draw_arc(Vector2.ZERO, 13.2, 0.0, TAU, 64, border, 2.1, true)
-	draw_arc(Vector2.ZERO, 9.8, 0.0, TAU, 64, Color(inner.r, inner.g, inner.b, 0.78), 2.0, true)
 
-	if available:
-		draw_arc(Vector2.ZERO, 18.5, -0.45, PI + 0.35, 40, Color(1.0, 0.86, 0.42, 0.58), 1.5, true)
-	elif room.selected:
-		draw_line(Vector2(-6, 12), Vector2(6, 12), Color(0.93, 0.77, 0.40, 0.82), 1.8, true)
+func _is_large_room() -> bool:
+	return room.type == Room.Type.BOSS or room.type == Room.Type.ELITE or room.type == Room.Type.BLESSING
 
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
@@ -123,6 +97,7 @@ func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> voi
 
 	room.selected = true
 	clicked.emit(room)
+	_refresh_visual_state()
 	queue_redraw()
 	animation_player.play("select")
 

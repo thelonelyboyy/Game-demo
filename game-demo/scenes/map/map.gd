@@ -129,7 +129,6 @@ func _connect_lines(room: Room) -> void:
 		var new_map_line := MAP_LINE.instantiate() as Line2D
 		new_map_line.add_point(room.position)
 		new_map_line.add_point(next.position)
-		new_map_line.texture = null
 		new_map_line.antialiased = true
 		new_map_line.set_meta("from_room", room)
 		new_map_line.set_meta("to_room", next)
@@ -191,14 +190,14 @@ func _update_line_states() -> void:
 func _style_map_line(line: Line2D, state: String) -> void:
 	match state:
 		"selected":
-			line.width = 3.2
-			line.default_color = Color(1.0, 0.82, 0.32, 0.92)
+			line.width = 4.0
+			line.default_color = Color(0.22, 0.16, 0.10, 0.96)
 		"available":
-			line.width = 2.8
-			line.default_color = Color(0.95, 0.75, 0.36, 0.78)
+			line.width = 3.8
+			line.default_color = Color(0.15, 0.13, 0.23, 0.92)
 		_:
-			line.width = 1.75
-			line.default_color = Color(0.66, 0.56, 0.34, 0.42)
+			line.width = 3.4
+			line.default_color = Color(0.13, 0.12, 0.18, 0.78)
 
 
 func _is_room_available(room_to_check: Room) -> bool:
