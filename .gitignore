@@ -16,6 +16,9 @@ export_credentials.cfg
 data_*/
 mono_crash.*.json
 
+#codex environment
+.codex
+
 #mcp
 mcp-server-dist
 addons
