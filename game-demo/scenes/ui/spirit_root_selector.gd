@@ -1,13 +1,14 @@
 extends Control
 
 const RUN_SCENE := preload("res://scenes/run/run.tscn")
-const SELECTOR_BACKGROUND := preload("res://test1.png")
+const SELECTOR_BACKGROUND := preload("res://art/blessing_cavern_bg.png")
 
 @export var run_startup: RunStartup
 
 @onready var title: Label = %Title
 @onready var description: Label = %Description
-@onready var buttons: HBoxContainer = %Buttons
+@onready var content: VBoxContainer = $Content
+@onready var buttons: VBoxContainer = %Buttons
 
 var offered_roots: Array = []
 
@@ -32,38 +33,13 @@ func _roll_spirit_roots() -> void:
 
 func _setup_buttons() -> void:
 	title.text = "选择灵根"
-	description.text = "从三种灵根中选择一种。开局会随机将一张打击或防御转化为所选元素。"
+	description.text = "从三种灵根中选择一种，开局会将一张打击或防御转化为所选元素。"
 
 	for child: Node in buttons.get_children():
 		child.queue_free()
 
 	for root in offered_roots:
-		var panel := PanelContainer.new()
-		panel.custom_minimum_size = Vector2(250, 220)
-		InkTheme.apply_panel(panel)
-		buttons.add_child(panel)
-
-		var content := VBoxContainer.new()
-		content.add_theme_constant_override("separation", 14)
-		panel.add_child(content)
-
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(210, 72)
-		button.text = "%s灵根" % SpiritRootText.element_name(root)
-		InkTheme.apply_button(button, true)
-		button.add_theme_color_override("font_color", SpiritRootText.element_color(root))
-		button.pressed.connect(_on_root_selected.bind(root))
-		content.add_child(button)
-
-		var effect := Label.new()
-		effect.text = SpiritRootText.perfect_effect(root)
-		effect.custom_minimum_size = Vector2(210, 104)
-		effect.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		effect.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		effect.add_theme_font_size_override("font_size", 18)
-		effect.add_theme_color_override("font_color", Color("eee7d2"))
-		content.add_child(effect)
+		buttons.add_child(_create_root_row(root))
 
 
 func _on_root_selected(root: Card.Element) -> void:
@@ -74,8 +50,9 @@ func _on_root_selected(root: Card.Element) -> void:
 
 func _polish_scene() -> void:
 	_apply_custom_background()
-	InkTheme.apply_title(title, 56)
-	InkTheme.apply_body_label(description, 22)
+	_apply_content_layout()
+	_apply_title_style()
+	_apply_description_style()
 
 
 func _apply_custom_background() -> void:
@@ -85,3 +62,158 @@ func _apply_custom_background() -> void:
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	background.show()
+
+
+func _apply_content_layout() -> void:
+	content.set_anchors_preset(Control.PRESET_CENTER)
+	content.offset_left = -470.0
+	content.offset_top = -108.0
+	content.offset_right = 470.0
+	content.offset_bottom = 360.0
+	content.add_theme_constant_override("separation", 14)
+
+	buttons.add_theme_constant_override("separation", 12)
+	buttons.custom_minimum_size = Vector2(940, 264)
+
+
+func _apply_title_style() -> void:
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title.add_theme_color_override("font_color", Color("f2c94f"))
+	title.add_theme_color_override("font_shadow_color", Color(0.02, 0.05, 0.07, 0.94))
+	title.add_theme_constant_override("shadow_offset_x", 4)
+	title.add_theme_constant_override("shadow_offset_y", 5)
+	title.add_theme_font_size_override("font_size", 58)
+
+
+func _apply_description_style() -> void:
+	description.custom_minimum_size = Vector2(940, 52)
+	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	description.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description.add_theme_color_override("font_color", Color("d7eef4"))
+	description.add_theme_color_override("font_shadow_color", Color(0.01, 0.03, 0.05, 0.88))
+	description.add_theme_constant_override("shadow_offset_x", 2)
+	description.add_theme_constant_override("shadow_offset_y", 3)
+	description.add_theme_font_size_override("font_size", 24)
+
+
+func _create_root_row(root: Card.Element) -> Button:
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(940, 78)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.focus_mode = Control.FOCUS_NONE
+	button.text = ""
+	button.pressed.connect(_on_root_selected.bind(root))
+	_apply_root_button_style(button, root)
+
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	row.offset_left = 22
+	row.offset_top = 8
+	row.offset_right = -22
+	row.offset_bottom = -8
+	row.add_theme_constant_override("separation", 18)
+	button.add_child(row)
+
+	var icon := PanelContainer.new()
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.custom_minimum_size = Vector2(58, 58)
+	icon.add_theme_stylebox_override("panel", _make_round_style(
+		SpiritRootText.element_color(root).darkened(0.45),
+		SpiritRootText.element_color(root).lightened(0.20),
+		2,
+		29,
+		Color(0, 0, 0, 0.52),
+		8
+	))
+	row.add_child(icon)
+
+	var glyph := Label.new()
+	glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	glyph.text = _element_glyph(root)
+	glyph.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	glyph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	glyph.add_theme_color_override("font_color", Color("f6efd8"))
+	glyph.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.72))
+	glyph.add_theme_constant_override("shadow_offset_x", 2)
+	glyph.add_theme_constant_override("shadow_offset_y", 2)
+	glyph.add_theme_font_size_override("font_size", 30)
+	icon.add_child(glyph)
+
+	var text_box := VBoxContainer.new()
+	text_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text_box.add_theme_constant_override("separation", 2)
+	row.add_child(text_box)
+
+	var name_label := Label.new()
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_label.text = "%s灵根" % SpiritRootText.element_name(root)
+	name_label.add_theme_color_override("font_color", SpiritRootText.element_color(root).lightened(0.16))
+	name_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.76))
+	name_label.add_theme_constant_override("shadow_offset_x", 2)
+	name_label.add_theme_constant_override("shadow_offset_y", 2)
+	name_label.add_theme_font_size_override("font_size", 25)
+	text_box.add_child(name_label)
+
+	var effect := Label.new()
+	effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	effect.text = SpiritRootText.perfect_effect(root)
+	effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	effect.add_theme_color_override("font_color", Color("f4efe4"))
+	effect.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.72))
+	effect.add_theme_constant_override("shadow_offset_x", 2)
+	effect.add_theme_constant_override("shadow_offset_y", 2)
+	effect.add_theme_font_size_override("font_size", 21)
+	text_box.add_child(effect)
+
+	return button
+
+
+func _apply_root_button_style(button: Button, root: Card.Element) -> void:
+	var element_color := SpiritRootText.element_color(root)
+	button.add_theme_stylebox_override("normal", _make_round_style(Color(0.03, 0.22, 0.29, 0.72), element_color.darkened(0.22), 1, 8))
+	button.add_theme_stylebox_override("hover", _make_round_style(Color(0.05, 0.34, 0.42, 0.88), element_color.lightened(0.18), 2, 8, Color(element_color.r, element_color.g, element_color.b, 0.18), 10))
+	button.add_theme_stylebox_override("pressed", _make_round_style(Color(0.02, 0.18, 0.22, 0.92), Color("f2c94f"), 2, 8))
+	button.add_theme_color_override("font_color", Color.TRANSPARENT)
+	button.add_theme_color_override("font_hover_color", Color.TRANSPARENT)
+	button.add_theme_color_override("font_pressed_color", Color.TRANSPARENT)
+
+
+func _element_glyph(root: Card.Element) -> String:
+	match root:
+		Card.Element.METAL:
+			return "金"
+		Card.Element.WOOD:
+			return "木"
+		Card.Element.WATER:
+			return "水"
+		Card.Element.FIRE:
+			return "火"
+		Card.Element.EARTH:
+			return "土"
+		_:
+			return "?"
+
+
+func _make_round_style(bg: Color, border: Color, border_width := 1, radius := 8, shadow := Color(0, 0, 0, 0.38), shadow_size := 8) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.border_width_left = border_width
+	style.border_width_top = border_width
+	style.border_width_right = border_width
+	style.border_width_bottom = border_width
+	style.corner_radius_top_left = radius
+	style.corner_radius_top_right = radius
+	style.corner_radius_bottom_left = radius
+	style.corner_radius_bottom_right = radius
+	style.content_margin_left = 16
+	style.content_margin_top = 8
+	style.content_margin_right = 16
+	style.content_margin_bottom = 8
+	style.shadow_color = shadow
+	style.shadow_size = shadow_size
+	return style

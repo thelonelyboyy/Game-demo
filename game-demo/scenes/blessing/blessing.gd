@@ -1,7 +1,7 @@
 class_name Blessing
 extends Control
 
-const BACKGROUND := preload("res://test1.png")
+const BACKGROUND := preload("res://art/blessing_cavern_bg.png")
 
 const GODS := [
 	{
@@ -15,11 +15,11 @@ const GODS := [
 		],
 	},
 	{
-		"name": "斗姆元君",
+		"name": "斗姥元君",
 		"description": "星斗归位，照见此行凶吉。",
 		"blessings": [
 			{"name": "星辉满身", "description": "回复至满生命。", "effect": "full_heal"},
-			{"name": "星盘赠财", "description": "获得 100 灵石。", "effect": "big_gold"},
+			{"name": "星盘赐财", "description": "获得 100 灵石。", "effect": "big_gold"},
 			{"name": "观星悟法", "description": "每回合抽牌数 +1。", "effect": "draw"},
 			{"name": "星火破障", "description": "随机突破牌组中一张可突破卡牌。", "effect": "upgrade"},
 		],
@@ -36,6 +36,16 @@ const GODS := [
 	},
 ]
 
+const EFFECT_ICONS := {
+	"max_health": preload("res://art/heart.png"),
+	"full_heal": preload("res://art/heart.png"),
+	"gold": preload("res://art/gold.png"),
+	"big_gold": preload("res://art/gold.png"),
+	"upgrade": preload("res://art/deck.png"),
+	"draw": preload("res://art/draw.png"),
+	"max_mana": preload("res://art/map/nodes/map_node_blessing.png"),
+}
+
 @export var character_stats: CharacterStats
 @export var run_stats: RunStats
 @export var chapter := 1
@@ -43,6 +53,7 @@ const GODS := [
 var god: Dictionary
 var choices: Array
 var choice_buttons: Array[Button] = []
+var choice_rows: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -74,57 +85,138 @@ func _build_ui() -> void:
 	add_child(background)
 
 	var dimmer := ColorRect.new()
-	dimmer.color = Color(0.03, 0.035, 0.035, 0.62)
+	dimmer.color = Color(0.00, 0.03, 0.06, 0.14)
 	dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dimmer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(dimmer)
 
-	var content := VBoxContainer.new()
-	content.name = "Content"
-	content.custom_minimum_size = Vector2(960, 620)
-	content.set_anchors_preset(Control.PRESET_CENTER)
-	content.offset_left = -480
-	content.offset_top = -310
-	content.offset_right = 480
-	content.offset_bottom = 310
-	content.add_theme_constant_override("separation", 18)
-	add_child(content)
-
 	var title := Label.new()
 	title.name = "Title"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	InkTheme.apply_title(title, 52)
-	content.add_child(title)
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	title.offset_left = -360
+	title.offset_top = 330
+	title.offset_right = 360
+	title.offset_bottom = 410
+	title.add_theme_color_override("font_color", Color("f2c94f"))
+	title.add_theme_color_override("font_shadow_color", Color(0.02, 0.05, 0.07, 0.94))
+	title.add_theme_constant_override("shadow_offset_x", 4)
+	title.add_theme_constant_override("shadow_offset_y", 5)
+	title.add_theme_font_size_override("font_size", 58)
+	add_child(title)
 
-	var description := Label.new()
-	description.name = "Description"
-	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	description.custom_minimum_size = Vector2(960, 72)
-	InkTheme.apply_body_label(description, 24)
-	content.add_child(description)
+	var subtitle := Label.new()
+	subtitle.name = "Description"
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	subtitle.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	subtitle.offset_left = -420
+	subtitle.offset_top = 402
+	subtitle.offset_right = 420
+	subtitle.offset_bottom = 452
+	subtitle.add_theme_color_override("font_color", Color("d7eef4"))
+	subtitle.add_theme_color_override("font_shadow_color", Color(0.01, 0.03, 0.05, 0.88))
+	subtitle.add_theme_constant_override("shadow_offset_x", 2)
+	subtitle.add_theme_constant_override("shadow_offset_y", 3)
+	subtitle.add_theme_font_size_override("font_size", 25)
+	add_child(subtitle)
 
-	var choices_row := HBoxContainer.new()
-	choices_row.name = "Choices"
-	choices_row.custom_minimum_size = Vector2(960, 340)
-	choices_row.add_theme_constant_override("separation", 20)
-	content.add_child(choices_row)
+	var dialogue := PanelContainer.new()
+	dialogue.name = "Dialogue"
+	dialogue.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	dialogue.offset_left = -420
+	dialogue.offset_top = 650
+	dialogue.offset_right = 420
+	dialogue.offset_bottom = 700
+	dialogue.add_theme_stylebox_override("panel", _make_panel_style(Color(0.05, 0.15, 0.18, 0.92), Color(0.15, 0.78, 0.95, 0.32), 2, 18))
+	add_child(dialogue)
+
+	var dialogue_label := Label.new()
+	dialogue_label.name = "DialogueText"
+	dialogue_label.text = "聆听先古回响，择其一而行。"
+	dialogue_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	dialogue_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	dialogue_label.add_theme_color_override("font_color", Color("f2efe2"))
+	dialogue_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.72))
+	dialogue_label.add_theme_constant_override("shadow_offset_x", 2)
+	dialogue_label.add_theme_constant_override("shadow_offset_y", 2)
+	dialogue_label.add_theme_font_size_override("font_size", 25)
+	dialogue.add_child(dialogue_label)
+
+	var list := VBoxContainer.new()
+	list.name = "Choices"
+	list.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	list.offset_left = -470
+	list.offset_top = 718
+	list.offset_right = 470
+	list.offset_bottom = 980
+	list.add_theme_constant_override("separation", 12)
+	add_child(list)
 
 	for i in 3:
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(300, 330)
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.alignment = HORIZONTAL_ALIGNMENT_CENTER
-		InkTheme.apply_button(button, true)
-		button.pressed.connect(_on_choice_pressed.bind(i))
-		choices_row.add_child(button)
-		choice_buttons.append(button)
+		var row := _create_choice_row(i)
+		list.add_child(row["button"])
+		choice_buttons.append(row["button"])
+		choice_rows.append(row)
 
-	var hint := Label.new()
-	hint.name = "Hint"
-	hint.text = "选择一项祝福后将直接进入本章地图。"
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	InkTheme.apply_body_label(hint, 20)
-	content.add_child(hint)
+
+func _create_choice_row(index: int) -> Dictionary:
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(940, 76)
+	button.focus_mode = Control.FOCUS_NONE
+	button.text = ""
+	button.pressed.connect(_on_choice_pressed.bind(index))
+	_apply_choice_button_style(button)
+
+	var content := HBoxContainer.new()
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	content.offset_left = 22
+	content.offset_top = 8
+	content.offset_right = -22
+	content.offset_bottom = -8
+	content.add_theme_constant_override("separation", 18)
+	button.add_child(content)
+
+	var icon := TextureRect.new()
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.custom_minimum_size = Vector2(58, 58)
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	content.add_child(icon)
+
+	var text_box := VBoxContainer.new()
+	text_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text_box.add_theme_constant_override("separation", 2)
+	content.add_child(text_box)
+
+	var name_label := Label.new()
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_label.add_theme_color_override("font_color", Color("f2c94f"))
+	name_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.72))
+	name_label.add_theme_constant_override("shadow_offset_x", 2)
+	name_label.add_theme_constant_override("shadow_offset_y", 2)
+	name_label.add_theme_font_size_override("font_size", 24)
+	text_box.add_child(name_label)
+
+	var description_label := Label.new()
+	description_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description_label.add_theme_color_override("font_color", Color("f4efe4"))
+	description_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.72))
+	description_label.add_theme_constant_override("shadow_offset_x", 2)
+	description_label.add_theme_constant_override("shadow_offset_y", 2)
+	description_label.add_theme_font_size_override("font_size", 22)
+	text_box.add_child(description_label)
+
+	return {
+		"button": button,
+		"icon": icon,
+		"name": name_label,
+		"description": description_label,
+	}
 
 
 func _roll_blessings() -> void:
@@ -133,22 +225,24 @@ func _roll_blessings() -> void:
 	RNG.array_shuffle(blessing_pool)
 	choices = blessing_pool.slice(0, mini(3, blessing_pool.size()))
 
-	var title := $Content/Title as Label
-	var description := $Content/Description as Label
-	title.text = "第%s章之前  %s降下祝福" % [chapter, god.get("name", "未知神明")]
-	description.text = god.get("description", "")
+	var title := $Title as Label
+	var description := $Description as Label
+	title.text = god.get("name", "先古神明")
+	description.text = "第 %s 章之前，%s" % [chapter, god.get("description", "")]
 
-	for i in choice_buttons.size():
-		var button := choice_buttons[i]
+	for i in choice_rows.size():
+		var row := choice_rows[i]
+		var button := row["button"] as Button
 		if i >= choices.size():
 			button.hide()
 			continue
 
 		var blessing := choices[i] as Dictionary
-		button.text = "%s\n\n%s" % [
-			blessing.get("name", "未知祝福"),
-			blessing.get("description", "")
-		]
+		var effect := blessing.get("effect", "") as String
+		(row["icon"] as TextureRect).texture = EFFECT_ICONS.get(effect, EFFECT_ICONS["max_mana"])
+		(row["name"] as Label).text = blessing.get("name", "未知祝福")
+		(row["description"] as Label).text = blessing.get("description", "")
+		button.show()
 
 
 func _on_choice_pressed(index: int) -> void:
@@ -193,3 +287,31 @@ func _upgrade_random_card() -> void:
 	var picked := RNG.array_pick_random(candidates) as Card
 	if picked:
 		picked.upgrade()
+
+
+func _apply_choice_button_style(button: Button) -> void:
+	button.add_theme_stylebox_override("normal", _make_panel_style(Color(0.03, 0.22, 0.29, 0.70), Color(0.08, 0.72, 0.92, 0.32), 1, 8))
+	button.add_theme_stylebox_override("hover", _make_panel_style(Color(0.05, 0.34, 0.42, 0.86), Color(0.45, 0.94, 1.0, 0.70), 2, 8, Color(0.20, 0.86, 1.0, 0.18), 10))
+	button.add_theme_stylebox_override("pressed", _make_panel_style(Color(0.02, 0.18, 0.22, 0.88), Color(0.94, 0.74, 0.25, 0.78), 2, 8))
+	button.add_theme_color_override("font_color", Color.TRANSPARENT)
+
+
+func _make_panel_style(bg: Color, border: Color, border_width := 1, radius := 8, shadow := Color(0, 0, 0, 0.38), shadow_size := 8) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.border_width_left = border_width
+	style.border_width_top = border_width
+	style.border_width_right = border_width
+	style.border_width_bottom = border_width
+	style.corner_radius_top_left = radius
+	style.corner_radius_top_right = radius
+	style.corner_radius_bottom_left = radius
+	style.corner_radius_bottom_right = radius
+	style.content_margin_left = 16
+	style.content_margin_top = 8
+	style.content_margin_right = 16
+	style.content_margin_bottom = 8
+	style.shadow_color = shadow
+	style.shadow_size = shadow_size
+	return style

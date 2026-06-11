@@ -5,6 +5,7 @@ const SHOP_CARD = preload("res://scenes/shop/shop_card.tscn")
 const SHOP_RELIC = preload("res://scenes/shop/shop_relic.tscn")
 const CARD_REMOVE_SCENE := preload("res://scenes/card_remove/card_remove.tscn")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
+const SHOP_BACKGROUND := preload("res://art/shop_market_bg.png")
 const COMMON_SHOP_CARDS := [
 	preload("res://common_cards/strike.tres"),
 	preload("res://common_cards/defend.tres"),
@@ -23,10 +24,14 @@ const MYTHIC_SHOP_CHANCE := 0.02
 @export var relic_handler: RelicHandler
 
 @onready var ui_layer: CanvasLayer = $UILayer
+@onready var background: TextureRect = $BackgroundLayer/Background
+@onready var title: Label = $UILayer/Title
+@onready var shop_content: VBoxContainer = $UILayer/ShopContent
 @onready var cards: HBoxContainer = %Cards
 @onready var relics: HBoxContainer = %Relics
 @onready var back_button: Button = $UILayer/BackButton
 @onready var remove_card_button: Button = %RemoveCardButton
+@onready var shopkeeper: TextureRect = $DecorationLayer/Shopkeeper
 @onready var shop_keeper_animation: AnimationPlayer = %ShopkeeperAnimation
 @onready var blink_timer: Timer = %BlinkTimer
 @onready var card_tooltip_popup: CardTooltipPopup = %CardTooltipPopup
@@ -38,6 +43,7 @@ var remove_service_used := false
 
 
 func _ready() -> void:
+	_apply_shop_visuals()
 	ui_layer.move_child(back_button, ui_layer.get_child_count() - 1)
 	if not back_button.pressed.is_connected(_on_back_button_pressed):
 		back_button.pressed.connect(_on_back_button_pressed)
@@ -274,3 +280,159 @@ func _on_shop_relic_bought(relic: Relic, gold_cost: int) -> void:
 func _on_blink_timer_timeout() -> void:
 	shop_keeper_animation.play("blink")
 	_blink_timer_setup()
+
+
+func _apply_shop_visuals() -> void:
+	background.texture = SHOP_BACKGROUND
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var dimmer := ColorRect.new()
+	dimmer.name = "Dimmer"
+	dimmer.color = Color(0.00, 0.03, 0.05, 0.18)
+	dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dimmer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	$BackgroundLayer.add_child(dimmer)
+
+	shopkeeper.hide()
+
+	title.text = "坊市"
+	title.offset_top = -360.0
+	title.offset_bottom = -292.0
+	title.add_theme_color_override("font_color", Color("f2c94f"))
+	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
+	title.add_theme_constant_override("shadow_offset_x", 4)
+	title.add_theme_constant_override("shadow_offset_y", 5)
+	title.add_theme_font_size_override("font_size", 56)
+
+	_add_subtitle()
+	_add_market_panel()
+	_add_section_labels()
+
+	shop_content.offset_left = -620.0
+	shop_content.offset_top = -250.0
+	shop_content.offset_right = 620.0
+	shop_content.offset_bottom = 326.0
+	shop_content.add_theme_constant_override("separation", 14)
+
+	cards.alignment = BoxContainer.ALIGNMENT_CENTER
+	cards.add_theme_constant_override("separation", 14)
+	relics.alignment = BoxContainer.ALIGNMENT_CENTER
+	relics.add_theme_constant_override("separation", 42)
+
+	back_button.offset_left = -612.0
+	back_button.offset_top = 272.0
+	back_button.offset_right = -430.0
+	back_button.offset_bottom = 326.0
+	back_button.text = "离开"
+	_style_button(back_button, Color("b89648"))
+
+	remove_card_button.custom_minimum_size = Vector2(320, 54)
+	_style_button(remove_card_button, Color("6fb2d8"))
+
+
+func _add_subtitle() -> void:
+	if $UILayer.has_node("Subtitle"):
+		return
+
+	var subtitle := Label.new()
+	subtitle.name = "Subtitle"
+	subtitle.text = "灵石可换符牌法宝，也可请掌柜净化一张旧牌。"
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	subtitle.set_anchors_preset(Control.PRESET_CENTER)
+	subtitle.offset_left = -440.0
+	subtitle.offset_top = -300.0
+	subtitle.offset_right = 440.0
+	subtitle.offset_bottom = -258.0
+	subtitle.add_theme_color_override("font_color", Color("d7eef4"))
+	subtitle.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.76))
+	subtitle.add_theme_constant_override("shadow_offset_x", 2)
+	subtitle.add_theme_constant_override("shadow_offset_y", 3)
+	subtitle.add_theme_font_size_override("font_size", 23)
+	ui_layer.add_child(subtitle)
+
+
+func _add_market_panel() -> void:
+	if $UILayer.has_node("MarketPanel"):
+		return
+
+	var panel := PanelContainer.new()
+	panel.name = "MarketPanel"
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.offset_left = -660.0
+	panel.offset_top = -270.0
+	panel.offset_right = 660.0
+	panel.offset_bottom = 354.0
+	panel.add_theme_stylebox_override("panel", _make_panel_style(
+		Color(0.03, 0.12, 0.14, 0.70),
+		Color(0.60, 0.48, 0.25, 0.76),
+		2,
+		8,
+		Color(0, 0, 0, 0.54),
+		18
+	))
+	ui_layer.add_child(panel)
+	ui_layer.move_child(panel, shop_content.get_index())
+
+
+func _add_section_labels() -> void:
+	if not shop_content.has_node("CardsTitle"):
+		var cards_title := _make_section_label("")
+		cards_title.name = "CardsTitle"
+		shop_content.add_child(cards_title)
+		shop_content.move_child(cards_title, cards.get_index())
+
+	if not shop_content.has_node("RelicsTitle"):
+		var relics_title := _make_section_label("法宝")
+		relics_title.name = "RelicsTitle"
+		shop_content.add_child(relics_title)
+		shop_content.move_child(relics_title, relics.get_index())
+
+
+func _make_section_label(text: String) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_color_override("font_color", Color("f2c94f"))
+	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.78))
+	label.add_theme_constant_override("shadow_offset_x", 2)
+	label.add_theme_constant_override("shadow_offset_y", 3)
+	label.add_theme_font_size_override("font_size", 24)
+	return label
+
+
+func _style_button(button: Button, accent: Color) -> void:
+	button.add_theme_font_size_override("font_size", 22)
+	button.add_theme_color_override("font_color", Color("f4efe4"))
+	button.add_theme_color_override("font_hover_color", Color("fff6dc"))
+	button.add_theme_color_override("font_pressed_color", Color("f2c94f"))
+	button.add_theme_color_override("font_disabled_color", Color(0.67, 0.63, 0.52, 0.48))
+	button.add_theme_stylebox_override("normal", _make_panel_style(Color(0.05, 0.20, 0.24, 0.86), accent.darkened(0.25), 1, 6))
+	button.add_theme_stylebox_override("hover", _make_panel_style(Color(0.08, 0.31, 0.36, 0.96), accent.lightened(0.20), 2, 6, Color(accent.r, accent.g, accent.b, 0.22), 10))
+	button.add_theme_stylebox_override("pressed", _make_panel_style(Color(0.03, 0.14, 0.17, 0.98), Color("f2c94f"), 2, 6))
+	button.add_theme_stylebox_override("disabled", _make_panel_style(Color(0.05, 0.06, 0.06, 0.68), Color(0.42, 0.38, 0.30, 0.48), 1, 6))
+
+
+func _make_panel_style(bg: Color, border: Color, border_width := 1, radius := 8, shadow := Color(0, 0, 0, 0.34), shadow_size := 8) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.border_width_left = border_width
+	style.border_width_top = border_width
+	style.border_width_right = border_width
+	style.border_width_bottom = border_width
+	style.corner_radius_top_left = radius
+	style.corner_radius_top_right = radius
+	style.corner_radius_bottom_left = radius
+	style.corner_radius_bottom_right = radius
+	style.content_margin_left = 16
+	style.content_margin_top = 10
+	style.content_margin_right = 16
+	style.content_margin_bottom = 10
+	style.shadow_color = shadow
+	style.shadow_size = shadow_size
+	return style

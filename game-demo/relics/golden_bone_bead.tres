@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="TimingStatusRelic" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/status_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/phase4/golden_bone_bead.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/golden_bone_bead.png" id="2"]
 [ext_resource type="Resource" path="res://statuses/gold_body.tres" id="3"]
 
 [resource]

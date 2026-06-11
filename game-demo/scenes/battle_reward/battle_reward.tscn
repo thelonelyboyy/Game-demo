@@ -1,16 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://b6b781nbyeuds"]
+[gd_scene load_steps=6 format=3 uid="uid://b6b781nbyeuds"]
 
 [ext_resource type="Script" path="res://scenes/battle_reward/battle_reward.gd" id="1_q1rg4"]
-[ext_resource type="Texture2D" uid="uid://cp4iq5fd6j8be" path="res://art/background.png" id="2_ymhpx"]
+[ext_resource type="Texture2D" path="res://art/treasure/treasure_room_bg.png" id="2_c2jde"]
 [ext_resource type="PackedScene" uid="uid://dh6d1t3b0006b" path="res://scenes/ui/reward_button.tscn" id="3_1u6of"]
 [ext_resource type="Texture2D" uid="uid://dhmtctwb5ymhc" path="res://art/gold.png" id="4_pr1pa"]
 [ext_resource type="Texture2D" uid="uid://du7r7v1iaahuo" path="res://art/rarity.png" id="5_lc0i4"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_oksol"]
-font_size = 36
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_78yad"]
-bg_color = Color(0.1, 0.1, 0.1, 0.8)
 
 [node name="BattleReward" type="Control"]
 layout_mode = 3
@@ -23,17 +17,19 @@ mouse_filter = 2
 script = ExtResource("1_q1rg4")
 
 [node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_ymhpx")
+texture = ExtResource("2_c2jde")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="BackgroundDimmer" type="ColorRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,58 +37,74 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.05, 0.05, 0.05, 0.9)
+color = Color(0, 0.03, 0.05, 0.34)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Content" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -220.0
-offset_top = -230.0
-offset_right = 220.0
-offset_bottom = 240.0
+offset_left = -560.0
+offset_top = -322.0
+offset_right = 560.0
+offset_bottom = 326.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 16
 
-[node name="Label" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-text = "战利品"
-label_settings = SubResource("LabelSettings_oksol")
-horizontal_alignment = 1
-
-[node name="RewardContainer" type="PanelContainer" parent="VBoxContainer"]
-custom_minimum_size = Vector2(440, 280)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_78yad")
-
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/RewardContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 18
-
-[node name="Rewards" type="VBoxContainer" parent="VBoxContainer/RewardContainer/MarginContainer"]
+[node name="Title" type="Label" parent="Content"]
 unique_name_in_owner = true
 layout_mode = 2
+text = "战利归匣"
+horizontal_alignment = 1
 
-[node name="GoldReward" parent="VBoxContainer/RewardContainer/MarginContainer/Rewards" instance=ExtResource("3_1u6of")]
+[node name="Subtitle" type="Label" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "收下战斗所得，再继续向洞府深处前行。"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RewardContainer" type="PanelContainer" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1120, 334)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Content/RewardContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 34
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 34
+theme_override_constants/margin_bottom = 28
+
+[node name="Rewards" type="HBoxContainer" parent="Content/RewardContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="GoldReward" parent="Content/RewardContainer/MarginContainer/Rewards" instance=ExtResource("3_1u6of")]
 layout_mode = 2
 reward_icon = ExtResource("4_pr1pa")
 reward_text = "127 灵石"
+reward_subtext = "收纳战后散落的灵石"
 
-[node name="CardReward" parent="VBoxContainer/RewardContainer/MarginContainer/Rewards" instance=ExtResource("3_1u6of")]
+[node name="CardReward" parent="Content/RewardContainer/MarginContainer/Rewards" instance=ExtResource("3_1u6of")]
 layout_mode = 2
 reward_icon = ExtResource("5_lc0i4")
 reward_text = "择取新术法"
+reward_subtext = "从三张术法中选择一张"
 
-[node name="BackButton" type="Button" parent="VBoxContainer"]
-custom_minimum_size = Vector2(180, 56)
+[node name="BackButton" type="Button" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(190, 54)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "继续"
 
-[connection signal="pressed" from="VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="Content/BackButton" to="." method="_on_back_button_pressed"]

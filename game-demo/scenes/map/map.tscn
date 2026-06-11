@@ -28,7 +28,7 @@ offset = Vector2(640, 360)
 
 [node name="MapGenerator" type="Node" parent="."]
 script = ExtResource("2_0qmb6")
-map_mode = 1
+map_mode = 2
 battle_stats_pool = ExtResource("3_cadnm")
 event_room_pool = ExtResource("4_0q2ee")
 

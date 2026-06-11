@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="TimingDrawRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/draw_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/phase4/cloud_step_charm.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/cloud_step_charm.png" id="2"]
 
 [resource]
 script = ExtResource("1")

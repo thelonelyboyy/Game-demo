@@ -48,7 +48,7 @@ signal campfire_exited
 signal battle_reward_exited
 
 # Treasure Room-related events
-signal treasure_room_exited(found_relic: Relic)
+signal treasure_room_exited(found_relics: Array[Relic])
 
 # Relic-related events
 signal relic_tooltip_requested(relic: Relic)

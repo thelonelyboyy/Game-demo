@@ -7,8 +7,8 @@ const X_DIST := 45
 const Y_DIST := 40
 const PLACEMENT_RANDOMNESS := 4
 const FLOORS := 15
-const TEST_FLOORS := 6
-const TEST_ELITE_FLOORS := 7
+const TEST_FLOORS := 7
+const TEST_ELITE_FLOORS := 8
 const MAP_WIDTH := 7
 const PATHS := 6
 const MONSTER_ROOM_WEIGHT := 12.0
@@ -70,6 +70,7 @@ func _generate_test_linear_map() -> Array[Array]:
 		Room.Type.MONSTER,
 		Room.Type.CAMPFIRE,
 		Room.Type.SHOP,
+		Room.Type.TREASURE,
 		Room.Type.EVENT,
 		Room.Type.BOSS,
 	]
@@ -102,6 +103,7 @@ func _generate_test_elite_linear_map() -> Array[Array]:
 		Room.Type.ELITE,
 		Room.Type.CAMPFIRE,
 		Room.Type.SHOP,
+		Room.Type.TREASURE,
 		Room.Type.EVENT,
 		Room.Type.BOSS,
 	]

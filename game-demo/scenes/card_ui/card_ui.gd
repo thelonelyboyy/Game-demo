@@ -128,12 +128,7 @@ func _set_card(value: Card) -> void:
 
 func _set_playable(value: bool) -> void:
 	playable = value
-	if not playable:
-		card_visuals.cost.add_theme_color_override("font_color", Color.RED)
-		card_visuals.icon.modulate = Color(1, 1, 1, 0.5)
-	else:
-		card_visuals.cost.remove_theme_color_override("font_color")
-		card_visuals.icon.modulate = Color(1, 1, 1, 1)
+	card_visuals.set_disabled_visual(not playable)
 
 
 func _set_char_stats(value: CharacterStats) -> void:

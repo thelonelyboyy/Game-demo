@@ -1,14 +1,14 @@
 [gd_scene load_steps=23 format=3 uid="uid://dl16ggyeuwg5c"]
 
 [ext_resource type="Script" path="res://scenes/treasure/treasure.gd" id="1_0dgmn"]
-[ext_resource type="Texture2D" uid="uid://cp4iq5fd6j8be" path="res://art/background.png" id="2_g7pdp"]
+[ext_resource type="Texture2D" path="res://art/treasure/treasure_room_bg.png" id="2_g7pdp"]
 [ext_resource type="Resource" uid="uid://b11jhsqqh7kfe" path="res://relics/explosive_barrel.tres" id="2_g8620"]
-[ext_resource type="Texture2D" uid="uid://hva3iy5hon7a" path="res://art/tile_0089.png" id="3_4v1q1"]
+[ext_resource type="Texture2D" path="res://art/treasure/treasure_chest_closed.png" id="3_4v1q1"]
 [ext_resource type="Resource" uid="uid://dn6frpxqh1o7" path="res://relics/mana_potion.tres" id="3_b2sgi"]
 [ext_resource type="Texture2D" uid="uid://dhmtctwb5ymhc" path="res://art/gold.png" id="4_3wkp5"]
-[ext_resource type="Texture2D" uid="uid://d007n5sscvumv" path="res://art/tile_0090.png" id="4_lw04s"]
+[ext_resource type="Texture2D" path="res://art/treasure/treasure_chest_opening.png" id="4_lw04s"]
 [ext_resource type="Resource" uid="uid://c8c1y85x2h5l" path="res://relics/reinforced_armor.tres" id="4_xb65p"]
-[ext_resource type="Texture2D" uid="uid://isan6btj7dwy" path="res://art/tile_0091.png" id="5_h2q1b"]
+[ext_resource type="Texture2D" path="res://art/treasure/treasure_chest_open.png" id="5_h2q1b"]
 [ext_resource type="Resource" uid="uid://b7xh51rkdccfy" path="res://relics/confusing_staff.tres" id="6_fkuuo"]
 [ext_resource type="Resource" uid="uid://r6aixmaucd4b" path="res://relics/wooden_sword.tres" id="7_oqlxp"]
 [ext_resource type="Resource" path="res://relics/relic_reward_pool.tres" id="8_p2p11"]
@@ -176,7 +176,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.05, 0.05, 0.05, 0.9)
+color = Color(0, 0.03, 0.05, 0.2)
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 1

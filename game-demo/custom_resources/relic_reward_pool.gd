@@ -5,6 +5,14 @@ extends Resource
 
 
 func get_random_available(char_stats: CharacterStats, relic_handler: RelicHandler) -> Relic:
+	var choices := get_random_available_choices(char_stats, relic_handler, 1)
+	if choices.is_empty():
+		return null
+
+	return choices[0]
+
+
+func get_random_available_choices(char_stats: CharacterStats, relic_handler: RelicHandler, count := 2) -> Array[Relic]:
 	var available_relics: Array[Relic] = []
 	for relic: Relic in relics:
 		if not relic:
@@ -16,6 +24,7 @@ func get_random_available(char_stats: CharacterStats, relic_handler: RelicHandle
 			available_relics.append(relic)
 
 	if available_relics.is_empty():
-		return null
+		return []
 
-	return RNG.array_pick_random(available_relics) as Relic
+	RNG.array_shuffle(available_relics)
+	return available_relics.slice(0, mini(count, available_relics.size()))

@@ -168,41 +168,66 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.05, 0.05, 0.05, 0.85)
+mouse_filter = 0
+color = Color(0.01, 0.02, 0.025, 0.78)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenu"]
+[node name="CenterPanel" type="PanelContainer" parent="PauseMenu"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -47.0
-offset_top = -20.0
-offset_right = 47.0
-offset_bottom = 20.0
+offset_left = -270.0
+offset_top = -170.0
+offset_right = 270.0
+offset_bottom = 170.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 15
 
-[node name="Label" type="Label" parent="PauseMenu/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="PauseMenu/CenterPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 34
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 34
+theme_override_constants/margin_bottom = 26
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PauseMenu/CenterPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Title" type="Label" parent="PauseMenu/CenterPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "暂停"
 label_settings = SubResource("LabelSettings_68deg")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PauseMenu/VBoxContainer"]
+[node name="Subtitle" type="Label" parent="PauseMenu/CenterPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+text = "山路暂歇，整理一下再继续。"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
 
-[node name="BackToGameButton" type="Button" parent="PauseMenu/VBoxContainer/HBoxContainer"]
+[node name="Divider" type="ColorRect" parent="PauseMenu/CenterPanel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+color = Color(0.728, 0.56, 0.25, 0.55)
+
+[node name="Actions" type="VBoxContainer" parent="PauseMenu/CenterPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BackToGameButton" type="Button" parent="PauseMenu/CenterPanel/MarginContainer/VBoxContainer/Actions"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 14)
+custom_minimum_size = Vector2(260, 52)
 layout_mode = 2
 text = "继续"
 
-[node name="SaveAndQuitButton" type="Button" parent="PauseMenu/VBoxContainer/HBoxContainer"]
+[node name="SaveAndQuitButton" type="Button" parent="PauseMenu/CenterPanel/MarginContainer/VBoxContainer/Actions"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(50, 0)
+custom_minimum_size = Vector2(260, 52)
 layout_mode = 2
 text = "返回山门"

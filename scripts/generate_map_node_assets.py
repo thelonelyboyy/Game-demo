@@ -118,17 +118,31 @@ def icon_shop(draw: ImageDraw.ImageDraw, icon, dark, light) -> None:
 
 
 def icon_treasure(draw: ImageDraw.ImageDraw, icon, dark, light) -> None:
+    # Open treasure casket: wider silhouette and gold/cyan contrast for fast map scanning.
+    polygon(draw, [(55, 67), (105, 67), (112, 92), (48, 92)], rgba("#372414", 245), dark, 2.4)
+    polygon(draw, [(56, 42), (102, 55), (98, 72), (50, 59)], icon, dark, 2.6)
+    polygon(draw, [(61, 49), (95, 58), (92, 64), (58, 56)], light, None)
+    polygon(draw, [(51, 76), (109, 76), (104, 108), (56, 108)], icon, dark, 3.2)
     draw.rounded_rectangle(
-        (round(54 * SCALE), round(71 * SCALE), round(106 * SCALE), round(103 * SCALE)),
-        radius=round(7 * SCALE),
-        fill=icon,
+        (round(58 * SCALE), round(81 * SCALE), round(102 * SCALE), round(101 * SCALE)),
+        radius=round(4 * SCALE),
+        fill=rgba("#7b4b20", 255),
         outline=dark,
-        width=round(3 * SCALE),
+        width=round(2 * SCALE),
     )
-    arc(draw, 80, 73, 26, 185, 355, icon, 8)
-    arc(draw, 80, 73, 26, 185, 355, dark, 2)
-    line(draw, [(80, 70), (80, 103)], dark, 3)
-    ellipse(draw, 80, 86, 5, light, dark, 1.6)
+    line(draw, [(80, 77), (80, 107)], dark, 3)
+    draw.rounded_rectangle(
+        (round(73 * SCALE), round(84 * SCALE), round(87 * SCALE), round(98 * SCALE)),
+        radius=round(3 * SCALE),
+        fill=rgba("#f7e7b0", 255),
+        outline=dark,
+        width=round(1.5 * SCALE),
+    )
+    polygon(draw, [(60, 80), (72, 87), (61, 94)], rgba("#f4cf64", 210), None)
+    polygon(draw, [(100, 80), (88, 87), (99, 94)], rgba("#f4cf64", 210), None)
+    ellipse(draw, 67, 62, 3.0, rgba("#dffcff", 245))
+    ellipse(draw, 82, 56, 3.6, rgba("#dffcff", 245))
+    ellipse(draw, 96, 66, 2.8, rgba("#dffcff", 245))
 
 
 def icon_campfire(draw: ImageDraw.ImageDraw, icon, dark, light) -> None:
@@ -187,7 +201,7 @@ def main() -> None:
     palettes = {
         "map_node_unknown": {"rim_dark": "#6e5627", "rim": "#9c8044", "face": "#715d35", "inner": "#8a7242", "icon": "#f2e4c4", "glow": "#d7b36c"},
         "map_node_shop": {"rim_dark": "#4b5b27", "rim": "#7f8a3c", "face": "#506425", "inner": "#6f7c30", "icon": "#efecc3", "glow": "#98bd4b"},
-        "map_node_treasure": {"rim_dark": "#405a6c", "rim": "#75a9bf", "face": "#47778a", "inner": "#6c9fb2", "icon": "#d7f0f4", "glow": "#7bd8f3"},
+        "map_node_treasure": {"rim_dark": "#6a4c17", "rim": "#d1a746", "face": "#745321", "inner": "#b0812f", "icon": "#f1bf4f", "glow": "#f4cf64"},
         "map_node_campfire": {"rim_dark": "#6e2d24", "rim": "#b44d37", "face": "#7f332b", "inner": "#9f4732", "icon": "#ffe6bc", "glow": "#e4653f"},
         "map_node_monster": {"rim_dark": "#5a4a35", "rim": "#8b7651", "face": "#6b5d47", "inner": "#827254", "icon": "#ede1c8", "glow": "#a99161"},
         "map_node_elite": {"rim_dark": "#5a2f55", "rim": "#9b5c92", "face": "#6d3e69", "inner": "#85517d", "icon": "#f0d7ee", "glow": "#c072bc"},

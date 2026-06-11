@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EventChoiceRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/event_choice_relic.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://art/relics/phase4/star_compass.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/fate_ledger.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_script")

@@ -209,16 +209,20 @@ func _on_treasure_room_entered() -> void:
 	var treasure_scene := _change_view(TREASURE_SCENE) as Treasure
 	treasure_scene.relic_handler = relic_handler
 	treasure_scene.char_stats = character
-	treasure_scene.generate_relic()
+	treasure_scene.generate_relic_choices(2)
 
 
-func _on_treasure_room_exited(relic: Relic) -> void:
+func _on_treasure_room_exited(relic_choices: Array[Relic]) -> void:
+	if relic_choices.is_empty():
+		_show_map()
+		return
+
 	var reward_scene := _change_view(BATTLE_REWARD_SCENE) as BattleReward
 	reward_scene.run_stats = stats
 	reward_scene.character_stats = character
 	reward_scene.relic_handler = relic_handler
 	
-	reward_scene.add_relic_reward(relic)
+	reward_scene.add_relic_choice_rewards(relic_choices)
 
 
 func _on_campfire_entered() -> void:

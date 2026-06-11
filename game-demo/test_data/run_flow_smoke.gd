@@ -38,6 +38,7 @@ func _run_smoke() -> void:
 	_check_required_room(rooms, Room.Type.BLESSING, "blessing")
 	_check_required_room(rooms, Room.Type.MONSTER, "monster")
 	_check_required_room(rooms, Room.Type.ELITE, "elite")
+	_check_required_room(rooms, Room.Type.TREASURE, "treasure")
 	_check_required_room(rooms, Room.Type.CAMPFIRE, "campfire")
 	_check_required_room(rooms, Room.Type.SHOP, "shop")
 	_check_required_room(rooms, Room.Type.EVENT, "event")
@@ -56,6 +57,8 @@ func _run_smoke() -> void:
 	await _check_boss_room_resolution(run, rooms.get(Room.Type.BOSS))
 	print("RUN_FLOW_SMOKE_STEP:reward")
 	await _check_reward_entry(run, rooms.get(Room.Type.MONSTER))
+	print("RUN_FLOW_SMOKE_STEP:treasure")
+	await _check_treasure_entry(run, rooms.get(Room.Type.TREASURE))
 	print("RUN_FLOW_SMOKE_STEP:shop")
 	await _check_shop_entry(run, rooms.get(Room.Type.SHOP))
 	print("RUN_FLOW_SMOKE_STEP:event")
@@ -266,6 +269,50 @@ func _check_shop_entry(run: Run, _room: Room) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_check_returned_to_map(run, "shop")
+
+
+func _check_treasure_entry(run: Run, _room: Room) -> void:
+	if not run:
+		_check(false, "treasure entry has run")
+		return
+
+	run._on_treasure_room_entered()
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	var treasure := _current_view_child(run) as Treasure
+	_check(treasure != null, "treasure view opens")
+	if not treasure:
+		return
+
+	_check(treasure.found_relics.size() == 2, "treasure generates two relic choices")
+	if treasure.found_relics.size() == 2:
+		_check(treasure.found_relics[0] != treasure.found_relics[1], "treasure relic choices are different")
+
+	var relic_count_before := run.relic_handler.get_all_relics().size()
+	treasure._on_treasure_opened()
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	var reward := _current_view_child(run) as BattleReward
+	_check(reward != null, "treasure opens relic choice reward view")
+	if not reward:
+		return
+
+	_check(reward.rewards.get_child_count() == 2, "treasure reward view shows two relic choices")
+	_check(reward.back_button.disabled, "treasure reward requires choosing a relic")
+	var choice := reward.rewards.get_child(0) as RewardButton if reward.rewards.get_child_count() > 0 else null
+	_check(choice != null, "treasure relic choice button exists")
+	if choice:
+		choice.pressed.emit()
+		await get_tree().process_frame
+		_check(run.relic_handler.get_all_relics().size() == relic_count_before + 1, "treasure choice grants one relic")
+		_check(not reward.back_button.disabled, "treasure reward can continue after choosing")
+
+	reward._on_back_button_pressed()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check_returned_to_map(run, "treasure")
 
 
 func _check_event_entry(run: Run, room: Room) -> void:

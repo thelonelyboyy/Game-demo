@@ -1,0 +1,121 @@
+class_name CardStyle
+extends RefCounted
+
+const TYPE_THUNDER := "雷系"
+const TYPE_SWORD := "剑系"
+const TYPE_MIND := "心法"
+const TYPE_SECRET := "秘术"
+const TYPE_ALCHEMY := "丹道"
+const TYPE_ARRAY := "剑阵"
+const TYPE_DEFAULT := "术法"
+
+const TYPE_COLORS := {
+	TYPE_THUNDER: {
+		"main": Color("7b4acb"),
+		"dark": Color("241832"),
+		"highlight": Color("c89bff"),
+	},
+	TYPE_SWORD: {
+		"main": Color("c89a35"),
+		"dark": Color("2c2413"),
+		"highlight": Color("ffe08a"),
+	},
+	TYPE_MIND: {
+		"main": Color("2fa486"),
+		"dark": Color("102a24"),
+		"highlight": Color("9fffe0"),
+	},
+	TYPE_SECRET: {
+		"main": Color("9a5acb"),
+		"dark": Color("21152d"),
+		"highlight": Color("e0b0ff"),
+	},
+	TYPE_ALCHEMY: {
+		"main": Color("d47a22"),
+		"dark": Color("2e1a0d"),
+		"highlight": Color("ffb15c"),
+	},
+	TYPE_ARRAY: {
+		"main": Color("c64a32"),
+		"dark": Color("2d1110"),
+		"highlight": Color("ff8a6a"),
+	},
+	TYPE_DEFAULT: {
+		"main": Color("b89c62"),
+		"dark": Color("1d1a14"),
+		"highlight": Color("e8d8a0"),
+	},
+}
+
+
+func get_card_type(card: Card) -> String:
+	if not card:
+		return TYPE_DEFAULT
+
+	var marker: String = _card_marker(card)
+	if marker.contains("剑阵") or marker.contains("劍陣") or marker.contains("array") or marker.contains("formation"):
+		return TYPE_ARRAY
+	if card.type == Card.Type.POWER:
+		return TYPE_MIND
+	if card.get_profession() == Card.Profession.DEMONIC:
+		return TYPE_SECRET
+	if card.element == Card.Element.FIRE:
+		return TYPE_ALCHEMY
+	if card.get_profession() == Card.Profession.SWORD or card.element == Card.Element.METAL:
+		return TYPE_SWORD
+	if card.element == Card.Element.WATER:
+		return TYPE_THUNDER
+	return TYPE_DEFAULT
+
+
+func get_card_style(card: Card) -> Dictionary:
+	var card_type: String = get_card_type(card)
+	var colors: Dictionary = TYPE_COLORS.get(card_type, TYPE_COLORS[TYPE_DEFAULT])
+	return {
+		"type_name": card_type,
+		"main": colors["main"],
+		"dark": colors["dark"],
+		"highlight": colors["highlight"],
+		"gold": Color("d7b56d"),
+		"ink": Color("05090a"),
+		"text": Color("f3ead4"),
+		"muted": Color("c8bfa8"),
+	}
+
+
+func make_style(
+	bg: Color,
+	border: Color,
+	border_width := 1,
+	radius := 6,
+	shadow := Color(0, 0, 0, 0.0),
+	shadow_size := 0,
+	margin := 0
+) -> StyleBoxFlat:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.border_width_left = border_width
+	style.border_width_top = border_width
+	style.border_width_right = border_width
+	style.border_width_bottom = border_width
+	style.corner_radius_top_left = radius
+	style.corner_radius_top_right = radius
+	style.corner_radius_bottom_left = radius
+	style.corner_radius_bottom_right = radius
+	style.shadow_color = shadow
+	style.shadow_size = shadow_size
+	style.content_margin_left = margin
+	style.content_margin_top = margin
+	style.content_margin_right = margin
+	style.content_margin_bottom = margin
+	return style
+
+
+func _card_marker(card: Card) -> String:
+	var parts: PackedStringArray = PackedStringArray()
+	parts.append(card.id.to_lower())
+	parts.append(card.get_display_name().to_lower())
+	for tag: String in card.mechanic_tags:
+		parts.append(tag.to_lower())
+	return " ".join(parts)
