@@ -34,13 +34,40 @@ func save_data() -> void:
 
 
 static func load_data() -> SaveGame:
-	if FileAccess.file_exists(SAVE_PATH):
-		var save := ResourceLoader.load(SAVE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as SaveGame
-		if save:
-			save._migrate_card_resources()
-		return save
-	
-	return null
+	if not FileAccess.file_exists(SAVE_PATH):
+		return null
+
+	# 存档以路径方式内嵌了大量资源引用（卡牌贴图、立绘、脚本等）。
+	# 若其中任意资源被移动/重命名/删除，整个存档会在解析阶段直接报错且无法加载。
+	# 先检查依赖是否齐全，缺失则当作损坏存档清理掉，避免每次启动刷错误、且让“继续游戏”自动失效。
+	if _has_missing_dependencies():
+		push_warning("存档引用的资源已缺失（可能因资源移动或重命名），无法加载，已清理该存档。")
+		delete_data()
+		return null
+
+	var save := ResourceLoader.load(SAVE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE) as SaveGame
+	if not save:
+		push_warning("存档损坏或不兼容，无法加载，已清理该存档。")
+		delete_data()
+		return null
+
+	save._migrate_card_resources()
+	return save
+
+
+static func _has_missing_dependencies() -> bool:
+	for dependency in ResourceLoader.get_dependencies(SAVE_PATH):
+		var has_path := false
+		var resolvable := false
+		for part in dependency.split("::"):
+			if part.begins_with("res://") or part.begins_with("uid://"):
+				has_path = true
+				if ResourceLoader.exists(part):
+					resolvable = true
+					break
+		if has_path and not resolvable:
+			return true
+	return false
 
 
 static func delete_data() -> void:

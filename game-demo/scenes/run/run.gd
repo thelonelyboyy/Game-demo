@@ -89,8 +89,11 @@ func _save_run(was_on_map: bool) -> void:
 
 func _load_run() -> void:
 	save_data = SaveGame.load_data()
-	assert(save_data, "Couldn't load last save")
-	
+	if not save_data:
+		push_warning("没有可用存档（可能已损坏并被清理），返回主菜单。")
+		get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
+		return
+
 	RNG.set_from_save_data(save_data.rng_seed, save_data.rng_state)
 	stats = save_data.run_stats
 	character = save_data.char_stats
