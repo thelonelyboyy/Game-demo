@@ -15,14 +15,17 @@ func _ready() -> void:
 		card.queue_free()
 		
 	background.color = background_color
+	card_description.hide()
 
 
 func show_tooltip(card: Card) -> void:
 	var new_card := CARD_MENU_UI_SCENE.instantiate() as CardMenuUI
 	tooltip_card.add_child(new_card)
+	new_card.set_visual_size(Vector2(230.0, 330.0))
 	new_card.card = card
 	new_card.tooltip_requested.connect(hide_tooltip.unbind(1))
-	card_description.text = "%s\n%s" % [card.get_default_tooltip(), card.get_element_tooltip()]
+	card_description.text = ""
+	card_description.hide()
 	show()
 
 

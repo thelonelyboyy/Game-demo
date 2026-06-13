@@ -66,7 +66,7 @@ func _on_buy_button_pressed() -> void:
 
 
 func _apply_visuals() -> void:
-	custom_minimum_size = Vector2(184, 344)
+	custom_minimum_size = Vector2(216, 392)
 	add_theme_constant_override("separation", 8)
 	price.add_theme_constant_override("separation", 6)
 	price_label.add_theme_color_override("font_color", Color("f2c94f"))

@@ -6,9 +6,9 @@
 [ext_resource type="Texture2D" uid="uid://dhmtctwb5ymhc" path="res://art/gold.png" id="2_s11cf"]
 
 [node name="ShopCard" type="VBoxContainer"]
-custom_minimum_size = Vector2(184, 344)
-offset_right = 184.0
-offset_bottom = 344.0
+custom_minimum_size = Vector2(216, 392)
+offset_right = 216.0
+offset_bottom = 392.0
 theme_override_constants/separation = 10
 script = ExtResource("1_ojxkp")
 card = ExtResource("2_k75is")

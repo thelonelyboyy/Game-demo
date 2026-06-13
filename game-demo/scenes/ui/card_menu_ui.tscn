@@ -5,14 +5,15 @@
 [ext_resource type="PackedScene" uid="uid://b362c35jf6fmy" path="res://scenes/ui/card_visuals.tscn" id="3_vpo1j"]
 
 [node name="CardMenuUI" type="CenterContainer"]
-custom_minimum_size = Vector2(160, 230)
-offset_right = 160.0
-offset_bottom = 230.0
+custom_minimum_size = Vector2(190, 272)
+offset_right = 190.0
+offset_bottom = 272.0
 size_flags_horizontal = 3
 script = ExtResource("1_0f0jo")
 card = ExtResource("2_1ngm1")
 
 [node name="Visuals" parent="." instance=ExtResource("3_vpo1j")]
+custom_minimum_size = Vector2(190, 272)
 layout_mode = 2
 
 [connection signal="gui_input" from="Visuals" to="." method="_on_visuals_gui_input"]

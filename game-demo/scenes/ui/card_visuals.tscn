@@ -1,7 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://b362c35jf6fmy"]
+[gd_scene load_steps=5 format=3 uid="uid://b362c35jf6fmy"]
 
 [ext_resource type="Theme" uid="uid://c8cqncsqlplyu" path="res://main_theme.tres" id="1_hiimn"]
-[ext_resource type="StyleBox" uid="uid://b4b3e0d14kvmi" path="res://scenes/card_ui/card_base_stylebox.tres" id="2_nvr8g"]
 [ext_resource type="Script" path="res://scenes/ui/card_visuals.gd" id="2_uk7ay"]
 [ext_resource type="Texture2D" uid="uid://c6rme2o6dyaoj" path="res://art/tile_0104.png" id="3_wd32c"]
 [ext_resource type="Texture2D" uid="uid://du7r7v1iaahuo" path="res://art/rarity.png" id="4_w0uhs"]
@@ -21,16 +20,26 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_styles/panel = ExtResource("2_nvr8g")
+
+[node name="FrameTexture" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
 
 [node name="TitleBar" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 18.0
-offset_top = 10.0
-offset_right = -12.0
-offset_bottom = 38.0
+offset_left = 20.0
+offset_top = 11.0
+offset_right = -11.0
+offset_bottom = 39.0
 grow_horizontal = 2
 mouse_filter = 2
 
@@ -41,7 +50,7 @@ anchor_top = 0.5
 anchor_bottom = 0.5
 offset_left = 8.0
 offset_top = -1.0
-offset_right = 28.0
+offset_right = 24.0
 offset_bottom = 1.0
 grow_vertical = 2
 mouse_filter = 2
@@ -54,7 +63,7 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -28.0
+offset_left = -24.0
 offset_top = -1.0
 offset_right = -8.0
 offset_bottom = 1.0
@@ -68,26 +77,29 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 30.0
-offset_right = -30.0
+offset_left = 26.0
+offset_right = -26.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 19
-text = "打击"
+text = "剑气引"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+clip_text = true
 
 [node name="ArtFrame" type="Panel" parent="."]
 clip_contents = true
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 0
 anchor_right = 1.0
-offset_left = 14.0
-offset_top = 43.0
-offset_right = -14.0
-offset_bottom = 128.0
+anchor_bottom = 0.56
+offset_left = 15.0
+offset_top = 45.0
+offset_right = -15.0
+offset_bottom = -7.0
 grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="Icon" type="TextureRect" parent="ArtFrame"]
@@ -95,10 +107,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = -4.0
-offset_bottom = -4.0
+offset_left = 8.0
+offset_top = 7.0
+offset_right = -8.0
+offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -108,16 +120,16 @@ stretch_mode = 5
 
 [node name="DescriptionPanel" type="Panel" parent="."]
 layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
+anchors_preset = 0
+anchor_top = 0.56
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = -98.0
-offset_right = -12.0
-offset_bottom = -31.0
+offset_left = 13.0
+offset_top = 1.0
+offset_right = -13.0
+offset_bottom = -32.0
 grow_horizontal = 2
-grow_vertical = 0
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="Description" type="RichTextLabel" parent="DescriptionPanel"]
@@ -125,17 +137,17 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 7.0
-offset_top = 5.0
-offset_right = -7.0
-offset_bottom = -5.0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = -8.0
+offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_font_sizes/normal_font_size = 14
+theme_override_font_sizes/normal_font_size = 13
 bbcode_enabled = true
 text = "造成 [color=#f0c85b]6[/color] 点伤害。"
-fit_content = true
+fit_content = false
 scroll_active = false
 autowrap_mode = 3
 
@@ -145,10 +157,10 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 42.0
-offset_top = -27.0
-offset_right = -42.0
-offset_bottom = -7.0
+offset_left = 40.0
+offset_top = -28.0
+offset_right = -40.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
@@ -161,16 +173,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 15
-text = "术法"
+text = "剑系"
 horizontal_alignment = 1
 vertical_alignment = 1
+clip_text = true
 
 [node name="CostOrb" type="Panel" parent="."]
 layout_mode = 0
-offset_left = 4.0
+offset_left = 3.0
 offset_top = 3.0
-offset_right = 40.0
-offset_bottom = 39.0
+offset_right = 41.0
+offset_bottom = 41.0
 mouse_filter = 2
 
 [node name="Cost" type="Label" parent="CostOrb"]
@@ -194,10 +207,10 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -9.0
-offset_top = 127.0
-offset_right = 9.0
-offset_bottom = 145.0
+offset_left = -8.0
+offset_top = 125.0
+offset_right = 8.0
+offset_bottom = 141.0
 grow_horizontal = 2
 mouse_filter = 2
 texture = ExtResource("4_w0uhs")
@@ -205,11 +218,15 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="ElementTag" type="Label" parent="."]
-layout_mode = 0
-offset_left = 121.0
-offset_top = 13.0
-offset_right = 149.0
-offset_bottom = 34.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -33.0
+offset_top = 15.0
+offset_right = -10.0
+offset_bottom = 35.0
+grow_horizontal = 0
 mouse_filter = 2
 theme_override_font_sizes/font_size = 13
 text = "火"
@@ -225,4 +242,4 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.04, 0.045, 0.05, 0.45)
+color = Color(0.04, 0.045, 0.05, 0.5)

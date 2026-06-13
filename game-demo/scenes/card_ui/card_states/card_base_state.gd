@@ -33,7 +33,6 @@ func on_mouse_entered() -> void:
 	card_ui.card_visuals.apply_hover_style()
 	if card_ui.parent and card_ui.parent.has_method("focus_card"):
 		card_ui.parent.focus_card(card_ui)
-	card_ui.request_tooltip()
 
 
 func on_mouse_exited() -> void:

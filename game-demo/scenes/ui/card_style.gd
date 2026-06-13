@@ -9,43 +9,73 @@ const TYPE_ALCHEMY := "丹道"
 const TYPE_ARRAY := "剑阵"
 const TYPE_DEFAULT := "术法"
 
+const FRAME_ROOT := "res://art/ui/cards/generated/"
+
 const TYPE_COLORS := {
 	TYPE_THUNDER: {
 		"main": Color("7b4acb"),
 		"dark": Color("241832"),
 		"highlight": Color("c89bff"),
+		"frame": FRAME_ROOT + "card_frame_thunder.png",
 	},
 	TYPE_SWORD: {
 		"main": Color("c89a35"),
 		"dark": Color("2c2413"),
 		"highlight": Color("ffe08a"),
+		"frame": FRAME_ROOT + "card_frame_sword.png",
 	},
 	TYPE_MIND: {
 		"main": Color("2fa486"),
 		"dark": Color("102a24"),
 		"highlight": Color("9fffe0"),
+		"frame": FRAME_ROOT + "card_frame_mind.png",
 	},
 	TYPE_SECRET: {
 		"main": Color("9a5acb"),
 		"dark": Color("21152d"),
 		"highlight": Color("e0b0ff"),
+		"frame": FRAME_ROOT + "card_frame_secret.png",
 	},
 	TYPE_ALCHEMY: {
 		"main": Color("d47a22"),
 		"dark": Color("2e1a0d"),
 		"highlight": Color("ffb15c"),
+		"frame": FRAME_ROOT + "card_frame_alchemy.png",
 	},
 	TYPE_ARRAY: {
 		"main": Color("c64a32"),
 		"dark": Color("2d1110"),
 		"highlight": Color("ff8a6a"),
+		"frame": FRAME_ROOT + "card_frame_array.png",
 	},
 	TYPE_DEFAULT: {
 		"main": Color("b89c62"),
 		"dark": Color("1d1a14"),
 		"highlight": Color("e8d8a0"),
+		"frame": FRAME_ROOT + "card_frame_default.png",
 	},
 }
+
+const KEYWORDS := [
+	"剑伤",
+	"雷",
+	"层",
+	"灵气",
+	"护体",
+	"生命",
+	"破绽",
+	"邪祟",
+	"中毒",
+	"攻击",
+	"防御",
+	"格挡",
+	"抽",
+	"火",
+	"金",
+	"木",
+	"水",
+	"土",
+]
 
 
 func get_card_type(card: Card) -> String:
@@ -53,7 +83,12 @@ func get_card_type(card: Card) -> String:
 		return TYPE_DEFAULT
 
 	var marker: String = _card_marker(card)
-	if marker.contains("剑阵") or marker.contains("劍陣") or marker.contains("array") or marker.contains("formation"):
+	if (
+		marker.contains("剑阵")
+		or marker.contains("劍陣")
+		or marker.contains("array")
+		or marker.contains("formation")
+	):
 		return TYPE_ARRAY
 	if card.type == Card.Type.POWER:
 		return TYPE_MIND
@@ -68,6 +103,12 @@ func get_card_type(card: Card) -> String:
 	return TYPE_DEFAULT
 
 
+func get_card_frame_path(card: Card) -> String:
+	var card_type: String = get_card_type(card)
+	var colors: Dictionary = TYPE_COLORS.get(card_type, TYPE_COLORS[TYPE_DEFAULT])
+	return colors["frame"]
+
+
 func get_card_style(card: Card) -> Dictionary:
 	var card_type: String = get_card_type(card)
 	var colors: Dictionary = TYPE_COLORS.get(card_type, TYPE_COLORS[TYPE_DEFAULT])
@@ -76,14 +117,29 @@ func get_card_style(card: Card) -> Dictionary:
 		"main": colors["main"],
 		"dark": colors["dark"],
 		"highlight": colors["highlight"],
+		"frame": colors["frame"],
 		"gold": Color("d7b56d"),
-		"ink": Color("05090a"),
-		"text": Color("f3ead4"),
+		"bright_gold": Color("ffe3a0"),
+		"ink": Color("050706"),
+		"panel": Color("10130f"),
+		"text": Color("f4ead1"),
 		"muted": Color("c8bfa8"),
 	}
 
 
-func make_style(
+func format_card_text(card: Card, value: String) -> String:
+	var text := value
+	if card:
+		text = text.replace("[center][b]%s[/b]\n" % card.get_display_name(), "[center]")
+	text = text.replace("[center]", "")
+	text = text.replace("[/center]", "")
+	text = text.replace("[b]", "")
+	text = text.replace("[/b]", "")
+	text = text.strip_edges()
+	return _highlight_numbers_and_keywords(text)
+
+
+func make_panel_style(
 	bg: Color,
 	border: Color,
 	border_width := 1,
@@ -109,7 +165,31 @@ func make_style(
 	style.content_margin_top = margin
 	style.content_margin_right = margin
 	style.content_margin_bottom = margin
+	style.anti_aliasing = true
 	return style
+
+
+func make_style(
+	bg: Color,
+	border: Color,
+	border_width := 1,
+	radius := 6,
+	shadow := Color(0, 0, 0, 0.0),
+	shadow_size := 0,
+	margin := 0
+) -> StyleBoxFlat:
+	return make_panel_style(bg, border, border_width, radius, shadow, shadow_size, margin)
+
+
+func _highlight_numbers_and_keywords(value: String) -> String:
+	var text := value
+	var number_regex := RegEx.new()
+	number_regex.compile("([0-9]+)")
+	text = number_regex.sub(text, "[color=#f0c85b]$1[/color]", true)
+
+	for keyword: String in KEYWORDS:
+		text = text.replace(keyword, "[color=#e6a84f]%s[/color]" % keyword)
+	return text
 
 
 func _card_marker(card: Card) -> String:

@@ -7,12 +7,16 @@ signal tooltip_requested(card: Card)
 
 @onready var visuals: CardVisuals = $Visuals
 
+var requested_visual_size := Vector2.ZERO
+
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	gui_input.connect(_on_visuals_gui_input)
 	mouse_entered.connect(_on_visuals_mouse_entered)
 	mouse_exited.connect(_on_visuals_mouse_exited)
+	if requested_visual_size != Vector2.ZERO:
+		_apply_visual_size(requested_visual_size)
 
 
 func _on_visuals_gui_input(event: InputEvent) -> void:
@@ -38,3 +42,19 @@ func set_card(value: Card) -> void:
 		return
 
 	visuals.card = card
+
+
+func set_visual_size(value: Vector2) -> void:
+	requested_visual_size = value
+	if not is_node_ready():
+		custom_minimum_size = value
+		size = value
+		return
+	_apply_visual_size(value)
+
+
+func _apply_visual_size(value: Vector2) -> void:
+	custom_minimum_size = value
+	size = value
+	visuals.custom_minimum_size = value
+	visuals.size = value

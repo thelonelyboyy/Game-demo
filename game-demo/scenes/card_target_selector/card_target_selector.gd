@@ -85,6 +85,7 @@ func _on_card_aim_started(card: CardUI) -> void:
 	area_2d.monitorable = true
 	current_card = card
 	current_card.targets.clear()
+	Events.tooltip_hide_requested.emit()
 	arrow_shadow.show()
 	card_arc.show()
 	arrow_head.show()
@@ -109,7 +110,6 @@ func _on_area_2d_area_entered(area: Area2D) -> void:
 	
 	if not current_card.targets.has(area):
 		current_card.targets.append(area)
-		current_card.request_tooltip()
 
 
 func _on_area_2d_area_exited(area: Area2D) -> void:
@@ -117,7 +117,6 @@ func _on_area_2d_area_exited(area: Area2D) -> void:
 		return
 	
 	current_card.targets.erase(area)
-	current_card.request_tooltip()
 
 
 func _setup_arrow_visuals() -> void:
