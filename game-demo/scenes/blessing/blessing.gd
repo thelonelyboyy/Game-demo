@@ -1,7 +1,7 @@
 class_name Blessing
 extends Control
 
-const BACKGROUND := preload("res://art/blessing_cavern_bg.png")
+const BACKGROUND := preload("res://art/backgrounds/blessing_cavern_bg.png")
 
 const GODS := [
 	{
@@ -37,12 +37,12 @@ const GODS := [
 ]
 
 const EFFECT_ICONS := {
-	"max_health": preload("res://art/heart.png"),
-	"full_heal": preload("res://art/heart.png"),
-	"gold": preload("res://art/gold.png"),
-	"big_gold": preload("res://art/gold.png"),
-	"upgrade": preload("res://art/deck.png"),
-	"draw": preload("res://art/draw.png"),
+	"max_health": preload("res://art/ui/icons/heart.png"),
+	"full_heal": preload("res://art/ui/icons/heart.png"),
+	"gold": preload("res://art/ui/icons/gold.png"),
+	"big_gold": preload("res://art/ui/icons/gold.png"),
+	"upgrade": preload("res://art/ui/icons/deck.png"),
+	"draw": preload("res://art/ui/icons/draw.png"),
 	"max_mana": preload("res://art/map/nodes/map_node_blessing.png"),
 }
 

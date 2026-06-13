@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/cards/beastmaster/beast_pack_howl.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/block.ogg" id="3"]
+[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="3"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
 [ext_resource type="Resource" path="res://statuses/muscle.tres" id="auto_status_muscle"]
 [ext_resource type="Resource" path="res://statuses/beast_pack.tres" id="auto_status_beast_pack"]

@@ -5,7 +5,7 @@ const SHOP_CARD = preload("res://scenes/shop/shop_card.tscn")
 const SHOP_RELIC = preload("res://scenes/shop/shop_relic.tscn")
 const CARD_REMOVE_SCENE := preload("res://scenes/card_remove/card_remove.tscn")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
-const SHOP_BACKGROUND := preload("res://art/shop_market_bg.png")
+const SHOP_BACKGROUND := preload("res://art/backgrounds/shop_market_bg.png")
 const COMMON_SHOP_CARDS := [
 	preload("res://common_cards/strike.tres"),
 	preload("res://common_cards/defend.tres"),

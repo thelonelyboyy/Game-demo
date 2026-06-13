@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/campfire/campfire.gd" id="1_i8fph"]
 [ext_resource type="Resource" path="res://characters/body_cultivator/body_cultivator.tres" id="2_0gfpy"]
-[ext_resource type="Texture2D" uid="uid://djbldcvfo4swr" path="res://art/line.png" id="2_ykw02"]
+[ext_resource type="Texture2D" uid="uid://djbldcvfo4swr" path="res://art/ui/icons/line.png" id="2_ykw02"]
 
 [sub_resource type="Gradient" id="Gradient_lx464"]
 offsets = PackedFloat32Array(0.2125, 1)

@@ -1,10 +1,10 @@
 [gd_scene load_steps=21 format=3 uid="uid://c2k6lpae18q8v"]
 
 [ext_resource type="Script" path="res://scenes/shop/shop.gd" id="1_oqoy8"]
-[ext_resource type="Texture2D" uid="uid://bj3im6egs4wxx" path="res://art/tile_0086.png" id="2_41omk"]
+[ext_resource type="Texture2D" uid="uid://bj3im6egs4wxx" path="res://art/tiles/tile_0086.png" id="2_41omk"]
 [ext_resource type="Resource" uid="uid://cy5rtyb7a4hpp" path="res://relics/coupons.tres" id="2_ccxow"]
 [ext_resource type="Resource" uid="uid://b11jhsqqh7kfe" path="res://relics/explosive_barrel.tres" id="3_7lk2o"]
-[ext_resource type="Texture2D" uid="uid://cvtonr5sinxbx" path="res://art/shopkeeper_blink.png" id="3_uthr0"]
+[ext_resource type="Texture2D" uid="uid://cvtonr5sinxbx" path="res://art/characters/shopkeeper_blink.png" id="3_uthr0"]
 [ext_resource type="PackedScene" uid="uid://d24w6bygugbhd" path="res://scenes/shop/shop_card.tscn" id="4_2u2et"]
 [ext_resource type="Resource" uid="uid://dn6frpxqh1o7" path="res://relics/mana_potion.tres" id="4_4u268"]
 [ext_resource type="Resource" uid="uid://c8c1y85x2h5l" path="res://relics/reinforced_armor.tres" id="5_8ym3b"]

@@ -5,8 +5,8 @@
 [ext_resource type="Script" path="res://custom_resources/effects/configured_damage_effect.gd" id="3"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="4"]
 [ext_resource type="Resource" path="res://statuses/bleed.tres" id="5"]
-[ext_resource type="Texture2D" path="res://art/tile_0092.png" id="6"]
-[ext_resource type="AudioStream" path="res://art/slash.ogg" id="7"]
+[ext_resource type="Texture2D" path="res://art/tiles/tile_0092.png" id="6"]
+[ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="7"]
 
 [sub_resource type="Resource" id="Resource_self_damage"]
 script = ExtResource("2")

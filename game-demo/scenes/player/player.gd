@@ -1,7 +1,7 @@
 class_name Player
 extends Node2D
 
-const WHITE_SPRITE_MATERIAL := preload("res://art/white_sprite_material.tres")
+const WHITE_SPRITE_MATERIAL := preload("res://art/shaders/white_sprite_material.tres")
 const MAX_BATTLE_ART_HEIGHT := 102.0
 const HEALTH_BAR_HALF_WIDTH := 88.0
 const STATUS_ROW_HALF_WIDTH := 20.0

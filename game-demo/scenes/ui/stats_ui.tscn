@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://ph0oi5od64u5"]
 
 [ext_resource type="Theme" uid="uid://c8cqncsqlplyu" path="res://main_theme.tres" id="1_6mdvy"]
-[ext_resource type="Texture2D" uid="uid://oe7v35ii8vrs" path="res://art/tile_0102.png" id="2_3xkif"]
+[ext_resource type="Texture2D" uid="uid://oe7v35ii8vrs" path="res://art/tiles/tile_0102.png" id="2_3xkif"]
 [ext_resource type="Script" path="res://scenes/ui/stats_ui.gd" id="2_t62e8"]
 
 [node name="StatsUI" type="Control"]

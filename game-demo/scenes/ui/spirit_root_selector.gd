@@ -1,7 +1,7 @@
 extends Control
 
 const RUN_SCENE := preload("res://scenes/run/run.tscn")
-const SELECTOR_BACKGROUND := preload("res://art/blessing_cavern_bg.png")
+const SELECTOR_BACKGROUND := preload("res://art/backgrounds/blessing_cavern_bg.png")
 
 @export var run_startup: RunStartup
 

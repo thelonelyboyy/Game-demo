@@ -2,7 +2,7 @@ class_name Enemy
 extends Area2D
 
 const ARROW_OFFSET := 5
-const WHITE_SPRITE_MATERIAL := preload("res://art/white_sprite_material.tres")
+const WHITE_SPRITE_MATERIAL := preload("res://art/shaders/white_sprite_material.tres")
 const DEFAULT_ART_MAX_SIZE := 88.0
 const ELITE_ART_MAX_SIZE := 116.0
 const BOSS_ART_MAX_SIZE := 140.0

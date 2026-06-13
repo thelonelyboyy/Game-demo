@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/cards/sword_cultivator/sword_split_heaven.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/axe.ogg" id="3"]
+[ext_resource type="AudioStream" path="res://art/audio/axe.ogg" id="3"]
 [ext_resource type="Script" path="res://custom_resources/effects/consume_status_effect.gd" id="auto_effect_consume_status"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_damage_effect.gd" id="auto_effect_damage"]
 

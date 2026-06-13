@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/tile_0118.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/slash.ogg" id="3"]
+[ext_resource type="Texture2D" path="res://art/tiles/tile_0118.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="3"]
 [ext_resource type="Script" path="res://custom_resources/effects/low_health_bonus_damage_effect.gd" id="auto_effect_low_health_damage"]
 
 [sub_resource type="Resource" id="AutoEffect_1_low_health_damage"]
