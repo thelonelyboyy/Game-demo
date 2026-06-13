@@ -85,7 +85,7 @@ E:\code\game-demo
 
 - Autoload：`Events`、`Shaker`、`MusicPlayer`、`SFXPlayer`、`RNG`。
 - 卡牌资源：`res://custom_resources/card.gd`、`res://custom_resources/cultivation_card.gd`。
-- 卡牌效果优先使用 `configured_effects`，不要回退到旧字段驱动。
+- 卡牌效果统一走 `configured_effects`：旧字段驱动路径（`base_damage`、`muscle_stacks` 等）已从 `cultivation_card.gd` 删除，新卡只能用 `configured_effects` 配置效果。`validate_project.py` 仍会拦截任何在 `.tres` 里重新写入旧字段的情况。
 - 新增卡牌后要检查职业卡池、图鉴扫描、奖励/商店来源。
 - 修改主流程后必须跑 `run-flow`。
 - 修改 Boss、敌人或战斗配置后必须跑 `boss-battle`。
