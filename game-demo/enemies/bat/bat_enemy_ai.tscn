@@ -13,11 +13,13 @@
 script = ExtResource("4_a486a")
 base_text = "2x%s"
 icon = ExtResource("3_snynw")
+category = 1
 
 [sub_resource type="Resource" id="Resource_1xroc"]
 script = ExtResource("4_a486a")
 base_text = "4"
 icon = ExtResource("7_2im00")
+category = 2
 
 [node name="BatEnemyAI" type="Node"]
 script = ExtResource("1_ideu7")

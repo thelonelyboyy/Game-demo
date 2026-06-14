@@ -1,33 +1,24 @@
-[gd_scene load_steps=3 format=3 uid="uid://b6p08ajglydq8"]
+[gd_scene load_steps=2 format=3 uid="uid://b6p08ajglydq8"]
 
 [ext_resource type="Script" path="res://scenes/ui/intent_ui.gd" id="1_aarbb"]
-[ext_resource type="Texture2D" uid="uid://bq4im540nk025" path="res://art/tiles/tile_0106.png" id="1_giyx2"]
 
-[node name="IntentUI" type="HBoxContainer"]
-custom_minimum_size = Vector2(68, 30)
-offset_left = -34.0
-offset_right = 34.0
-offset_bottom = 30.0
+[node name="IntentUI" type="Control"]
+custom_minimum_size = Vector2(68, 32)
+offset_right = 68.0
+offset_bottom = 32.0
 mouse_filter = 2
-theme_override_constants/separation = 3
-alignment = 1
 script = ExtResource("1_aarbb")
 
-[node name="Icon" type="TextureRect" parent="."]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
-texture = ExtResource("1_giyx2")
-expand_mode = 1
-stretch_mode = 5
-
 [node name="Label" type="Label" parent="."]
-layout_mode = 2
-size_flags_vertical = 1
+layout_mode = 0
+offset_left = 30.0
+offset_right = 64.0
+offset_bottom = 32.0
 text = "7"
 theme_override_colors/font_color = Color(1, 0.94, 0.76, 1)
-theme_override_colors/font_shadow_color = Color(0.10, 0.02, 0.04, 1)
+theme_override_colors/font_shadow_color = Color(0.1, 0.02, 0.04, 1)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1

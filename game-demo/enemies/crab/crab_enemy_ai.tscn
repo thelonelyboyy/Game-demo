@@ -20,11 +20,13 @@ icon = ExtResource("3_ek0pi")
 script = ExtResource("4_vcx3h")
 base_text = "6"
 icon = ExtResource("6_1jsuk")
+category = 2
 
 [sub_resource type="Resource" id="Resource_fvhin"]
 script = ExtResource("4_vcx3h")
 base_text = "15"
 icon = ExtResource("8_xt5n4")
+category = 2
 
 [node name="CrabEnemyAI" type="Node"]
 script = ExtResource("1_pubwu")

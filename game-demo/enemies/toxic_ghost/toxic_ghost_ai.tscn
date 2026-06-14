@@ -15,6 +15,7 @@
 script = ExtResource("4_fh8gu")
 base_text = ""
 icon = ExtResource("3_wn3bc")
+category = 4
 
 [sub_resource type="Resource" id="Resource_ge4s4"]
 script = ExtResource("4_fh8gu")
@@ -25,6 +26,7 @@ icon = ExtResource("7_tt27l")
 script = ExtResource("4_fh8gu")
 base_text = ""
 icon = ExtResource("10_ptccm")
+category = 2
 
 [node name="ToxicGhostAI" type="Node"]
 script = ExtResource("1_5bnwn")
