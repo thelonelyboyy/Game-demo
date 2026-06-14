@@ -3,6 +3,9 @@ extends Node2D
 
 const MAP_VISUAL_SCALE := 3.35
 const SCROLL_SPEED := 15
+const SCROLL_FLOOR_CAPACITY := 17
+const SCROLL_SIDE_PADDING := 74.0
+const SCROLL_VERTICAL_PADDING := 64.0
 const MAP_ROOM = preload("res://scenes/map/map_room.tscn")
 const MAP_LINE = preload("res://scenes/map/map_line.tscn")
 
@@ -10,6 +13,7 @@ const MAP_LINE = preload("res://scenes/map/map_line.tscn")
 @onready var lines: Node2D = %Lines
 @onready var rooms: Node2D = %Rooms
 @onready var visuals: Node2D = $Visuals
+@onready var scroll_board: Sprite2D = $Visuals/ScrollBoard
 @onready var camera_2d: Camera2D = $Camera2D
 
 var map_data: Array[Array]
@@ -23,7 +27,9 @@ var free_navigation := false
 func _ready() -> void:
 	free_navigation = map_generator.map_mode != MapGenerator.MapMode.ROGUELIKE
 	InkTheme.add_backdrop($MapBackground, "map")
-	$MapBackground/Background.hide()
+	var scroll_background := $MapBackground/Background as TextureRect
+	scroll_background.hide()
+	scroll_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visuals.scale = Vector2.ONE * MAP_VISUAL_SCALE
 	camera_2d.offset = get_viewport_rect().size / 2.0
 	_update_camera_limits()
@@ -78,13 +84,16 @@ func create_map() -> void:
 	var middle := floori(map_data[last_floor].size() * 0.5)
 	_spawn_room(map_data[last_floor][middle])
 
-	var map_width_pixels: float = MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1) * MAP_VISUAL_SCALE
-	var map_height_pixels: float = MapGenerator.Y_DIST * maxi(get_floor_count() - 1, 0) * MAP_VISUAL_SCALE
+	var content_width := MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1)
+	var content_height := MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0)
+	var map_width_pixels: float = content_width * MAP_VISUAL_SCALE
+	var map_height_pixels: float = content_height * MAP_VISUAL_SCALE
 	visuals.position.x = (get_viewport_rect().size.x - map_width_pixels) / 2
 	visuals.position.y = minf(
 		get_viewport_rect().size.y * 0.84,
 		(get_viewport_rect().size.y + map_height_pixels) / 2.0
 	)
+	_layout_scroll_board(content_width, content_height)
 
 
 func unlock_floor(which_floor: int = floors_climbed) -> void:
@@ -192,7 +201,26 @@ func is_final_floor_reached() -> bool:
 
 
 func _update_camera_limits() -> void:
-	camera_edge_y = MapGenerator.Y_DIST * maxi(get_floor_count() - 1, 0) * MAP_VISUAL_SCALE
+	camera_edge_y = MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0) * MAP_VISUAL_SCALE
+
+
+func _get_scroll_floor_slots() -> int:
+	return maxi(SCROLL_FLOOR_CAPACITY, get_floor_count())
+
+
+func _layout_scroll_board(content_width: float, content_height: float) -> void:
+	if not scroll_board or not scroll_board.texture:
+		return
+
+	var texture_size := scroll_board.texture.get_size()
+	if texture_size.x <= 0 or texture_size.y <= 0:
+		return
+
+	var scroll_width := content_width + SCROLL_SIDE_PADDING * 2.0
+	var scroll_height := content_height + SCROLL_VERTICAL_PADDING * 2.0
+	scroll_board.centered = true
+	scroll_board.position = Vector2(content_width * 0.5, content_height * -0.5)
+	scroll_board.scale = Vector2(scroll_width / texture_size.x, scroll_height / texture_size.y)
 
 
 func _update_line_states() -> void:
