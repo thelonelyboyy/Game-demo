@@ -27,3 +27,11 @@ godot_connection.js.backup
 godot_connection.js.map.backup
 godot_connection.ts.backup
 websocket_server.gd.backup
+
+# 美术工作流的临时/备份/源文件，保留本地、不入库
+*_old.png
+*_old.png.import
+**/GE/
+**/gemini/
+**/tmp_*/
+**/*backup*/
