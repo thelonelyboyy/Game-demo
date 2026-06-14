@@ -9,7 +9,7 @@
 
 [sub_resource type="Resource" id="AutoEffect_1_block"]
 script = ExtResource("auto_effect_block")
-amount = 8
+amount = 6
 
 [sub_resource type="Resource" id="AutoEffect_2_status"]
 script = ExtResource("auto_effect_status")

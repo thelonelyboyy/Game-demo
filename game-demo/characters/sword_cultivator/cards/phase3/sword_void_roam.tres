@@ -14,7 +14,7 @@ amount = 8
 
 [sub_resource type="Resource" id="AutoEffect_2_draw"]
 script = ExtResource("auto_effect_draw")
-amount = 3
+amount = 2
 
 [sub_resource type="Resource" id="AutoEffect_3_status"]
 script = ExtResource("auto_effect_status")

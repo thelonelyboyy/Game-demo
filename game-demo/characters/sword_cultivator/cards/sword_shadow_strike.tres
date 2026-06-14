@@ -23,6 +23,7 @@ type = 0
 rarity = 1
 target = 1
 cost = 0
+exhausts = true
 upgrade_type = 1
 element = 1
 display_name = "瞬影剑"
