@@ -13,6 +13,8 @@ extends Stats
 @export var max_mana: int
 @export var starting_relic: Relic
 @export var spirit_root: Card.Element = Card.Element.NONE
+# 战斗帧动画前缀：非空时玩家在战斗里用 art/frame_animation/<id>_standby|attack|attacked 帧动画
+@export var battle_anim_id: String = ""
 
 var mana: int : set = set_mana
 var deck: CardPile
