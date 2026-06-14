@@ -9,9 +9,22 @@ const CARD_MENU_UI = preload("res://scenes/ui/card_menu_ui.tscn")
 @onready var price: HBoxContainer = %Price
 @onready var price_label: Label = %PriceLabel
 @onready var buy_button: Button = %BuyButton
-@onready var gold_cost := RNG.instance.randi_range(100, 300)
 
+# 按稀有度定基价（±10% 浮动），不再与稀有度脱钩
+const PRICE_BY_RARITY := {
+	Card.Rarity.COMMON: 90,
+	Card.Rarity.UNCOMMON: 140,
+	Card.Rarity.RARE: 210,
+	Card.Rarity.MYTHIC: 320,
+}
+
+var gold_cost := 0
 var current_card_ui: CardMenuUI
+
+
+func _roll_card_price(rarity: Card.Rarity) -> int:
+	var base: int = PRICE_BY_RARITY.get(rarity, 140)
+	return RNG.instance.randi_range(roundi(base * 0.9), roundi(base * 1.1))
 
 
 func _ready() -> void:
@@ -48,7 +61,8 @@ func set_card(new_card: Card) -> void:
 		await ready
 
 	card = new_card
-	
+	gold_cost = _roll_card_price(card.rarity)
+
 	for card_menu_ui: CardMenuUI in card_container.get_children():
 		card_menu_ui.queue_free()
 	

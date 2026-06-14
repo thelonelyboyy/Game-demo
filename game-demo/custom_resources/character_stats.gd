@@ -122,13 +122,13 @@ func get_spirit_root_modified_value(value: int) -> int:
 
 	match get_spirit_root_stage():
 		1:
-			return ceili(value * 1.2) + 2
+			return ceili(value * 1.2) + 1
 		2:
-			return ceili(value * 1.5) + 2
+			return ceili(value * 1.4) + 1
 		3:
-			return value * 2 + 2
+			return ceili(value * 1.8) + 1
 		_:
-			return value + 2
+			return value + 1
 
 
 func bind_all_card_piles_to_owner() -> void:

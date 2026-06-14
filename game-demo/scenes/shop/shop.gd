@@ -16,7 +16,7 @@ const COMMON_SHOP_CARDS := [
 
 const SHOP_CARD_COUNT := 6
 const SHOP_RELIC_COUNT := 4
-const MYTHIC_SHOP_CHANCE := 0.02
+const MYTHIC_SHOP_CHANCE := 0.04
 
 @export var shop_relics: Array[Relic]
 @export var char_stats: CharacterStats

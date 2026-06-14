@@ -2,6 +2,11 @@ class_name SwordIntentStatus
 extends Status
 
 const MODIFIER_PER_STACK := 0.25
+const MAX_STACKS := 4
+
+
+func set_stacks(new_stacks: int) -> void:
+	super.set_stacks(mini(new_stacks, MAX_STACKS))
 
 
 func get_tooltip() -> String:

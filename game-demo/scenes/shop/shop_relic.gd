@@ -9,7 +9,12 @@ const RELIC_UI = preload("res://scenes/relic_handler/relic_ui.tscn")
 @onready var price: HBoxContainer = %Price
 @onready var price_label: Label = %PriceLabel
 @onready var buy_button: Button = %BuyButton
-@onready var gold_cost := RNG.instance.randi_range(100, 300)
+
+# 法宝资源没有稀有度字段，统一用一个法宝价位带（比纯随机 100-300 收窄、更稳定）
+const RELIC_PRICE_MIN := 160
+const RELIC_PRICE_MAX := 240
+
+var gold_cost := 0
 
 
 func _ready() -> void:
@@ -46,7 +51,8 @@ func set_relic(new_relic: Relic) -> void:
 		await ready
 
 	relic = new_relic
-	
+	gold_cost = RNG.instance.randi_range(RELIC_PRICE_MIN, RELIC_PRICE_MAX)
+
 	for relic_ui: RelicUI in relic_container.get_children():
 		relic_ui.queue_free()
 	
