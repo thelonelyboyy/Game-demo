@@ -176,7 +176,7 @@ offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
-text = "百劫残卷已启"
+text = "万劫残卷已启"
 vertical_alignment = 1
 
 [node name="SettingsToast" type="Label" parent="."]

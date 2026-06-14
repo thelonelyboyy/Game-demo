@@ -1,4 +1,4 @@
-﻿# 百劫成仙项目交接文档
+﻿# 万劫求仙项目交接文档
 
 更新时间：2026-06-13  
 项目根目录：`E:\code\game-demo`  
@@ -121,7 +121,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ### 游戏名与主页
 
-- 游戏名已改为 `百劫成仙`。
+- 游戏名已改为 `万劫求仙`。
 - `game-demo/project.godot` 中的项目名称已更新。
 - 新增主页标题图资源：
   - `game-demo/art/ui/title/baijie_chengxian_title.png`
