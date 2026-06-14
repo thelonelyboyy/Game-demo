@@ -21,6 +21,12 @@ const ELITE_DAMAGE_MULTIPLIER := 1.25
 const ELITE_GOLD_MULTIPLIER := 1.55
 const ELITE_BATTLE := preload("res://battles/tier_1_bull_demon.tres")
 
+# 章节难度爬升：按章节号(1~3)取下标，0 号占位不用。
+# 越后期的章节敌人血量/伤害越高，金币奖励也相应提升，让三章形成明显梯度。
+const CHAPTER_HEALTH_MULTIPLIERS := [1.0, 1.0, 1.30, 1.65]
+const CHAPTER_DAMAGE_MULTIPLIERS := [1.0, 1.0, 1.15, 1.30]
+const CHAPTER_GOLD_MULTIPLIERS := [1.0, 1.0, 1.20, 1.40]
+
 @export var map_mode: MapMode = MapMode.ROGUELIKE
 @export var battle_stats_pool: BattleStatsPool
 @export var event_room_pool: EventRoomPool
@@ -35,6 +41,7 @@ var random_room_type_weights = {
 }
 var random_room_type_total_weight := 0
 var map_data: Array[Array]
+var current_chapter := 1
 
 
 func generate_map() -> Array[Array]:
@@ -81,9 +88,9 @@ func _generate_test_linear_map() -> Array[Array]:
 		room.position = Vector2(middle * X_DIST, i * -Y_DIST)
 
 		if room.type == Room.Type.MONSTER:
-			room.battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
+			room.battle_stats = _battle_for_room(0)
 		elif room.type == Room.Type.BOSS:
-			room.battle_stats = battle_stats_pool.get_random_battle_for_tier(2)
+			room.battle_stats = _battle_for_room(2)
 		elif room.type == Room.Type.EVENT:
 			room.event_scene = event_room_pool.get_random()
 
@@ -114,11 +121,11 @@ func _generate_test_elite_linear_map() -> Array[Array]:
 		room.position = Vector2(middle * X_DIST, i * -Y_DIST)
 
 		if room.type == Room.Type.MONSTER:
-			room.battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
+			room.battle_stats = _battle_for_room(0)
 		elif room.type == Room.Type.ELITE:
 			_setup_elite_battle(room)
 		elif room.type == Room.Type.BOSS:
-			room.battle_stats = battle_stats_pool.get_random_battle_for_tier(2)
+			room.battle_stats = _battle_for_room(2)
 		elif room.type == Room.Type.EVENT:
 			room.event_scene = event_room_pool.get_random()
 
@@ -222,7 +229,7 @@ func _setup_boss_room() -> void:
 			current_room.next_rooms.append(boss_room)
 			
 	boss_room.type = Room.Type.BOSS
-	boss_room.battle_stats = battle_stats_pool.get_random_battle_for_tier(2)
+	boss_room.battle_stats = _battle_for_room(2)
 
 
 func _setup_random_room_weights() -> void:
@@ -240,7 +247,7 @@ func _setup_room_types() -> void:
 	for room: Room in map_data[0]:
 		if room.next_rooms.size() > 0:
 				room.type = Room.Type.MONSTER
-				room.battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
+				room.battle_stats = _battle_for_room(0)
 
 	# 9th floor is always a treasure
 	for room: Room in map_data[8]:
@@ -292,7 +299,7 @@ func _set_room_randomly(room_to_set: Room) -> void:
 	if type_candidate == Room.Type.ELITE:
 		_setup_elite_battle(room_to_set)
 	elif type_candidate == Room.Type.MONSTER:
-		room_to_set.battle_stats = battle_stats_pool.get_random_battle_for_tier(0)
+		room_to_set.battle_stats = _battle_for_room(0)
 	
 	if type_candidate == Room.Type.EVENT:
 		room_to_set.event_scene = event_room_pool.get_random()
@@ -337,10 +344,36 @@ func _setup_elite_battle(room: Room) -> void:
 		return
 
 	room.battle_stats = battle_stats.duplicate() as BattleStats
-	room.battle_stats.enemy_health_multiplier = ELITE_HEALTH_MULTIPLIER
-	room.battle_stats.enemy_damage_multiplier = ELITE_DAMAGE_MULTIPLIER
-	room.battle_stats.gold_reward_min = ceili(room.battle_stats.gold_reward_min * ELITE_GOLD_MULTIPLIER)
-	room.battle_stats.gold_reward_max = ceili(room.battle_stats.gold_reward_max * ELITE_GOLD_MULTIPLIER)
+	# 精英在精英倍率的基础上再叠加章节倍率
+	room.battle_stats.enemy_health_multiplier = ELITE_HEALTH_MULTIPLIER * _chapter_value(CHAPTER_HEALTH_MULTIPLIERS)
+	room.battle_stats.enemy_damage_multiplier = ELITE_DAMAGE_MULTIPLIER * _chapter_value(CHAPTER_DAMAGE_MULTIPLIERS)
+	var gold_multiplier := ELITE_GOLD_MULTIPLIER * _chapter_value(CHAPTER_GOLD_MULTIPLIERS)
+	room.battle_stats.gold_reward_min = ceili(room.battle_stats.gold_reward_min * gold_multiplier)
+	room.battle_stats.gold_reward_max = ceili(room.battle_stats.gold_reward_max * gold_multiplier)
+
+
+func _battle_for_room(tier: int) -> BattleStats:
+	var base := battle_stats_pool.get_random_battle_for_tier(tier)
+	if not base:
+		return null
+	# 复制一份再缩放，避免改动共享的战斗池资源
+	return _apply_chapter_scaling(base.duplicate() as BattleStats)
+
+
+func _apply_chapter_scaling(battle_stats: BattleStats) -> BattleStats:
+	if not battle_stats:
+		return null
+	battle_stats.enemy_health_multiplier *= _chapter_value(CHAPTER_HEALTH_MULTIPLIERS)
+	battle_stats.enemy_damage_multiplier *= _chapter_value(CHAPTER_DAMAGE_MULTIPLIERS)
+	var gold_multiplier := _chapter_value(CHAPTER_GOLD_MULTIPLIERS)
+	battle_stats.gold_reward_min = ceili(battle_stats.gold_reward_min * gold_multiplier)
+	battle_stats.gold_reward_max = ceili(battle_stats.gold_reward_max * gold_multiplier)
+	return battle_stats
+
+
+func _chapter_value(multipliers: Array) -> float:
+	var index := clampi(current_chapter, 1, multipliers.size() - 1)
+	return multipliers[index]
 
 
 func _ensure_elite_room_exists() -> void:

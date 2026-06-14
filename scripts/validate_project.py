@@ -289,7 +289,12 @@ def validate_battle_pool_tiers(issues: list[Issue]) -> None:
     map_generator_path = PROJECT_ROOT / "scenes" / "map" / "map_generator.gd"
     map_generator_text = read_text(map_generator_path) if map_generator_path.exists() else ""
     for tier in required_counts:
-        if f"get_random_battle_for_tier({tier})" not in map_generator_text:
+        # 章节缩放后多数 tier 通过 _battle_for_room(tier) 包装请求；精英 tier 仍直接取池
+        requests_tier = (
+            f"get_random_battle_for_tier({tier})" in map_generator_text
+            or f"_battle_for_room({tier})" in map_generator_text
+        )
+        if not requests_tier:
             issues.append(Issue("ERROR", map_generator_path, f"Map generator does not request battle tier {tier}"))
 
 

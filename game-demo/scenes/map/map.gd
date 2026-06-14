@@ -16,9 +16,12 @@ var map_data: Array[Array]
 var floors_climbed: int
 var last_room: Room
 var camera_edge_y: float
+# 测试地图（非 ROGUELIKE）下解锁全部节点，想点哪个点哪个，方便调试各类房间
+var free_navigation := false
 
 
 func _ready() -> void:
+	free_navigation = map_generator.map_mode != MapGenerator.MapMode.ROGUELIKE
 	InkTheme.add_backdrop($MapBackground, "map")
 	$MapBackground/Background.hide()
 	visuals.scale = Vector2.ONE * MAP_VISUAL_SCALE
@@ -38,10 +41,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	camera_2d.position.y = clamp(camera_2d.position.y, -camera_edge_y, 0)
 
 
-func generate_new_map() -> void:
+func generate_new_map(chapter: int = 1) -> void:
 	floors_climbed = 0
 	last_room = null
 	camera_2d.position = Vector2.ZERO
+	map_generator.current_chapter = chapter
 	map_data = map_generator.generate_map()
 	create_map()
 	_update_camera_limits()
@@ -84,6 +88,10 @@ func create_map() -> void:
 
 
 func unlock_floor(which_floor: int = floors_climbed) -> void:
+	if free_navigation:
+		_unlock_all_rooms()
+		return
+
 	for map_room: MapRoom in rooms.get_children():
 		if map_room.room.row == which_floor:
 			map_room.available = true
@@ -92,9 +100,20 @@ func unlock_floor(which_floor: int = floors_climbed) -> void:
 
 
 func unlock_next_rooms() -> void:
+	if free_navigation:
+		_unlock_all_rooms()
+		return
+
 	for map_room: MapRoom in rooms.get_children():
 		if last_room.next_rooms.has(map_room.room):
 			map_room.available = true
+
+	_update_line_states()
+
+
+func _unlock_all_rooms() -> void:
+	for map_room: MapRoom in rooms.get_children():
+		map_room.available = true
 
 	_update_line_states()
 
@@ -146,7 +165,11 @@ func _on_map_room_clicked(room: Room) -> void:
 
 func _on_map_room_selected(room: Room) -> void:
 	last_room = room
-	floors_climbed += 1
+	# 自由导航下按节点所在层定位，确保直接点 Boss 也能正确触发通关/进章
+	if free_navigation:
+		floors_climbed = room.row + 1
+	else:
+		floors_climbed += 1
 	_update_line_states()
 	Events.map_exited.emit(room)
 

@@ -62,10 +62,10 @@ func _start_run() -> void:
 	
 	_setup_event_connections()
 	_setup_top_bar()
-	
-	map.generate_new_map()
+
+	map.generate_new_map(current_chapter)
 	map.unlock_floor(0)
-	
+
 	save_data = SaveGame.new()
 	_save_run(true)
 
@@ -270,7 +270,9 @@ func _on_battle_won() -> void:
 
 func _advance_to_next_chapter() -> void:
 	current_chapter += 1
-	map.generate_new_map()
+	# 进入新一章时角色回满血
+	character.health = character.max_health
+	map.generate_new_map(current_chapter)
 	map.unlock_floor(0)
 	_show_map()
 
