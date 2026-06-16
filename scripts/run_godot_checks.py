@@ -67,6 +67,8 @@ def run_check(godot: Path, check: dict) -> tuple[bool, str]:
             command,
             cwd=REPO_ROOT,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             capture_output=True,
             check=False,
             timeout=CHECK_TIMEOUT_SECONDS,

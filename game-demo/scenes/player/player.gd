@@ -9,8 +9,8 @@ const ANIM_ROOT := "res://art/frame_animation/"
 # 各动画的帧率与是否循环
 const ANIM_DEFS := {
 	"standby": {"fps": 10.0, "loop": true},
-	"attack": {"fps": 14.0, "loop": false},
-	"attacked": {"fps": 14.0, "loop": false},
+	"attack": {"fps": 10.0, "loop": false},
+	"attacked": {"fps": 10.0, "loop": false},
 }
 
 @export var stats: CharacterStats : set = set_character_stats
@@ -186,6 +186,7 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 	if stats.health <= 0:
 		return
 
+	_play_oneshot("attacked")
 	var modified_damage := maxi(0, modifier_handler.get_modified_value(damage, which_modifier))
 
 	var tween := create_tween()

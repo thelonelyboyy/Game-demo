@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=11 format=3 uid="uid://l8r4mrtnn41d"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_forbidden_power.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="auto_effect_draw"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bikgv7wlvr7kf" path="res://art/cards/demonic_cultivator/ai/demon_forbidden_power.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
+[ext_resource type="Script" uid="uid://37ewyomluh2u" path="res://custom_resources/effects/configured_draw_effect.gd" id="auto_effect_draw"]
+[ext_resource type="Script" uid="uid://cknickcitjj0m" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
+[ext_resource type="Script" uid="uid://dpgu18d4ll1s7" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
 [ext_resource type="Resource" path="res://statuses/qi_flow.tres" id="auto_status_qi_flow"]
 
 [sub_resource type="Resource" id="AutoEffect_1_draw"]
@@ -20,8 +20,6 @@ affected_by_spirit_root = false
 [sub_resource type="Resource" id="AutoEffect_3_status"]
 script = ExtResource("auto_effect_status")
 status = ExtResource("auto_status_qi_flow")
-target_mode = 1
-use_duration = false
 amount = 1
 
 [resource]
@@ -31,7 +29,6 @@ effect_text = "失去 {self_damage} 点生命，抽 {draw} 张牌，获得 {qi} 
 id = "demon_forbidden_power"
 type = 1
 rarity = 1
-target = 0
 cost = 1
 upgrade_type = 1
 element = 4

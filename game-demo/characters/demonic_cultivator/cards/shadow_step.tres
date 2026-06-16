@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=5 format=3 uid="uid://dbivmv7sqi5qq"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/ui/icons/draw.png" id="2"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="auto_effect_draw"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dc5hqpdarhl0q" path="res://art/cards/demonic_cultivator/ai/shadow_step.png" id="2"]
+[ext_resource type="Script" uid="uid://37ewyomluh2u" path="res://custom_resources/effects/configured_draw_effect.gd" id="auto_effect_draw"]
 
 [sub_resource type="Resource" id="AutoEffect_1_draw"]
 script = ExtResource("auto_effect_draw")
@@ -15,10 +15,9 @@ effect_text = "抽 {draw} 张牌。"
 id = "shadow_step"
 type = 1
 rarity = 1
-target = 0
-cost = 0
 exhausts = true
 upgrade_type = 1
 element = 4
+mechanic_tags = null
 display_name = "影遁"
 icon = ExtResource("2")

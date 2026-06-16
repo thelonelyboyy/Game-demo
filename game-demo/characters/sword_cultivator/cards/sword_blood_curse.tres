@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=11 format=3 uid="uid://c0bbers344x0s"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="2"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_damage_effect.gd" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="4"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" uid="uid://cknickcitjj0m" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="2"]
+[ext_resource type="Script" uid="uid://bfbtae55pt1yq" path="res://custom_resources/effects/configured_damage_effect.gd" id="3"]
+[ext_resource type="Script" uid="uid://dpgu18d4ll1s7" path="res://custom_resources/effects/configured_status_effect.gd" id="4"]
 [ext_resource type="Resource" path="res://statuses/bleed.tres" id="5"]
-[ext_resource type="Texture2D" path="res://art/tiles/tile_0092.png" id="6"]
-[ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="7"]
+[ext_resource type="Texture2D" uid="uid://d04wlhgv8rafo" path="res://art/cards/sword_cultivator/ai/sword_blood_curse.png" id="6"]
+[ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/audio/slash.ogg" id="7"]
 
 [sub_resource type="Resource" id="Resource_self_damage"]
 script = ExtResource("2")
@@ -21,22 +21,21 @@ description_template = "造成 {amount} 点伤害。"
 
 [sub_resource type="Resource" id="Resource_bleed"]
 script = ExtResource("4")
-amount = 2
-description_template = "施加 {amount} 回合流血。"
 status = ExtResource("5")
 target_mode = 0
 use_duration = true
+amount = 2
+description_template = "施加 {amount} 回合流血。"
 
 [resource]
 script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("Resource_self_damage"), SubResource("Resource_damage"), SubResource("Resource_bleed")])
 id = "sword_blood_curse"
-type = 0
 rarity = 1
 target = 1
-cost = 0
 upgrade_type = 1
 element = 1
+mechanic_tags = null
 display_name = "血祭剑咒"
 icon = ExtResource("6")
 sound = ExtResource("7")

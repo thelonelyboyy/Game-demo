@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=9 format=3 uid="uid://ditacsi4gi58f"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_mark_bloom.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
-[ext_resource type="Resource" path="res://statuses/exposed.tres" id="auto_status_exposed"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cq0qsvcjbcih1" path="res://art/cards/demonic_cultivator/ai/demon_mark_bloom.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
+[ext_resource type="Script" uid="uid://dpgu18d4ll1s7" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
+[ext_resource type="Resource" uid="uid://cxqq0117oxehu" path="res://statuses/exposed.tres" id="auto_status_exposed"]
 [ext_resource type="Resource" path="res://statuses/soul_mark.tres" id="auto_status_soul_mark"]
 
 [sub_resource type="Resource" id="AutoEffect_1_status"]
@@ -18,7 +18,6 @@ amount = 1
 script = ExtResource("auto_effect_status")
 status = ExtResource("auto_status_soul_mark")
 target_mode = 0
-use_duration = false
 amount = 3
 
 [resource]

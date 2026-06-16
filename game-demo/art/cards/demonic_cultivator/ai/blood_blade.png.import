@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1dkgiitp637e"
-path="res://.godot/imported/frame_002.png-507da176ba85704739e402ad8e7ddf74.ctex"
+uid="uid://bgkv2lgpg10hi"
+path="res://.godot/imported/blood_blade.png-30d4cc4126b3833285b37dc6ff04b84c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/frame_animation/test/frame_002.png"
-dest_files=["res://.godot/imported/frame_002.png-507da176ba85704739e402ad8e7ddf74.ctex"]
+source_file="res://art/cards/demonic_cultivator/ai/blood_blade.png"
+dest_files=["res://.godot/imported/blood_blade.png-30d4cc4126b3833285b37dc6ff04b84c.ctex"]
 
 [params]
 

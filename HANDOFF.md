@@ -1,16 +1,17 @@
 ﻿# 万劫求仙项目交接文档
 
-更新时间：2026-06-13  
+更新时间：2026-06-16  
 项目根目录：`E:\code\game-demo`  
 Godot 工程目录：`E:\code\game-demo\game-demo`  
 Godot 版本：4.5.2 stable mono  
 Godot 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe`
 
-## 1. 当前状态
+## 1. 当前状态（2026-06-16）
 
-- 工作区存在一批未提交改动，主要集中在 UI、美术资源和卡牌显示组件。
-- 最近一次项目静态校验和 Godot headless 检查均已通过。
-- 原交接文档存在编码乱码问题，本文件已重写为可读中文版本。
+- 稳定运行的杀戮尖塔式修仙卡牌肉鸽 Demo。本轮做了大量系统、数值、美术与工程改动，**汇总见第 6 节「本轮系统级更新」**。
+- **工作区有大批未提交改动**（约 107 改 / 2 删 / 42 新增）：剑修+魔修卡牌接入 AI 插画、10 张新魔修卡、剑修/魔修战斗帧动画、意图系统、数值平衡、敌人行动时序修复、地图实验回退、新状态/意图图标等。提交前请按第 5 节验证。
+- `validate_project.py` 通过（0 error）；`run_godot_checks.py` 7 项基本通过，但 `run-flow` 存在一个**偶发**的 `Lambda capture freed`（见第 8 节已知问题）。
+- 新增完整开发路线图：根目录 `ROADMAP.md`（通往「杀戮尖塔级成品」的分阶段优化方案，11 个阶段、每步带验收标准）。
 
 ## 2. 项目概况
 
@@ -60,7 +61,10 @@ Run
 E:\code\game-demo
 ├─ game-demo\                 Godot 工程根目录
 │  ├─ project.godot           Godot 工程配置
-│  ├─ art\                    背景、角色、怪物、卡牌框、标题图、遗物图标等美术资源
+│  ├─ art\                    美术资源（背景/角色/怪物/卡框/标题/遗物图标等）
+│  │  ├─ cards\<职业>\ai\      卡牌 AI 大插画（剑修、魔修已接；体修、驭兽待补）
+│  │  ├─ frame_animation\      战斗角色逐帧动画 <id>_standby|attack|attacked（魔修、剑修）
+│  │  └─ tiles\                共享 16px 占位像素图（含 intent_* 意图图标）
 │  ├─ battles\                战斗配置 BattleStats
 │  ├─ characters\             职业资源、初始牌组、职业卡牌
 │  ├─ common_cards\           通用卡牌
@@ -78,6 +82,8 @@ E:\code\game-demo
 │  ├─ validate_project.py     资源和内容校验脚本
 │  ├─ run_godot_checks.py     Headless Godot smoke 测试
 │  └─ generate_relic_icons.py 遗物图标生成脚本
+├─ ROADMAP.md                 通往成品的分阶段优化方案（11 阶段，每步带验收标准）
+├─ tmp\                       AI 出图工作流暂存（已 gitignore，不入库）
 └─ HANDOFF.md                 本交接文档
 ```
 
@@ -91,6 +97,12 @@ E:\code\game-demo
 - 修改 Boss、敌人或战斗配置后必须跑 `boss-battle`。
 - 修改图鉴资源扫描后必须跑 `codex` smoke。
 - 修改存档字段后要测试继续游戏。
+- **战斗角色帧动画**：`CharacterStats.battle_anim_id` 非空时，玩家在战斗中改用 `art/frame_animation/<id>_standby|attack|attacked/` 逐帧动画（`scenes/player/player.gd` 运行时构建 SpriteFrames，贴图缺失则回退静态立绘）。已配置：魔修=`demonic_cultivator`、剑修=`sword_cultivator`。帧率在 `player.gd` 的 `ANIM_DEFS`（当前统一 10fps）。待机循环、出攻击牌播攻击、受击播受击；白闪/震屏已移除。新增帧文件夹后务必在编辑器导入。
+- **敌人意图系统**：`Intent.category`（12 种分类）驱动 `scenes/ui/intent_ui.gd` 的彩色气泡；攻击/防御/强化等分类用 `art/tiles/intent_*.png` 贴图、其余分类用代码绘制图标兜底。给敌人意图分类：在其 AI 场景（如 `enemies/crab/crab_enemy_ai.tscn`）的 Intent 子资源里设 `category`。
+- **存档自愈**：`SaveGame.load_data()` 加载前用 `get_dependencies` 检查依赖是否齐全，缺失/损坏则清理坏档并返回 null（`run.gd` 也会在空存档时返回主菜单）。注意：存档仍按路径内嵌大量资源引用，**移动/重命名被引用的资源会让旧存档失效**（架构隐患，见 ROADMAP 阶段 0）。
+- **章节难度爬升**：`scenes/map/map_generator.gd` 的 `CHAPTER_HEALTH/DAMAGE/GOLD_MULTIPLIERS` 让敌人血量/伤害/金币按章节递增（经 `_battle_for_room` 复制缩放，不污染战斗池）；进入新一章在 `run.gd._advance_to_next_chapter` 回满血；测试地图（`map_mode != ROGUELIKE`）开启 `Map.free_navigation`（所有节点可点，直接点 Boss 也能进章）。
+- **数值/平衡关键位置**：商店按稀有度定价 `shop_card.gd PRICE_BY_RARITY` + 法宝价位带 `shop_relic.gd`；暗金卡上架 `shop.gd MYTHIC_SHOP_CHANCE=0.04`；灵根缩放 `character_stats.gd get_spirit_root_modified_value`（初悟+1/小成×1.2+1/大成×1.4+1/圆满×1.8+1）；剑意上限 `statuses/sword_intent.gd MAX_STACKS=4`；灵气回蓝上限 `statuses/energy_charge.gd MAX_MANA_PER_TURN=2`；四职业每回合均抽 5 张。
+- **敌人行动延迟回调**：敌人攻击/格挡行动用 `get_tree().create_timer()`/补间 `finished` 回调发 `enemy_action_completed`，**必须捕获 `enemy.get_instance_id()` 而非节点本身**（否则补间未完成前敌人/战斗被释放会报 `Lambda capture freed`）。新增此类行动请照此写法。
 
 ## 5. 快速验证命令
 
@@ -112,12 +124,35 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 & "F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe" --headless --editor --quit --path "E:\code\game-demo\game-demo"
 ```
 
-最近通过的检查结果：
+最近检查结果：
 
-- `validate_project.py`：0 error(s), 0 warning(s)
-- `run_godot_checks.py`：`main`、`character-selector`、`codex`、`battle`、`map`、`run-flow`、`boss-battle` 全部 ok
+- `validate_project.py`：0 error / 0 warning。
+- `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`boss-battle` 通过；`run-flow` **偶发** `Lambda capture freed`（重跑通常即过，根因见第 8 节）。
+- `run_godot_checks.py` 已改用 UTF-8 解码 Godot 输出，修复了中文 Windows 上的 GBK 解码崩溃。
+- ⚠️ **新增/替换 PNG 后必须在 Godot 编辑器导入一次**（或跑上面的 `--headless --editor --quit`），否则会出现「文件在但加载失败 / no loader found」的错误，而 `validate_project.py` 查不出（它只查文件是否存在、查不出"未导入"）。
 
 ## 6. 最近改动摘要
+
+### 本轮（2026-06-16）系统级更新
+
+> 以下为本轮新增/改动的系统总览，详细机制位置见第 4 节。
+
+- **改名**：游戏更名为「万劫求仙」（`project.godot` + 主菜单文案 + 本文档）。⚠️ 主菜单**标题 logo 图**仍是旧的 `baijie_chengxian_title.png`（图里写着"百劫成仙"），需重做替换。
+- **卡牌效果系统**：彻底删除旧字段驱动路径，`cultivation_card.gd` 只走 `configured_effects`（见第 4 节）。
+- **存档自愈**：缺失/损坏存档自动清理降级，不再崩或卡死。
+- **三章难度爬升 + 进章回血 + 测试地图自由导航**。
+- **敌人意图系统**：12 种分类 + 彩色气泡 + 贴图优先/代码兜底图标。
+- **数值平衡**：商店稀有度定价、暗金卡 4%、灵根缩放、剑意封顶 4、灵气回蓝封顶 2、四职业抽 5。
+- **战斗帧动画**：`battle_anim_id` 机制；魔修、剑修已接（待机/攻击/受击）；帧率 `ANIM_DEFS` 当前 10fps。体修、驭兽暂无动画（仍静态立绘）。
+- **新增 10 张魔修卡**（`characters/demonic_cultivator/cards/demon_*.tres`，已登记进 draftable 池），围绕献祭/魂印/以伤换爆发。
+- **卡牌 AI 插画**：剑修、魔修卡牌已接入 AI 生成插画，路径 `art/cards/<职业>/ai/`（`.tres` 的 `icon` 指向该目录）。体修、驭兽待补。
+- **敌人行动时序修复**：7 处敌人攻击/格挡行动改为捕获 instance_id，消除大部分 `Lambda capture freed`。
+- **工具链**：`run_godot_checks.py` UTF-8 解码修复。
+- **`.gitignore`**：新增排除美术工作流的临时/备份/源文件（`*_old.png`、`tmp_*/`、`*backup*/`、`GE/`、`gemini/`），避免污染仓库。
+- **路线图**：新增 `ROADMAP.md`。
+- **地图背景**：本轮做过"满屏/拉伸/加宽画布"等多种实验，最终**回退**到原始的「居中卷轴 + 山景两侧」样式（`map.gd`/`map.tscn`/`map_scroll_bg.png` 已恢复到提交版）。
+
+### 历史改动（更早批次，供参考）
 
 ### 游戏名与主页
 
@@ -215,11 +250,20 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - `game-demo/scenes/card_ui/card_states/card_base_state.gd`
 - `game-demo/scenes/card_target_selector/card_target_selector.gd`
 
-## 8. 当前注意事项
+## 8. 当前注意事项与已知问题
 
-- 当前卡牌整体已经使用真实卡框，但中间仍是原有低分辨率小图标，因此和宣传图的大插画质感仍有明显差距。
-- 要进一步接近宣传图，需要后续为每张卡或每类卡补齐真正的卡牌插画，而不是只替换卡框。
-- 当前卡框资源是 AI 生成贴图，已能作为临时美术资源使用；若后续有正式美术，应保持相同布局区域，避免重改 UI 坐标。
+### 美术现状
+
+- 剑修、魔修卡牌已接入 AI 生成大插画（`art/cards/<职业>/ai/`）；**体修、驭兽卡面仍是占位小图**，待补。
+- 卡框资源是 AI 生成贴图，作为临时美术可用；若后续有正式美术，应保持相同布局区域，避免重改 UI 坐标。
+- `art/tiles/` 仍有一批 16px 占位像素图（被卡牌/词条/敌人共用），属低清待替换。
+
+### 已知问题
+
+- **`run-flow` 偶发 `Lambda capture freed`**：本轮已修 7 处敌人行动（攻击/格挡，boss 战 15/15 干净），但完整流程仍约 2/12 偶发——还有另一处来源未根除（疑似 `status_handler`/`relic_handler`/弃牌结算等多回合才走的补间回调）。非功能 bug（逻辑仍通过），但会干扰验证、将来上 CI 会变随机红灯。修法同样是把 `tween.finished` 的 lambda 改为不捕获节点 / 加 `is_instance_valid` 守卫。
+- **`validate_project.py` 有盲区**：只查 `res://` 文件是否存在，查不出「文件在但未导入」（缺 `.import`）和字符串拼接路径（如 `card_style.gd` 的卡框）。新增美术务必在编辑器导入。
+- **存档跨资源移动会失效**：存档按路径内嵌资源引用，移动/重命名被引用资源后旧档加载失败（已有自愈清档兜底，但会丢进度）。彻底修复需改成"按 id 重建"（ROADMAP 阶段 0）。
+- **标题 logo** 仍显示旧游戏名"百劫成仙"，需重做图片。
 - 卡牌显示逻辑没有修改 `Card` 数据结构，也没有改卡牌效果逻辑。
 - 战斗手牌尺寸仍偏紧凑，主要是为了避免遮挡战斗场景。
 - 如果再调整卡牌比例，要同步检查战斗手牌、奖励三选一、商店、图鉴/预览、升级、删除、融合界面。

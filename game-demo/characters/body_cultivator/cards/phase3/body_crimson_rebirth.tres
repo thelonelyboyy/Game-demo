@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=10 format=3 uid="uid://d1tcwxadoclsk"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/body_cultivator/body_crimson_rebirth.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_block_effect.gd" id="auto_effect_block"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="auto_effect_draw"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://buw7seoe8imc2" path="res://art/cards/body_cultivator/body_crimson_rebirth.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
+[ext_resource type="Script" uid="uid://bo8gedp7cx6tx" path="res://custom_resources/effects/configured_block_effect.gd" id="auto_effect_block"]
+[ext_resource type="Script" uid="uid://37ewyomluh2u" path="res://custom_resources/effects/configured_draw_effect.gd" id="auto_effect_draw"]
+[ext_resource type="Script" uid="uid://cknickcitjj0m" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
 
 [sub_resource type="Resource" id="AutoEffect_1_block"]
 script = ExtResource("auto_effect_block")
@@ -27,7 +27,6 @@ effect_text = "失去 {self_damage} 点生命，获得 {block} 点护体，抽 {
 id = "body_crimson_rebirth"
 type = 1
 rarity = 1
-target = 0
 cost = 1
 upgrade_type = 1
 element = 2

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3 uid="uid://edbg78s8gpqy"]
+
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cmef55hy82d4g" path="res://art/cards/demonic_cultivator/ai/demon_flesh_rebirth.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
+[ext_resource type="Script" uid="uid://4fcmjl85rq2j" path="res://custom_resources/effects/configured_heal_effect.gd" id="auto_heal"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("auto_heal")
+amount = 8
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("E1")])
+effect_text = "恢复 8 点生命。"
+id = "demon_flesh_rebirth"
+type = 1
+rarity = 1
+cost = 1
+upgrade_type = 1
+element = 4
+profession = 3
+mechanic_tags = null
+display_name = "血肉重生"
+icon = ExtResource("2")
+sound = ExtResource("3")

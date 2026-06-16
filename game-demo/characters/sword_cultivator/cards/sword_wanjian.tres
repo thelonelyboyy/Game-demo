@@ -1,22 +1,20 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3 uid="uid://cxe48gxpun5d0"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Script" path="res://custom_resources/effects/player_status_damage_effect.gd" id="2"]
-[ext_resource type="Texture2D" path="res://art/tiles/tile_0099.png" id="3"]
-[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="4"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" uid="uid://ccw6m8k1a4x25" path="res://custom_resources/effects/player_status_damage_effect.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://ca2g1bjk2rg4q" path="res://art/cards/sword_cultivator/ai/sword_wanjian.png" id="3"]
+[ext_resource type="AudioStream" uid="uid://cnqve7dtqjghp" path="res://art/audio/true_strength.ogg" id="4"]
 
 [sub_resource type="Resource" id="Resource_muscle_damage"]
 script = ExtResource("2")
-amount = 6
 value_per_stack = 2
+amount = 6
 description_template = "造成 {amount} 点基础伤害。总伤害：{total}。每有 1 层劲气，额外造成 {bonus} 点伤害。"
-status_id = "muscle"
 
 [resource]
 script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("Resource_muscle_damage")])
 id = "sword_wanjian"
-type = 0
 rarity = 2
 target = 1
 cost = 3

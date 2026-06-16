@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3 uid="uid://ck27uispkob7w"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/body_cultivator/body_blood_collapse.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/low_health_bonus_damage_effect.gd" id="auto_effect_low_health_damage"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://byla3st2k1caq" path="res://art/cards/body_cultivator/body_blood_collapse.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/audio/slash.ogg" id="3"]
+[ext_resource type="Script" uid="uid://c0o6dt8q7xb3r" path="res://custom_resources/effects/low_health_bonus_damage_effect.gd" id="auto_effect_low_health_damage"]
+[ext_resource type="Script" uid="uid://cknickcitjj0m" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
 
 [sub_resource type="Resource" id="AutoEffect_1_low_health_damage"]
 script = ExtResource("auto_effect_low_health_damage")
@@ -21,7 +21,6 @@ script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_low_health_damage"), SubResource("AutoEffect_2_self_damage")])
 effect_text = "失去 {self_damage} 点生命，造成 {damage} 点伤害。若生命不高于一半，额外造成 {blood_bonus} 点伤害。"
 id = "body_blood_collapse"
-type = 0
 rarity = 1
 target = 1
 cost = 2

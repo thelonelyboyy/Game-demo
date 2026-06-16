@@ -9,10 +9,12 @@ const ICON_SIZE := 22.0
 # 分类专属图标（贴图优先，没有的分类回退到代码绘制）
 const ICON_SWORD := preload("res://art/tiles/intent_attack_sword.png")
 const ICON_SHIELD := preload("res://art/tiles/intent_block_shield.png")
+const ICON_BUFF := preload("res://art/tiles/intent_buff_self.png")
 const CATEGORY_ICONS := {
 	Intent.Category.ATTACK: ICON_SWORD,
 	Intent.Category.MULTI_ATTACK: ICON_SWORD,
 	Intent.Category.DEFEND: ICON_SHIELD,
+	Intent.Category.BUFF: ICON_BUFF,
 }
 
 @onready var label: Label = $Label

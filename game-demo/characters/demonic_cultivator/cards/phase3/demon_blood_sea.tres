@@ -1,15 +1,15 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3 uid="uid://cboey57w1d38h"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_blood_sea.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_damage_effect.gd" id="auto_effect_damage"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cf2y05kng8wp" path="res://art/cards/demonic_cultivator/ai/demon_blood_sea.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/audio/slash.ogg" id="3"]
+[ext_resource type="Script" uid="uid://bfbtae55pt1yq" path="res://custom_resources/effects/configured_damage_effect.gd" id="auto_effect_damage"]
+[ext_resource type="Script" uid="uid://cknickcitjj0m" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
 
 [sub_resource type="Resource" id="AutoEffect_1_damage"]
 script = ExtResource("auto_effect_damage")
-amount = 8
 target_mode = 2
+amount = 8
 
 [sub_resource type="Resource" id="AutoEffect_2_self_damage"]
 script = ExtResource("auto_effect_self_damage")
@@ -21,7 +21,6 @@ script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_self_damage")])
 effect_text = "失去 {self_damage} 点生命，对所有敌人造成 {damage} 点伤害。"
 id = "demon_blood_sea"
-type = 0
 rarity = 1
 target = 2
 cost = 2

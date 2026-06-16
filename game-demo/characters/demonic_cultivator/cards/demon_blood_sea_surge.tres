@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3 uid="uid://bw3h6qqvxd5lc"]
+
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bwh7fj2o1g4el" path="res://art/cards/demonic_cultivator/ai/demon_blood_sea_surge.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/audio/slash.ogg" id="3"]
+[ext_resource type="Script" uid="uid://bfbtae55pt1yq" path="res://custom_resources/effects/configured_damage_effect.gd" id="auto_dmg"]
+[ext_resource type="Script" uid="uid://cknickcitjj0m" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_self"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("auto_dmg")
+target_mode = 2
+amount = 7
+
+[sub_resource type="Resource" id="E2"]
+script = ExtResource("auto_self")
+amount = 3
+affected_by_spirit_root = false
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
+effect_text = "对所有敌人造成 7 点伤害，失去 3 点生命。"
+id = "demon_blood_sea_surge"
+rarity = 2
+target = 2
+cost = 2
+upgrade_type = 1
+element = 3
+profession = 3
+mechanic_tags = PackedStringArray("献祭")
+display_name = "血海滔天"
+icon = ExtResource("2")
+sound = ExtResource("3")

@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=9 format=3 uid="uid://cm31dip3ynf6d"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/body_cultivator/body_wound_power.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
-[ext_resource type="Resource" path="res://statuses/muscle.tres" id="auto_status_muscle"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bpu3csp8tnoc7" path="res://art/cards/body_cultivator/body_wound_power.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://cnqve7dtqjghp" path="res://art/audio/true_strength.ogg" id="3"]
+[ext_resource type="Script" uid="uid://cknickcitjj0m" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
+[ext_resource type="Script" uid="uid://dpgu18d4ll1s7" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
+[ext_resource type="Resource" uid="uid://c42kh5n15gn2r" path="res://statuses/muscle.tres" id="auto_status_muscle"]
 
 [sub_resource type="Resource" id="AutoEffect_1_self_damage"]
 script = ExtResource("auto_effect_self_damage")
@@ -15,8 +15,6 @@ affected_by_spirit_root = false
 [sub_resource type="Resource" id="AutoEffect_2_status"]
 script = ExtResource("auto_effect_status")
 status = ExtResource("auto_status_muscle")
-target_mode = 1
-use_duration = false
 amount = 1
 
 [resource]
@@ -25,8 +23,6 @@ configured_effects = Array[Resource]([SubResource("AutoEffect_1_self_damage"), S
 effect_text = "失去 {self_damage} 点生命，获得 {muscle} 层劲气。"
 id = "body_wound_power"
 type = 2
-rarity = 0
-target = 0
 cost = 1
 upgrade_type = 1
 element = 4

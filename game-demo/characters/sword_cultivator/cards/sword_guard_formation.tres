@@ -1,16 +1,16 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=7 format=3 uid="uid://y6ahen3okhue"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="2"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" uid="uid://dpgu18d4ll1s7" path="res://custom_resources/effects/configured_status_effect.gd" id="2"]
 [ext_resource type="Resource" path="res://statuses/sword_guard.tres" id="3"]
-[ext_resource type="Texture2D" path="res://art/tiles/tile_0129.png" id="4"]
-[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="5"]
+[ext_resource type="Texture2D" uid="uid://dwq72ul25ocas" path="res://art/cards/sword_cultivator/ai/sword_guard_formation.png" id="4"]
+[ext_resource type="AudioStream" uid="uid://cnqve7dtqjghp" path="res://art/audio/true_strength.ogg" id="5"]
 
 [sub_resource type="Resource" id="Resource_sword_guard"]
 script = ExtResource("2")
+status = ExtResource("3")
 amount = 2
 description_template = "获得 {amount} 层剑阵。"
-status = ExtResource("3")
 
 [resource]
 script = ExtResource("1")
@@ -18,10 +18,10 @@ configured_effects = Array[Resource]([SubResource("Resource_sword_guard")])
 id = "sword_guard_formation"
 type = 2
 rarity = 1
-target = 0
 cost = 2
 upgrade_type = 1
 element = 1
+mechanic_tags = null
 display_name = "万剑护体"
 icon = ExtResource("4")
 sound = ExtResource("5")
