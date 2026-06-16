@@ -48,8 +48,10 @@ func set_card(value: Card) -> void:
 	card_name.text = card.get_display_name()
 	card_name.add_theme_font_size_override("font_size", _get_title_font_size(card_name.text))
 	description.text = style_helper.format_card_text(card, card.get_default_tooltip())
+	description.add_theme_font_size_override("normal_font_size", _get_description_font_size(description.text))
 	icon.texture = card.icon
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	rarity.modulate = Card.RARITY_COLORS[card.rarity]
 	rarity.tooltip_text = _get_rarity_name(card.rarity)
 	type_label.text = style_helper.get_card_type(card)
@@ -217,7 +219,7 @@ func _apply_card_style(card_to_style: Card, state: int = VisualState.NORMAL) -> 
 	description.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.72))
 	description.add_theme_constant_override("shadow_offset_x", 1)
 	description.add_theme_constant_override("shadow_offset_y", 1)
-	description.add_theme_font_size_override("normal_font_size", 13)
+	description.add_theme_font_size_override("normal_font_size", _get_description_font_size(description.text))
 	type_label.add_theme_color_override("font_color", highlight.lerp(Color("fff2c2"), 0.36))
 	type_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
 	type_label.add_theme_constant_override("shadow_offset_x", 1)
@@ -232,10 +234,35 @@ func _apply_card_style(card_to_style: Card, state: int = VisualState.NORMAL) -> 
 
 func _get_title_font_size(value: String) -> int:
 	if value.length() >= 7:
-		return 15
+		return 14
 	if value.length() >= 5:
-		return 17
-	return 19
+		return 16
+	return 18
+
+
+func _get_description_font_size(value: String) -> int:
+	var plain_text := _strip_bbcode(value).strip_edges()
+	if plain_text.length() >= 62:
+		return 10
+	if plain_text.length() >= 44:
+		return 11
+	if plain_text.length() >= 28:
+		return 12
+	return 13
+
+
+func _strip_bbcode(value: String) -> String:
+	var result := ""
+	var inside_tag := false
+	for i in value.length():
+		var character := value.substr(i, 1)
+		if character == "[":
+			inside_tag = true
+		elif character == "]":
+			inside_tag = false
+		elif not inside_tag:
+			result += character
+	return result
 
 
 func _get_element_badge(element: Card.Element) -> String:

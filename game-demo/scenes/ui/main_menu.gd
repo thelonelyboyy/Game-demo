@@ -2,8 +2,7 @@ extends Control
 
 const CHAR_SELECTOR_SCENE := preload("res://scenes/ui/character_selector.tscn")
 const RUN_SCENE = preload("res://scenes/run/run.tscn")
-const MENU_BACKGROUND := preload("res://test1.png")
-const TITLE_LOGO := preload("res://art/ui/title/baijie_chengxian_title.png")
+const MENU_BACKGROUND := preload("res://art/backgrounds/background1.png")
 
 @export var run_startup: RunStartup
 
@@ -51,11 +50,36 @@ func _on_exit_pressed() -> void:
 
 
 func _polish_scene() -> void:
+	_apply_layout()
 	_apply_custom_background()
 	_apply_title_style()
 	_apply_menu_panel_style()
 	_apply_menu_button_style()
 	_apply_toast_style()
+
+
+func _apply_layout() -> void:
+	subtitle.set_anchors_preset(Control.PRESET_BOTTOM_LEFT, false)
+	subtitle.offset_left = 42.0
+	subtitle.offset_top = -92.0
+	subtitle.offset_right = 620.0
+	subtitle.offset_bottom = -52.0
+
+	footer_hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT, false)
+	footer_hint.offset_left = 42.0
+	footer_hint.offset_top = -48.0
+	footer_hint.offset_right = 540.0
+	footer_hint.offset_bottom = -18.0
+
+	menu_panel.anchor_left = 0.5
+	menu_panel.anchor_top = 0.5
+	menu_panel.anchor_right = 0.5
+	menu_panel.anchor_bottom = 0.5
+	menu_panel.offset_left = -240.0
+	menu_panel.offset_top = 8.0
+	menu_panel.offset_right = 240.0
+	menu_panel.offset_bottom = 368.0
+
 
 func _apply_custom_background() -> void:
 	var background := $Background as TextureRect
@@ -67,17 +91,14 @@ func _apply_custom_background() -> void:
 
 
 func _apply_title_style() -> void:
-	var title_logo := $TitleLogo as TextureRect
-	title_logo.texture = TITLE_LOGO
-	title_logo.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	title_logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	subtitle.add_theme_color_override("font_color", Color("f3dec0"))
+	subtitle.text = "修仙卡牌 · 肉鸽构筑"
+	footer_hint.text = "万劫残卷已启"
+	subtitle.add_theme_color_override("font_color", Color("d9c089"))
 	subtitle.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.62))
 	subtitle.add_theme_constant_override("shadow_offset_x", 2)
 	subtitle.add_theme_constant_override("shadow_offset_y", 2)
-	subtitle.add_theme_font_size_override("font_size", 39)
-	footer_hint.add_theme_color_override("font_color", Color(0.82, 0.74, 0.58, 0.72))
+	subtitle.add_theme_font_size_override("font_size", 24)
+	footer_hint.add_theme_color_override("font_color", Color(0.82, 0.74, 0.58, 0.68))
 	footer_hint.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.68))
 	footer_hint.add_theme_constant_override("shadow_offset_x", 2)
 	footer_hint.add_theme_constant_override("shadow_offset_y", 2)
@@ -86,19 +107,20 @@ func _apply_title_style() -> void:
 
 func _apply_menu_panel_style() -> void:
 	menu_panel.add_theme_stylebox_override("panel", _make_panel_style(
-		Color(0.025, 0.045, 0.041, 0.78),
-		Color(0.78, 0.60, 0.24, 0.82),
-		2,
+		Color(0.025, 0.021, 0.018, 0.08),
+		Color(0.72, 0.52, 0.22, 0.42),
+		1,
 		8,
-		Color(0, 0, 0, 0.52),
-		18
+		Color(0, 0, 0, 0.18),
+		8
 	))
-	panel_title.add_theme_color_override("font_color", Color("f6df9a"))
+	panel_title.hide()
+	panel_title.add_theme_color_override("font_color", Color("ead093"))
 	panel_title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
 	panel_title.add_theme_constant_override("shadow_offset_x", 2)
 	panel_title.add_theme_constant_override("shadow_offset_y", 2)
-	panel_title.add_theme_font_size_override("font_size", 30)
-	panel_rule.color = Color(0.86, 0.67, 0.28, 0.78)
+	panel_title.add_theme_font_size_override("font_size", 27)
+	panel_rule.color = Color(0.78, 0.55, 0.23, 0.42)
 
 
 func _apply_menu_button_style() -> void:
@@ -109,30 +131,30 @@ func _apply_menu_button_style() -> void:
 		button.flat = false
 		button.focus_mode = Control.FOCUS_NONE
 		button.add_theme_stylebox_override("normal", _make_panel_style(
-			Color(0.055, 0.083, 0.072, 0.88),
-			Color(0.58, 0.47, 0.24, 0.86),
+			Color(0.025, 0.045, 0.038, 0.18),
+			Color(0.68, 0.52, 0.24, 0.72),
 			1,
 			5,
-			Color(0, 0, 0, 0.32),
-			6
+			Color(0, 0, 0, 0.20),
+			4
 		))
 		button.add_theme_stylebox_override("hover", _make_panel_style(
-			Color(0.08, 0.15, 0.125, 0.96),
-			Color(0.92, 0.72, 0.32, 0.98),
+			Color(0.08, 0.11, 0.085, 0.34),
+			Color(0.96, 0.72, 0.32, 0.96),
 			2,
 			5,
-			Color(0.95, 0.72, 0.30, 0.20),
-			12
+			Color(0.95, 0.72, 0.30, 0.18),
+			10
 		))
 		button.add_theme_stylebox_override("pressed", _make_panel_style(
-			Color(0.035, 0.055, 0.050, 0.98),
+			Color(0.055, 0.065, 0.048, 0.46),
 			Color("f2c94f"),
 			2,
 			5
 		))
 		button.add_theme_stylebox_override("disabled", _make_panel_style(
-			Color(0.035, 0.04, 0.038, 0.62),
-			Color(0.34, 0.30, 0.22, 0.52),
+			Color(0.035, 0.04, 0.038, 0.10),
+			Color(0.34, 0.30, 0.22, 0.36),
 			1,
 			5
 		))

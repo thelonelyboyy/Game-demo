@@ -6,6 +6,7 @@ const SCROLL_SPEED := 15
 const SCROLL_FLOOR_CAPACITY := 17
 const SCROLL_SIDE_PADDING := 74.0
 const SCROLL_VERTICAL_PADDING := 64.0
+const SCROLL_VIEWPORT_WIDTH_RATIO := 1.02
 const MAP_ROOM = preload("res://scenes/map/map_room.tscn")
 const MAP_LINE = preload("res://scenes/map/map_line.tscn")
 
@@ -20,6 +21,8 @@ var map_data: Array[Array]
 var floors_climbed: int
 var last_room: Room
 var camera_edge_y: float
+var camera_min_y := 0.0
+var camera_max_y := 0.0
 # 测试地图（非 ROGUELIKE）下解锁全部节点，想点哪个点哪个，方便调试各类房间
 var free_navigation := false
 
@@ -32,6 +35,7 @@ func _ready() -> void:
 	scroll_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visuals.scale = Vector2.ONE * MAP_VISUAL_SCALE
 	camera_2d.offset = get_viewport_rect().size / 2.0
+	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	_update_camera_limits()
 
 
@@ -44,7 +48,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("scroll_down"):
 		camera_2d.position.y += SCROLL_SPEED * MAP_VISUAL_SCALE
 
-	camera_2d.position.y = clamp(camera_2d.position.y, -camera_edge_y, 0)
+	_clamp_camera_position()
 
 
 func generate_new_map(chapter: int = 1) -> void:
@@ -63,7 +67,7 @@ func load_map(map: Array[Array], floors_completed: int, last_room_climbed: Room)
 	last_room = last_room_climbed
 	create_map()
 	_update_camera_limits()
-	camera_2d.position.y = clamp(camera_2d.position.y, -camera_edge_y, 0)
+	_clamp_camera_position()
 	
 	if floors_climbed > 0:
 		unlock_next_rooms()
@@ -86,14 +90,7 @@ func create_map() -> void:
 
 	var content_width := MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1)
 	var content_height := MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0)
-	var map_width_pixels: float = content_width * MAP_VISUAL_SCALE
-	var map_height_pixels: float = content_height * MAP_VISUAL_SCALE
-	visuals.position.x = (get_viewport_rect().size.x - map_width_pixels) / 2
-	visuals.position.y = minf(
-		get_viewport_rect().size.y * 0.84,
-		(get_viewport_rect().size.y + map_height_pixels) / 2.0
-	)
-	_layout_scroll_board(content_width, content_height)
+	_layout_map_visuals(content_width, content_height)
 
 
 func unlock_floor(which_floor: int = floors_climbed) -> void:
@@ -201,14 +198,55 @@ func is_final_floor_reached() -> bool:
 
 
 func _update_camera_limits() -> void:
-	camera_edge_y = MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0) * MAP_VISUAL_SCALE
+	camera_min_y = -MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0) * MAP_VISUAL_SCALE
+	camera_max_y = 0.0
+
+	if scroll_board and scroll_board.texture:
+		var texture_size := scroll_board.texture.get_size()
+		var board_height := texture_size.y * scroll_board.scale.y
+		var scroll_top := visuals.position.y + (scroll_board.position.y - board_height * 0.5) * visuals.scale.y
+		var scroll_bottom := visuals.position.y + (scroll_board.position.y + board_height * 0.5) * visuals.scale.y
+		var viewport_height := get_viewport_rect().size.y
+		var next_camera_max_y := minf(0.0, scroll_bottom - viewport_height)
+		camera_min_y = minf(next_camera_max_y, scroll_top)
+		camera_max_y = next_camera_max_y
+
+	camera_edge_y = -camera_min_y
+
+
+func _clamp_camera_position() -> void:
+	camera_2d.position.y = clamp(camera_2d.position.y, camera_min_y, camera_max_y)
+
+
+func _on_viewport_size_changed() -> void:
+	camera_2d.offset = get_viewport_rect().size / 2.0
+	if map_data.is_empty():
+		return
+
+	var content_width := MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1)
+	var content_height := MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0)
+	_layout_map_visuals(content_width, content_height)
 
 
 func _get_scroll_floor_slots() -> int:
 	return maxi(SCROLL_FLOOR_CAPACITY, get_floor_count())
 
 
-func _layout_scroll_board(content_width: float, content_height: float) -> void:
+func _layout_map_visuals(content_width: float, content_height: float) -> void:
+	var viewport_size := get_viewport_rect().size
+	var map_width_pixels: float = content_width * MAP_VISUAL_SCALE
+	var map_height_pixels: float = content_height * MAP_VISUAL_SCALE
+	visuals.position.x = (viewport_size.x - map_width_pixels) / 2
+	visuals.position.y = minf(
+		viewport_size.y * 0.84,
+		(viewport_size.y + map_height_pixels) / 2.0
+	)
+	_layout_scroll_board(content_width, content_height, viewport_size)
+	_update_camera_limits()
+	_clamp_camera_position()
+
+
+func _layout_scroll_board(content_width: float, content_height: float, viewport_size: Vector2) -> void:
 	if not scroll_board or not scroll_board.texture:
 		return
 
@@ -216,7 +254,9 @@ func _layout_scroll_board(content_width: float, content_height: float) -> void:
 	if texture_size.x <= 0 or texture_size.y <= 0:
 		return
 
-	var scroll_width := content_width + SCROLL_SIDE_PADDING * 2.0
+	var content_scroll_width := content_width + SCROLL_SIDE_PADDING * 2.0
+	var viewport_scroll_width := viewport_size.x * SCROLL_VIEWPORT_WIDTH_RATIO / MAP_VISUAL_SCALE
+	var scroll_width := maxf(content_scroll_width, viewport_scroll_width)
 	var scroll_height := content_height + SCROLL_VERTICAL_PADDING * 2.0
 	scroll_board.centered = true
 	scroll_board.position = Vector2(content_width * 0.5, content_height * -0.5)
