@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://ph0oi5od64u5"]
+[gd_scene load_steps=3 format=3 uid="uid://ph0oi5od64u5"]
 
 [ext_resource type="Theme" uid="uid://c8cqncsqlplyu" path="res://main_theme.tres" id="1_6mdvy"]
-[ext_resource type="Texture2D" uid="uid://oe7v35ii8vrs" path="res://art/tiles/tile_0102.png" id="2_3xkif"]
 [ext_resource type="Script" path="res://scenes/ui/stats_ui.gd" id="2_t62e8"]
 
 [node name="StatsUI" type="Control"]
@@ -75,32 +74,60 @@ theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Block" type="HBoxContainer" parent="."]
+[node name="BlockBar" type="Control" parent="."]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
-offset_left = 66.0
-offset_top = 25.0
-offset_right = 110.0
-offset_bottom = 43.0
-theme_override_constants/separation = 1
+offset_left = 5.0
+offset_top = 23.0
+offset_right = 171.0
+offset_bottom = 33.0
+mouse_filter = 2
 
-[node name="BlockImage" type="TextureRect" parent="Block"]
-layout_mode = 2
-custom_minimum_size = Vector2(16, 16)
-texture = ExtResource("2_3xkif")
-expand_mode = 1
-stretch_mode = 5
+[node name="BlockBarShadow" type="ColorRect" parent="BlockBar"]
+layout_mode = 0
+offset_left = -1.0
+offset_top = 1.0
+offset_right = 167.0
+offset_bottom = 11.0
+color = Color(0, 0, 0, 0.4)
 
-[node name="BlockLabel" type="Label" parent="Block"]
+[node name="BlockBarBack" type="ColorRect" parent="BlockBar"]
+layout_mode = 0
+offset_right = 166.0
+offset_bottom = 10.0
+color = Color(0.05, 0.09, 0.17, 0.9)
+
+[node name="BlockBarFill" type="ColorRect" parent="BlockBar"]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 1
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 80.0
+offset_bottom = 9.0
+color = Color(0.32, 0.66, 0.98, 0.96)
+
+[node name="BlockBarHighlight" type="ColorRect" parent="BlockBar"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 80.0
+offset_bottom = 3.0
+color = Color(0.74, 0.9, 1, 0.7)
+
+[node name="BlockLabel" type="Label" parent="BlockBar"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = -5.0
+offset_right = 160.0
+offset_bottom = 14.0
 text = "6"
-theme_override_colors/font_color = Color(0.9, 0.96, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.02, 0.05, 0.08, 1)
+theme_override_colors/font_color = Color(0.92, 0.97, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.02, 0.05, 0.1, 1)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 13
-horizontal_alignment = 1
+horizontal_alignment = 0
 vertical_alignment = 1

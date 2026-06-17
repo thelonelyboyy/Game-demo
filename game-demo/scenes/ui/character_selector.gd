@@ -36,7 +36,7 @@ var character_entries: Array[Dictionary] = []
 func _ready() -> void:
 	_build_character_entries()
 	_polish_scene()
-	set_current_character(BODY_CULTIVATOR_STATS)
+	set_current_character(_default_character())
 
 
 func set_current_character(new_character: CharacterStats) -> void:
@@ -98,6 +98,7 @@ func _build_character_entries() -> void:
 		{
 			"stats": BODY_CULTIVATOR_STATS,
 			"button": $CharacterButtons/BodyCultivatorButton,
+			"enabled": false,
 			"name": "体修",
 			"subtitle": "金身炼体 · 稳扎稳打",
 			"description": "以血肉为炉，拳掌破山。擅长护体、回血与承伤反击，越战越硬。",
@@ -110,6 +111,7 @@ func _build_character_entries() -> void:
 		{
 			"stats": SWORD_CULTIVATOR_STATS,
 			"button": $CharacterButtons/SwordCultivatorButton,
+			"enabled": true,
 			"name": "剑修",
 			"subtitle": "一念起剑 · 轻灵迅捷",
 			"description": "擅长过牌与铸剑，出手频率高。越打越锋利，适合追求连招节奏。",
@@ -122,6 +124,7 @@ func _build_character_entries() -> void:
 		{
 			"stats": DEMONIC_CULTIVATOR_STATS,
 			"button": $CharacterButtons/DemonicCultivatorButton,
+			"enabled": true,
 			"name": "魔修",
 			"subtitle": "血契燃魂 · 高风险爆发",
 			"description": "以伤换势，用生命换取爆发。会献祭、吸魂与叠印，打得狠也要算得准。",
@@ -134,6 +137,7 @@ func _build_character_entries() -> void:
 		{
 			"stats": BEASTMASTER_STATS,
 			"button": $CharacterButtons/BeastmasterButton,
+			"enabled": false,
 			"name": "驭兽",
 			"subtitle": "百兽同心 · 召唤协同",
 			"description": "灵兽相伴，攻守轮转。依靠兽群、召唤与连携压制敌人。",
@@ -167,8 +171,12 @@ func _polish_scene() -> void:
 	character_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	character_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
+	# Keep the button row centered so hiding locked classes still looks balanced.
+	character_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+
 	for entry in character_entries:
 		var button := entry.button as Button
+		button.visible = entry.get("enabled", true)
 		button.text = ""
 		button.tooltip_text = entry.name
 		button.custom_minimum_size = Vector2(92.0, 122.0)
@@ -218,6 +226,13 @@ func _apply_character_button_style(button: Button, selected: bool, tint: Color) 
 	button.add_theme_stylebox_override("hover", InkTheme.make_style(Color(0.12, 0.12, 0.09, 0.68), accent, 3, 4, Color(0.9, 0.72, 0.28, 0.32), 12))
 	button.add_theme_stylebox_override("pressed", InkTheme.make_style(Color(0.11, 0.10, 0.07, 0.72), accent, 3, 4, Color(0.9, 0.72, 0.28, 0.34), 12))
 	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+
+
+func _default_character() -> CharacterStats:
+	for entry in character_entries:
+		if entry.get("enabled", true):
+			return entry.stats
+	return character_entries[0].stats
 
 
 func _get_character_index(character: CharacterStats) -> int:

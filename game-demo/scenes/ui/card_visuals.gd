@@ -8,13 +8,11 @@ const CARD_STYLE := preload("res://scenes/ui/card_style.gd")
 @onready var panel: Panel = $Panel
 @onready var frame_texture: TextureRect = $FrameTexture
 @onready var title_bar: Panel = $TitleBar
-@onready var title_left_mark: ColorRect = $TitleBar/LeftMark
-@onready var title_right_mark: ColorRect = $TitleBar/RightMark
 @onready var card_name: Label = $TitleBar/Name
 @onready var art_frame: Panel = $ArtFrame
 @onready var icon: TextureRect = $ArtFrame/Icon
 @onready var description_panel: Panel = $DescriptionPanel
-@onready var description: RichTextLabel = $DescriptionPanel/Description
+@onready var description: RichTextLabel = $DescriptionPanel/DescBox/Description
 @onready var type_bar: Panel = $TypeBar
 @onready var type_label: Label = $TypeBar/TypeLabel
 @onready var cost_orb: Panel = $CostOrb
@@ -47,7 +45,7 @@ func set_card(value: Card) -> void:
 	cost.text = str(card.cost)
 	card_name.text = card.get_display_name()
 	card_name.add_theme_font_size_override("font_size", _get_title_font_size(card_name.text))
-	description.text = style_helper.format_card_text(card, card.get_default_tooltip())
+	description.text = "[center]%s[/center]" % style_helper.format_card_text(card, card.get_default_tooltip())
 	description.add_theme_font_size_override("normal_font_size", _get_description_font_size(description.text))
 	icon.texture = card.icon
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
@@ -142,7 +140,6 @@ func _apply_card_style(card_to_style: Card, state: int = VisualState.NORMAL) -> 
 	var frame_modulate := Color.WHITE
 	var shadow_color := Color(0, 0, 0, 0.58)
 	var shadow_size := 12
-	var panel_tint_alpha := 0.10
 	var icon_alpha := 1.0
 
 	if card_to_style.rarity == Card.Rarity.RARE:
@@ -155,19 +152,16 @@ func _apply_card_style(card_to_style: Card, state: int = VisualState.NORMAL) -> 
 		frame_modulate = frame_modulate * Color(1.16, 1.12, 1.08, 1.0)
 		shadow_color = Color(highlight.r, highlight.g, highlight.b, 0.40)
 		shadow_size = 22
-		panel_tint_alpha = 0.16
 	elif state == VisualState.DRAG:
 		frame_modulate = frame_modulate * Color(1.20, 1.16, 1.10, 1.0)
 		shadow_color = Color(highlight.r, highlight.g, highlight.b, 0.52)
 		shadow_size = 28
-		panel_tint_alpha = 0.20
 
 	if disabled_visual:
 		frame_modulate = Color(0.48, 0.48, 0.48, 0.72)
 		shadow_color = Color(0, 0, 0, 0.36)
 		shadow_size = 8
 		icon_alpha = 0.68
-		panel_tint_alpha = 0.08
 
 	frame_texture.modulate = frame_modulate
 	icon.modulate = Color(1, 1, 1, icon_alpha)
@@ -180,23 +174,26 @@ func _apply_card_style(card_to_style: Card, state: int = VisualState.NORMAL) -> 
 		shadow_color,
 		shadow_size
 	))
+	# Title banner is part of the frame texture; keep the overlay transparent.
 	title_bar.set("theme_override_styles/panel", style_helper.make_panel_style(
-		Color(dark.r, dark.g, dark.b, panel_tint_alpha),
+		Color(0, 0, 0, 0),
 		Color(0, 0, 0, 0),
 		0,
 		6
 	))
+	# Art window and description plate borders are baked into the frame texture,
+	# so keep these overlay panels transparent to avoid a doubled border.
 	art_frame.set("theme_override_styles/panel", style_helper.make_panel_style(
-		Color(0.02, 0.02, 0.018, 0.16),
-		Color(bright_gold.r, bright_gold.g, bright_gold.b, 0.20),
-		1,
-		5
+		Color(0, 0, 0, 0),
+		Color(0, 0, 0, 0),
+		0,
+		4
 	))
 	description_panel.set("theme_override_styles/panel", style_helper.make_panel_style(
-		Color(0.02, 0.025, 0.02, 0.20),
-		Color(gold.r, gold.g, gold.b, 0.18),
-		1,
-		5
+		Color(0, 0, 0, 0),
+		Color(0, 0, 0, 0),
+		0,
+		4
 	))
 	type_bar.set("theme_override_styles/panel", style_helper.make_panel_style(
 		Color(0, 0, 0, 0),
@@ -228,8 +225,6 @@ func _apply_card_style(card_to_style: Card, state: int = VisualState.NORMAL) -> 
 	element_tag.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.82))
 	element_tag.add_theme_constant_override("shadow_offset_x", 1)
 	element_tag.add_theme_constant_override("shadow_offset_y", 1)
-	title_left_mark.color = Color(gold.r, gold.g, gold.b, 0.54)
-	title_right_mark.color = Color(gold.r, gold.g, gold.b, 0.54)
 
 
 func _get_title_font_size(value: String) -> int:

@@ -64,7 +64,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/h_separation = 18
 theme_override_constants/v_separation = 18
-columns = 7
+columns = 6
 
 [node name="CardMenuUI" parent="MarginContainer/VBoxContainer/ScrollContainer/Cards" instance=ExtResource("1_yhny2")]
 layout_mode = 2

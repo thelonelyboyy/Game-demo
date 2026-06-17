@@ -14,6 +14,7 @@ func set_status(new_status: Status) -> void:
 	
 	status = new_status
 	icon.texture = status.icon
+	tooltip_text = _format_tooltip()
 	duration.visible = status.stack_type == Status.StackType.DURATION
 	stacks.visible = status.stack_type == Status.StackType.INTENSITY
 	custom_minimum_size = icon.custom_minimum_size
@@ -47,3 +48,19 @@ func _on_status_changed() -> void:
 
 	duration.text = str(status.duration)
 	stacks.text = str(status.stacks)
+	tooltip_text = _format_tooltip()
+
+
+func _format_tooltip() -> String:
+	if not status:
+		return ""
+	var text := status.get_tooltip()
+	if text.is_empty():
+		return ""
+	# Many status tooltips embed a "%s" placeholder for their magnitude.
+	if text.contains("%s"):
+		var magnitude := status.stacks if status.stack_type == Status.StackType.INTENSITY else status.duration
+		text = text.replace("%s", str(magnitude))
+	# "%%" is the escaped percent sign used for the format operator; show it literally.
+	text = text.replace("%%", "%")
+	return text

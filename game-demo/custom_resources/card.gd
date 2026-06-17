@@ -92,6 +92,12 @@ func play(targets: Array[Node], char_stats: CharacterStats, modifiers: ModifierH
 	Events.card_played.emit(self)
 	char_stats.mana -= cost
 
+	# Attack cards wait for the player's attack animation to finish before
+	# dealing damage, so the hit lands at the end of the swing. The player
+	# guarantees this signal fires (immediately if it has no attack animation).
+	if type == Type.ATTACK:
+		await Events.attack_animation_finished
+
 	if is_single_targeted():
 		apply_effects(targets, modifiers)
 	else:

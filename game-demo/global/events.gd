@@ -19,6 +19,10 @@ signal player_turn_ended
 signal player_hit
 signal player_self_damaged(amount: int)
 signal player_died
+# Emitted when the player's attack animation finishes (or immediately when the
+# player has no attack animation). Gates attack-card damage so it lands at the
+# end of the swing instead of the start.
+signal attack_animation_finished
 
 # Enemy-related events
 signal enemy_action_completed(enemy: Enemy)

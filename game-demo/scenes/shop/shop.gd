@@ -298,8 +298,8 @@ func _apply_shop_visuals() -> void:
 	shopkeeper.hide()
 
 	title.text = "坊市"
-	title.offset_top = -360.0
-	title.offset_bottom = -292.0
+	title.offset_top = -460.0
+	title.offset_bottom = -392.0
 	title.add_theme_color_override("font_color", Color("f2c94f"))
 	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
 	title.add_theme_constant_override("shadow_offset_x", 4)
@@ -343,9 +343,9 @@ func _add_subtitle() -> void:
 	subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	subtitle.set_anchors_preset(Control.PRESET_CENTER)
 	subtitle.offset_left = -440.0
-	subtitle.offset_top = -300.0
+	subtitle.offset_top = -384.0
 	subtitle.offset_right = 440.0
-	subtitle.offset_bottom = -258.0
+	subtitle.offset_bottom = -342.0
 	subtitle.add_theme_color_override("font_color", Color("d7eef4"))
 	subtitle.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.76))
 	subtitle.add_theme_constant_override("shadow_offset_x", 2)

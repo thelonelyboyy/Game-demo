@@ -155,7 +155,7 @@ func refresh_battle_overlays() -> void:
 	)
 	status_handler.position = Vector2(
 		-STATUS_ROW_HALF_WIDTH * status_scale,
-		stats_ui.position.y + 27.0 * status_scale
+		stats_ui.position.y + 46.0 * status_scale
 	)
 
 

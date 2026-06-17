@@ -1,16 +1,18 @@
 class_name Player
 extends Node2D
 
-const MAX_BATTLE_ART_HEIGHT := 102.0
+const MAX_BATTLE_ART_HEIGHT := 82.0
 const HEALTH_BAR_HALF_WIDTH := 88.0
 const STATUS_ROW_HALF_WIDTH := 20.0
 
 const ANIM_ROOT := "res://art/frame_animation/"
 # 各动画的帧率与是否循环
 const ANIM_DEFS := {
-	"standby": {"fps": 10.0, "loop": true},
-	"attack": {"fps": 10.0, "loop": false},
-	"attacked": {"fps": 10.0, "loop": false},
+	"standby": {"fps": 20.0, "loop": true},
+	"attack": {"fps": 20.0, "loop": false},
+	"attacked": {"fps": 20.0, "loop": false},
+	"Spellcasting": {"fps": 20.0, "loop": false},
+	"death": {"fps": 20.0, "loop": false},
 }
 
 @export var stats: CharacterStats : set = set_character_stats
@@ -149,7 +151,7 @@ func refresh_battle_overlays() -> void:
 	)
 	status_handler.position = Vector2(
 		-STATUS_ROW_HALF_WIDTH * status_scale,
-		stats_ui.position.y + 27.0 * status_scale
+		stats_ui.position.y + 46.0 * status_scale
 	)
 
 
@@ -164,38 +166,82 @@ func update_stats() -> void:
 
 
 func _on_card_played(card: Card) -> void:
-	if not animated_sprite or not card:
+	if not card:
 		return
+
 	if card.type == Card.Type.ATTACK:
-		_play_oneshot("attack")
+		# Play the attack swing, then signal so the card's damage lands at the
+		# end of the animation. If there is no attack animation, resolve the
+		# gate immediately so the attack still deals damage.
+		if _has_anim("attack"):
+			_play_oneshot("attack")
+		else:
+			Events.attack_animation_finished.emit.call_deferred()
+	elif _has_anim("Spellcasting"):
+		_play_oneshot("Spellcasting")
+
+
+func _has_anim(anim_name: String) -> bool:
+	return animated_sprite != null and animated_sprite.sprite_frames.has_animation(anim_name)
 
 
 func _play_oneshot(anim_name: String) -> void:
-	if not animated_sprite or not animated_sprite.sprite_frames.has_animation(anim_name):
+	if not _has_anim(anim_name):
 		return
 	animated_sprite.play(anim_name)
 
 
 func _on_animation_finished() -> void:
-	# 非循环动画（attack/attacked）播完回到待机
-	if animated_sprite:
+	if not animated_sprite:
+		return
+
+	var finished_anim := animated_sprite.animation
+	# 非循环动画（attack/attacked/Spellcasting）播完回到待机；死亡动画保持最后一帧。
+	if finished_anim != "death":
 		animated_sprite.play("standby")
+
+	if finished_anim == "attack":
+		Events.attack_animation_finished.emit()
 
 
 func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 	if stats.health <= 0:
 		return
 
-	_play_oneshot("attacked")
 	var modified_damage := maxi(0, modifier_handler.get_modified_value(damage, which_modifier))
 
+	# 受击动画播完后再扣血，与攻击节奏保持一致：怪物攻击 -> 角色受击动画 -> 扣血。
+	var hit_delay := 0.0
+	if _has_anim("attacked"):
+		animated_sprite.play("attacked")
+		hit_delay = _anim_duration("attacked")
+
 	var tween := create_tween()
+	if hit_delay > 0.0:
+		tween.tween_interval(hit_delay)
 	tween.tween_callback(stats.take_damage.bind(modified_damage))
 	tween.tween_interval(0.17)
 
 	tween.finished.connect(
 		func():
 			if stats.health <= 0:
-				Events.player_died.emit()
-				queue_free()
+				_play_death_and_die()
 	)
+
+
+func _anim_duration(anim_name: String) -> float:
+	if not _has_anim(anim_name):
+		return 0.0
+	var fps: float = ANIM_DEFS.get(anim_name, {}).get("fps", 10.0)
+	if fps <= 0.0:
+		return 0.0
+	return float(animated_sprite.sprite_frames.get_frame_count(anim_name)) / fps
+
+
+func _play_death_and_die() -> void:
+	# 播放死亡动画后再结算死亡（无死亡动画则立即结算）。
+	if _has_anim("death"):
+		animated_sprite.play("death")
+		await animated_sprite.animation_finished
+	Events.player_died.emit()
+	queue_free()

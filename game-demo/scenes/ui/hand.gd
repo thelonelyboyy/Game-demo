@@ -2,15 +2,15 @@ class_name Hand
 extends Control
 
 const CARD_UI_SCENE := preload("res://scenes/card_ui/card_ui.tscn")
-const CARD_SIZE := Vector2(160.0, 230.0)
-const MAX_CARD_GAP := 180.0
-const MIN_CARD_GAP := 88.0
+const CARD_SIZE := Vector2(224.0, 322.0)
+const MAX_CARD_GAP := 252.0
+const MIN_CARD_GAP := 123.0
 const SIDE_SAFE_AREA := 460.0
 const FAN_ROTATION := 10.5
-const FAN_DROP := 58.0
-const CENTER_LIFT := 28.0
+const FAN_DROP := 81.0
+const CENTER_LIFT := 39.0
 const HOVER_SCALE := 1.42
-const HOVER_LIFT := 34.0
+const HOVER_LIFT := 48.0
 const HOVER_Z_INDEX := 1000
 const LAYOUT_DURATION := 0.18
 
@@ -104,7 +104,7 @@ func _layout_cards() -> void:
 
 	var total_width := CARD_SIZE.x + card_gap * float(card_count - 1)
 	var start_x := (size.x - total_width) * 0.5
-	var base_y := size.y - CARD_SIZE.y + 44.0
+	var base_y := size.y - CARD_SIZE.y + 62.0
 	var middle := float(card_count - 1) * 0.5
 	var divisor := maxf(middle, 1.0)
 
