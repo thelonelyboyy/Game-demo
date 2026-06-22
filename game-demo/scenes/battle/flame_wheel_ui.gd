@@ -15,6 +15,7 @@ const COLORS := [
 const DIM := 0.22
 
 var _pips: Array[ColorRect] = []
+var _active := false   # 魔修战斗：从开局起常显（即使焰轮为空）
 
 
 func _ready() -> void:
@@ -45,13 +46,20 @@ func _ready() -> void:
 
 	if not Events.flame_wheel_changed.is_connected(_on_flame_wheel_changed):
 		Events.flame_wheel_changed.connect(_on_flame_wheel_changed)
-	hide()
+	# 按 _active 决定初始可见性，避免 activate() 早于 _ready 时被这里盖掉。
+	visible = _active
+
+
+## 魔修战斗开始时调用：焰轮常显（空时全暗）。
+func activate() -> void:
+	_active = true
+	show()
 
 
 func _on_flame_wheel_changed(colors: Array) -> void:
 	for i in _pips.size():
 		_pips[i].modulate = Color.WHITE if colors.has(i) else Color(1, 1, 1, DIM)
-	visible = not colors.is_empty()
+	visible = _active or not colors.is_empty()
 
 
 func _exit_tree() -> void:

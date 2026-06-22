@@ -215,6 +215,11 @@ func _setup_class_mechanic_handler() -> void:
 
 	class_mechanic_handler.setup(char_stats, player, player_handler, enemy_handler)
 
+	# 魔修：焰轮从开局起常显（空时全暗），让玩家随时看到机制。
+	var flame_wheel := battle_ui.get_node_or_null("FlameWheelUI") as FlameWheelUI
+	if flame_wheel and class_mechanic_handler.is_demonic():
+		flame_wheel.activate()
+
 
 func _setup_ink_backdrop() -> void:
 	var layer := CanvasLayer.new()

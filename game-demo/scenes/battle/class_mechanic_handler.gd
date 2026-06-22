@@ -118,6 +118,10 @@ func _has_tag(card: Card, tag: String) -> bool:
 
 # ----------------------------- 煞气 / 天魔降世 -----------------------------
 
+func is_demonic() -> bool:
+	return _is_demonic()
+
+
 func _is_demonic() -> bool:
 	if not character:
 		return false

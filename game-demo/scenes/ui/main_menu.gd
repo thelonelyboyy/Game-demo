@@ -56,6 +56,61 @@ func _polish_scene() -> void:
 	_apply_menu_panel_style()
 	_apply_menu_button_style()
 	_apply_toast_style()
+	_spawn_spirit_motes()
+	_animate_breathing_glow()
+
+
+func _spawn_spirit_motes() -> void:
+	## 飘浮灵光粒子（暖金色光点，加色发光），叠在背景之上、墨色遮罩之下。
+	if has_node("SpiritMotes"):
+		return
+	var view_size := get_viewport_rect().size
+	var p := GPUParticles2D.new()
+	p.name = "SpiritMotes"
+	p.amount = 160
+	p.lifetime = 10.0
+	p.preprocess = 10.0         # 进场即铺满全屏，不用等粒子升上来
+	p.position = Vector2(view_size.x * 0.5, view_size.y + 8.0)
+
+	var mat := ParticleProcessMaterial.new()
+	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	mat.emission_box_extents = Vector3(view_size.x * 0.75, 12.0, 1.0)
+	mat.direction = Vector3(0, -1, 0)
+	mat.spread = 18.0
+	mat.gravity = Vector3.ZERO
+	# 上升速度 + 寿命让粒子覆盖整屏高度
+	mat.initial_velocity_min = 45.0
+	mat.initial_velocity_max = 110.0
+	mat.scale_min = 0.7
+	mat.scale_max = 2.4
+	# 整段生命周期内淡入淡出，呈赤红灵光
+	var grad := Gradient.new()
+	grad.set_color(0, Color(1.0, 0.28, 0.2, 0.0))
+	grad.set_color(1, Color(1.0, 0.35, 0.24, 0.0))
+	grad.add_point(0.5, Color(1.0, 0.3, 0.2, 0.9))
+	var ramp := GradientTexture1D.new()
+	ramp.gradient = grad
+	mat.color_ramp = ramp
+	p.process_material = mat
+
+	var cmat := CanvasItemMaterial.new()
+	cmat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD   # 发光叠加
+	p.material = cmat
+
+	add_child(p)
+	move_child(p, 1)            # Background(0) 之上、墨色遮罩之下
+	p.emitting = true
+
+
+func _animate_breathing_glow() -> void:
+	## 呼吸辉光：背景亮度极缓慢明暗脉动，画框不动，只有光在变化。
+	var background := $Background as TextureRect
+	var dim := Color(0.76, 0.76, 0.80)
+	var bright := Color(1.20, 1.20, 1.24)
+	background.modulate = dim
+	var t := create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(background, "modulate", bright, 5.0)
+	t.tween_property(background, "modulate", dim, 5.0)
 
 
 func _apply_layout() -> void:
