@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Potion" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/potion.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/draw.png" id="2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="e1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_block_effect.gd" id="e2"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("e1")
+amount = 2
+
+[sub_resource type="Resource" id="E2"]
+script = ExtResource("e2")
+amount = 8
+
+[resource]
+script = ExtResource("1")
+id = "cloudstep_talisman"
+potion_name = "云步符"
+category = 0
+rarity = 1
+target_kind = 0
+usable_out_of_combat = false
+icon = ExtResource("2")
+tooltip = "抽 2 张牌，获得 8 点护体。"
+configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
+character_type = 0

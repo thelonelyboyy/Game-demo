@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/muscle.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="e1"]
+[ext_resource type="Resource" path="res://statuses/muscle.tres" id="s1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_flame_effect.gd" id="e2"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("e1")
+amount = 2
+status = ExtResource("s1")
+target_mode = 1
+
+[sub_resource type="Resource" id="E2"]
+script = ExtResource("e2")
+color = 5
+bonus = 6
+bonus_per_color = 1
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
+effect_text = "获得 2 层劲气。共鸣：每有 1 种其它魔焰颜色额外获得 1 层劲气。"
+id = "demon_flame_yellow"
+type = 1
+rarity = 1
+target = 0
+cost = 1
+mechanic_tags = null
+display_name = "魔焰黄·狂烬"
+icon = ExtResource("2")
+sound = ExtResource("3")

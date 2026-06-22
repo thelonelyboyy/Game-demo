@@ -144,7 +144,8 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **符箓丹药系统**（新）：可携带一次性消耗品（对标药水）。`custom_resources/potion.gd`（复用 `CardEffect`）；`scenes/potion_handler/`（3 槽位、点击使用、hover tooltip）；顶栏灵根右侧显示；战斗内可用，回血类丹药战斗外也可用。**获取**：普通战斗 ~40% 掉落、精英必掉、商店上架 2 个。`SaveGame.potions` 持久化。起手赠送 2 个。6 张初始：回春丹/聚气丹/引灵符/烈焰符/寒冰符/血祭符。
 - **魔修·阶段1 煞气**（`statuses/sha_qi`，逻辑在 `scenes/battle/class_mechanic_handler.gd`）：受伤(`player_hit`)/出煞气牌得煞气；≥3 卡伤+1、≥6 造成/受到×2、≥10 天魔降世(本回合×3，回合末关、下回合开始失50%最大生命+煞气降5)。仅魔修生效。阈值用 modifier 系统**原地改值**实现（不要用 `remove_value`，它 queue_free 延迟会丢值）。煞气牌：引煞诀/聚煞。
 - **魔修·阶段2 魂印引爆(X=3)**：新增 `configured_soul_mark_detonate_effect.gd`（消耗 N 层→ 3×N 伤害，**走玩家 DMG_DEALT 增伤**，被煞气放大）与 `configured_soul_mark_consume_effect.gd`（转化消耗）。回合末 DoT 仍由敌人自身状态结算(stacks×2)，**不吃增伤**。卡：引爆 裂魂/三魂同焚/魂葬，转化 魂铠/摄魂续元（均已入抽卡池）。
-- **阶段3 魔焰焰轮**：⬜ 待做。
+- **魔修·阶段3 魔焰焰轮**：`configured_flame_effect.gd`（携带本牌颜色，先按焰轮里"其它颜色"数结算共鸣，再把自身颜色加入焰轮）；焰轮状态在 `class_mechanic_handler.gd`（组 `class_mechanic`，回合开始/结束清空）。7 张七色魔焰卡（紫蚀魂/白护魂/绿镇煞/蓝灵涌·移出战斗/黑噬血/黄狂烬/红焚界），初始卡组加魔焰紫·蚀魂，全部入抽卡池。共鸣按"每有1种其它颜色"缩放（白+护体、黑+伤、红+群伤、紫挂魂印、黄+劲气、蓝抽牌）。**已简化的 rider**（黄"接下来N次魔焰伤害+2"、蓝费用-1、绿消2煞气翻倍、红4色额外引爆）用近似实现，待细化。
+- **魔修三系统已全部落地** ✅（煞气/魂印引爆/魔焰焰轮）。
 
 ### 本轮（2026-06-18）系统级更新
 

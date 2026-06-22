@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CardPile" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="CardPile" load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/card_pile.gd" id="1"]
 [ext_resource type="Script" path="res://custom_resources/card.gd" id="2"]
@@ -6,7 +6,8 @@
 [ext_resource type="Resource" path="res://characters/demonic_cultivator/cards/demon_defend.tres" id="4"]
 [ext_resource type="Resource" path="res://characters/demonic_cultivator/cards/shadow_step.tres" id="5"]
 [ext_resource type="Resource" path="res://characters/demonic_cultivator/cards/forbidden_mantra.tres" id="6"]
+[ext_resource type="Resource" path="res://characters/demonic_cultivator/cards/demon_flame_purple.tres" id="7"]
 
 [resource]
 script = ExtResource("1")
-cards = Array[ExtResource("2")]([ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("4"), ExtResource("4"), ExtResource("4"), ExtResource("4"), ExtResource("4"), ExtResource("5"), ExtResource("6")])
+cards = Array[ExtResource("2")]([ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("4"), ExtResource("4"), ExtResource("4"), ExtResource("4"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7")])

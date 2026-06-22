@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/status_soul_mark.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="e1"]
+[ext_resource type="Resource" path="res://statuses/exposed.tres" id="s1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_damage_effect.gd" id="e2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_flame_effect.gd" id="e3"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("e1")
+amount = 1
+status = ExtResource("s1")
+target_mode = 0
+use_duration = true
+
+[sub_resource type="Resource" id="E2"]
+script = ExtResource("e2")
+amount = 9
+target_mode = 0
+
+[sub_resource type="Resource" id="E3"]
+script = ExtResource("e3")
+color = 0
+bonus = 4
+bonus_flat = 1
+target_mode = 0
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2"), SubResource("E3")])
+effect_text = "施加 1 回合破绽，造成 9 点伤害。共鸣：焰轮已有其它颜色时施加 1 层魂印。"
+id = "demon_flame_purple"
+type = 0
+rarity = 0
+target = 1
+cost = 1
+mechanic_tags = null
+display_name = "魔焰紫·蚀魂"
+icon = ExtResource("2")
+sound = ExtResource("3")

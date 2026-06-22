@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="Potion" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/potion.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/status_spirit_beast.png" id="2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="e1"]
+[ext_resource type="Resource" path="res://statuses/spirit_beast.tres" id="s1"]
+[ext_resource type="Resource" path="res://statuses/beast_pack.tres" id="s2"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("e1")
+amount = 1
+status = ExtResource("s1")
+target_mode = 1
+
+[sub_resource type="Resource" id="E2"]
+script = ExtResource("e1")
+amount = 1
+status = ExtResource("s2")
+target_mode = 1
+
+[resource]
+script = ExtResource("1")
+id = "beast_lure_pill"
+potion_name = "引兽丹"
+category = 1
+rarity = 2
+target_kind = 0
+usable_out_of_combat = false
+icon = ExtResource("2")
+tooltip = "驭兽限定。获得 1 层灵兽与 1 层兽群。"
+configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
+character_type = 4

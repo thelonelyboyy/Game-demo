@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Potion" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/potion.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/heart.png" id="2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_heal_effect.gd" id="e1"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("e1")
+amount = 16
+
+[resource]
+script = ExtResource("1")
+id = "greater_healing_pill"
+potion_name = "大回春丹"
+category = 1
+rarity = 1
+target_kind = 0
+usable_out_of_combat = true
+icon = ExtResource("2")
+tooltip = "回复 16 点生命。战斗外亦可服用。"
+configured_effects = Array[Resource]([SubResource("E1")])
+character_type = 0

@@ -24,6 +24,7 @@ var enemy_handler: EnemyHandler
 var _sha_qi_connected := false
 var _heavenly_active := false           # 本回合处于天魔降世（×3）
 var _heavenly_penalty_pending := false  # 下回合开始结算代价
+var _flame_wheel := {}                  # 本回合焰轮里的魔焰颜色集合
 # 一次性创建、原地更新的 modifier 值（避免 remove_value 的 queue_free 延迟问题）
 var _mv_dealt_flat: ModifierValue
 var _mv_dealt_mult: ModifierValue
@@ -40,6 +41,10 @@ func setup(
 	player = battle_player
 	player_handler = battle_player_handler
 	enemy_handler = battle_enemy_handler
+
+	# 让魔焰效果能通过组找到本处理器读取/更新焰轮
+	if not is_in_group("class_mechanic"):
+		add_to_group("class_mechanic")
 
 	if not Events.card_played.is_connected(_on_card_played):
 		Events.card_played.connect(_on_card_played)
@@ -196,7 +201,20 @@ func _update_sha_qi_modifiers() -> void:
 	_mv_taken_mult.percent_value = mult
 
 
+func flame_other_color_count(color: int) -> int:
+	var count := 0
+	for c in _flame_wheel:
+		if c != color:
+			count += 1
+	return count
+
+
+func flame_add_color(color: int) -> void:
+	_flame_wheel[color] = true
+
+
 func _on_player_turn_started() -> void:
+	_flame_wheel.clear()
 	if not _is_demonic():
 		return
 	if _heavenly_penalty_pending:
@@ -214,6 +232,8 @@ func _on_player_turn_started() -> void:
 
 
 func _on_player_turn_ended() -> void:
+	# 回合结束清空焰轮。
+	_flame_wheel.clear()
 	# 天魔降世的 ×3 仅持续本回合。
 	if _heavenly_active:
 		_heavenly_active = false

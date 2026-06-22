@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Potion" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/potion.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/attack_negative.png" id="2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="e1"]
+[ext_resource type="Resource" path="res://statuses/bleed.tres" id="s1"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("e1")
+amount = 4
+status = ExtResource("s1")
+target_mode = 2
+
+[resource]
+script = ExtResource("1")
+id = "bleed_talisman"
+potion_name = "血痕符"
+category = 0
+rarity = 1
+target_kind = 2
+usable_out_of_combat = false
+icon = ExtResource("2")
+tooltip = "给予所有敌人 4 层流血。"
+configured_effects = Array[Resource]([SubResource("E1")])
+character_type = 0

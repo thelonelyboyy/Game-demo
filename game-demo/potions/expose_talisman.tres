@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Potion" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/potion.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/expose.png" id="2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="e1"]
+[ext_resource type="Resource" path="res://statuses/exposed.tres" id="s1"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("e1")
+amount = 2
+status = ExtResource("s1")
+target_mode = 0
+use_duration = true
+
+[resource]
+script = ExtResource("1")
+id = "expose_talisman"
+potion_name = "破绽符"
+category = 0
+rarity = 0
+target_kind = 1
+usable_out_of_combat = false
+icon = ExtResource("2")
+tooltip = "给予一个敌人 2 回合破绽。"
+configured_effects = Array[Resource]([SubResource("E1")])
+character_type = 0

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/attack_negative.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="e1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_damage_effect.gd" id="e2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_flame_effect.gd" id="e3"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("e1")
+amount = 3
+
+[sub_resource type="Resource" id="E2"]
+script = ExtResource("e2")
+amount = 12
+target_mode = 0
+
+[sub_resource type="Resource" id="E3"]
+script = ExtResource("e3")
+color = 4
+bonus = 2
+bonus_per_color = 3
+target_mode = 0
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2"), SubResource("E3")])
+effect_text = "失去 3 点生命，造成 12 点伤害。共鸣：每有 1 种其它魔焰颜色额外造成 3 伤害。"
+id = "demon_flame_black"
+type = 0
+rarity = 1
+target = 1
+cost = 1
+mechanic_tags = null
+display_name = "魔焰黑·噬血"
+icon = ExtResource("2")
+sound = ExtResource("3")
