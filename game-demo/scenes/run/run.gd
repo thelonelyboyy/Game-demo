@@ -66,6 +66,7 @@ var stats: RunStats
 var character: CharacterStats
 var save_data: SaveGame
 var spirit_root_badge: SpiritRootBadge
+var potion_bar_panel: PanelContainer
 var current_chapter := 1
 
 
@@ -234,13 +235,28 @@ func _setup_spirit_root_badge() -> void:
 
 	spirit_root_badge.character = character
 
-	# 把符箓丹药槽放到灵根徽章右侧
+	# 丹药栏：复用灵根徽章的面板样式，放在其右侧
 	var badge_parent := spirit_root_badge.get_parent()
-	if potion_handler.get_parent() != badge_parent:
-		potion_handler.reparent(badge_parent)
-	badge_parent.move_child(potion_handler, spirit_root_badge.get_index() + 1)
-	potion_handler.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	potion_handler.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	if not potion_bar_panel:
+		potion_bar_panel = PanelContainer.new()
+		potion_bar_panel.name = "PotionBar"
+		potion_bar_panel.custom_minimum_size = Vector2(0, 56)
+		potion_bar_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		InkTheme.apply_panel(potion_bar_panel)
+		var hb := HBoxContainer.new()
+		hb.add_theme_constant_override("separation", 6)
+		hb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		potion_bar_panel.add_child(hb)
+		var lbl := Label.new()
+		lbl.text = "丹"
+		lbl.add_theme_font_size_override("font_size", 20)
+		lbl.add_theme_color_override("font_color", Color("d98c5a"))
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		hb.add_child(lbl)
+		potion_handler.reparent(hb)
+		potion_handler.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		badge_parent.add_child(potion_bar_panel)
+	badge_parent.move_child(potion_bar_panel, spirit_root_badge.get_index() + 1)
 
 
 func _show_regular_battle_rewards() -> void:

@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://c7c8cgkuro8b3" path="res://art/ui/icons/discard.png" id="18_g47ei"]
 [ext_resource type="PackedScene" uid="uid://d2jq2r5hb1ajk" path="res://scenes/ui/card_pile_view.tscn" id="21_rnul2"]
 [ext_resource type="PackedScene" uid="uid://c3fu2yk5vm3qb" path="res://scenes/ui/status_view.tscn" id="22_kfjwu"]
+[ext_resource type="Script" path="res://scenes/battle/flame_wheel_ui.gd" id="23_flame"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xyg5u"]
 size = Vector2(256, 100)
@@ -92,6 +93,17 @@ offset_left = 92.0
 offset_top = -156.0
 offset_right = 184.0
 offset_bottom = -64.0
+
+[node name="FlameWheelUI" type="PanelContainer" parent="BattleUI"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 92.0
+offset_top = -212.0
+offset_right = 268.0
+offset_bottom = -166.0
+grow_vertical = 0
+script = ExtResource("23_flame")
 
 [node name="Tooltip" parent="BattleUI" instance=ExtResource("12_qx741")]
 offset_left = 28.0

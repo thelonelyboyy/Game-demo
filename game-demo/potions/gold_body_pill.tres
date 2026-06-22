@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="Potion" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/potion.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/ui/icons/status_gold_body.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/potions/icons/gold_body_pill.png" id="2"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="e1"]
 [ext_resource type="Resource" path="res://statuses/gold_body.tres" id="s1"]
 

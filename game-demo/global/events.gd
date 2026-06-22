@@ -23,6 +23,8 @@ signal player_died
 # player has no attack animation). Gates attack-card damage so it lands at the
 # end of the swing instead of the start.
 signal attack_animation_finished
+# 魔焰焰轮变化（携带本回合已点亮的颜色 int 数组），战斗内焰轮 UI 监听刷新。
+signal flame_wheel_changed(colors: Array)
 
 # Enemy-related events
 signal enemy_action_completed(enemy: Enemy)

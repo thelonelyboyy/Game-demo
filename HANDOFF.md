@@ -146,6 +146,8 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **魔修·阶段2 魂印引爆(X=3)**：新增 `configured_soul_mark_detonate_effect.gd`（消耗 N 层→ 3×N 伤害，**走玩家 DMG_DEALT 增伤**，被煞气放大）与 `configured_soul_mark_consume_effect.gd`（转化消耗）。回合末 DoT 仍由敌人自身状态结算(stacks×2)，**不吃增伤**。卡：引爆 裂魂/三魂同焚/魂葬，转化 魂铠/摄魂续元（均已入抽卡池）。
 - **魔修·阶段3 魔焰焰轮**：`configured_flame_effect.gd`（携带本牌颜色，先按焰轮里"其它颜色"数结算共鸣，再把自身颜色加入焰轮）；焰轮状态在 `class_mechanic_handler.gd`（组 `class_mechanic`，回合开始/结束清空）。7 张七色魔焰卡（紫蚀魂/白护魂/绿镇煞/蓝灵涌·移出战斗/黑噬血/黄狂烬/红焚界），初始卡组加魔焰紫·蚀魂，全部入抽卡池。共鸣按"每有1种其它颜色"缩放（白+护体、黑+伤、红+群伤、紫挂魂印、黄+劲气、蓝抽牌）。**已简化的 rider**（黄"接下来N次魔焰伤害+2"、蓝费用-1、绿消2煞气翻倍、红4色额外引爆）用近似实现，待细化。
 - **魔修三系统已全部落地** ✅（煞气/魂印引爆/魔焰焰轮）。
+- **战斗内焰轮 UI**：`scenes/battle/flame_wheel_ui.gd`（"焰" + 7 色色珠，本回合点亮的颜色高亮、其余暗淡，空焰轮隐藏），置于战斗左下能量条上方。实时刷新走新信号 `Events.flame_wheel_changed`（`class_mechanic_handler` 加色/清空时发出）。
+- **丹药栏 UI**：`run.gd` 把符箓丹药槽包进 `InkTheme` 面板（与灵根徽章同款边框 + "丹" 标签），放在顶栏灵根徽章右侧。
 
 ### 本轮（2026-06-18）系统级更新
 

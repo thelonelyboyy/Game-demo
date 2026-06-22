@@ -211,10 +211,18 @@ func flame_other_color_count(color: int) -> int:
 
 func flame_add_color(color: int) -> void:
 	_flame_wheel[color] = true
+	Events.flame_wheel_changed.emit(_flame_wheel.keys())
+
+
+func _clear_flame_wheel() -> void:
+	if _flame_wheel.is_empty():
+		return
+	_flame_wheel.clear()
+	Events.flame_wheel_changed.emit([])
 
 
 func _on_player_turn_started() -> void:
-	_flame_wheel.clear()
+	_clear_flame_wheel()
 	if not _is_demonic():
 		return
 	if _heavenly_penalty_pending:
@@ -233,7 +241,7 @@ func _on_player_turn_started() -> void:
 
 func _on_player_turn_ended() -> void:
 	# 回合结束清空焰轮。
-	_flame_wheel.clear()
+	_clear_flame_wheel()
 	# 天魔降世的 ×3 仅持续本回合。
 	if _heavenly_active:
 		_heavenly_active = false
