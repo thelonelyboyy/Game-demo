@@ -13,12 +13,12 @@ affected_by_spirit_root = false
 
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("auto_dmg")
-amount = 9
+amount = 7
 
 [resource]
 script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
-effect_text = "失去 2 点生命，造成 9 点伤害。"
+effect_text = "失去 2 点生命，造成 7 点伤害。"
 id = "demon_blood_rite_slash"
 target = 1
 cost = 1

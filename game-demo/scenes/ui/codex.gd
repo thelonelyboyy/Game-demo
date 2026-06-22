@@ -21,7 +21,7 @@ const CARD_SCAN_ROOTS := {
 	"fusion": ["res://fusion_cards/"],
 }
 
-enum EntryKind {SUMMARY, CARD, RELIC, ENEMY, STATUS}
+enum EntryKind {SUMMARY, CARD, RELIC, ENEMY, STATUS, POTION}
 
 @onready var title: Label = %Title
 @onready var directory: Tree = %Directory
@@ -38,6 +38,7 @@ var cards_by_scope := {}
 var all_relics: Array = []
 var all_enemies: Array = []
 var all_statuses: Array = []
+var all_potions: Array = []
 
 
 func _ready() -> void:
@@ -73,6 +74,7 @@ func _collect_all_data() -> void:
 	all_relics = _collect_resources_of_type(["res://relics/"], Relic)
 	all_enemies = _collect_resources_of_type(["res://enemies/"], EnemyStats)
 	all_statuses = _collect_resources_of_type(["res://statuses/"], Status)
+	all_potions = _collect_resources_of_type(["res://potions/"], Potion)
 
 
 func _collect_cards() -> void:
@@ -177,14 +179,35 @@ func _build_directory() -> void:
 	for status: Status in all_statuses:
 		_add_resource_node(statuses_root, _status_display_name(status), EntryKind.STATUS, status)
 
+	var potions_root := _add_summary_node(root, "符箓丹药（%s）" % all_potions.size(), "符箓丹药", _format_potion_summary())
+	var talismans := all_potions.filter(func(p: Potion): return p.category == Potion.Category.TALISMAN)
+	var pills := all_potions.filter(func(p: Potion): return p.category == Potion.Category.PILL)
+	_add_potion_group(potions_root, "符箓", talismans)
+	_add_potion_group(potions_root, "丹药", pills)
+
 	cards_root.collapsed = false
 	relics_root.collapsed = true
 	enemies_root.collapsed = true
 	statuses_root.collapsed = true
+	potions_root.collapsed = true
 
 	var first_card_scope := cards_root.get_first_child()
 	if first_card_scope:
 		first_card_scope.collapsed = false
+
+
+func _add_potion_group(parent: TreeItem, label: String, potions: Array) -> void:
+	if potions.is_empty():
+		return
+	var group := _add_summary_node(
+		parent,
+		"%s（%s）" % [label, potions.size()],
+		label,
+		_format_potion_group_summary(label, potions)
+	)
+	for potion: Potion in potions:
+		var item := _add_resource_node(group, _potion_display_name(potion), EntryKind.POTION, potion)
+		item.set_custom_color(0, _rarity_color(potion.rarity))
 
 
 func _add_summary_node(parent: TreeItem, label: String, title_text: String, body_text: String) -> TreeItem:
@@ -227,6 +250,8 @@ func _on_directory_item_selected() -> void:
 			_show_enemy_detail(data.resource as EnemyStats)
 		EntryKind.STATUS:
 			_show_status_detail(data.resource as Status)
+		EntryKind.POTION:
+			_show_potion_detail(data.resource as Potion)
 		_:
 			_show_summary(str(data.get("title", "图鉴")), str(data.get("text", "")))
 
@@ -309,6 +334,37 @@ func _show_status_detail(status: Status) -> void:
 	]
 
 
+func _show_potion_detail(potion: Potion) -> void:
+	if not potion:
+		return
+
+	_show_texture_preview(potion.icon, Vector2(140, 140))
+	detail_icon.show()
+	detail_icon.texture = potion.icon
+	detail_title.text = _potion_display_name(potion)
+	detail_meta.text = "符箓丹药 / %s / %s / %s / %s" % [
+		_potion_category_name(potion.category),
+		_card_rarity_name(potion.rarity),
+		_potion_target_name(potion.target_kind),
+		_relic_character_type_name(potion.character_type),
+	]
+	var usage := "战斗内外均可使用" if potion.usable_out_of_combat else "仅战斗内可用"
+	var lines := PackedStringArray()
+	lines.append("[b]说明[/b]")
+	lines.append(_potion_tooltip(potion))
+	var effects_text := _format_potion_effects(potion)
+	if not effects_text.is_empty():
+		lines.append("")
+		lines.append("[b]效果[/b]")
+		lines.append(effects_text)
+	lines.append("")
+	lines.append("[b]使用[/b]")
+	lines.append(usage)
+	lines.append("")
+	lines.append("[color=#cdbf92]资源：%s[/color]" % potion.resource_path)
+	detail_text.text = "\n".join(lines)
+
+
 func _show_texture_preview(texture: Texture, minimum_size: Vector2) -> void:
 	_clear_preview()
 	var rect := TextureRect.new()
@@ -326,11 +382,12 @@ func _clear_preview() -> void:
 
 
 func _format_overview() -> String:
-	return "[b]已接入资源[/b]\n卡牌：%s 张\n法宝：%s 件\n怪物：%s 个\n词条：%s 条\n\n左侧目录已按类型展开，卡牌额外按职业分类。" % [
+	return "[b]已接入资源[/b]\n卡牌：%s 张\n法宝：%s 件\n怪物：%s 个\n词条：%s 条\n符箓丹药：%s 个\n\n左侧目录已按类型展开，卡牌额外按职业分类。" % [
 		all_cards.size(),
 		all_relics.size(),
 		all_enemies.size(),
 		all_statuses.size(),
+		all_potions.size(),
 	]
 
 
@@ -355,6 +412,57 @@ func _format_enemy_summary() -> String:
 
 func _format_status_summary() -> String:
 	return "[b]词条总览[/b]\n已扫描 `res://statuses/` 下全部状态词条，共 %s 条。\n\n选择词条可查看触发时机、叠加方式和说明。" % all_statuses.size()
+
+
+func _format_potion_summary() -> String:
+	return "[b]符箓丹药总览[/b]\n已扫描 `res://potions/` 下全部符箓丹药，共 %s 个。\n\n符箓与丹药为可携带的一次性消耗品，战斗中（部分战斗外）使用，从战斗奖励和商店获取。" % all_potions.size()
+
+
+func _format_potion_group_summary(label: String, potions: Array) -> String:
+	return "[b]%s[/b]\n共 %s 个。\n\n选择下方名称查看详情。" % [label, potions.size()]
+
+
+func _format_potion_effects(potion: Potion) -> String:
+	var lines := PackedStringArray()
+	for effect in potion.configured_effects:
+		var line := _describe_potion_effect(effect)
+		if not line.is_empty():
+			lines.append("· %s" % line)
+	return "\n".join(lines)
+
+
+func _describe_potion_effect(effect: Resource) -> String:
+	if effect is ConfiguredDamageEffect:
+		var dmg := effect as ConfiguredDamageEffect
+		return "造成 %s 点伤害%s" % [dmg.amount, _effect_scope_suffix(dmg.target_mode)]
+	if effect is ConfiguredBlockEffect:
+		return "获得 %s 点护体" % (effect as ConfiguredBlockEffect).amount
+	if effect is ConfiguredHealEffect:
+		return "回复 %s 点生命" % (effect as ConfiguredHealEffect).amount
+	if effect is ConfiguredSelfDamageEffect:
+		return "失去 %s 点生命" % (effect as ConfiguredSelfDamageEffect).amount
+	if effect is ConfiguredDrawEffect:
+		return "抽 %s 张牌" % (effect as ConfiguredDrawEffect).amount
+	if effect is ConfiguredManaEffect:
+		return "获得 %s 点灵气" % (effect as ConfiguredManaEffect).amount
+	if effect is ConfiguredStatusEffect:
+		var st := effect as ConfiguredStatusEffect
+		var status_name := _status_display_name(st.status) if st.status else "状态"
+		var unit := "回合" if st.use_duration else "层"
+		return "施加 %s %s%s" % [st.amount, status_name, unit]
+	return ""
+
+
+func _effect_scope_suffix(target_mode: int) -> String:
+	match target_mode:
+		CardEffect.TargetMode.ALL_ENEMIES:
+			return "（所有敌人）"
+		CardEffect.TargetMode.EVERYONE:
+			return "（全体）"
+		CardEffect.TargetMode.PLAYER:
+			return "（自身）"
+		_:
+			return ""
 
 
 func _format_card_detail(card: Card) -> String:
@@ -395,6 +503,8 @@ func _resource_sort_name(resource) -> String:
 		return _enemy_display_name(resource)
 	if resource is Status:
 		return _status_display_name(resource)
+	if resource is Potion:
+		return _potion_sort_key(resource)
 	return str(resource.resource_path)
 
 
@@ -461,6 +571,18 @@ func _card_rarity_name(rarity: Card.Rarity) -> String:
 			return "暗金"
 		_:
 			return "未知"
+
+
+func _rarity_color(rarity: Card.Rarity) -> Color:
+	match rarity:
+		Card.Rarity.UNCOMMON:
+			return Color("5a9bf0")  # 蓝卡
+		Card.Rarity.RARE:
+			return Color("f0c85b")  # 金卡
+		Card.Rarity.MYTHIC:
+			return Color("d98a3d")  # 暗金
+		_:
+			return Color("e8e6dd")  # 白卡
 
 
 func _card_target_name(target: Card.Target) -> String:
@@ -606,6 +728,45 @@ func _status_stack_type_name(stack_type: Status.StackType) -> String:
 			return "持续回合"
 		_:
 			return "不可叠加"
+
+
+func _potion_display_name(potion: Potion) -> String:
+	if not potion.potion_name.is_empty():
+		return potion.potion_name
+	return potion.id.capitalize()
+
+
+func _potion_sort_key(potion: Potion) -> String:
+	# 先符箓后丹药，同类按名称
+	return "%d_%s" % [potion.category, _potion_display_name(potion)]
+
+
+func _potion_tooltip(potion: Potion) -> String:
+	if potion.tooltip.is_empty():
+		return "暂无说明。"
+	return potion.tooltip
+
+
+func _potion_category_name(category: Potion.Category) -> String:
+	match category:
+		Potion.Category.TALISMAN:
+			return "符箓"
+		Potion.Category.PILL:
+			return "丹药"
+		_:
+			return "未知"
+
+
+func _potion_target_name(target_kind: Potion.TargetKind) -> String:
+	match target_kind:
+		Potion.TargetKind.SELF:
+			return "自身"
+		Potion.TargetKind.SINGLE_ENEMY:
+			return "单个敌人"
+		Potion.TargetKind.ALL_ENEMIES:
+			return "所有敌人"
+		_:
+			return "未知"
 
 
 func _on_back_pressed() -> void:

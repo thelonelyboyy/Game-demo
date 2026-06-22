@@ -97,6 +97,8 @@ E:\code\game-demo
 - 卡牌资源：`res://custom_resources/card.gd`、`res://custom_resources/cultivation_card.gd`。
 - 卡牌效果统一走 `configured_effects`：旧字段驱动路径（`base_damage`、`muscle_stacks` 等）已从 `cultivation_card.gd` 删除，新卡只能用 `configured_effects` 配置效果。`validate_project.py` 仍会拦截任何在 `.tres` 里重新写入旧字段的情况。
 - 新增卡牌后要检查职业卡池、图鉴扫描、奖励/商店来源。
+- **新增任何可收集资源类型（卡牌/法宝/词条/怪物/符箓丹药等）必须接入图鉴扫描** `scenes/ui/codex.gd`（`_collect_all_data` + `_build_directory` + 对应 `_show_*_detail`），否则玩家在图鉴里看不到。图鉴用运行时递归 `DirAccess` 扫描目录，新增同类资源会自动出现，但**新类型需手动加扫描根**。
+- 图鉴/扫描器查不出"文件在但未导入"（缺 `.import`）：新增 `.tres`/PNG 后务必在编辑器导入一次。
 - 修改主流程后必须跑 `run-flow`。
 - 修改 Boss、敌人或战斗配置后必须跑 `boss-battle`。
 - 修改图鉴资源扫描后必须跑 `codex` smoke。

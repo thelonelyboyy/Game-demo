@@ -13,12 +13,12 @@ affected_by_spirit_root = false
 
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("auto_block")
-amount = 10
+amount = 8
 
 [resource]
 script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
-effect_text = "失去 2 点生命，获得 10 点护体。"
+effect_text = "失去 2 点生命，获得 8 点护体。"
 id = "demon_blood_ward"
 type = 1
 cost = 1
