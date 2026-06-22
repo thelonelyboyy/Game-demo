@@ -1,10 +1,10 @@
 [gd_scene load_steps=21 format=3 uid="uid://c2k6lpae18q8v"]
 
 [ext_resource type="Script" path="res://scenes/shop/shop.gd" id="1_oqoy8"]
-[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/scenes/shop_shopkeeper.png" id="2_41omk"]
+[ext_resource type="Texture2D" path="res://art/characters_redesign/shopkeeper_blink.png" id="2_41omk"]
 [ext_resource type="Resource" uid="uid://cy5rtyb7a4hpp" path="res://relics/coupons.tres" id="2_ccxow"]
 [ext_resource type="Resource" uid="uid://b11jhsqqh7kfe" path="res://relics/explosive_barrel.tres" id="3_7lk2o"]
-[ext_resource type="Texture2D" uid="uid://cvtonr5sinxbx" path="res://art/characters/shopkeeper_blink.png" id="3_uthr0"]
+[ext_resource type="Texture2D" path="res://art/characters_redesign/shopkeeper_blink.png" id="3_uthr0"]
 [ext_resource type="PackedScene" uid="uid://d24w6bygugbhd" path="res://scenes/shop/shop_card.tscn" id="4_2u2et"]
 [ext_resource type="Resource" uid="uid://dn6frpxqh1o7" path="res://relics/mana_potion.tres" id="4_4u268"]
 [ext_resource type="Resource" uid="uid://c8c1y85x2h5l" path="res://relics/reinforced_armor.tres" id="5_8ym3b"]
@@ -200,6 +200,12 @@ layout_mode = 2
 
 [node name="ShopRelic4" parent="UILayer/ShopContent/Relics" instance=ExtResource("5_m1t66")]
 layout_mode = 2
+
+[node name="Potions" type="HBoxContainer" parent="UILayer/ShopContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 22
+alignment = 1
 
 [node name="RemoveCardButton" type="Button" parent="UILayer/ShopContent"]
 unique_name_in_owner = true

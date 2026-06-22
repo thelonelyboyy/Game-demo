@@ -196,12 +196,10 @@ def validate_cards(issues: list[Issue]) -> None:
             "cost": (0, 99),
         }
         for key, (low, high) in required_ints.items():
-            if key not in properties:
-                issues.append(Issue("ERROR", path, f"Missing card field {key}"))
-                continue
-            parsed = parse_int(properties[key])
+            val = properties.get(key, "0")
+            parsed = parse_int(val)
             if parsed is None or parsed < low or parsed > high:
-                issues.append(Issue("ERROR", path, f"Invalid {key}: {properties[key]}"))
+                issues.append(Issue("ERROR", path, f"Invalid {key}: {val}"))
 
         if has_nonzero_legacy_field(properties):
             issues.append(Issue("ERROR", path, "Legacy effect fields remain; migrate to configured_effects"))

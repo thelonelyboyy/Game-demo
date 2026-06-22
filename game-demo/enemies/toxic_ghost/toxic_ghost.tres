@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://c4kjdbymx7u0a" path="res://enemies/toxic_ghost/toxic_ghost_ai.tscn" id="1_3lheq"]
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_dyv27"]
-[ext_resource type="Texture2D" path="res://art/enemies/bone_dragon.png" id="1_frmvf"]
+[ext_resource type="Texture2D" path="res://art/enemies_redesign/bone_dragon.png" id="1_frmvf"]
 
 [resource]
 script = ExtResource("1_dyv27")

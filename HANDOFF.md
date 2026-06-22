@@ -1,17 +1,21 @@
 ﻿# 万劫求仙项目交接文档
 
-更新时间：2026-06-16  
+更新时间：2026-06-19  
 项目根目录：`E:\code\game-demo`  
 Godot 工程目录：`E:\code\game-demo\game-demo`  
 Godot 版本：4.5.2 stable mono  
 Godot 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe`
 
-## 1. 当前状态（2026-06-16）
+## 1. 当前状态（2026-06-19）
 
-- 稳定运行的杀戮尖塔式修仙卡牌肉鸽 Demo。本轮做了大量系统、数值、美术与工程改动，**汇总见第 6 节「本轮系统级更新」**。
-- **工作区有大批未提交改动**（约 107 改 / 2 删 / 42 新增）：剑修+魔修卡牌接入 AI 插画、10 张新魔修卡、剑修/魔修战斗帧动画、意图系统、数值平衡、敌人行动时序修复、地图实验回退、新状态/意图图标等。提交前请按第 5 节验证。
-- `validate_project.py` 通过（0 error）；`run_godot_checks.py` 7 项基本通过，但 `run-flow` 存在一个**偶发**的 `Lambda capture freed`（见第 8 节已知问题）。
-- 新增完整开发路线图：根目录 `ROADMAP.md`（通往「杀戮尖塔级成品」的分阶段优化方案，11 个阶段、每步带验收标准）。
+- 稳定运行的杀戮尖塔式修仙卡牌肉鸽 Demo。当前焦点：**把魔修打磨成完整 Demo**。
+- **新增「符箓丹药」系统**（可携带一次性消耗品，对标药水）：战斗奖励/商店获取、3 槽位、战斗内/部分战斗外使用。见第 4、6 节。
+- **魔修机制大改进行中**（三系统，引爆倍率 X=3）：阶段1 煞气 ✅、阶段2 魂印引爆 ✅、阶段3 魔焰焰轮 ⬜。见第 4、6 节。
+- 视觉/动画/UI/全量 mipmap 等上一大批已提交推送（`master` `7b81880`）。
+- `validate_project.py` 现在 **0 error / 0 warning**（校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
+- `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`boss-battle` 通过；`run-flow` 仍存在**偶发** `Lambda capture freed`（见第 8 节，非功能 bug，重跑即过）。
+- **新增 Excel 数值管线**：`cards.xlsx` + `scripts/cards_to_xlsx.py` / `xlsx_to_cards.py` / `card_table.py`——改表回写 `.tres`，专调数值平衡（见第 6、7 节）。
+- 开发路线图见根目录 `ROADMAP.md`。
 
 ## 2. 项目概况
 
@@ -97,7 +101,7 @@ E:\code\game-demo
 - 修改 Boss、敌人或战斗配置后必须跑 `boss-battle`。
 - 修改图鉴资源扫描后必须跑 `codex` smoke。
 - 修改存档字段后要测试继续游戏。
-- **战斗角色帧动画**：`CharacterStats.battle_anim_id` 非空时，玩家在战斗中改用 `art/frame_animation/<id>_standby|attack|attacked/` 逐帧动画（`scenes/player/player.gd` 运行时构建 SpriteFrames，贴图缺失则回退静态立绘）。已配置：魔修=`demonic_cultivator`、剑修=`sword_cultivator`。帧率在 `player.gd` 的 `ANIM_DEFS`（当前统一 10fps）。待机循环、出攻击牌播攻击、受击播受击；白闪/震屏已移除。新增帧文件夹后务必在编辑器导入。
+- **战斗角色帧动画**：`CharacterStats.battle_anim_id` 非空时，玩家在战斗中改用 `art/frame_animation/<id>_<动作>/` 逐帧动画（`scenes/player/player.gd` 运行时构建 SpriteFrames，贴图缺失则回退静态立绘）。动作：`standby`(待机循环)/`attack`/`attacked`/`Spellcasting`(出非攻击牌)/`death`(死亡，停在末帧)。已配置：魔修=`demonic_cultivator`(5 套全)、剑修=`sword_cultivator`(standby/attack/attacked)。帧率 `ANIM_DEFS` 当前统一 **20fps**。**攻击/受击时序**：出攻击牌→播攻击动画→动画结束才结算伤害（`card.gd` 经 `Events.attack_animation_finished` 门控）；受击同理——受击动画播完才扣血（`player.take_damage`）。新增帧文件夹后务必在编辑器导入。
 - **敌人意图系统**：`Intent.category`（12 种分类）驱动 `scenes/ui/intent_ui.gd` 的彩色气泡；攻击/防御/强化等分类用 `art/tiles/intent_*.png` 贴图、其余分类用代码绘制图标兜底。给敌人意图分类：在其 AI 场景（如 `enemies/crab/crab_enemy_ai.tscn`）的 Intent 子资源里设 `category`。
 - **存档自愈**：`SaveGame.load_data()` 加载前用 `get_dependencies` 检查依赖是否齐全，缺失/损坏则清理坏档并返回 null（`run.gd` 也会在空存档时返回主菜单）。注意：存档仍按路径内嵌大量资源引用，**移动/重命名被引用的资源会让旧存档失效**（架构隐患，见 ROADMAP 阶段 0）。
 - **章节难度爬升**：`scenes/map/map_generator.gd` 的 `CHAPTER_HEALTH/DAMAGE/GOLD_MULTIPLIERS` 让敌人血量/伤害/金币按章节递增（经 `_battle_for_room` 复制缩放，不污染战斗池）；进入新一章在 `run.gd._advance_to_next_chapter` 回满血；测试地图（`map_mode != ROGUELIKE`）开启 `Map.free_navigation`（所有节点可点，直接点 Boss 也能进章）。
@@ -133,7 +137,36 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ## 6. 最近改动摘要
 
-### 本轮（2026-06-16）系统级更新
+### 本轮（2026-06-19）系统级更新
+
+> 详细机制见第 4 节；魔修大改完整方案见记忆 `demonic-overhaul-plan`。
+
+- **符箓丹药系统**（新）：可携带一次性消耗品（对标药水）。`custom_resources/potion.gd`（复用 `CardEffect`）；`scenes/potion_handler/`（3 槽位、点击使用、hover tooltip）；顶栏灵根右侧显示；战斗内可用，回血类丹药战斗外也可用。**获取**：普通战斗 ~40% 掉落、精英必掉、商店上架 2 个。`SaveGame.potions` 持久化。起手赠送 2 个。6 张初始：回春丹/聚气丹/引灵符/烈焰符/寒冰符/血祭符。
+- **魔修·阶段1 煞气**（`statuses/sha_qi`，逻辑在 `scenes/battle/class_mechanic_handler.gd`）：受伤(`player_hit`)/出煞气牌得煞气；≥3 卡伤+1、≥6 造成/受到×2、≥10 天魔降世(本回合×3，回合末关、下回合开始失50%最大生命+煞气降5)。仅魔修生效。阈值用 modifier 系统**原地改值**实现（不要用 `remove_value`，它 queue_free 延迟会丢值）。煞气牌：引煞诀/聚煞。
+- **魔修·阶段2 魂印引爆(X=3)**：新增 `configured_soul_mark_detonate_effect.gd`（消耗 N 层→ 3×N 伤害，**走玩家 DMG_DEALT 增伤**，被煞气放大）与 `configured_soul_mark_consume_effect.gd`（转化消耗）。回合末 DoT 仍由敌人自身状态结算(stacks×2)，**不吃增伤**。卡：引爆 裂魂/三魂同焚/魂葬，转化 魂铠/摄魂续元（均已入抽卡池）。
+- **阶段3 魔焰焰轮**：⬜ 待做。
+
+### 本轮（2026-06-18）系统级更新
+
+> 详细机制位置见第 4、7 节。
+
+- **卡牌模板重做**：`card_visuals.tscn` 改为**锚点比例布局**（不再用固定像素偏移，任意尺寸不漂移），各元素对齐卡框窗口；描述文字垂直居中。
+- **插画移到边框下层 + 填满窗口**：把 7 张卡框 PNG（`art/ui/cards/generated/card_frame_*.png`）的插画窗用洪水填充**挖空成透明**，渲染顺序改为「插画在下、边框在上」，插画铺满窗口、金边压在插画之上。
+- **卡牌整体放大 1.4 倍**：`Hand.CARD_SIZE` 160×230→224×322（含扇形间距）、`card_ui.tscn`、`card_visuals.tscn`、`card_menu_ui.tscn` 同步；奖励三选一容器加宽、牌库网格列数 7→6、融合网格列数 4→3，防溢出。
+- **全量 mipmap**：所有会缩小显示的高清美术（卡插画/卡框/帧动画/立绘/敌人/法宝·状态·地图图标/背景）开启 mipmap，消除缩放白点/走样；**像素 `tiles/tile_*` 不开**。新增/替换高清图记得开 mipmap 再导入。
+- **战斗动画**：接入魔修**施法 `Spellcasting` / 死亡 `death`** 帧动画；`ANIM_DEFS` 帧率统一 **20fps**。
+- **攻击/受击时序**：攻击牌出牌→播放攻击动画→**动画结束才结算伤害**（`card.gd` 用 `Events.attack_animation_finished` 门控；玩家无动画时立即发信号兜底）；受击对称——`player.take_damage` 受击动画播完才扣血。
+- **战斗人物**：缩小至 80%（`player.gd MAX_BATTLE_ART_HEIGHT 102→82`）+ 上移（`battle.gd PLAYER_SCREEN_ANCHOR y 0.50→0.42`）。
+- **护体蓝条**：`stats_ui` 血条下方新增蓝色护体条；状态栏下移让位（`player.gd`/`enemy.gd` 的 +27→+46）。玩家/怪物共用。
+- **状态图标**：放大（17→26px）+ **悬停 tooltip**（`status_ui.gd` 把 `status.tooltip` 填到 `tooltip_text`）。修复 tooltip 被遮挡——`battle.tscn` 的 `Hand` 控件改 `mouse_filter=IGNORE`（空白处穿透）、`StatusUI` 改 STOP。
+- **选人界面**：隐藏体修/驭兽（`enabled` 开关，默认选剑修）；**移除立绘**；**按职业切换背景**——剑修=`art/backgrounds/sw.png`、魔修=`art/backgrounds/demonic_selector_bg.png`；**去掉了背景上的色罩/暗角**（`AccentTint`/`Vignette` 已隐藏）。
+- **商店/融合 UI**：商店标题上移防遮挡；融合每行列数下调。
+- **魔修打击/防御换图**：新建 `demon_strike.tres` / `demon_defend.tres`（用 `art/cards/demonic_cultivator/ai/attack.png` / `defense.png`，秘术框），换进魔修起手牌组；**不影响其它职业的通用打击/防御**。
+- **Excel 数值管线**（新工具）：`cards.xlsx` + `scripts/cards_to_xlsx.py`（导出）/`xlsx_to_cards.py`（回写）/`card_table.py`（共用）。改 xlsx 的浅黄列→跑回写脚本→Godot 导入。只调数值（费用/伤害/护体/层数/名称/类型等），增删效果/改状态种类仍在 Godot 改。幂等（无改动导入=改 0 文件）。
+- **art 清理 + 校验修复**：删除未用资源（旧标题图/背景/占位 tile/未用帧）；`validate_project.py` 已修掉默认值字段误报（现 0 error）；更新 `art/README.md`。
+- **外部图标**：接入了一批 `art/generated_icons/tile_replacements/` 生成图标（替换占位 tile）。
+
+### 上一轮（2026-06-16）系统级更新
 
 > 以下为本轮新增/改动的系统总览，详细机制位置见第 4 节。
 
@@ -224,11 +257,15 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ## 7. 关键文件索引
 
-### 主菜单
+### 主菜单 / 选人
 
-- `game-demo/scenes/ui/main_menu.tscn`
-- `game-demo/scenes/ui/main_menu.gd`
-- `game-demo/art/ui/title/baijie_chengxian_title.png`
+- `game-demo/scenes/ui/main_menu.tscn` / `.gd`（标题已烤进 `art/backgrounds/background1.png`）
+- `game-demo/scenes/ui/character_selector.tscn` / `.gd`（体修/驭兽隐藏；无立绘；按职业背景：剑修 `art/backgrounds/sw.png`、魔修 `art/backgrounds/demonic_selector_bg.png`；无色罩/暗角）
+
+### 数值工具 · Excel 管线
+
+- `cards.xlsx`（数值编辑表，项目根）
+- `scripts/cards_to_xlsx.py`（导出 .tres→xlsx）/ `scripts/xlsx_to_cards.py`（回写 xlsx→.tres）/ `scripts/card_table.py`（共用解析）
 
 ### 卡牌显示
 
@@ -255,18 +292,18 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 ### 美术现状
 
 - 剑修、魔修卡牌已接入 AI 生成大插画（`art/cards/<职业>/ai/`）；**体修、驭兽卡面仍是占位小图**，待补。
-- 卡框资源是 AI 生成贴图，作为临时美术可用；若后续有正式美术，应保持相同布局区域，避免重改 UI 坐标。
-- `art/tiles/` 仍有一批 16px 占位像素图（被卡牌/词条/敌人共用），属低清待替换。
+- 通用卡（打击/防御等 `common_cards/`）仍用 16px 占位图，放大后偏糊；魔修起手已用专属 `demon_strike`/`demon_defend`（AI 图）替代。
+- 卡框资源是 AI 生成贴图，插画窗已挖空透明；新卡框需保持相同窗口区域与透明窗，避免重改 UI。
+- `art/tiles/tile_*` 仍是 16px 占位像素图（**不要给它们开 mipmap**）；部分已被 `art/generated_icons/tile_replacements/` 替换。
 
 ### 已知问题
 
-- **`run-flow` 偶发 `Lambda capture freed`**：本轮已修 7 处敌人行动（攻击/格挡，boss 战 15/15 干净），但完整流程仍约 2/12 偶发——还有另一处来源未根除（疑似 `status_handler`/`relic_handler`/弃牌结算等多回合才走的补间回调）。非功能 bug（逻辑仍通过），但会干扰验证、将来上 CI 会变随机红灯。修法同样是把 `tween.finished` 的 lambda 改为不捕获节点 / 加 `is_instance_valid` 守卫。
-- **`validate_project.py` 有盲区**：只查 `res://` 文件是否存在，查不出「文件在但未导入」（缺 `.import`）和字符串拼接路径（如 `card_style.gd` 的卡框）。新增美术务必在编辑器导入。
-- **存档跨资源移动会失效**：存档按路径内嵌资源引用，移动/重命名被引用资源后旧档加载失败（已有自愈清档兜底，但会丢进度）。彻底修复需改成"按 id 重建"（ROADMAP 阶段 0）。
-- **标题 logo** 仍显示旧游戏名"百劫成仙"，需重做图片。
-- 卡牌显示逻辑没有修改 `Card` 数据结构，也没有改卡牌效果逻辑。
-- 战斗手牌尺寸仍偏紧凑，主要是为了避免遮挡战斗场景。
-- 如果再调整卡牌比例，要同步检查战斗手牌、奖励三选一、商店、图鉴/预览、升级、删除、融合界面。
+- **`run-flow` 偶发 `Lambda capture freed`**：完整流程约 2/12 偶发，还有一处多回合补间回调来源未根除（疑似 `status_handler`/`relic_handler`/弃牌结算）。非功能 bug（逻辑仍通过，重跑即过），但将来上 CI 会随机红灯。修法：把 `tween.finished` 的 lambda 改为捕获 `get_instance_id()` / 加 `is_instance_valid` 守卫。
+- **`validate_project.py` 仍有盲区**：查不出「文件在但未导入」（缺 `.import`）和字符串拼接路径。新增美术务必在编辑器导入。（注：默认值字段误报已修，现 0 error。）
+- **存档跨资源移动会失效**：存档按路径内嵌资源引用，移动/重命名被引用资源后旧档加载失败（有自愈清档兜底，但丢进度）。彻底修复需改成"按 id 重建"（ROADMAP 阶段 0）。
+- **魔修待办**：`demon_flame` 与 `demon_flame_heart` 重名「魔焰焚心」需改名；血祭斩/血盾/血誓等白卡数值偏强（可用 `cards.xlsx` 直接调）；魂印缺"引爆" payoff 卡；确认 37 张魔修卡都进了 `demonic_cultivator_draftable_cards.tres`。
+- 调整卡牌比例时，要同步检查战斗手牌、奖励三选一、商店、图鉴/预览、升级、删除、融合界面（当前卡 224×322，详见第 6 节 1.4x 改动）。
+- 主菜单标题已烤进背景图 `art/backgrounds/background1.png`（旧 `baijie_chengxian_title.png` 已删）；战斗/选人背景部分仍硬编码在项目根 `test1.png`/`test2.png`（见 `art/README.md`）。
 
 ## 9. 后续建议
 

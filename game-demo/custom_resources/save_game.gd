@@ -21,6 +21,7 @@ const MIGRATED_CARD_PATHS := {
 @export var current_deck: CardPile
 @export var current_health: int
 @export var relics: Array[Relic]
+@export var potions: Array[Potion]
 @export var map_data: Array[Array]
 @export var last_room: Room
 @export var floors_climbed: int

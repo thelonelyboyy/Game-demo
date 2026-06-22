@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/status_soul_mark.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_soul_mark_consume_effect.gd" id="e1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_block_effect.gd" id="e2"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("e1")
+target_mode = 0
+consume_amount = 2
+
+[sub_resource type="Resource" id="E2"]
+script = ExtResource("e2")
+amount = 8
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
+effect_text = "消耗目标 2 层魂印，获得 8 点护体。"
+id = "hun_kai"
+type = 1
+rarity = 0
+target = 1
+cost = 1
+mechanic_tags = null
+display_name = "魂铠"
+icon = ExtResource("2")
+sound = ExtResource("3")

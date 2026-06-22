@@ -53,10 +53,7 @@ func set_current_character(new_character: CharacterStats) -> void:
 	description.text = entry.description
 	health_value.text = "%s/%s" % [current_character.max_health, current_character.max_health]
 	gold_value.text = str(STARTING_GOLD)
-	character_portrait.texture = current_character.portrait
-	character_portrait.modulate = entry.hero_modulate
-	accent_tint.color = entry.tint
-	vignette.color = entry.vignette
+	background.texture = _resolve_background(entry)
 
 	if current_character.starting_relic:
 		relic_icon.texture = current_character.starting_relic.icon
@@ -112,6 +109,7 @@ func _build_character_entries() -> void:
 			"stats": SWORD_CULTIVATOR_STATS,
 			"button": $CharacterButtons/SwordCultivatorButton,
 			"enabled": true,
+			"background": "res://art/backgrounds/sw.png",
 			"name": "剑修",
 			"subtitle": "一念起剑 · 轻灵迅捷",
 			"description": "擅长过牌与铸剑，出手频率高。越打越锋利，适合追求连招节奏。",
@@ -125,6 +123,7 @@ func _build_character_entries() -> void:
 			"stats": DEMONIC_CULTIVATOR_STATS,
 			"button": $CharacterButtons/DemonicCultivatorButton,
 			"enabled": true,
+			"background": "res://art/backgrounds/demonic_selector_bg.png",
 			"name": "魔修",
 			"subtitle": "血契燃魂 · 高风险爆发",
 			"description": "以伤换势，用生命换取爆发。会献祭、吸魂与叠印，打得狠也要算得准。",
@@ -168,8 +167,11 @@ func _polish_scene() -> void:
 	relic_name.add_theme_color_override("font_color", Color("f0c85b"))
 	health_value.autowrap_mode = TextServer.AUTOWRAP_OFF
 	gold_value.autowrap_mode = TextServer.AUTOWRAP_OFF
-	character_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	character_portrait.hide()
 	character_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 不再给背景图盖色罩/暗角，保持背景原图。
+	accent_tint.hide()
+	vignette.hide()
 
 	# Keep the button row centered so hiding locked classes still looks balanced.
 	character_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -226,6 +228,13 @@ func _apply_character_button_style(button: Button, selected: bool, tint: Color) 
 	button.add_theme_stylebox_override("hover", InkTheme.make_style(Color(0.12, 0.12, 0.09, 0.68), accent, 3, 4, Color(0.9, 0.72, 0.28, 0.32), 12))
 	button.add_theme_stylebox_override("pressed", InkTheme.make_style(Color(0.11, 0.10, 0.07, 0.72), accent, 3, 4, Color(0.9, 0.72, 0.28, 0.34), 12))
 	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+
+
+func _resolve_background(entry: Dictionary) -> Texture2D:
+	var path: String = entry.get("background", "")
+	if not path.is_empty() and ResourceLoader.exists(path):
+		return load(path) as Texture2D
+	return SELECTOR_BACKGROUND
 
 
 func _default_character() -> CharacterStats:

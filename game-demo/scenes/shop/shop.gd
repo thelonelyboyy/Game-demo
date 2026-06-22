@@ -3,6 +3,16 @@ extends Control
 
 const SHOP_CARD = preload("res://scenes/shop/shop_card.tscn")
 const SHOP_RELIC = preload("res://scenes/shop/shop_relic.tscn")
+const SHOP_POTION = preload("res://scenes/shop/shop_potion.tscn")
+const SHOP_POTION_PATHS := [
+	"res://potions/healing_pill.tres",
+	"res://potions/qi_pill.tres",
+	"res://potions/draw_talisman.tres",
+	"res://potions/flame_talisman.tres",
+	"res://potions/frost_talisman.tres",
+	"res://potions/blood_rite_talisman.tres",
+]
+const SHOP_POTION_COUNT := 2
 const CARD_REMOVE_SCENE := preload("res://scenes/card_remove/card_remove.tscn")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
 const SHOP_BACKGROUND := preload("res://art/backgrounds/shop_market_bg.png")
@@ -22,6 +32,7 @@ const MYTHIC_SHOP_CHANCE := 0.04
 @export var char_stats: CharacterStats
 @export var run_stats: RunStats
 @export var relic_handler: RelicHandler
+@export var potion_handler: PotionHandler
 
 @onready var ui_layer: CanvasLayer = $UILayer
 @onready var background: TextureRect = $BackgroundLayer/Background
@@ -29,6 +40,7 @@ const MYTHIC_SHOP_CHANCE := 0.04
 @onready var shop_content: VBoxContainer = $UILayer/ShopContent
 @onready var cards: HBoxContainer = %Cards
 @onready var relics: HBoxContainer = %Relics
+@onready var potions: HBoxContainer = %Potions
 @onready var back_button: Button = $UILayer/BackButton
 @onready var remove_card_button: Button = %RemoveCardButton
 @onready var shopkeeper: TextureRect = $DecorationLayer/Shopkeeper
@@ -54,8 +66,12 @@ func _ready() -> void:
 	for shop_relic: ShopRelic in relics.get_children():
 		shop_relic.queue_free()
 
+	for shop_potion: ShopPotion in potions.get_children():
+		shop_potion.queue_free()
+
 	Events.shop_card_bought.connect(_on_shop_card_bought)
 	Events.shop_relic_bought.connect(_on_shop_relic_bought)
+	Events.shop_potion_bought.connect(_on_shop_potion_bought)
 	remove_card_button.pressed.connect(_on_remove_card_button_pressed)
 
 	_blink_timer_setup()
@@ -70,6 +86,7 @@ func _input(event: InputEvent) -> void:
 func populate_shop() -> void:
 	_generate_shop_cards()
 	_generate_shop_relics()
+	_generate_shop_potions()
 	_update_remove_card_service()
 
 
@@ -172,12 +189,41 @@ func _append_available_relic(relic, available_relics: Array, seen_ids: Dictionar
 		available_relics.append(relic)
 
 
+func _generate_shop_potions() -> void:
+	var available: Array[Potion] = []
+	for path in SHOP_POTION_PATHS:
+		if not ResourceLoader.exists(path):
+			continue
+		var potion := load(path) as Potion
+		if potion and potion.can_appear_as_reward(char_stats):
+			available.append(potion)
+
+	RNG.array_shuffle(available)
+	for i in range(mini(SHOP_POTION_COUNT, available.size())):
+		var new_shop_potion := SHOP_POTION.instantiate() as ShopPotion
+		potions.add_child(new_shop_potion)
+		new_shop_potion.potion = available[i]
+		new_shop_potion.gold_cost = _get_updated_shop_cost(new_shop_potion.gold_cost)
+		new_shop_potion.update(run_stats)
+
+
+func _on_shop_potion_bought(potion: Potion, gold_cost: int) -> void:
+	if not potion_handler or potion_handler.is_full():
+		return
+	potion_handler.add_potion(potion)
+	run_stats.gold -= gold_cost
+	_update_items()
+
+
 func _update_items() -> void:
 	for shop_card: ShopCard in cards.get_children():
 		shop_card.update(run_stats)
 
 	for shop_relic: ShopRelic in relics.get_children():
 		shop_relic.update(run_stats)
+
+	for shop_potion: ShopPotion in potions.get_children():
+		shop_potion.update(run_stats)
 
 	_update_remove_card_service()
 

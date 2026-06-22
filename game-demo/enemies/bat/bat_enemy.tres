@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_1akn0"]
 [ext_resource type="PackedScene" uid="uid://d3b23v3dpsd60" path="res://enemies/bat/bat_enemy_ai.tscn" id="1_oeu8d"]
-[ext_resource type="Texture2D" path="res://art/enemies/silver_moon_wolf.png" id="1_xdrl7"]
+[ext_resource type="Texture2D" path="res://art/enemies_redesign/silver_moon_wolf.png" id="1_xdrl7"]
 
 [resource]
 script = ExtResource("1_1akn0")

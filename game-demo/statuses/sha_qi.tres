@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ShaQiStatus" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://statuses/sha_qi.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/attack_negative.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "sha_qi"
+type = 2
+stack_type = 1
+can_expire = false
+stacks = 1
+icon = ExtResource("2")
+tooltip = "煞气：当前 %s。≥3 卡牌伤害+1；≥6 造成/受到伤害翻倍；≥10 触发天魔降世(本回合×3)，下回合开始失去50%最大生命且煞气降至5。战斗结束清空。"

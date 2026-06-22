@@ -22,6 +22,7 @@ const REWARD_RARITY_ORDER := [
 @export var run_stats: RunStats
 @export var character_stats: CharacterStats
 @export var relic_handler: RelicHandler
+@export var potion_handler: PotionHandler
 
 @onready var background: TextureRect = %Background
 @onready var dimmer: ColorRect = %BackgroundDimmer
@@ -106,6 +107,24 @@ func add_relic_choice_rewards(relics: Array[Relic]) -> void:
 		relic_reward.set_meta("relic_choice", true)
 		relic_reward.pressed.connect(_on_relic_choice_taken.bind(relic))
 		rewards.add_child.call_deferred(relic_reward)
+
+
+func add_potion_reward(potion: Potion) -> void:
+	if not potion:
+		return
+	var label := "符箓" if potion.category == Potion.Category.TALISMAN else "丹药"
+	var potion_reward := REWARD_BUTTON.instantiate() as RewardButton
+	potion_reward.reward_icon = potion.icon
+	potion_reward.reward_text = potion.potion_name
+	potion_reward.reward_subtext = "获得%s · %s" % [label, potion.get_tooltip().replace("\n", " ")]
+	potion_reward.accent_color = Color("c0508c") if potion.category == Potion.Category.TALISMAN else Color("5fb18a")
+	potion_reward.pressed.connect(_on_potion_reward_taken.bind(potion))
+	rewards.add_child.call_deferred(potion_reward)
+
+
+func _on_potion_reward_taken(potion: Potion) -> void:
+	if potion and potion_handler:
+		potion_handler.add_potion(potion)
 
 
 func add_card_fusion_reward() -> void:

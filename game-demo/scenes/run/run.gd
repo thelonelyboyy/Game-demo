@@ -10,6 +10,15 @@ const TREASURE_SCENE = preload("res://scenes/treasure/treasure.tscn")
 const WIN_SCREEN_SCENE := preload("res://scenes/win_screen/win_screen.tscn")
 const SPIRIT_ROOT_BADGE_SCENE := preload("res://scenes/ui/spirit_root_badge.tscn")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
+const POTION_REWARD_PATHS := [
+	"res://potions/healing_pill.tres",
+	"res://potions/qi_pill.tres",
+	"res://potions/draw_talisman.tres",
+	"res://potions/flame_talisman.tres",
+	"res://potions/frost_talisman.tres",
+	"res://potions/blood_rite_talisman.tres",
+]
+const POTION_DROP_CHANCE := 0.4
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 const TOTAL_CHAPTERS := 3
 
@@ -20,6 +29,7 @@ const TOTAL_CHAPTERS := 3
 @onready var health_ui: HealthUI = %HealthUI
 @onready var gold_ui: GoldUI = %GoldUI
 @onready var relic_handler: RelicHandler = %RelicHandler
+@onready var potion_handler: PotionHandler = %PotionHandler
 @onready var relic_tooltip: RelicTooltip = %RelicTooltip
 @onready var deck_button: CardPileOpener = %DeckButton
 @onready var deck_view: CardPileView = %DeckView
@@ -66,8 +76,30 @@ func _start_run() -> void:
 	map.generate_new_map(current_chapter)
 	map.unlock_floor(0)
 
+	_grant_starter_potions()
+
 	save_data = SaveGame.new()
 	_save_run(true)
+
+
+func _random_reward_potion() -> Potion:
+	var pool: Array[Potion] = []
+	for path in POTION_REWARD_PATHS:
+		if not ResourceLoader.exists(path):
+			continue
+		var potion := load(path) as Potion
+		if potion and potion.can_appear_as_reward(character):
+			pool.append(potion)
+	if pool.is_empty():
+		return null
+	return RNG.array_pick_random(pool)
+
+
+func _grant_starter_potions() -> void:
+	# 起手赠送 2 个符箓丹药（也方便测试，获取系统接好后可调整）。
+	for path in ["res://potions/healing_pill.tres", "res://potions/flame_talisman.tres"]:
+		if ResourceLoader.exists(path):
+			potion_handler.add_potion(load(path) as Potion)
 
 
 func _save_run(was_on_map: bool) -> void:
@@ -79,6 +111,7 @@ func _save_run(was_on_map: bool) -> void:
 	save_data.current_deck = character.deck
 	save_data.current_health = character.health
 	save_data.relics = relic_handler.get_all_relics()
+	save_data.potions = potion_handler.get_potions()
 	save_data.last_room = map.last_room
 	save_data.map_data = map.map_data.duplicate()
 	save_data.floors_climbed = map.floors_climbed
@@ -104,6 +137,7 @@ func _load_run() -> void:
 	character.health = save_data.current_health
 	character.bind_all_card_piles_to_owner()
 	relic_handler.add_relics(save_data.relics)
+	potion_handler.load_potions(save_data.potions)
 	_setup_top_bar()
 	_setup_event_connections()
 	
@@ -139,6 +173,7 @@ func _show_map() -> void:
 
 
 func _setup_event_connections() -> void:
+	potion_handler.character_stats = character
 	Events.battle_won.connect(_on_battle_won)
 	Events.battle_reward_exited.connect(_show_map)
 	Events.campfire_exited.connect(_show_map)
@@ -179,14 +214,26 @@ func _setup_spirit_root_badge() -> void:
 
 	spirit_root_badge.character = character
 
+	# 把符箓丹药槽放到灵根徽章右侧
+	var badge_parent := spirit_root_badge.get_parent()
+	if potion_handler.get_parent() != badge_parent:
+		potion_handler.reparent(badge_parent)
+	badge_parent.move_child(potion_handler, spirit_root_badge.get_index() + 1)
+	potion_handler.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	potion_handler.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
 
 func _show_regular_battle_rewards() -> void:
 	var reward_scene := _change_view(BATTLE_REWARD_SCENE) as BattleReward
 	reward_scene.run_stats = stats
 	reward_scene.character_stats = character
 
+	reward_scene.potion_handler = potion_handler
 	reward_scene.add_gold_reward(map.last_room.battle_stats.roll_gold_reward())
 	reward_scene.add_card_reward()
+	# 普通战斗有概率掉落符箓丹药（槽位满则不掉）。
+	if not potion_handler.is_full() and RNG.instance.randf_range(0.0, 1.0) < POTION_DROP_CHANCE:
+		reward_scene.add_potion_reward(_random_reward_potion())
 
 
 func _show_elite_battle_rewards() -> void:
@@ -194,10 +241,14 @@ func _show_elite_battle_rewards() -> void:
 	reward_scene.run_stats = stats
 	reward_scene.character_stats = character
 	reward_scene.relic_handler = relic_handler
+	reward_scene.potion_handler = potion_handler
 
 	reward_scene.add_gold_reward(map.last_room.battle_stats.roll_gold_reward())
 	reward_scene.add_relic_reward(RELIC_REWARD_POOL.get_random_available(character, relic_handler))
 	reward_scene.add_card_fusion_reward()
+	# 精英战必掉一个符箓丹药（槽位满则跳过）。
+	if not potion_handler.is_full():
+		reward_scene.add_potion_reward(_random_reward_potion())
 
 
 func _on_battle_room_entered(room: Room) -> void:
@@ -238,6 +289,7 @@ func _on_shop_entered() -> void:
 	shop.char_stats = character
 	shop.run_stats = stats
 	shop.relic_handler = relic_handler
+	shop.potion_handler = potion_handler
 	Events.shop_entered.emit(shop)
 	shop.populate_shop()
 
