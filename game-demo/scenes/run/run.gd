@@ -240,17 +240,20 @@ func _setup_spirit_root_badge() -> void:
 	if not potion_bar_panel:
 		potion_bar_panel = PanelContainer.new()
 		potion_bar_panel.name = "PotionBar"
-		potion_bar_panel.custom_minimum_size = Vector2(0, 56)
+		potion_bar_panel.custom_minimum_size = Vector2(178, 56)
 		potion_bar_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		InkTheme.apply_panel(potion_bar_panel)
+		InkTheme.apply_demonic_panel(potion_bar_panel)
 		var hb := HBoxContainer.new()
-		hb.add_theme_constant_override("separation", 6)
+		hb.add_theme_constant_override("separation", 5)
 		hb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		potion_bar_panel.add_child(hb)
 		var lbl := Label.new()
 		lbl.text = "丹"
-		lbl.add_theme_font_size_override("font_size", 20)
-		lbl.add_theme_color_override("font_color", Color("d98c5a"))
+		lbl.add_theme_font_size_override("font_size", 18)
+		lbl.add_theme_color_override("font_color", Color("e2a36a"))
+		lbl.add_theme_color_override("font_shadow_color", Color(0.08, 0, 0, 0.9))
+		lbl.add_theme_constant_override("shadow_offset_x", 1)
+		lbl.add_theme_constant_override("shadow_offset_y", 1)
 		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		hb.add_child(lbl)
 		potion_handler.reparent(hb)

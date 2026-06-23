@@ -1,0 +1,39 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
+[ext_resource type="Script" path="res://enemies/crab/crab_attack_action.gd" id="2"]
+[ext_resource type="Script" path="res://enemies/bat/bat_attack_action.gd" id="3"]
+[ext_resource type="Script" path="res://custom_resources/intent.gd" id="4"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_attack.png" id="5"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/bat_attack.png" id="6"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="7"]
+
+[sub_resource type="Resource" id="IntentBite"]
+script = ExtResource("4")
+base_text = "%s"
+icon = ExtResource("5")
+category = 0
+
+[sub_resource type="Resource" id="IntentPounce"]
+script = ExtResource("4")
+base_text = "2x%s"
+icon = ExtResource("6")
+category = 1
+
+[node name="MistWolfAI" type="Node"]
+script = ExtResource("1")
+fixed_sequence = Array[int]([0, 0, 1])
+
+[node name="BiteAction" type="Node" parent="."]
+script = ExtResource("2")
+intent = SubResource("IntentBite")
+sound = ExtResource("7")
+type = 1
+damage = 5
+
+[node name="PounceAction" type="Node" parent="."]
+script = ExtResource("3")
+intent = SubResource("IntentPounce")
+sound = ExtResource("7")
+type = 1
+damage = 3

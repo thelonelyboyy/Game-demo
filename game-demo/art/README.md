@@ -20,7 +20,7 @@
 | `treasure/` (4) | 宝箱与宝箱房背景 | `treasure_chest_closed/open/opening.png`、`treasure_room_bg.png` |
 | `ui/` (30) | 界面元件 | `ui/cards/generated/`（7 套卡框）、`ui/icons/`（HUD 小图标 + `status_*` 状态 AI 图标）、`ui/rewards/`（奖励图标）、`ui/top_bar_ink.png`。`ui/title/` **目前为空**（旧标题图已删，标题烤进了 `background1.png`） |
 | `tiles/` (22) | **共享像素图标集** + 意图图标 | `tile_XXXX.png`（19 张 16px 像素图，多处共用）、`intent_attack_sword/_block_shield/_buff_self.png`（敌人意图）。见下方「关于 tiles」 |
-| `audio/` | 音效与音乐 | `slash.ogg`、`enemy_attack.ogg`、`8_bit_iced_village_lofi.mp3` 等 |
+| `audio/` | 音效与音乐 | `slash.ogg`、`enemy_attack.ogg`、`dark_theme_jaggedstone.ogg` 等 |
 | `fonts/` | 字体 | `pixel_rpg.ttf` |
 | `shaders/` | 着色器及其材质 | `white_sprite_material.gdshader` / `.tres`（敌人受击白闪） |
 

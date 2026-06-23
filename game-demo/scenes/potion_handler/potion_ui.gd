@@ -6,6 +6,7 @@ signal use_requested(potion_ui: PotionUI)
 @export var potion: Potion : set = set_potion
 
 @onready var icon: TextureRect = $Icon
+@onready var slot_frame: TextureRect = $SlotFrame
 
 
 func set_potion(new_potion: Potion) -> void:
@@ -14,9 +15,19 @@ func set_potion(new_potion: Potion) -> void:
 
 	potion = new_potion
 	if not potion:
+		icon.texture = null
+		icon.modulate = Color(1, 1, 1, 0.0)
+		slot_frame.modulate = Color(0.65, 0.55, 0.52, 0.76)
+		tooltip_text = ""
 		return
 	icon.texture = potion.icon
+	icon.modulate = Color.WHITE
+	slot_frame.modulate = Color.WHITE
 	tooltip_text = _format_tooltip()
+
+
+func clear_potion() -> void:
+	set_potion(null)
 
 
 func _format_tooltip() -> String:
@@ -27,5 +38,5 @@ func _format_tooltip() -> String:
 
 
 func _on_gui_input(event: InputEvent) -> void:
-	if event.is_action_pressed("left_mouse"):
+	if potion and event.is_action_pressed("left_mouse"):
 		use_requested.emit(self)

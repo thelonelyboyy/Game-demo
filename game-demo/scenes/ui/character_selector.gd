@@ -8,10 +8,12 @@ const BEASTMASTER_STATS := preload("res://characters/beastmaster/beastmaster.tre
 const SELECTOR_BACKGROUND := preload("res://test1.png")
 
 const STARTING_GOLD := 99
+const ANIMATED_BACKGROUND_FPS := 24.0
 
 @export var run_startup: RunStartup
 
 @onready var background: TextureRect = $Background
+@onready var animated_background: TextureRect = %AnimatedBackground
 @onready var accent_tint: ColorRect = %AccentTint
 @onready var vignette: ColorRect = %Vignette
 @onready var title: Label = %Title
@@ -31,6 +33,11 @@ const STARTING_GOLD := 99
 var current_character: CharacterStats : set = set_current_character
 var selected_index := 0
 var character_entries: Array[Dictionary] = []
+var animated_background_frames: Array[Texture2D] = []
+var animated_background_frame_dir := ""
+var animated_background_time := 0.0
+var animated_background_index := 0
+var animated_background_playing := false
 
 
 func _ready() -> void:
@@ -54,6 +61,7 @@ func set_current_character(new_character: CharacterStats) -> void:
 	health_value.text = "%s/%s" % [current_character.max_health, current_character.max_health]
 	gold_value.text = str(STARTING_GOLD)
 	background.texture = _resolve_background(entry)
+	_apply_animated_background(entry)
 
 	if current_character.starting_relic:
 		relic_icon.texture = current_character.starting_relic.icon
@@ -110,6 +118,7 @@ func _build_character_entries() -> void:
 			"button": $CharacterButtons/SwordCultivatorButton,
 			"enabled": true,
 			"background": "res://art/backgrounds/sw.png",
+			"animated_background": "res://art/backgrounds/sw_selector_bg_frames",
 			"name": "剑修",
 			"subtitle": "一念起剑 · 轻灵迅捷",
 			"description": "擅长过牌与铸剑，出手频率高。越打越锋利，适合追求连招节奏。",
@@ -124,6 +133,7 @@ func _build_character_entries() -> void:
 			"button": $CharacterButtons/DemonicCultivatorButton,
 			"enabled": true,
 			"background": "res://art/backgrounds/demonic_selector_bg.png",
+			"animated_background": "res://art/backgrounds/demonic_selector_bg_frames",
 			"name": "魔修",
 			"subtitle": "血契燃魂 · 高风险爆发",
 			"description": "以伤换势，用生命换取爆发。会献祭、吸魂与叠印，打得狠也要算得准。",
@@ -147,11 +157,29 @@ func _build_character_entries() -> void:
 			"hero_modulate": Color(0.82, 1.0, 0.78, 0.95),
 		},
 	]
+	character_entries.sort_custom(_sort_character_entries)
+
+
+func _sort_character_entries(a: Dictionary, b: Dictionary) -> bool:
+	return _character_entry_order(a) < _character_entry_order(b)
+
+
+func _character_entry_order(entry: Dictionary) -> int:
+	var stats := entry.stats as CharacterStats
+	if stats == DEMONIC_CULTIVATOR_STATS:
+		return 0
+	if stats == SWORD_CULTIVATOR_STATS:
+		return 1
+	if stats == BODY_CULTIVATOR_STATS:
+		return 2
+	if stats == BEASTMASTER_STATS:
+		return 3
+	return 99
 
 
 func _polish_scene() -> void:
 	_apply_custom_background()
-	InkTheme.apply_panel(info_panel)
+	_apply_info_panel_style()
 	InkTheme.apply_title(title, 76)
 	InkTheme.apply_body_label(subtitle, 25)
 	InkTheme.apply_body_label(description, 26)
@@ -175,6 +203,10 @@ func _polish_scene() -> void:
 
 	# Keep the button row centered so hiding locked classes still looks balanced.
 	character_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	for order_index in character_entries.size():
+		var ordered_button := character_entries[order_index].button as Button
+		if ordered_button and ordered_button.get_parent() == character_buttons:
+			character_buttons.move_child(ordered_button, order_index)
 
 	for entry in character_entries:
 		var button := entry.button as Button
@@ -193,12 +225,84 @@ func _polish_scene() -> void:
 			InkTheme.apply_body_label(label, 17)
 
 
+func _apply_info_panel_style() -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color.TRANSPARENT
+	style.border_color = Color.TRANSPARENT
+	style.set_border_width_all(0)
+	style.set_corner_radius_all(0)
+	style.content_margin_left = 40
+	style.content_margin_top = 30
+	style.content_margin_right = 34
+	style.content_margin_bottom = 30
+	info_panel.add_theme_stylebox_override("panel", style)
+
+
 func _apply_custom_background() -> void:
 	background.texture = SELECTOR_BACKGROUND
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	background.show()
+	animated_background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	animated_background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	animated_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stop_animated_background()
+
+
+func _process(delta: float) -> void:
+	if not animated_background_playing or animated_background_frames.is_empty():
+		return
+
+	animated_background_time += delta
+	var frame_duration := 1.0 / ANIMATED_BACKGROUND_FPS
+	while animated_background_time >= frame_duration:
+		animated_background_time -= frame_duration
+		animated_background_index = (animated_background_index + 1) % animated_background_frames.size()
+		animated_background.texture = animated_background_frames[animated_background_index]
+
+
+func _apply_animated_background(entry: Dictionary) -> void:
+	var frame_dir: String = entry.get("animated_background", "")
+	if frame_dir.is_empty():
+		_stop_animated_background()
+		return
+
+	if not _load_animated_background_frames(frame_dir):
+		_stop_animated_background()
+		return
+
+	animated_background_index = 0
+	animated_background_time = 0.0
+	animated_background.texture = animated_background_frames[0]
+	animated_background.show()
+	animated_background_playing = true
+
+
+func _stop_animated_background() -> void:
+	animated_background_playing = false
+	animated_background_time = 0.0
+	animated_background_index = 0
+	animated_background.texture = null
+	animated_background.hide()
+
+
+func _load_animated_background_frames(frame_dir: String) -> bool:
+	if animated_background_frame_dir == frame_dir and not animated_background_frames.is_empty():
+		return true
+
+	animated_background_frames.clear()
+	animated_background_frame_dir = frame_dir
+	var files := DirAccess.get_files_at(frame_dir)
+	files.sort()
+	for file_name in files:
+		var lower_name := file_name.to_lower()
+		if not lower_name.ends_with(".jpg") and not lower_name.ends_with(".jpeg") and not lower_name.ends_with(".png") and not lower_name.ends_with(".webp"):
+			continue
+		var texture := load("%s/%s" % [frame_dir, file_name]) as Texture2D
+		if texture:
+			animated_background_frames.append(texture)
+	return not animated_background_frames.is_empty()
 
 
 func _update_character_buttons() -> void:

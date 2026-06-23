@@ -1,10 +1,10 @@
 class_name IntentUI
 extends Control
 
-const BUBBLE := Rect2(0, 0, 68, 32)
-const GLYPH_LEFT := Vector2(18, 16)
-const GLYPH_CENTER := Vector2(34, 16)
-const ICON_SIZE := 22.0
+const BUBBLE := Rect2(0, 0, 92, 44)
+const GLYPH_LEFT := Vector2(27, 22)
+const GLYPH_CENTER := Vector2(46, 22)
+const ICON_SIZE := 28.0
 
 # 分类专属图标（贴图优先，没有的分类回退到代码绘制）
 const ICON_SWORD := preload("res://art/tiles/intent_attack_sword.png")
@@ -44,8 +44,9 @@ func update_intent(intent: Intent) -> void:
 	label.visible = intent.current_text.length() > 0
 	label.add_theme_color_override("font_color", style.accent)
 	if label.visible:
-		label.position = Vector2(30, 0)
-		label.size = Vector2(34, 32)
+		label.position = Vector2(50, 0)
+		label.size = Vector2(38, 44)
+		label.add_theme_font_size_override("font_size", 20)
 
 	queue_redraw()
 	show()

@@ -52,7 +52,6 @@ func _polish_ui() -> void:
 	add_child(top_band)
 	move_child(top_band, 0)
 
-	InkTheme.apply_button(end_turn_button, true)
-	InkTheme.apply_panel(mana_ui)
+	InkTheme.apply_demonic_button(end_turn_button, true)
 	draw_pile_button.modulate = Color(0.95, 0.86, 0.62, 0.96)
 	discard_pile_button.modulate = Color(0.95, 0.86, 0.62, 0.96)

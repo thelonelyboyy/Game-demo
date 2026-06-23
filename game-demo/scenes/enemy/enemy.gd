@@ -9,9 +9,9 @@ const BOSS_ART_MAX_SIZE := 140.0
 const TARGET_HIGHLIGHT_PADDING := Vector2(5.0, 4.0)
 const TARGET_CORNER_MIN_LENGTH := 6.0
 const TARGET_CORNER_MAX_LENGTH := 13.0
-const HEALTH_BAR_HALF_WIDTH := 88.0
+const HEALTH_BAR_HALF_WIDTH := 95.0
 const STATUS_ROW_HALF_WIDTH := 20.0
-const INTENT_HALF_WIDTH := 34.0
+const INTENT_HALF_WIDTH := 46.0
 
 @export var stats: EnemyStats : set = set_enemy_stats
 
@@ -147,7 +147,7 @@ func refresh_battle_overlays() -> void:
 
 	intent_ui.position = Vector2(
 		-INTENT_HALF_WIDTH * intent_scale,
-		-sprite_visible_size.y * 0.33 - 24.0 * intent_scale
+		-sprite_visible_size.y * 0.33 - 30.0 * intent_scale
 	)
 	stats_ui.position = Vector2(
 		-HEALTH_BAR_HALF_WIDTH * stats_scale,

@@ -10,25 +10,29 @@ var connected_deck: CardPile
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(142, 56)
+	custom_minimum_size = Vector2(132, 56)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	InkTheme.apply_panel(self)
+	InkTheme.apply_demonic_panel(self)
 
 	var content := HBoxContainer.new()
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	content.add_theme_constant_override("separation", 8)
+	content.add_theme_constant_override("separation", 6)
 	add_child(content)
 
 	icon_label = Label.new()
-	icon_label.custom_minimum_size = Vector2(34, 34)
+	icon_label.custom_minimum_size = Vector2(30, 34)
 	icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	icon_label.add_theme_font_size_override("font_size", 26)
+	icon_label.add_theme_font_size_override("font_size", 24)
 	content.add_child(icon_label)
 
 	name_label = Label.new()
 	name_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	name_label.add_theme_font_size_override("font_size", 18)
+	name_label.add_theme_font_size_override("font_size", 17)
+	name_label.add_theme_color_override("font_color", Color("f3dfb6"))
+	name_label.add_theme_color_override("font_shadow_color", Color(0.08, 0, 0, 0.9))
+	name_label.add_theme_constant_override("shadow_offset_x", 1)
+	name_label.add_theme_constant_override("shadow_offset_y", 1)
 	content.add_child(name_label)
 
 	mouse_entered.connect(_refresh)

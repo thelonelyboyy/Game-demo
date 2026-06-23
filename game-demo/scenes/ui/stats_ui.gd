@@ -1,8 +1,8 @@
 class_name StatsUI
 extends Control
 
-const HEALTH_FILL_WIDTH := 158.0
-const BLOCK_FILL_WIDTH := 164.0
+const HEALTH_FILL_WIDTH := 170.0
+const BLOCK_FILL_WIDTH := 174.0
 const BLOCK_FILL_MIN := 12.0
 
 @onready var block_bar: Control = %BlockBar

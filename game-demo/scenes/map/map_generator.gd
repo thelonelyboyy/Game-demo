@@ -20,6 +20,10 @@ const ELITE_HEALTH_MULTIPLIER := 1.45
 const ELITE_DAMAGE_MULTIPLIER := 1.25
 const ELITE_GOLD_MULTIPLIER := 1.55
 const ELITE_BATTLE := preload("res://battles/tier_1_bull_demon.tres")
+# 测试地图固定战斗：普通=符纸兵+雾隐狼、精英=牛魔、Boss=渊狱剑魂（确定性，便于调试）
+const TEST_FIXED_MONSTER_BATTLE := preload("res://battles/demo_n_paper_wolf.tres")
+const TEST_FIXED_ELITE_BATTLE := preload("res://battles/demo_e_bull_demon.tres")
+const TEST_FIXED_BOSS_BATTLE := preload("res://battles/demo_b_sword_soul.tres")
 
 # 章节难度爬升：按章节号(1~3)取下标，0 号占位不用。
 # 越后期的章节敌人血量/伤害越高，金币奖励也相应提升，让三章形成明显梯度。
@@ -88,9 +92,9 @@ func _generate_test_linear_map() -> Array[Array]:
 		room.position = Vector2(middle * X_DIST, i * -Y_DIST)
 
 		if room.type == Room.Type.MONSTER:
-			room.battle_stats = _battle_for_room(0)
+			room.battle_stats = TEST_FIXED_MONSTER_BATTLE
 		elif room.type == Room.Type.BOSS:
-			room.battle_stats = _battle_for_room(2)
+			room.battle_stats = TEST_FIXED_BOSS_BATTLE
 		elif room.type == Room.Type.EVENT:
 			room.event_scene = event_room_pool.get_random()
 
@@ -121,11 +125,11 @@ func _generate_test_elite_linear_map() -> Array[Array]:
 		room.position = Vector2(middle * X_DIST, i * -Y_DIST)
 
 		if room.type == Room.Type.MONSTER:
-			room.battle_stats = _battle_for_room(0)
+			room.battle_stats = TEST_FIXED_MONSTER_BATTLE
 		elif room.type == Room.Type.ELITE:
-			_setup_elite_battle(room)
+			room.battle_stats = TEST_FIXED_ELITE_BATTLE
 		elif room.type == Room.Type.BOSS:
-			room.battle_stats = _battle_for_room(2)
+			room.battle_stats = TEST_FIXED_BOSS_BATTLE
 		elif room.type == Room.Type.EVENT:
 			room.event_scene = event_room_pool.get_random()
 

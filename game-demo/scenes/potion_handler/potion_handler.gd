@@ -11,13 +11,19 @@ var character_stats: CharacterStats
 
 
 func _ready() -> void:
-	add_theme_constant_override("separation", 8)
+	add_theme_constant_override("separation", 4)
 	for child in get_children():
 		child.queue_free()
+	for i in range(MAX_SLOTS):
+		_add_empty_slot()
 
 
 func count() -> int:
-	return get_child_count()
+	var occupied := 0
+	for ui: PotionUI in get_children():
+		if ui.potion:
+			occupied += 1
+	return occupied
 
 
 func is_full() -> bool:
@@ -27,11 +33,11 @@ func is_full() -> bool:
 func add_potion(potion: Potion) -> bool:
 	if not potion or is_full():
 		return false
-	var ui := POTION_UI.instantiate() as PotionUI
-	add_child(ui)
-	ui.potion = potion
-	ui.use_requested.connect(_on_use_requested)
-	return true
+	for ui: PotionUI in get_children():
+		if not ui.potion:
+			ui.potion = potion
+			return true
+	return false
 
 
 func get_potions() -> Array[Potion]:
@@ -43,8 +49,9 @@ func get_potions() -> Array[Potion]:
 
 
 func load_potions(potions: Array) -> void:
-	for ui in get_children():
-		ui.queue_free()
+	_ensure_slots()
+	for ui: PotionUI in get_children():
+		ui.clear_potion()
 	for potion: Potion in potions:
 		add_potion(potion)
 
@@ -64,8 +71,21 @@ func _on_use_requested(ui: PotionUI) -> void:
 		return
 	var potion := ui.potion
 	_apply(potion)
-	ui.queue_free()
+	ui.clear_potion()
 	potion_used.emit(potion)
+
+
+func _add_empty_slot() -> PotionUI:
+	var ui := POTION_UI.instantiate() as PotionUI
+	add_child(ui)
+	ui.use_requested.connect(_on_use_requested)
+	ui.potion = null
+	return ui
+
+
+func _ensure_slots() -> void:
+	while get_child_count() < MAX_SLOTS:
+		_add_empty_slot()
 
 
 func _apply(potion: Potion) -> void:

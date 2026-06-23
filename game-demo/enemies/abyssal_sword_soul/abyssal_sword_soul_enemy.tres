@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/abyssal_sword_soul.png" id="2_art"]
-[ext_resource type="PackedScene" path="res://enemies/bat/bat_enemy_ai.tscn" id="3_ai"]
+[ext_resource type="PackedScene" path="res://enemies/abyssal_sword_soul/abyssal_sword_soul_ai.tscn" id="3_ai"]
 
 [resource]
 script = ExtResource("1_stats")

@@ -15,7 +15,6 @@ const MENU_BACKGROUND := preload("res://art/backgrounds/background1.png")
 @onready var footer_hint: Label = %FooterHint
 @onready var settings_toast: Label = %SettingsToast
 
-
 func _ready() -> void:
 	get_tree().paused = false
 	_polish_scene()
@@ -183,43 +182,19 @@ func _apply_menu_button_style() -> void:
 		if not child is Button:
 			continue
 		var button := child as Button
-		button.flat = false
+		button.flat = true
 		button.focus_mode = Control.FOCUS_NONE
-		button.add_theme_stylebox_override("normal", _make_panel_style(
-			Color(0.025, 0.045, 0.038, 0.18),
-			Color(0.68, 0.52, 0.24, 0.72),
-			1,
-			5,
-			Color(0, 0, 0, 0.20),
-			4
-		))
-		button.add_theme_stylebox_override("hover", _make_panel_style(
-			Color(0.08, 0.11, 0.085, 0.34),
-			Color(0.96, 0.72, 0.32, 0.96),
-			2,
-			5,
-			Color(0.95, 0.72, 0.30, 0.18),
-			10
-		))
-		button.add_theme_stylebox_override("pressed", _make_panel_style(
-			Color(0.055, 0.065, 0.048, 0.46),
-			Color("f2c94f"),
-			2,
-			5
-		))
-		button.add_theme_stylebox_override("disabled", _make_panel_style(
-			Color(0.035, 0.04, 0.038, 0.10),
-			Color(0.34, 0.30, 0.22, 0.36),
-			1,
-			5
-		))
+		button.add_theme_stylebox_override("normal", _make_transparent_button_style(Color.TRANSPARENT))
+		button.add_theme_stylebox_override("hover", _make_transparent_button_style(Color(0.96, 0.72, 0.32, 0.82), 2, 9, Color(0.95, 0.66, 0.24, 0.22), 10))
+		button.add_theme_stylebox_override("pressed", _make_transparent_button_style(Color("f2c94f"), 2, 9, Color(0.95, 0.66, 0.24, 0.16), 6))
+		button.add_theme_stylebox_override("disabled", _make_transparent_button_style(Color(0.34, 0.30, 0.22, 0.28)))
 		button.add_theme_color_override("font_color", Color("f7ead2"))
 		button.add_theme_color_override("font_hover_color", Color("ffe38a"))
 		button.add_theme_color_override("font_pressed_color", Color("f2c94f"))
 		button.add_theme_color_override("font_disabled_color", Color(0.78, 0.72, 0.60, 0.42))
 		button.add_theme_color_override("font_outline_color", Color(0.02, 0.025, 0.03, 0.9))
 		button.add_theme_constant_override("outline_size", 3)
-		button.add_theme_font_size_override("font_size", 27)
+		button.add_theme_font_size_override("font_size", 32)
 		button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 
@@ -241,6 +216,33 @@ func _make_panel_style(
 ) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = bg
+	style.border_color = border
+	style.border_width_left = border_width
+	style.border_width_top = border_width
+	style.border_width_right = border_width
+	style.border_width_bottom = border_width
+	style.corner_radius_top_left = radius
+	style.corner_radius_top_right = radius
+	style.corner_radius_bottom_left = radius
+	style.corner_radius_bottom_right = radius
+	style.content_margin_left = 14
+	style.content_margin_top = 8
+	style.content_margin_right = 14
+	style.content_margin_bottom = 8
+	style.shadow_color = shadow
+	style.shadow_size = shadow_size
+	return style
+
+
+func _make_transparent_button_style(
+	border: Color,
+	border_width := 0,
+	radius := 6,
+	shadow := Color(0, 0, 0, 0.0),
+	shadow_size := 0
+) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color.TRANSPARENT
 	style.border_color = border
 	style.border_width_left = border_width
 	style.border_width_top = border_width

@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://d0efyathkfg74" path="res://scenes/enemy/enemy.tscn" id="2_02s5s"]
 [ext_resource type="Script" path="res://scenes/ui/hand.gd" id="2_uaw60"]
 [ext_resource type="PackedScene" uid="uid://2n4lap6w3pde" path="res://scenes/player/player.tscn" id="3_dpj45"]
-[ext_resource type="AudioStream" uid="uid://dpdenqqbovwfq" path="res://art/audio/8_bit_iced_village_lofi.mp3" id="3_nuoky"]
+[ext_resource type="AudioStream" path="res://art/audio/dark_theme_jaggedstone.ogg" id="3_nuoky"]
 [ext_resource type="PackedScene" uid="uid://dwt63vvppukag" path="res://scenes/card_target_selector/card_target_selector.tscn" id="3_vyv1n"]
 [ext_resource type="Script" path="res://scenes/enemy/enemy_handler.gd" id="4_41vpn"]
 [ext_resource type="Resource" path="res://characters/body_cultivator/body_cultivator.tres" id="4_fwb8a"]
@@ -89,19 +89,19 @@ script = ExtResource("2_uaw60")
 player = NodePath("../../Player")
 
 [node name="ManaUI" parent="BattleUI" instance=ExtResource("11_2vu01")]
-offset_left = 92.0
-offset_top = -156.0
-offset_right = 184.0
-offset_bottom = -64.0
+offset_left = 88.0
+offset_top = -162.0
+offset_right = 188.0
+offset_bottom = -62.0
 
 [node name="FlameWheelUI" type="PanelContainer" parent="BattleUI"]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 92.0
-offset_top = -212.0
-offset_right = 268.0
-offset_bottom = -166.0
+offset_top = -226.0
+offset_right = 286.0
+offset_bottom = -174.0
 grow_vertical = 0
 script = ExtResource("23_flame")
 
@@ -118,10 +118,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -238.0
-offset_top = -160.0
-offset_right = -34.0
-offset_bottom = -92.0
+offset_left = -250.0
+offset_top = -166.0
+offset_right = -28.0
+offset_bottom = -88.0
 grow_horizontal = 0
 grow_vertical = 0
 theme = ExtResource("13_523u4")
