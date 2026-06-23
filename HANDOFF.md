@@ -1,6 +1,6 @@
 ﻿# 万劫求仙项目交接文档
 
-更新时间：2026-06-19  
+更新时间：2026-06-23  
 项目根目录：`E:\code\game-demo`  
 Godot 工程目录：`E:\code\game-demo\game-demo`  
 Godot 版本：4.5.2 stable mono  
@@ -10,7 +10,7 @@ Godot 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2
 
 - 稳定运行的杀戮尖塔式修仙卡牌肉鸽 Demo。当前焦点：**把魔修打磨成完整 Demo**。
 - **新增「符箓丹药」系统**（可携带一次性消耗品，对标药水）：战斗奖励/商店获取、3 槽位、战斗内/部分战斗外使用。见第 4、6 节。
-- **魔修机制大改进行中**（三系统，引爆倍率 X=3）：阶段1 煞气 ✅、阶段2 魂印引爆 ✅、阶段3 魔焰焰轮 ⬜。见第 4、6 节。
+- **魔修机制大改**（三系统，引爆倍率 X=3）：阶段1 煞气 ✅、阶段2 魂印引爆 ✅、阶段3 魔焰焰轮 ✅（含 7 色 rider 细化）。见第 4、6 节。
 - 视觉/动画/UI/全量 mipmap 等上一大批已提交推送（`master` `7b81880`）。
 - `validate_project.py` 现在 **0 error / 0 warning**（校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
 - `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`boss-battle` 通过；`run-flow` 仍存在**偶发** `Lambda capture freed`（见第 8 节，非功能 bug，重跑即过）。
@@ -139,6 +139,15 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ## 6. 最近改动摘要
 
+### 本轮（2026-06-23）系统级更新
+
+- **魔焰焰轮 7 色 rider 细化**（阶段3 收尾）：绿消煞翻倍 / 蓝减魔焰费用 / 黄本回合魔焰共鸣伤害+（2+其它色数）/ 红 4 色引爆全体魂印。`ConfiguredFlameEffect` 新增 `Rider` 枚举与 `base_amount`，`class_mechanic_handler.gd` 加 `consume_sha_qi`/`reduce_flame_card_costs`/`detonate_all_soul_marks`/焰伤 buff。详见第 4 节阶段3。
+- **符箓丹药接入图鉴**：`codex.gd` 新增「符箓丹药」分类（符箓/丹药二级分组、稀有度颜色、按效果类型解析展示）。
+- **魔修卡牌改名/平衡**：`demon_flame`→「魔焰燎原」（与「魔焰焚心」区分）；血祭斩 9→7、血盾 10→8（`cards.xlsx` 同步）。
+- **主菜单动效**：赤红灵光粒子（满屏）+ 背景呼吸辉光。
+- **战斗焰盘常显**：魔修战斗开局即显示焰轮（空时全暗）。
+- **符箓丹药专属图标**：6 张新图标接入 `art/potions/icons/`（替换借用的通用图标）。
+
 ### 本轮（2026-06-19）系统级更新
 
 > 详细机制见第 4 节；魔修大改完整方案见记忆 `demonic-overhaul-plan`。
@@ -146,7 +155,15 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **符箓丹药系统**（新）：可携带一次性消耗品（对标药水）。`custom_resources/potion.gd`（复用 `CardEffect`）；`scenes/potion_handler/`（3 槽位、点击使用、hover tooltip）；顶栏灵根右侧显示；战斗内可用，回血类丹药战斗外也可用。**获取**：普通战斗 ~40% 掉落、精英必掉、商店上架 2 个。`SaveGame.potions` 持久化。起手赠送 2 个。6 张初始：回春丹/聚气丹/引灵符/烈焰符/寒冰符/血祭符。
 - **魔修·阶段1 煞气**（`statuses/sha_qi`，逻辑在 `scenes/battle/class_mechanic_handler.gd`）：受伤(`player_hit`)/出煞气牌得煞气；≥3 卡伤+1、≥6 造成/受到×2、≥10 天魔降世(本回合×3，回合末关、下回合开始失50%最大生命+煞气降5)。仅魔修生效。阈值用 modifier 系统**原地改值**实现（不要用 `remove_value`，它 queue_free 延迟会丢值）。煞气牌：引煞诀/聚煞。
 - **魔修·阶段2 魂印引爆(X=3)**：新增 `configured_soul_mark_detonate_effect.gd`（消耗 N 层→ 3×N 伤害，**走玩家 DMG_DEALT 增伤**，被煞气放大）与 `configured_soul_mark_consume_effect.gd`（转化消耗）。回合末 DoT 仍由敌人自身状态结算(stacks×2)，**不吃增伤**。卡：引爆 裂魂/三魂同焚/魂葬，转化 魂铠/摄魂续元（均已入抽卡池）。
-- **魔修·阶段3 魔焰焰轮**：`configured_flame_effect.gd`（携带本牌颜色，先按焰轮里"其它颜色"数结算共鸣，再把自身颜色加入焰轮）；焰轮状态在 `class_mechanic_handler.gd`（组 `class_mechanic`，回合开始/结束清空）。7 张七色魔焰卡（紫蚀魂/白护魂/绿镇煞/蓝灵涌·移出战斗/黑噬血/黄狂烬/红焚界），初始卡组加魔焰紫·蚀魂，全部入抽卡池。共鸣按"每有1种其它颜色"缩放（白+护体、黑+伤、红+群伤、紫挂魂印、黄+劲气、蓝抽牌）。**已简化的 rider**（黄"接下来N次魔焰伤害+2"、蓝费用-1、绿消2煞气翻倍、红4色额外引爆）用近似实现，待细化。
+- **魔修·阶段3 魔焰焰轮**：`configured_flame_effect.gd`（携带本牌颜色，先按焰轮里"其它颜色"数结算共鸣，再把自身颜色加入焰轮）；焰轮状态在 `class_mechanic_handler.gd`（组 `class_mechanic`，回合开始/结束清空）。7 张七色魔焰卡（紫蚀魂/白护魂/绿镇煞/蓝灵涌·移出战斗/黑噬血/黄狂烬/红焚界），初始卡组加魔焰紫·蚀魂，全部入抽卡池。共鸣按"每有1种其它颜色"缩放。**7 色 rider 已细化**（`ConfiguredFlameEffect` 新增 `Rider` 枚举 + `base_amount`/`rider`/`rider_value`，逻辑落在 `class_mechanic_handler.gd`）：
+  - 紫·蚀魂：破绽+伤，共鸣挂魂印（`SOUL_MARK_TARGET`）。
+  - 白·护魂：伤+护体，共鸣每其它色+护体（`BLOCK_SELF`）。
+  - 黑·噬血：失血+伤，共鸣每其它色+伤（`DAMAGE_TARGET`）。
+  - **绿·镇煞**：10 护体(每其它色+5)；煞气≥2 时消 2 煞气令**本牌护体翻倍**（`Rider.SHA_QI_DOUBLE_BLOCK`，`consume_sha_qi`）。
+  - **蓝·灵涌**：2 灵气；每有 1 种其它色 → 手牌 1 张魔焰卡**费用-1**（`Rider.REDUCE_FLAME_COST`，`reduce_flame_card_costs`，自限上限、排除本牌；复用 `card.reduce_cost_for_turn`）。消耗。
+  - **黄·狂烬**：本回合**魔焰共鸣伤害 +（2+其它色数）**，可叠加（`Rider.FLAME_DAMAGE_BUFF`，handler `_flame_damage_bonus`，回合切换清空；**仅作用共鸣伤害**=方案甲，在 `_deal` 叠加）。
+  - **红·焚界**：群伤+共鸣群伤；焰轮含红达 **4 色 → 引爆所有敌人魂印**（`Rider.DETONATE_AT_COLORS`，`detonate_all_soul_marks`，每层 3 伤走玩家增伤）。
+  - 卡面文案由 `ConfiguredFlameEffect.get_description`（共鸣+rider）与基础效果描述拼接；各卡 `effect_text` 同步更新作兜底。绿/黄已把主效果并入 flame effect 以便 rider 作用全部数值。
 - **魔修三系统已全部落地** ✅（煞气/魂印引爆/魔焰焰轮）。
 - **战斗内焰轮 UI**：`scenes/battle/flame_wheel_ui.gd`（"焰" + 7 色色珠，本回合点亮的颜色高亮、其余暗淡，空焰轮隐藏），置于战斗左下能量条上方。实时刷新走新信号 `Events.flame_wheel_changed`（`class_mechanic_handler` 加色/清空时发出）。
 - **丹药栏 UI**：`run.gd` 把符箓丹药槽包进 `InkTheme` 面板（与灵根徽章同款边框 + "丹" 标签），放在顶栏灵根徽章右侧。
@@ -306,7 +323,8 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **`run-flow` 偶发 `Lambda capture freed`**：完整流程约 2/12 偶发，还有一处多回合补间回调来源未根除（疑似 `status_handler`/`relic_handler`/弃牌结算）。非功能 bug（逻辑仍通过，重跑即过），但将来上 CI 会随机红灯。修法：把 `tween.finished` 的 lambda 改为捕获 `get_instance_id()` / 加 `is_instance_valid` 守卫。
 - **`validate_project.py` 仍有盲区**：查不出「文件在但未导入」（缺 `.import`）和字符串拼接路径。新增美术务必在编辑器导入。（注：默认值字段误报已修，现 0 error。）
 - **存档跨资源移动会失效**：存档按路径内嵌资源引用，移动/重命名被引用资源后旧档加载失败（有自愈清档兜底，但丢进度）。彻底修复需改成"按 id 重建"（ROADMAP 阶段 0）。
-- **魔修待办**：`demon_flame` 与 `demon_flame_heart` 重名「魔焰焚心」需改名；血祭斩/血盾/血誓等白卡数值偏强（可用 `cards.xlsx` 直接调）；魂印缺"引爆" payoff 卡；确认 37 张魔修卡都进了 `demonic_cultivator_draftable_cards.tres`。
+- **魔修待办**：~~`demon_flame`/`demon_flame_heart` 重名~~（已改：群伤献祭的 `demon_flame`→「魔焰燎原」，单体破绽的 `demon_flame_heart` 保留「魔焰焚心」）；~~血祭白卡偏强~~（已调：血祭斩 9→7、血盾 10→8，`cards.xlsx` 同步）；~~魔焰 rider 待细化~~（已细化，见第 6 节）；魂印仍可补更多"引爆" payoff 卡；确认 37 张魔修卡都进了 `demonic_cultivator_draftable_cards.tres`。
+- **符箓丹药图标**：已接入 6 张专属图标到 `art/potions/icons/`（healing_pill/qi_pill/draw_talisman/flame_talisman/frost_talisman/blood_rite_talisman），替换原借用的通用图标。⚠️ 新增 PNG 务必在编辑器导入一次（`--headless --editor --quit`），否则潜在丹药 `.tres` 加载失败、`main/codex/run-flow/boss-battle` 全红。
 - 调整卡牌比例时，要同步检查战斗手牌、奖励三选一、商店、图鉴/预览、升级、删除、融合界面（当前卡 224×322，详见第 6 节 1.4x 改动）。
 - 主菜单标题已烤进背景图 `art/backgrounds/background1.png`（旧 `baijie_chengxian_title.png` 已删）；战斗/选人背景部分仍硬编码在项目根 `test1.png`/`test2.png`（见 `art/README.md`）。
 

@@ -16,11 +16,13 @@ script = ExtResource("e2")
 color = 6
 bonus = 3
 bonus_per_color = 3
+rider = 4
+rider_value = 4
 
 [resource]
 script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
-effect_text = "对所有敌人造成 6 点伤害。共鸣：每有 1 种其它魔焰颜色额外对全体造成 3 伤害。"
+effect_text = "对所有敌人造成 6 点伤害（每有 1 种其它魔焰颜色额外 +3）。焰轮达 4 色时，引爆所有敌人的魂印。"
 id = "demon_flame_red"
 type = 0
 rarity = 2

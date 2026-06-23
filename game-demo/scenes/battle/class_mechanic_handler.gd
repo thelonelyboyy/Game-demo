@@ -8,6 +8,7 @@ const MUSCLE_STATUS = preload("res://statuses/muscle.tres")
 const SHA_QI_STATUS = preload("res://statuses/sha_qi.tres")
 
 const SOUL_MARK_HEAL_PER_STACK := 1
+const FLAME_DETONATE_DAMAGE_PER_STACK := 3   # 红·焚界引爆：每层魂印伤害（与主动引爆一致）
 
 # 煞气阈值与天魔降世
 const SHA_QI_ON_HIT := 1
@@ -25,6 +26,7 @@ var _sha_qi_connected := false
 var _heavenly_active := false           # 本回合处于天魔降世（×3）
 var _heavenly_penalty_pending := false  # 下回合开始结算代价
 var _flame_wheel := {}                  # 本回合焰轮里的魔焰颜色集合
+var _flame_damage_bonus := 0            # 本回合魔焰共鸣伤害加成（黄·狂烬累加，回合切换清空）
 # 一次性创建、原地更新的 modifier 值（避免 remove_value 的 queue_free 延迟问题）
 var _mv_dealt_flat: ModifierValue
 var _mv_dealt_mult: ModifierValue
@@ -225,8 +227,85 @@ func _clear_flame_wheel() -> void:
 	Events.flame_wheel_changed.emit([])
 
 
+# ----------------------------- 魔焰色卡 rider -----------------------------
+
+## 黄·狂烬：累加本回合魔焰共鸣伤害加成。
+func add_flame_damage_bonus(amount: int) -> void:
+	if amount > 0:
+		_flame_damage_bonus += amount
+
+
+func flame_damage_bonus() -> int:
+	return _flame_damage_bonus
+
+
+## 绿·镇煞：若煞气足够则消耗 n 点，返回是否消耗成功。
+func consume_sha_qi(n: int) -> bool:
+	if n <= 0:
+		return true
+	var status := _sha_qi_status()
+	if not status or status.stacks < n:
+		return false
+	status.stacks -= n
+	_update_sha_qi_modifiers()
+	return true
+
+
+## 蓝·灵涌：手牌中最多 count 张魔焰卡费用-1（排除正在打出的本牌）。
+func reduce_flame_card_costs(count: int, exclude_card: Card = null) -> void:
+	if count <= 0 or not player_handler or not player_handler.hand:
+		return
+	var reduced := 0
+	for card_ui in player_handler.hand.get_children():
+		if reduced >= count:
+			break
+		if not card_ui is CardUI:
+			continue
+		var c: Card = card_ui.card
+		if c and c != exclude_card and c.cost > 0 and _is_flame_card(c):
+			c.reduce_cost_for_turn(1)
+			card_ui.card = c   # 触发 CardUI 重新渲染费用
+			reduced += 1
+
+
+## 红·焚界：引爆所有敌人的魂印（消耗全部层数，每层 3 伤，走玩家增伤）。
+func detonate_all_soul_marks(modifiers: ModifierHandler) -> void:
+	var tree := get_tree()
+	if not tree:
+		return
+	for enemy in tree.get_nodes_in_group("enemies"):
+		if not is_instance_valid(enemy) or not (enemy is Enemy):
+			continue
+		var sh = enemy.status_handler
+		if not sh:
+			continue
+		var status: Status = sh.get_status("soul_mark")
+		if not status or status.stacks <= 0:
+			continue
+		var consumed := status.stacks
+		status.stacks = 0
+		var damage := FLAME_DETONATE_DAMAGE_PER_STACK * consumed
+		if modifiers:
+			damage = modifiers.get_modified_value(damage, Modifier.Type.DMG_DEALT)
+		if damage <= 0:
+			continue
+		var de := DamageEffect.new()
+		de.amount = damage
+		de.execute([enemy])
+
+
+func _is_flame_card(card: Card) -> bool:
+	if not card is CultivationCard:
+		return false
+	for e in (card as CultivationCard).configured_effects:
+		if e is ConfiguredFlameEffect:
+			return true
+	return false
+
+
 func _on_player_turn_started() -> void:
 	_clear_flame_wheel()
+	_flame_damage_bonus = 0
 	if not _is_demonic():
 		return
 	if _heavenly_penalty_pending:
@@ -244,8 +323,9 @@ func _on_player_turn_started() -> void:
 
 
 func _on_player_turn_ended() -> void:
-	# 回合结束清空焰轮。
+	# 回合结束清空焰轮与焰伤加成。
 	_clear_flame_wheel()
+	_flame_damage_bonus = 0
 	# 天魔降世的 ×3 仅持续本回合。
 	if _heavenly_active:
 		_heavenly_active = false

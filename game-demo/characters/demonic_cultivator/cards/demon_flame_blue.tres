@@ -13,13 +13,12 @@ amount = 2
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("e2")
 color = 3
-bonus = 5
-bonus_flat = 1
+rider = 2
 
 [resource]
 script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
-effect_text = "获得 2 点灵气。共鸣：焰轮已有其它颜色时抽 1 张牌。（移出战斗）"
+effect_text = "获得 2 点灵气。每有 1 种其它魔焰颜色，令手牌中 1 张魔焰卡本回合费用-1。（移出战斗）"
 id = "demon_flame_blue"
 type = 1
 rarity = 1
