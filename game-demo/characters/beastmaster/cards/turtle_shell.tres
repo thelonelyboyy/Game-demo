@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3 uid="uid://co42pdl0a8f6e"]
 
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/beastmaster/turtle_shell.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://dmfijmgf02vjt" path="res://art/generated_icons/tile_replacements/beastmaster/turtle_shell.png" id="2"]
 [ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
 [ext_resource type="Script" uid="uid://bo8gedp7cx6tx" path="res://custom_resources/effects/configured_block_effect.gd" id="auto_effect_block"]
 

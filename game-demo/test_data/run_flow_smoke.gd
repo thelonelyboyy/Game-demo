@@ -5,6 +5,9 @@ const GENERIC_EVENT_SMOKE_PATH := "res://scenes/event_rooms/spirit_beast_tracks_
 
 var failures: PackedStringArray = []
 var previous_save: SaveGame
+var event_choice_resolved_seen := false
+var campfire_rested_seen := false
+var player_turn_ended_seen := false
 
 
 func _ready() -> void:
@@ -332,16 +335,12 @@ func _check_event_entry(run: Run, room: Room) -> void:
 	if not generic_event or not generic_event.has_method("_apply_choice"):
 		return
 
-	var signal_state := {"seen": false}
-	Events.event_choice_resolved.connect(
-		func(_effect: String, _amount: int, _character: CharacterStats, _run_stats: RunStats) -> void:
-			signal_state["seen"] = true,
-		CONNECT_ONE_SHOT
-	)
+	event_choice_resolved_seen = false
+	Events.event_choice_resolved.connect(_on_event_choice_resolved, CONNECT_ONE_SHOT)
 	var gold_before := run.stats.gold
 	generic_event.choice_buttons[0]._on_pressed()
 	await get_tree().process_frame
-	_check(signal_state["seen"], "event choice emits resolved signal")
+	_check(event_choice_resolved_seen, "event choice emits resolved signal")
 	_check(run.stats.gold >= gold_before, "event choice applies reward")
 	await get_tree().process_frame
 	_check_returned_to_map(run, "event")
@@ -360,16 +359,12 @@ func _check_campfire_entry(run: Run, room: Room) -> void:
 	if not campfire:
 		return
 
-	var signal_state := {"seen": false}
-	Events.campfire_rested.connect(
-		func(_character: CharacterStats, _heal_amount: int) -> void:
-			signal_state["seen"] = true,
-		CONNECT_ONE_SHOT
-	)
+	campfire_rested_seen = false
+	Events.campfire_rested.connect(_on_campfire_rested, CONNECT_ONE_SHOT)
 	var health_before := run.character.health
 	campfire._on_rest_button_pressed()
 	await get_tree().process_frame
-	_check(signal_state["seen"], "campfire rest emits signal")
+	_check(campfire_rested_seen, "campfire rest emits signal")
 	_check(run.character.health >= health_before, "campfire rest does not reduce health")
 	campfire._on_fade_out_finished()
 	await get_tree().process_frame
@@ -446,16 +441,24 @@ func _check_targeting_feedback(battle: Battle) -> void:
 
 
 func _check_end_turn_button(battle: Battle) -> void:
-	var signal_state := {"seen": false}
-	Events.player_turn_ended.connect(
-		func() -> void:
-			signal_state["seen"] = true,
-		CONNECT_ONE_SHOT
-	)
+	player_turn_ended_seen = false
+	Events.player_turn_ended.connect(_on_player_turn_ended_seen, CONNECT_ONE_SHOT)
 	battle.battle_ui._on_end_turn_button_pressed()
 	await get_tree().process_frame
-	_check(signal_state["seen"], "end turn button emits player_turn_ended")
+	_check(player_turn_ended_seen, "end turn button emits player_turn_ended")
 	_check(battle.battle_ui.end_turn_button.disabled, "end turn button disables after press")
+
+
+func _on_event_choice_resolved(_effect: String, _amount: int, _character: CharacterStats, _run_stats: RunStats) -> void:
+	event_choice_resolved_seen = true
+
+
+func _on_campfire_rested(_character: CharacterStats, _heal_amount: int) -> void:
+	campfire_rested_seen = true
+
+
+func _on_player_turn_ended_seen() -> void:
+	player_turn_ended_seen = true
 
 
 func _find_single_target_card_ui(battle: Battle) -> CardUI:

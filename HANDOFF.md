@@ -1,20 +1,26 @@
 ﻿# 万劫求仙项目交接文档
 
-更新时间：2026-06-23  
+更新时间：2026-06-26  
 项目根目录：`E:\code\game-demo`  
 Godot 工程目录：`E:\code\game-demo\game-demo`  
 Godot 版本：4.5.2 stable mono  
 Godot 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe`
+Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64_console.exe`
 
-## 1. 当前状态（2026-06-19）
+## 1. 当前状态（2026-06-26）
 
 - 稳定运行的杀戮尖塔式修仙卡牌肉鸽 Demo。当前焦点：**把魔修打磨成完整 Demo**。
+- **主页/选人/战斗 UI 已按 `art/design` 目标图方向推进**：主页改成暗黑修仙主视觉；选人界面使用现有 UI 资产贴近目标图；魔修战斗界面改为暗蓝月夜战斗 HUD，底部法力球/焰轮/牌堆/结束回合按钮更接近 `art/design/target.png`。
+- **战斗 UI 最新资源位置**：新一批生成 HUD 资源在 `game-demo/assets/ui/generated/battle/`；旧一轮 `game-demo/art/ui/battle_hud/demonic_blue/` 仍保留给部分面板/历史对照。预览图在 `game-demo/art/design/run_battle_ui_preview.png` / `battle_ui_preview.png`。
+- **战斗顶栏最新约定**：Run 顶部使用黑金面板资源，角色名必须读取 `CharacterStats.character_name`；灵根/丹药仍在顶栏；总牌库按钮在右上；设置按钮在最右。法宝/遗物独占顶栏下方一栏，**不显示“法宝”标题**，放不下由 `HFlowContainer` 自动换第二行；不要再把法宝挤进顶栏小面板。
+- **HUD 美术说明**：`assets/ui/generated/battle` 与 `demonic_blue` 中的 HUD PNG 多为程序化/生成式临时美术，逻辑和布局已接好；若追求目标图级精致度，后续可用同名 PNG 替换，脚本引用不必大改。
+- **地图节点 hover/focus 说明已补**：精英战、营火、商店、机缘、宝箱等节点会给新玩家显示含义提示。
 - **新增「符箓丹药」系统**（可携带一次性消耗品，对标药水）：战斗奖励/商店获取、3 槽位、战斗内/部分战斗外使用。见第 4、6 节。
 - **魔修机制大改**（三系统，引爆倍率 X=3）：阶段1 煞气 ✅、阶段2 魂印引爆 ✅、阶段3 魔焰焰轮 ✅（含 7 色 rider 细化）。见第 4、6 节。
-- 视觉/动画/UI/全量 mipmap 等上一大批已提交推送（`master` `7b81880`）。
+- 最近一轮主干提交：`master` `d80c91a`（战斗 UI 与选人动画背景）；本轮继续追加 UI/资产/数值/文档更新。
 - `validate_project.py` 现在 **0 error / 0 warning**（校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
-- `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`boss-battle` 通过；`run-flow` 仍存在**偶发** `Lambda capture freed`（见第 8 节，非功能 bug，重跑即过）。
-- **新增 Excel 数值管线**：`cards.xlsx` + `scripts/cards_to_xlsx.py` / `xlsx_to_cards.py` / `card_table.py`——改表回写 `.tres`，专调数值平衡（见第 6、7 节）。
+- `run_godot_checks.py`：最近用 Godot exe 跑过全量检查，`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过。
+- **统一 Excel 数值总表**：`game_data.xlsx`（卡牌/祝福/怪物AI 三张数据表 + 说明）——改表回写 `.tres`/`.json`/`.tscn`，一个文件调全部数值平衡（见第 6、7 节）。旧的独立 `cards.xlsx` 已被它取代。
 - 开发路线图见根目录 `ROADMAP.md`。
 
 ## 2. 项目概况
@@ -67,7 +73,9 @@ E:\code\game-demo
 │  ├─ project.godot           Godot 工程配置
 │  ├─ art\                    美术资源（背景/角色/怪物/卡框/标题/遗物图标等）
 │  │  ├─ cards\<职业>\ai\      卡牌 AI 大插画（剑修、魔修已接；体修、驭兽待补）
+│  │  ├─ design\              目标图/当前截图/战斗 UI 预览图与设计计划
 │  │  ├─ frame_animation\      战斗角色逐帧动画 <id>_standby|attack|attacked（魔修、剑修）
+│  │  ├─ ui\battle_hud\demonic_blue\ 战斗 HUD 临时透明 PNG（黑金暗蓝，程序化生成）
 │  │  └─ tiles\                共享 16px 占位像素图（含 intent_* 意图图标）
 │  ├─ battles\                战斗配置 BattleStats
 │  ├─ characters\             职业资源、初始牌组、职业卡牌
@@ -81,12 +89,13 @@ E:\code\game-demo
 │  ├─ relics\                 法宝/遗物资源与奖励池
 │  ├─ scenes\                 主要 UI、战斗、地图、商店、事件等场景
 │  ├─ statuses\               词条/状态资源与脚本
-│  └─ test_data\              Godot smoke 测试场景
+│  └─ test_data\              Godot smoke 测试场景（含战斗 UI 截图 helper）
 ├─ scripts\
 │  ├─ validate_project.py     资源和内容校验脚本
 │  ├─ run_godot_checks.py     Headless Godot smoke 测试
 │  └─ generate_relic_icons.py 遗物图标生成脚本
 ├─ ROADMAP.md                 通往成品的分阶段优化方案（11 阶段，每步带验收标准）
+├─ game_data.xlsx             统一数值总表（卡牌/祝福/怪物AI）
 ├─ tmp\                       AI 出图工作流暂存（已 gitignore，不入库）
 └─ HANDOFF.md                 本交接文档
 ```
@@ -109,6 +118,8 @@ E:\code\game-demo
 - **章节难度爬升**：`scenes/map/map_generator.gd` 的 `CHAPTER_HEALTH/DAMAGE/GOLD_MULTIPLIERS` 让敌人血量/伤害/金币按章节递增（经 `_battle_for_room` 复制缩放，不污染战斗池）；进入新一章在 `run.gd._advance_to_next_chapter` 回满血；测试地图（`map_mode != ROGUELIKE`）开启 `Map.free_navigation`（所有节点可点，直接点 Boss 也能进章）。
 - **数值/平衡关键位置**：商店按稀有度定价 `shop_card.gd PRICE_BY_RARITY` + 法宝价位带 `shop_relic.gd`；暗金卡上架 `shop.gd MYTHIC_SHOP_CHANCE=0.04`；灵根缩放 `character_stats.gd get_spirit_root_modified_value`（初悟+1/小成×1.2+1/大成×1.4+1/圆满×1.8+1）；剑意上限 `statuses/sword_intent.gd MAX_STACKS=4`；灵气回蓝上限 `statuses/energy_charge.gd MAX_MANA_PER_TURN=2`；四职业每回合均抽 5 张。
 - **敌人行动延迟回调**：敌人攻击/格挡行动用 `get_tree().create_timer()`/补间 `finished` 回调发 `enemy_action_completed`，**必须捕获 `enemy.get_instance_id()` 而非节点本身**（否则补间未完成前敌人/战斗被释放会报 `Lambda capture freed`）。新增此类行动请照此写法。
+- **祝福系统（数据驱动）**：祝福内容在 `data/blessings.json`（5 类来源，`blessing.gd` 运行时读取），效果分发在 `blessing.gd._apply_effect`。可经 `game_data.xlsx` 的「祝福」表编辑回写。新增效果类型要同时在 `_apply_effect` 加分支 + `blessing_table.py EFFECT_TYPES` 登记。命格共鸣按 `_character_class()`（资源路径判职业）过滤。
+- **固定套路敌人 AI**：`EnemyActionPicker` 的 `fixed_sequence`（子节点下标数组）非空时按回合循环固定出招、忽略权重/条件；空时保持原随机逻辑。仅 4 个固定敌人（符纸兵/雾隐狼/牛魔/渊狱剑魂）用，各有专属 AI 场景。数值/序列可经 `game_data.xlsx` 的「怪物AI」表编辑。注意：AI 挂在敌人身上，正式地图出现这些敌人时也用此套路。
 
 ## 5. 快速验证命令
 
@@ -121,23 +132,51 @@ python scripts\validate_project.py
 Godot 检查：
 
 ```powershell
-python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe"
+python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64_console.exe"
 ```
 
 如新增或替换 PNG 资源后需要触发 Godot 导入：
 
 ```powershell
-& "F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe" --headless --editor --quit --path "E:\code\game-demo\game-demo"
+& "F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64_console.exe" --path "E:\code\game-demo\game-demo" --editor --quit
+```
+
+战斗 UI 视觉截图 helper：
+
+```powershell
+& "F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64_console.exe" --path "E:\code\game-demo\game-demo" --scene "res://test_data/capture_run_battle_ui_preview.tscn"
+& "F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64_console.exe" --path "E:\code\game-demo\game-demo" --scene "res://test_data/capture_battle_ui_preview.tscn"
 ```
 
 最近检查结果：
 
-- `validate_project.py`：0 error / 0 warning。
-- `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`boss-battle` 通过；`run-flow` **偶发** `Lambda capture freed`（重跑通常即过，根因见第 8 节）。
+- `validate_project.py`：0 error / 0 warning（2026-06-25 UI 微调后已跑）。
+- `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过（最近一次完整跑通：2026-06-26）。
+- 战斗 UI 预览：`art/design/run_battle_ui_preview.png` 与 `art/design/battle_ui_preview.png` 可用于人工对照；截图 helper 会临时写 marker，提交/交接前可删除 `*_marker.txt`。
 - `run_godot_checks.py` 已改用 UTF-8 解码 Godot 输出，修复了中文 Windows 上的 GBK 解码崩溃。
-- ⚠️ **新增/替换 PNG 后必须在 Godot 编辑器导入一次**（或跑上面的 `--headless --editor --quit`），否则会出现「文件在但加载失败 / no loader found」的错误，而 `validate_project.py` 查不出（它只查文件是否存在、查不出"未导入"）。
+- ⚠️ **新增/替换 PNG 后必须在 Godot 编辑器导入一次**（跑上面的 console exe `--editor --quit`），否则会出现「文件在但加载失败 / no loader found」的错误，而 `validate_project.py` 查不出（它只查文件是否存在、查不出"未导入"）。Godot 退出时偶尔有 RID/resource leak 警告；只要没有 `SCRIPT ERROR` / `Parse Error` / `Failed to load script`，通常不是本轮 UI 脚本问题。
 
 ## 6. 最近改动摘要
+
+### 本轮（2026-06-26）UI、资产与工具链更新
+
+- **Godot MCP 接入**：根目录新增 `.mcp.json`，用于在 Codex 内调用 Godot MCP 直接打开/分析场景。后续在 Codex 里明确说“用 Godot MCP 打开/分析某场景”即可触发相应工具（可用性取决于本机 MCP 服务是否已启动）。
+- **主页目标图落地**：`main_menu.gd` / `main_menu.tscn` 改为暗黑修仙主界面方向，透明中心菜单、无九宫格外框、按钮 hover/focus 比默认态略长，取消“新的轮回”默认 focus 高亮；新增/替换主页背景资产 `art/backgrounds/main_menu_background_v2.png`。
+- **选人界面目标图落地**：`character_selector.gd` 和相关背景帧资源更新，剑修/魔修选择页更贴近 `art/design/选人界面目标.png`；动画背景帧做了数量与导入资源整理。
+- **地图节点可读性增强**：`map_room.gd` / `map.gd` 增加 hover/focus 说明，精英战、营火、商店、机缘、宝箱等节点对新玩家更清晰。
+- **图鉴/数据/卡牌平衡扩展**：新增 `data/`、`docs/`、`game_data.xlsx` 与 `scripts/*_table.py` / `game_data_to_xlsx.py` / `xlsx_to_game_data.py` 等统一数据表工具；大量卡牌、祝福、怪物 AI 与动作脚本随表格/平衡调整更新。
+- **魔修战斗界面按 `art/design/target.png` 重构**：`battle_ui.gd`、`mana_ui.gd`、`flame_wheel_ui.gd`、`intent_ui.gd`、`run.gd`、`ink_theme.gd` 等接入 `assets/ui/generated/battle/` 新 HUD 资产；底部焰轮、法力球、牌堆、结束回合按钮、敌人意图、Run 顶栏都转为黑金暗蓝风格。
+- **默认战斗/预览辅助**：`battle.tscn` 与 `run_startup.tres` 的默认预览角色转向魔修；新增 `test_data/capture_battle_ui_preview.*` 与 `capture_run_battle_ui_preview.*` 方便截图对照 `art/design/battle_ui_preview.png` / `run_battle_ui_preview.png`。
+- **验证结果**：2026-06-26 已跑 `validate_project.py`（0 error / 0 warning）与 `run_godot_checks.py --godot ...Godot_v4.5.2-stable_mono_win64.exe`，全部 smoke 项通过。
+
+### 本轮（2026-06-25）系统级更新
+
+- **统一 Excel 数值总表 `game_data.xlsx`**（新）：一个文件三张表（卡牌/祝福/怪物AI）调全部数值。导出 `game_data_to_xlsx.py` / 回写 `xlsx_to_game_data.py`；模块 `card_table`/`blessing_table`/`ai_table`。详见第 7 节。修了 `card_table.py` 一个既有正则缺陷（`amount` 误匹配 `consume_amount`，会写坏魂印引爆卡）——现已锚定行首 `^amount`，特殊效果安全跳过。
+- **祝福系统重构为 5 类「劫中遗赠」**（数据外置到 `data/blessings.json`，`blessing.gd` 运行时读取）：灵脉余泽(续航)/残仙遗蜕(以命换力·带代价)/补天盟密阵(牌组改造)/照命石审判(赌命·发法宝)/命格共鸣(角色专属，按 `_character_class()` 过滤)。效果用 `effects` 数组（可叠加收益+代价）：`max_health/lose_max_health/full_heal/gold/lose_gold/max_mana/draw/upgrade/remove_card/duplicate_card/grant_relic`。持续型走发法宝（`run.gd` 已把 `relic_handler` 传入祝福场景）。
+- **剑修/魔修数值上调**：血量 32/30 → **100**，每回合费用(`max_mana`) 3 → **4**。⚠️ 敌人伤害/章节缩放仍按旧血量配置，需重新配平（见第 8 节待办）。
+- **测试地图固定 + 敌人 AI 固定套路**：`map_generator.gd` 两个测试模式的普通/精英/Boss 固定为 符纸兵+雾隐狼 / 牛魔 / 渊狱剑魂（`TEST_FIXED_*`，正式 roguelike 仍随机）。这 4 个敌人各建专属 AI 场景，用 `EnemyActionPicker.fixed_sequence`（按回合循环固定出招，空序列时其它敌人保持原随机逻辑）。
+- **选人界面优化**：动画背景改异步加载(`ResourceLoader.load_threaded_request`)+帧集缓存，消除进入/切换卡顿；帧率可按角色覆盖(`animated_background_fps`，剑修 12fps)。
+- **战斗 HUD 重构 + 目标图**：见 `art/design/battle_redesign_plan.md`（对照 `now.png`→`target.png` 的分区计划）。
 
 ### 本轮（2026-06-23）系统级更新
 
@@ -284,10 +323,15 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - `game-demo/scenes/ui/main_menu.tscn` / `.gd`（标题已烤进 `art/backgrounds/background1.png`）
 - `game-demo/scenes/ui/character_selector.tscn` / `.gd`（体修/驭兽隐藏；无立绘；按职业背景：剑修 `art/backgrounds/sw.png`、魔修 `art/backgrounds/demonic_selector_bg.png`；无色罩/暗角）
 
-### 数值工具 · Excel 管线
+### 数值工具 · 统一 Excel 管线
 
-- `cards.xlsx`（数值编辑表，项目根）
-- `scripts/cards_to_xlsx.py`（导出 .tres→xlsx）/ `scripts/xlsx_to_cards.py`（回写 xlsx→.tres）/ `scripts/card_table.py`（共用解析）
+- `game_data.xlsx`（统一数值总表，项目根）——三张数据表：**卡牌 / 祝福 / 怪物AI** + 说明页。只改浅黄列，灰列只读。
+- 导出：`python scripts/game_data_to_xlsx.py`（读 .tres/.json/.tscn → xlsx）
+- 回写：`python scripts/xlsx_to_game_data.py`（xlsx → .tres/.json/.tscn），之后 Godot 导入一次。
+- 模块：`scripts/card_table.py`（卡牌）/ `blessing_table.py`（祝福，读写 `data/blessings.json`）/ `ai_table.py`（4 个固定套路敌人 .tscn）。
+- **覆盖范围**：卡牌只调标准 amount 类效果（伤害/护体/治疗/状态层数）+ 费用；祝福可改描述/命格/效果类型+值（导入按表整体重建 JSON）；AI 改 数值 + 出招序列。
+- **不可调**：魂印引爆 `damage_per_stack`、魔焰焰轮 color/rider 等特殊字段（表中留空，仍在 Godot 改）。幂等：无修改回写 = 改 0 文件。
+- 旧 `cards.xlsx` + `cards_to_xlsx.py`/`xlsx_to_cards.py` 已被取代（保留未删）。
 
 ### 卡牌显示
 
@@ -320,6 +364,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ### 已知问题
 
+- **战斗数值待按 100 血重配平**：剑修/魔修血量已 30/32→100、费用 3→4，但敌人伤害（固定 AI 的处决 12/重砸 10 等）和 `map_generator.gd` 章节缩放仍按旧血量配置，现在战斗偏软。需重新配平敌人伤害 + 章节倍率（可经 `game_data.xlsx` 怪物AI 表 + `map_generator` 倍率调）。
 - **`run-flow` 偶发 `Lambda capture freed`**：完整流程约 2/12 偶发，还有一处多回合补间回调来源未根除（疑似 `status_handler`/`relic_handler`/弃牌结算）。非功能 bug（逻辑仍通过，重跑即过），但将来上 CI 会随机红灯。修法：把 `tween.finished` 的 lambda 改为捕获 `get_instance_id()` / 加 `is_instance_valid` 守卫。
 - **`validate_project.py` 仍有盲区**：查不出「文件在但未导入」（缺 `.import`）和字符串拼接路径。新增美术务必在编辑器导入。（注：默认值字段误报已修，现 0 error。）
 - **存档跨资源移动会失效**：存档按路径内嵌资源引用，移动/重命名被引用资源后旧档加载失败（有自愈清档兜底，但丢进度）。彻底修复需改成"按 id 重建"（ROADMAP 阶段 0）。

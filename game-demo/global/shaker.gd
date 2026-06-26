@@ -17,8 +17,10 @@ func shake(thing: Node2D, strength: float, duration: float = 0.2) -> void:
 		tween.tween_property(thing, "position", target, duration / float(shake_count))
 		strength *= 0.75
 	
-	tween.finished.connect(
-		func(): 
-			if thing:
-				thing.position = orig_pos
-	)
+	tween.finished.connect(_restore_position.bind(thing.get_instance_id(), orig_pos))
+
+
+func _restore_position(thing_id: int, position: Vector2) -> void:
+	var thing := instance_from_id(thing_id) as Node2D
+	if is_instance_valid(thing):
+		thing.position = position

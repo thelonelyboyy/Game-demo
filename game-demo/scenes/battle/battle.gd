@@ -5,6 +5,9 @@ const PIXEL_WORLD_SCALE := 5.0
 const SPIRIT_ROOT_HANDLER := preload("res://scenes/battle/spirit_root_handler.gd")
 const CLASS_MECHANIC_HANDLER := preload("res://scenes/battle/class_mechanic_handler.gd")
 const BATTLE_BACKGROUND := preload("res://test2.png")
+const BATTLE_BACKDROP_TINT := Color(0.32, 0.44, 0.70, 1.0)
+const BATTLE_NIGHT_WASH := Color(0.015, 0.035, 0.085, 0.36)
+const BATTLE_BOTTOM_SHADE := Color(0.0, 0.0, 0.0, 0.22)
 const PLAYER_SCREEN_ANCHOR := Vector2(0.22, 0.42)
 const ENEMY_SINGLE_SCREEN_ANCHOR := Vector2(0.74, 0.50)
 const ENEMY_ROW_START_RATIO := 0.61
@@ -233,12 +236,29 @@ func _setup_ink_backdrop() -> void:
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	background.modulate = BATTLE_BACKDROP_TINT
 	layer.add_child(background)
 	_fit_battle_background(background)
-	get_viewport().size_changed.connect(_fit_battle_background.bind(background))
+
+	var night_wash := ColorRect.new()
+	night_wash.name = "NightWash"
+	night_wash.color = BATTLE_NIGHT_WASH
+	night_wash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(night_wash)
+	_fit_battle_background(night_wash)
+
+	var bottom_shade := ColorRect.new()
+	bottom_shade.name = "BottomShade"
+	bottom_shade.color = BATTLE_BOTTOM_SHADE
+	bottom_shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bottom_shade.anchor_left = 0.0
+	bottom_shade.anchor_top = 0.68
+	bottom_shade.anchor_right = 1.0
+	bottom_shade.anchor_bottom = 1.0
+	layer.add_child(bottom_shade)
 
 
-func _fit_battle_background(background: TextureRect) -> void:
+func _fit_battle_background(background: Control) -> void:
 	if not is_instance_valid(background):
 		return
 
@@ -256,7 +276,7 @@ func _prepare_combatant_presentation(world_node: Node, _is_player := false) -> v
 	var sprite := world_node.get_node_or_null("Sprite2D") as Sprite2D
 	if sprite:
 		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-		sprite.modulate = Color(0.96, 0.90, 0.78, 0.92)
+		sprite.modulate = Color(0.82, 0.88, 1.0, 0.95)
 
 	var stand := Node2D.new()
 	stand.name = "InkStand"

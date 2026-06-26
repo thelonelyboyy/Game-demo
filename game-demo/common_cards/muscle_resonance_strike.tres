@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Script" uid="uid://bfbtae55pt1yq" path="res://custom_resources/effects/configured_damage_effect.gd" id="2"]
-[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/common_cards/muscle_resonance_strike.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://bgi66edqju6ni" path="res://art/generated_icons/tile_replacements/common_cards/muscle_resonance_strike.png" id="3"]
 [ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/audio/slash.ogg" id="4"]
 
 [sub_resource type="Resource" id="Resource_damage"]

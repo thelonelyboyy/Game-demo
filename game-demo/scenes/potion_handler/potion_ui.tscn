@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://potionui00001"]
 
 [ext_resource type="Script" path="res://scenes/potion_handler/potion_ui.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/ui/battle_hud/demonic_red/potion_slot_frame.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/ui/battle_hud/demonic_blue/potion_slot_frame.png" id="2"]
 
 [node name="PotionUI" type="Control"]
 custom_minimum_size = Vector2(42, 42)

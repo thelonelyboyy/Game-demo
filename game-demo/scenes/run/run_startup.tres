@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="RunStartup" load_steps=3 format=3 uid="uid://bd874b0h1q8n1"]
 
-[ext_resource type="Resource" path="res://characters/body_cultivator/body_cultivator.tres" id="1_ktrm1"]
+[ext_resource type="Resource" path="res://characters/demonic_cultivator/demonic_cultivator.tres" id="1_ktrm1"]
 [ext_resource type="Script" path="res://custom_resources/run_startup.gd" id="1_nndta"]
 
 [resource]

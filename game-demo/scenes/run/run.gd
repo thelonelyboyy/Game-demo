@@ -216,6 +216,7 @@ func _setup_top_bar():
 	character.stats_changed.connect(health_ui.update_stats.bind(character))
 	health_ui.update_stats(character)
 	gold_ui.run_stats = stats
+	_polish_top_bar()
 	_setup_spirit_root_badge()
 	
 	relic_handler.add_relic(character.starting_relic)
@@ -224,6 +225,191 @@ func _setup_top_bar():
 	deck_button.card_pile = character.deck
 	deck_view.card_pile = character.deck
 	deck_button.pressed.connect(deck_view.show_current_view.bind("牌组"))
+	_polish_deck_button()
+
+
+func _polish_top_bar() -> void:
+	var top_bar := $TopBar
+	var background := $TopBar/Background as TextureRect
+	if background:
+		background.show()
+		background.texture = InkTheme.HUD_BATTLE_TOP_BAR
+		background.custom_minimum_size = Vector2(0, 110)
+		background.offset_bottom = 110.0
+		background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		background.stretch_mode = TextureRect.STRETCH_SCALE
+
+	var bar_items := $TopBar/BarItems as VBoxContainer
+	if bar_items:
+		bar_items.custom_minimum_size = Vector2(0, 110)
+		bar_items.offset_left = 14.0
+		bar_items.offset_right = -88.0
+		bar_items.offset_bottom = 110.0
+		bar_items.add_theme_constant_override("separation", 0)
+
+	var top_row := $TopBar/BarItems/TopRow as HBoxContainer
+	if top_row:
+		top_row.custom_minimum_size = Vector2(0, 88)
+		top_row.add_theme_constant_override("separation", 18)
+
+	var left_info := health_ui.get_parent() as HBoxContainer
+	if left_info:
+		left_info.add_theme_constant_override("separation", 10)
+		if not left_info.has_node("TopInfoSpacer"):
+			var spacer := Control.new()
+			spacer.name = "TopInfoSpacer"
+			spacer.custom_minimum_size = Vector2(86, 42)
+			spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			left_info.add_child(spacer)
+			left_info.move_child(spacer, 0)
+		health_ui.custom_minimum_size = Vector2(142, 42)
+		gold_ui.custom_minimum_size = Vector2(112, 42)
+
+	if not top_bar.has_node("TopLeftPanel"):
+		var panel := TextureRect.new()
+		panel.name = "TopLeftPanel"
+		panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		panel.stretch_mode = TextureRect.STRETCH_SCALE
+		top_bar.add_child(panel)
+		top_bar.move_child(panel, 1)
+	var left_panel := top_bar.get_node_or_null("TopLeftPanel") as TextureRect
+	if left_panel:
+		left_panel.position = Vector2(8, 7)
+		left_panel.size = Vector2(440, 88)
+		left_panel.texture = InkTheme.HUD_BLUE_TOP_LEFT_PANEL
+
+	if not top_bar.has_node("TopClassEmblem"):
+		var emblem := TextureRect.new()
+		emblem.name = "TopClassEmblem"
+		emblem.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		emblem.texture = InkTheme.HUD_BLUE_CLASS_EMBLEM
+		emblem.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		emblem.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		top_bar.add_child(emblem)
+	var emblem := top_bar.get_node_or_null("TopClassEmblem") as TextureRect
+	if emblem:
+		emblem.position = Vector2(9, 1)
+		emblem.size = Vector2(96, 96)
+
+	var class_title := top_bar.get_node_or_null("TopClassTitle") as Label
+	if not class_title:
+		class_title = Label.new()
+		class_title.name = "TopClassTitle"
+		class_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		class_title.add_theme_font_size_override("font_size", 17)
+		class_title.add_theme_color_override("font_color", Color("ffe4a4"))
+		class_title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
+		class_title.add_theme_constant_override("shadow_offset_x", 2)
+		class_title.add_theme_constant_override("shadow_offset_y", 2)
+		top_bar.add_child(class_title)
+	class_title.position = Vector2(118, 6)
+	class_title.size = Vector2(112, 24)
+	class_title.text = character.character_name if character and not character.character_name.is_empty() else ""
+
+	_style_top_stat_widgets()
+	_polish_relic_row()
+	_polish_settings_button()
+
+
+func _style_top_stat_widgets() -> void:
+	var health_icon := health_ui.get_node_or_null("HealthImage") as TextureRect
+	if health_icon:
+		health_icon.custom_minimum_size = Vector2(28, 28)
+
+	var gold_icon := gold_ui.get_node_or_null("Icon") as TextureRect
+	if gold_icon:
+		gold_icon.custom_minimum_size = Vector2(30, 30)
+
+	for label: Label in [health_ui.health_label, health_ui.max_health_label, gold_ui.label]:
+		if not label:
+			continue
+		label.add_theme_font_size_override("font_size", 24)
+		label.add_theme_color_override("font_color", Color("fff0c8"))
+		label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+		label.add_theme_constant_override("shadow_offset_x", 2)
+		label.add_theme_constant_override("shadow_offset_y", 2)
+
+
+func _polish_deck_button() -> void:
+	deck_button.custom_minimum_size = Vector2(300, 82)
+	deck_button.ignore_texture_size = true
+	deck_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	deck_button.texture_normal = null
+	deck_button.texture_hover = null
+	deck_button.texture_pressed = null
+
+	var existing_panel := deck_button.get_node_or_null("DeckPanel")
+	if not existing_panel:
+		var panel := TextureRect.new()
+		panel.name = "DeckPanel"
+		panel.show_behind_parent = true
+		panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+		panel.texture = InkTheme.HUD_BLUE_DECK_PANEL
+		panel.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		panel.stretch_mode = TextureRect.STRETCH_SCALE
+		deck_button.add_child(panel)
+	var deck_panel := deck_button.get_node_or_null("DeckPanel") as TextureRect
+	if deck_panel:
+		deck_panel.texture = InkTheme.HUD_BLUE_DECK_PANEL
+
+	var title := deck_button.get_node_or_null("DeckTitle") as Label
+	if not title:
+		title = Label.new()
+		title.name = "DeckTitle"
+		title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		title.text = "总牌库"
+		title.add_theme_font_size_override("font_size", 22)
+		title.add_theme_color_override("font_color", Color("ffe0a0"))
+		title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+		title.add_theme_constant_override("shadow_offset_x", 2)
+		title.add_theme_constant_override("shadow_offset_y", 2)
+		title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		deck_button.add_child(title)
+	title.position = Vector2(34, 16)
+	title.size = Vector2(104, 34)
+
+	if deck_button.counter:
+		deck_button.counter.position = Vector2(116, 42)
+		deck_button.counter.size = Vector2(64, 26)
+		deck_button.counter.add_theme_font_size_override("font_size", 22)
+		deck_button.counter.add_theme_color_override("font_color", Color("fff0c8"))
+		deck_button.counter.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+		deck_button.counter.add_theme_constant_override("shadow_offset_x", 2)
+		deck_button.counter.add_theme_constant_override("shadow_offset_y", 2)
+		deck_button.counter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		deck_button.counter.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+
+func _polish_settings_button() -> void:
+	var top_bar := $TopBar
+	var settings_button := top_bar.get_node_or_null("BattleSettingsButton") as TextureButton
+	if not settings_button:
+		settings_button = TextureButton.new()
+		settings_button.name = "BattleSettingsButton"
+		settings_button.ignore_texture_size = true
+		settings_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+		settings_button.tooltip_text = "设置"
+		settings_button.pressed.connect(_open_pause_menu)
+		top_bar.add_child(settings_button)
+
+	settings_button.texture_normal = InkTheme.HUD_BATTLE_SETTINGS_NORMAL
+	settings_button.texture_hover = InkTheme.HUD_BATTLE_SETTINGS_HOVER
+	settings_button.texture_pressed = InkTheme.HUD_BATTLE_SETTINGS_PRESSED
+	settings_button.anchor_left = 1.0
+	settings_button.anchor_right = 1.0
+	settings_button.anchor_top = 0.0
+	settings_button.anchor_bottom = 0.0
+	settings_button.offset_left = -76.0
+	settings_button.offset_top = 13.0
+	settings_button.offset_right = -12.0
+	settings_button.offset_bottom = 77.0
+
+
+func _open_pause_menu() -> void:
+	pause_menu.show()
+	get_tree().paused = true
 
 
 func _setup_spirit_root_badge() -> void:
@@ -240,9 +426,9 @@ func _setup_spirit_root_badge() -> void:
 	if not potion_bar_panel:
 		potion_bar_panel = PanelContainer.new()
 		potion_bar_panel.name = "PotionBar"
-		potion_bar_panel.custom_minimum_size = Vector2(178, 56)
+		potion_bar_panel.custom_minimum_size = Vector2(152, 56)
 		potion_bar_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		InkTheme.apply_demonic_panel(potion_bar_panel)
+		InkTheme.apply_battle_blue_panel(potion_bar_panel)
 		var hb := HBoxContainer.new()
 		hb.add_theme_constant_override("separation", 5)
 		hb.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -260,6 +446,49 @@ func _setup_spirit_root_badge() -> void:
 		potion_handler.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		badge_parent.add_child(potion_bar_panel)
 	badge_parent.move_child(potion_bar_panel, spirit_root_badge.get_index() + 1)
+
+	_polish_relic_row()
+
+
+func _polish_relic_row() -> void:
+	var top_bar := $TopBar
+	var relic_row := $TopBar/BarItems/RelicRow as HBoxContainer
+	if not relic_row:
+		return
+
+	relic_row.visible = true
+	relic_row.custom_minimum_size = Vector2(0, 120)
+	relic_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	relic_row.add_theme_constant_override("separation", 10)
+
+	var existing_backdrop := top_bar.get_node_or_null("RelicLaneBackdrop")
+	if existing_backdrop:
+		existing_backdrop.queue_free()
+
+	var relic_title := relic_row.get_node_or_null("RelicTitle") as Label
+	if relic_title:
+		relic_title.custom_minimum_size = Vector2.ZERO
+		relic_title.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		relic_title.text = ""
+		relic_title.visible = false
+		relic_title.add_theme_font_size_override("font_size", 20)
+		relic_title.add_theme_color_override("font_color", Color("ffe0a0"))
+		relic_title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+		relic_title.add_theme_constant_override("shadow_offset_x", 2)
+		relic_title.add_theme_constant_override("shadow_offset_y", 2)
+		relic_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+	if relic_handler.get_parent() != relic_row:
+		relic_handler.reparent(relic_row)
+	relic_handler.custom_minimum_size = Vector2(0, 120)
+	relic_handler.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	relic_handler.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+
+	var relic_container := relic_handler.get_node_or_null("Relics") as HFlowContainer
+	if relic_container:
+		relic_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+		relic_container.add_theme_constant_override("h_separation", 8)
+		relic_container.add_theme_constant_override("v_separation", 8)
 
 
 func _show_regular_battle_rewards() -> void:
@@ -342,6 +571,7 @@ func _on_event_room_entered(room: Room) -> void:
 
 func _on_blessing_room_entered() -> void:
 	var blessing := _change_view(BLESSING_SCENE) as Blessing
+	blessing.relic_handler = relic_handler
 	blessing.setup(character, stats, current_chapter)
 
 

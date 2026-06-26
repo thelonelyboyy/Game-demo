@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "godot-mcp": {
+      "command": "node",
+      "args": ["E:/code/Godot-MCP/server/dist/index.js"]
+    }
+  }
+}

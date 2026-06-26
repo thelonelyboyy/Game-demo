@@ -1,13 +1,15 @@
 class_name IntentUI
 extends Control
 
-const BUBBLE := Rect2(0, 0, 92, 44)
-const GLYPH_LEFT := Vector2(27, 22)
-const GLYPH_CENTER := Vector2(46, 22)
-const ICON_SIZE := 28.0
+const BUBBLE := Rect2(0, 0, 190, 58)
+const INNER_BUBBLE := Rect2(27, 10, 136, 38)
+const GLYPH_LEFT := Vector2(52, 29)
+const GLYPH_CENTER := Vector2(95, 29)
+const ICON_SIZE := 32.0
 
 # 分类专属图标（贴图优先，没有的分类回退到代码绘制）
-const ICON_SWORD := preload("res://art/tiles/intent_attack_sword.png")
+const BADGE_FRAME := preload("res://assets/ui/generated/battle/battle_intent_badge_attack_9slice.png")
+const ICON_SWORD := preload("res://assets/ui/generated/icons/icon_intent_attack.png")
 const ICON_SHIELD := preload("res://art/tiles/intent_block_shield.png")
 const ICON_BUFF := preload("res://art/tiles/intent_buff_self.png")
 const CATEGORY_ICONS := {
@@ -38,22 +40,26 @@ func update_intent(intent: Intent) -> void:
 	_bubble.bg_color = fill
 	_bubble.border_color = style.border
 	_bubble.set_border_width_all(2)
-	_bubble.set_corner_radius_all(16)
+	_bubble.set_corner_radius_all(18)
 
-	label.text = str(intent.current_text)
-	label.visible = intent.current_text.length() > 0
+	label.text = _label_for(intent)
+	label.visible = label.text.length() > 0
 	label.add_theme_color_override("font_color", style.accent)
+	label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.92))
+	label.add_theme_constant_override("shadow_offset_x", 2)
+	label.add_theme_constant_override("shadow_offset_y", 2)
 	if label.visible:
-		label.position = Vector2(50, 0)
-		label.size = Vector2(38, 44)
-		label.add_theme_font_size_override("font_size", 20)
+		label.position = Vector2(75, 4)
+		label.size = Vector2(92, 48)
+		label.add_theme_font_size_override("font_size", 23)
 
 	queue_redraw()
 	show()
 
 
 func _draw() -> void:
-	draw_style_box(_bubble, BUBBLE)
+	draw_style_box(_bubble, INNER_BUBBLE)
+	draw_texture_rect(BADGE_FRAME, BUBBLE, false, Color(1, 1, 1, 0.96))
 	var center := GLYPH_LEFT if label.visible else GLYPH_CENTER
 	if CATEGORY_ICONS.has(_category):
 		var tex: Texture2D = CATEGORY_ICONS[_category]
@@ -146,3 +152,39 @@ func _style_for(category: int) -> Dictionary:
 			return {"border": Color("7d7460"), "fill": Color("14120c"), "accent": Color("cabf9f")}
 		_:  # UNKNOWN
 			return {"border": Color("9a8f74"), "fill": Color("16140d"), "accent": Color("d8cdaf")}
+
+
+func _label_for(intent: Intent) -> String:
+	var value := str(intent.current_text).strip_edges()
+	var label_text := _category_label(intent.category)
+	if value.is_empty():
+		return label_text
+	if label_text.is_empty():
+		return value
+	return "%s %s" % [label_text, value]
+
+
+func _category_label(category: int) -> String:
+	match category:
+		Intent.Category.ATTACK, Intent.Category.MULTI_ATTACK:
+			return "强攻"
+		Intent.Category.DEFEND:
+			return "防御"
+		Intent.Category.ATTACK_DEFEND:
+			return "攻防"
+		Intent.Category.BUFF:
+			return "强化"
+		Intent.Category.DEBUFF:
+			return "削弱"
+		Intent.Category.CHARGE:
+			return "蓄势"
+		Intent.Category.SUMMON:
+			return "召唤"
+		Intent.Category.HEAL:
+			return "疗愈"
+		Intent.Category.ESCAPE:
+			return "逃离"
+		Intent.Category.SLEEP:
+			return "休眠"
+		_:
+			return "未知"

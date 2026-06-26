@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=9 format=3 uid="uid://l7k0gxdkc1j"]
 
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/body_cultivator/collapsing_palm.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://c0sat814e0qf1" path="res://art/generated_icons/tile_replacements/body_cultivator/collapsing_palm.png" id="2"]
 [ext_resource type="AudioStream" uid="uid://b1vpjjmi5cj3n" path="res://art/audio/axe.ogg" id="3"]
 [ext_resource type="Script" uid="uid://bfbtae55pt1yq" path="res://custom_resources/effects/configured_damage_effect.gd" id="auto_effect_damage"]
 [ext_resource type="Script" uid="uid://dpgu18d4ll1s7" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]

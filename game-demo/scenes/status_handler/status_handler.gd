@@ -26,7 +26,7 @@ func apply_statuses_by_type(type: Status.Type) -> void:
 		tween.tween_callback(status.apply_status.bind(status_owner))
 		tween.tween_interval(STATUS_APPLY_INTERVAL)
 	
-	tween.finished.connect(func(): statuses_applied.emit(type))
+	tween.finished.connect(_emit_statuses_applied.bind(type))
 
 
 func add_status(status: Status) -> void:
@@ -91,6 +91,10 @@ func _get_all_statuses() -> Array[Status]:
 func _on_status_applied(status: Status) -> void:
 	if status.can_expire:
 		status.duration -= 1
+
+
+func _emit_statuses_applied(type: Status.Type) -> void:
+	statuses_applied.emit(type)
 
 
 func _on_gui_input(event: InputEvent) -> void:

@@ -96,15 +96,7 @@ func draw_cards(amount: int, is_start_of_turn_draw: bool = false) -> void:
 		draw_tween.tween_callback(draw_card.bind(is_start_of_turn_draw))
 		draw_tween.tween_interval(HAND_DRAW_INTERVAL)
 	
-	draw_tween.finished.connect(
-		func(): 
-			if not battle_running:
-				return
-			if hand:
-				hand.enable_hand()
-			if is_start_of_turn_draw:
-				Events.player_hand_drawn.emit()
-	)
+	draw_tween.finished.connect(_on_draw_tween_finished.bind(is_start_of_turn_draw))
 
 
 func discard_cards() -> void:
@@ -122,13 +114,7 @@ func discard_cards() -> void:
 		discard_tween.tween_callback(hand.discard_card.bind(card_ui))
 		discard_tween.tween_interval(HAND_DISCARD_INTERVAL)
 	
-	discard_tween.finished.connect(
-		func():
-			if not battle_running:
-				return
-			character.reset_temporary_card_costs()
-			Events.player_hand_discarded.emit()
-	)
+	discard_tween.finished.connect(_on_discard_tween_finished)
 
 
 func reshuffle_deck_from_discard() -> void:
@@ -173,6 +159,22 @@ func _on_relics_activated(type: Relic.Type) -> void:
 			player.status_handler.apply_statuses_by_type(Status.Type.START_OF_TURN)
 		Relic.Type.END_OF_TURN:
 			player.status_handler.apply_statuses_by_type(Status.Type.END_OF_TURN)
+
+
+func _on_draw_tween_finished(is_start_of_turn_draw: bool) -> void:
+	if not battle_running:
+		return
+	if hand:
+		hand.enable_hand()
+	if is_start_of_turn_draw:
+		Events.player_hand_drawn.emit()
+
+
+func _on_discard_tween_finished() -> void:
+	if not battle_running:
+		return
+	character.reset_temporary_card_costs()
+	Events.player_hand_discarded.emit()
 
 
 func _exit_tree() -> void:

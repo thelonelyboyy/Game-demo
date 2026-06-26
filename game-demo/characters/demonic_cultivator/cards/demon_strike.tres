@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3 uid="uid://ccitcoa4e826m"]
 
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://cgih7kw7mceia" path="res://art/cards/demonic_cultivator/ai/attack.png" id="2"]
@@ -14,8 +14,6 @@ script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage")])
 effect_text = "造成 {damage} 点伤害。"
 id = "demon_strike"
-type = 0
-rarity = 0
 target = 1
 cost = 1
 upgrade_type = 1

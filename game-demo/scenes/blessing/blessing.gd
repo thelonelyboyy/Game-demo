@@ -3,38 +3,10 @@ extends Control
 
 const BACKGROUND := preload("res://art/backgrounds/blessing_cavern_bg.png")
 
-const GODS := [
-	{
-		"name": "太上玄尊",
-		"description": "玄门祖炁垂照，为入山者稳住根基。",
-		"blessings": [
-			{"name": "玄门护命", "description": "最大生命 +8，并回复 8 点生命。", "effect": "max_health"},
-			{"name": "灵石启程", "description": "获得 80 灵石。", "effect": "gold"},
-			{"name": "点化旧术", "description": "随机突破牌组中一张可突破卡牌。", "effect": "upgrade"},
-			{"name": "气海初开", "description": "最大法力 +1。", "effect": "max_mana"},
-		],
-	},
-	{
-		"name": "斗姥元君",
-		"description": "星斗归位，照见此行凶吉。",
-		"blessings": [
-			{"name": "星辉满身", "description": "回复至满生命。", "effect": "full_heal"},
-			{"name": "星盘赐财", "description": "获得 100 灵石。", "effect": "big_gold"},
-			{"name": "观星悟法", "description": "每回合抽牌数 +1。", "effect": "draw"},
-			{"name": "星火破障", "description": "随机突破牌组中一张可突破卡牌。", "effect": "upgrade"},
-		],
-	},
-	{
-		"name": "伏羲道君",
-		"description": "先天八卦流转，替修士推演一线生机。",
-		"blessings": [
-			{"name": "卦象聚财", "description": "获得 80 灵石。", "effect": "gold"},
-			{"name": "先天强身", "description": "最大生命 +8，并回复 8 点生命。", "effect": "max_health"},
-			{"name": "八卦明心", "description": "每回合抽牌数 +1。", "effect": "draw"},
-			{"name": "开窍聚气", "description": "最大法力 +1。", "effect": "max_mana"},
-		],
-	},
-]
+# 祝福数据外置在 data/blessings.json，可经 Excel 管线编辑后回写。
+const BLESSINGS_DATA_PATH := "res://data/blessings.json"
+
+var sources_data: Array = []
 
 const EFFECT_ICONS := {
 	"max_health": preload("res://art/ui/icons/heart.png"),
@@ -42,25 +14,43 @@ const EFFECT_ICONS := {
 	"gold": preload("res://art/ui/icons/gold.png"),
 	"big_gold": preload("res://art/ui/icons/gold.png"),
 	"upgrade": preload("res://art/ui/icons/deck.png"),
+	"remove_card": preload("res://art/ui/icons/deck.png"),
+	"duplicate_card": preload("res://art/ui/icons/deck.png"),
 	"draw": preload("res://art/ui/icons/draw.png"),
 	"max_mana": preload("res://art/map/nodes/map_node_blessing.png"),
+	"relic": preload("res://art/map/nodes/map_node_blessing.png"),
 }
+
+const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
 
 @export var character_stats: CharacterStats
 @export var run_stats: RunStats
+@export var relic_handler: RelicHandler
 @export var chapter := 1
 
-var god: Dictionary
+var source: Dictionary
 var choices: Array
 var choice_buttons: Array[Button] = []
 var choice_rows: Array[Dictionary] = []
 
 
 func _ready() -> void:
+	_load_sources()
 	_build_ui()
 
 	if character_stats and run_stats:
 		_roll_blessings()
+
+
+func _load_sources() -> void:
+	if not sources_data.is_empty():
+		return
+	if not FileAccess.file_exists(BLESSINGS_DATA_PATH):
+		push_error("祝福数据缺失：%s" % BLESSINGS_DATA_PATH)
+		return
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(BLESSINGS_DATA_PATH))
+	if parsed is Dictionary:
+		sources_data = (parsed as Dictionary).get("sources", [])
 
 
 func setup(new_character_stats: CharacterStats, new_run_stats: RunStats, new_chapter: int) -> void:
@@ -220,15 +210,26 @@ func _create_choice_row(index: int) -> Dictionary:
 
 
 func _roll_blessings() -> void:
-	god = RNG.array_pick_random(GODS) as Dictionary
-	var blessing_pool: Array = (god.get("blessings", []) as Array).duplicate()
+	_load_sources()
+	if sources_data.is_empty():
+		return
+	source = RNG.array_pick_random(sources_data) as Dictionary
+
+	# 按角色命格过滤（仅命格共鸣带 class 标签；其余来源全部放行）。
+	var cls := _character_class()
+	var blessing_pool: Array = []
+	for b in (source.get("blessings", []) as Array):
+		var b_class: String = (b as Dictionary).get("class", "")
+		if b_class.is_empty() or b_class == cls:
+			blessing_pool.append(b)
+
 	RNG.array_shuffle(blessing_pool)
 	choices = blessing_pool.slice(0, mini(3, blessing_pool.size()))
 
 	var title := $Title as Label
 	var description := $Description as Label
-	title.text = god.get("name", "先古神明")
-	description.text = "第 %s 章之前，%s" % [chapter, god.get("description", "")]
+	title.text = source.get("name", "劫中遗赠")
+	description.text = "第 %s 章之前，%s" % [chapter, source.get("description", "")]
 
 	for i in choice_rows.size():
 		var row := choice_rows[i]
@@ -238,8 +239,8 @@ func _roll_blessings() -> void:
 			continue
 
 		var blessing := choices[i] as Dictionary
-		var effect := blessing.get("effect", "") as String
-		(row["icon"] as TextureRect).texture = EFFECT_ICONS.get(effect, EFFECT_ICONS["max_mana"])
+		var icon_key := blessing.get("icon", "max_mana") as String
+		(row["icon"] as TextureRect).texture = EFFECT_ICONS.get(icon_key, EFFECT_ICONS["max_mana"])
 		(row["name"] as Label).text = blessing.get("name", "未知祝福")
 		(row["description"] as Label).text = blessing.get("description", "")
 		button.show()
@@ -255,38 +256,99 @@ func _on_choice_pressed(index: int) -> void:
 
 
 func _apply_blessing(blessing: Dictionary) -> void:
-	match blessing.get("effect", ""):
+	for effect in blessing.get("effects", []):
+		_apply_effect(effect.get("type", ""), int(effect.get("amount", 0)))
+	character_stats.stats_changed.emit()
+
+
+func _apply_effect(type: String, amount: int) -> void:
+	match type:
 		"max_health":
-			character_stats.max_health += 8
-		"gold":
-			run_stats.gold += 80
-		"big_gold":
-			run_stats.gold += 100
-		"upgrade":
-			_upgrade_random_card()
-		"draw":
-			character_stats.cards_per_turn += 1
-			character_stats.stats_changed.emit()
-		"max_mana":
-			character_stats.max_mana += 1
-			character_stats.reset_mana()
-			character_stats.stats_changed.emit()
+			# Stats.set_max_health 在增加上限时已自动回复同等生命，无需再 heal。
+			character_stats.max_health += amount
+		"lose_max_health":
+			character_stats.max_health = maxi(1, character_stats.max_health - amount)
+			character_stats.health = mini(character_stats.health, character_stats.max_health)
 		"full_heal":
 			character_stats.heal(character_stats.max_health)
+		"gold":
+			run_stats.gold += amount
+		"lose_gold":
+			run_stats.gold = maxi(0, run_stats.gold - amount)
+		"max_mana":
+			character_stats.max_mana += amount
+			character_stats.reset_mana()
+		"draw":
+			character_stats.cards_per_turn += amount
+		"upgrade":
+			_upgrade_random_cards(maxi(amount, 1))
+		"remove_card":
+			_remove_random_cards(maxi(amount, 1))
+		"duplicate_card":
+			_duplicate_random_cards(maxi(amount, 1))
+		"grant_relic":
+			_grant_relics(maxi(amount, 1))
 
 
-func _upgrade_random_card() -> void:
+func _character_class() -> String:
+	if not character_stats:
+		return ""
+	var path := character_stats.resource_path
+	if path.is_empty() and character_stats.starting_deck:
+		path = character_stats.starting_deck.resource_path
+	if path.contains("demonic_cultivator"):
+		return "demonic"
+	if path.contains("sword_cultivator"):
+		return "sword"
+	if path.contains("body_cultivator"):
+		return "body"
+	if path.contains("beastmaster"):
+		return "beastmaster"
+	return ""
+
+
+func _upgrade_random_cards(count: int) -> void:
 	if not character_stats or not character_stats.deck:
 		return
+	for _i in count:
+		var candidates: Array[Card] = []
+		for card: Card in character_stats.deck.cards:
+			if card and card.can_upgrade():
+				candidates.append(card)
+		var picked := RNG.array_pick_random(candidates) as Card
+		if picked:
+			picked.upgrade()
 
-	var candidates: Array[Card] = []
-	for card: Card in character_stats.deck.cards:
-		if card and card.can_upgrade():
-			candidates.append(card)
 
-	var picked := RNG.array_pick_random(candidates) as Card
-	if picked:
-		picked.upgrade()
+func _remove_random_cards(count: int) -> void:
+	if not character_stats or not character_stats.deck:
+		return
+	for _i in count:
+		if character_stats.deck.cards.size() <= 1:
+			return
+		var picked := RNG.array_pick_random(character_stats.deck.cards) as Card
+		if picked:
+			character_stats.deck.remove_card(picked)
+
+
+func _duplicate_random_cards(count: int) -> void:
+	if not character_stats or not character_stats.deck:
+		return
+	for _i in count:
+		if character_stats.deck.cards.is_empty():
+			return
+		var picked := RNG.array_pick_random(character_stats.deck.cards) as Card
+		if picked:
+			character_stats.deck.add_card(picked.duplicate(true))
+
+
+func _grant_relics(count: int) -> void:
+	if not relic_handler:
+		return
+	for _i in count:
+		var relic := RELIC_REWARD_POOL.get_random_available(character_stats, relic_handler)
+		if relic:
+			relic_handler.add_relic(relic)
 
 
 func _apply_choice_button_style(button: Button) -> void:

@@ -63,6 +63,7 @@ offset_left = -240.0
 offset_top = 8.0
 offset_right = 240.0
 offset_bottom = 368.0
+grow_horizontal = 2
 grow_vertical = 2
 
 [node name="MenuMargin" type="MarginContainer" parent="MenuPanel"]
@@ -130,7 +131,6 @@ offset_right = 540.0
 offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 0
-mouse_filter = 2
 text = "万劫残卷已启"
 vertical_alignment = 1
 
@@ -153,7 +153,6 @@ text = "设置功能正在闭关打磨"
 horizontal_alignment = 1
 
 [node name="CodexPanel" parent="." instance=ExtResource("8_codex")]
-visible = false
 layout_mode = 1
 
 [connection signal="pressed" from="MenuPanel/MenuMargin/MenuVBox/Continue" to="." method="_on_continue_pressed"]

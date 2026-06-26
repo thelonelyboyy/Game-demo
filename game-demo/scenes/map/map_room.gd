@@ -3,6 +3,8 @@ extends Area2D
 
 signal clicked(room: Room)
 signal selected(room: Room)
+signal hovered(map_room: MapRoom)
+signal hover_cleared(map_room: MapRoom)
 
 const NORMAL_TEXTURE_SIZE := 38.0
 const LARGE_TEXTURE_SIZE := 44.0
@@ -23,7 +25,13 @@ const ICONS := {
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
 var available := false : set = set_available
+var focused := false : set = set_focused
 var room: Room : set = set_room
+
+
+func _ready() -> void:
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 
 
 func set_available(new_value: bool) -> void:
@@ -35,6 +43,11 @@ func set_available(new_value: bool) -> void:
 		animation_player.play("highlight")
 	elif not room.selected:
 		animation_player.play("RESET")
+
+
+func set_focused(new_value: bool) -> void:
+	focused = new_value
+	queue_redraw()
 
 
 func set_room(new_data: Room) -> void:
@@ -86,13 +99,16 @@ func _draw() -> void:
 		draw_circle(Vector2.ZERO, 20.0, Color(0.86, 0.70, 0.34, 0.16))
 		draw_arc(Vector2.ZERO, 17.5, 0.0, TAU, 72, Color(0.95, 0.80, 0.42, 0.55), 1.6, true)
 
+	if focused:
+		draw_arc(Vector2.ZERO, 25.5, 0.0, TAU, 96, Color(1.0, 0.90, 0.52, 0.86), 2.6, true)
+
 
 func _is_large_room() -> bool:
 	return room.type == Room.Type.BOSS or room.type == Room.Type.ELITE or room.type == Room.Type.BLESSING
 
 
-func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
-	if not available or not event.is_action_pressed("left_mouse"):
+func activate() -> void:
+	if not available or not room:
 		return
 
 	room.selected = true
@@ -100,6 +116,23 @@ func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> voi
 	_refresh_visual_state()
 	queue_redraw()
 	animation_player.play("select")
+
+
+func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if not event.is_action_pressed("left_mouse"):
+		return
+
+	activate()
+
+
+func _on_mouse_entered() -> void:
+	if room:
+		hovered.emit(self)
+
+
+func _on_mouse_exited() -> void:
+	if room:
+		hover_cleared.emit(self)
 
 
 # Called by the AnimationPlayer when the select animation finishes.

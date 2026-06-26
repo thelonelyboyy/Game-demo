@@ -12,7 +12,7 @@ var connected_deck: CardPile
 func _ready() -> void:
 	custom_minimum_size = Vector2(132, 56)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	InkTheme.apply_demonic_panel(self)
+	InkTheme.apply_battle_blue_panel(self)
 
 	var content := HBoxContainer.new()
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE

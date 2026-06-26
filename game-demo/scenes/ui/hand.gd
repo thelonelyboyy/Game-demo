@@ -3,14 +3,14 @@ extends Control
 
 const CARD_UI_SCENE := preload("res://scenes/card_ui/card_ui.tscn")
 const CARD_SIZE := Vector2(224.0, 322.0)
-const MAX_CARD_GAP := 252.0
-const MIN_CARD_GAP := 123.0
-const SIDE_SAFE_AREA := 460.0
-const FAN_ROTATION := 10.5
-const FAN_DROP := 81.0
-const CENTER_LIFT := 39.0
-const HOVER_SCALE := 1.42
-const HOVER_LIFT := 48.0
+const MAX_CARD_GAP := 172.0
+const MIN_CARD_GAP := 92.0
+const SIDE_SAFE_AREA := 720.0
+const FAN_ROTATION := 7.0
+const FAN_DROP := 38.0
+const CENTER_LIFT := 62.0
+const HOVER_SCALE := 1.38
+const HOVER_LIFT := 54.0
 const HOVER_Z_INDEX := 1000
 const LAYOUT_DURATION := 0.18
 
@@ -104,7 +104,7 @@ func _layout_cards() -> void:
 
 	var total_width := CARD_SIZE.x + card_gap * float(card_count - 1)
 	var start_x := (size.x - total_width) * 0.5
-	var base_y := size.y - CARD_SIZE.y + 62.0
+	var base_y := size.y - CARD_SIZE.y + 4.0
 	var middle := float(card_count - 1) * 0.5
 	var divisor := maxf(middle, 1.0)
 

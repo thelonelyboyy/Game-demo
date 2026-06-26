@@ -33,7 +33,7 @@ func activate_relics_by_type(type: Relic.Type) -> void:
 		tween.tween_callback(relic_ui.relic.activate_relic.bind(relic_ui))
 		tween.tween_interval(RELIC_APPLY_INTERVAL)
 	
-	tween.finished.connect(func(): relics_activated.emit(type))
+	tween.finished.connect(_emit_relics_activated.bind(type))
 
 
 func add_relics(relics_array: Array[Relic]) -> void:
@@ -83,3 +83,7 @@ func _on_relics_child_exiting_tree(relic_ui: RelicUI) -> void:
 	
 	if relic_ui.relic:
 		relic_ui.relic.deactivate_relic(relic_ui)
+
+
+func _emit_relics_activated(type: Relic.Type) -> void:
+	relics_activated.emit(type)

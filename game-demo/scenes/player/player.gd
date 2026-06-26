@@ -2,8 +2,8 @@ class_name Player
 extends Node2D
 
 const MAX_BATTLE_ART_HEIGHT := 82.0
-const HEALTH_BAR_HALF_WIDTH := 88.0
-const STATUS_ROW_HALF_WIDTH := 20.0
+const HEALTH_BAR_HALF_WIDTH := 124.0
+const STATUS_ROW_HALF_WIDTH := 30.0
 
 const ANIM_ROOT := "res://art/frame_animation/"
 # 各动画的帧率与是否循环
@@ -151,7 +151,7 @@ func refresh_battle_overlays() -> void:
 	)
 	status_handler.position = Vector2(
 		-STATUS_ROW_HALF_WIDTH * status_scale,
-		stats_ui.position.y + 46.0 * status_scale
+		stats_ui.position.y + 68.0 * status_scale
 	)
 
 
@@ -222,11 +222,12 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 	tween.tween_callback(stats.take_damage.bind(modified_damage))
 	tween.tween_interval(0.17)
 
-	tween.finished.connect(
-		func():
-			if stats.health <= 0:
-				_play_death_and_die()
-	)
+	tween.finished.connect(_on_damage_tween_finished)
+
+
+func _on_damage_tween_finished() -> void:
+	if stats.health <= 0:
+		_play_death_and_die()
 
 
 func _anim_duration(anim_name: String) -> float:

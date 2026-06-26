@@ -1,16 +1,14 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=10 format=3 uid="uid://sb0f4f7gbael"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/ui/icons/status_soul_mark.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="3"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://civrsdnd0770k" path="res://art/ui/icons/status_soul_mark.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_soul_mark_consume_effect.gd" id="e1"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_heal_effect.gd" id="e2"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="e3"]
+[ext_resource type="Script" uid="uid://4fcmjl85rq2j" path="res://custom_resources/effects/configured_heal_effect.gd" id="e2"]
+[ext_resource type="Script" uid="uid://37ewyomluh2u" path="res://custom_resources/effects/configured_draw_effect.gd" id="e3"]
 
 [sub_resource type="Resource" id="E1"]
 script = ExtResource("e1")
-target_mode = 0
-consume_amount = 2
 
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("e2")

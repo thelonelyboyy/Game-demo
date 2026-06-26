@@ -20,14 +20,7 @@ func perform_action() -> void:
 	tween.tween_interval(0.25)
 	tween.tween_property(enemy, "global_position", start, 0.4)
 	
-	# 捕获 instance_id 而非节点：补间未完成前敌人/战斗可能被释放，捕获节点会触发「Lambda capture freed」
-	var enemy_id := enemy.get_instance_id()
-	tween.finished.connect(
-		func():
-			var acting_enemy := instance_from_id(enemy_id) as Enemy
-			if is_instance_valid(acting_enemy):
-				Events.enemy_action_completed.emit(acting_enemy)
-	)
+	complete_action_when_tween_finishes(tween)
 
 
 func update_intent_text() -> void:

@@ -103,7 +103,8 @@ def parse_card(path: Path) -> dict:
     effects = []
     for block in _effect_blocks(text):
         scr = re.search(r'script = ExtResource\("([^"]+)"\)', block)
-        amt = re.search(r"amount = (-?\d+)", block)
+        # 必须锚定行首，否则会误匹配 consume_amount / *_amount 等字段。
+        amt = re.search(r"^amount = (-?\d+)", block, re.M)
         st = re.search(r'status = ExtResource\("([^"]+)"\)', block)
         label = EFFECT_LABEL.get(scripts.get(scr.group(1), ""), scripts.get(scr.group(1), "?")) if scr else "?"
         extra = statuses.get(st.group(1), "") if st else ""

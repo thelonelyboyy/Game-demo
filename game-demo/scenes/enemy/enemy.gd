@@ -9,9 +9,9 @@ const BOSS_ART_MAX_SIZE := 140.0
 const TARGET_HIGHLIGHT_PADDING := Vector2(5.0, 4.0)
 const TARGET_CORNER_MIN_LENGTH := 6.0
 const TARGET_CORNER_MAX_LENGTH := 13.0
-const HEALTH_BAR_HALF_WIDTH := 95.0
-const STATUS_ROW_HALF_WIDTH := 20.0
-const INTENT_HALF_WIDTH := 46.0
+const HEALTH_BAR_HALF_WIDTH := 124.0
+const STATUS_ROW_HALF_WIDTH := 30.0
+const INTENT_HALF_WIDTH := 95.0
 
 @export var stats: EnemyStats : set = set_enemy_stats
 
@@ -147,7 +147,7 @@ func refresh_battle_overlays() -> void:
 
 	intent_ui.position = Vector2(
 		-INTENT_HALF_WIDTH * intent_scale,
-		-sprite_visible_size.y * 0.33 - 30.0 * intent_scale
+		-sprite_visible_size.y * 0.42 - 58.0 * intent_scale
 	)
 	stats_ui.position = Vector2(
 		-HEALTH_BAR_HALF_WIDTH * stats_scale,
@@ -155,7 +155,7 @@ func refresh_battle_overlays() -> void:
 	)
 	status_handler.position = Vector2(
 		-STATUS_ROW_HALF_WIDTH * status_scale,
-		stats_ui.position.y + 46.0 * status_scale
+		stats_ui.position.y + 68.0 * status_scale
 	)
 
 
@@ -186,14 +186,16 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 	tween.tween_callback(stats.take_damage.bind(modified_damage))
 	tween.tween_interval(0.17)
 
-	tween.finished.connect(
-		func():
-			sprite_2d.material = null
-			
-			if stats.health <= 0:
-				Events.enemy_died.emit(self)
-				queue_free()
-	)
+	tween.finished.connect(_on_damage_tween_finished)
+
+
+func _on_damage_tween_finished() -> void:
+	if sprite_2d:
+		sprite_2d.material = null
+
+	if stats.health <= 0:
+		Events.enemy_died.emit(self)
+		queue_free()
 
 
 func _on_area_entered(_area: Area2D) -> void:

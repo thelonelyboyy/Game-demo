@@ -31,7 +31,7 @@ func enter() -> void:
 	
 	minimum_drag_time_elapsed = false
 	var threshold_timer := get_tree().create_timer(DRAG_MINIMUM_THRESHOLD, false)
-	threshold_timer.timeout.connect(func(): minimum_drag_time_elapsed = true)
+	threshold_timer.timeout.connect(_on_drag_threshold_timeout)
 
 
 func exit() -> void:
@@ -61,3 +61,7 @@ func _get_targeting_preview_position(hand: Control) -> Vector2:
 		(hand.size.x - card_ui.size.x * TARGETING_PREVIEW_SCALE) * 0.5,
 		TARGETING_PREVIEW_Y
 	)
+
+
+func _on_drag_threshold_timeout() -> void:
+	minimum_drag_time_elapsed = true

@@ -10,6 +10,23 @@ const RED := Color("8b2f2a")
 
 const HUD_PANEL_FRAME := preload("res://art/ui/battle_hud/demonic_red/panel_frame.png")
 const HUD_END_TURN_PLATE := preload("res://art/ui/battle_hud/demonic_red/end_turn_plate.png")
+const HUD_BLUE_PANEL_FRAME := preload("res://art/ui/battle_hud/demonic_blue/panel_frame.png")
+const HUD_BLUE_CLASS_EMBLEM := preload("res://art/ui/battle_hud/demonic_blue/top_class_emblem.png")
+const HUD_BATTLE_TOP_BAR := preload("res://assets/ui/generated/battle/battle_top_hud_bar_9slice.png")
+const HUD_BLUE_END_TURN_PLATE := preload("res://assets/ui/generated/battle/battle_end_turn_button_normal_9slice.png")
+const HUD_BATTLE_END_TURN_HOVER := preload("res://assets/ui/generated/battle/battle_end_turn_button_hover_9slice.png")
+const HUD_BATTLE_END_TURN_PRESSED := preload("res://assets/ui/generated/battle/battle_end_turn_button_pressed_9slice.png")
+const HUD_BATTLE_END_TURN_DISABLED := preload("res://assets/ui/generated/battle/battle_end_turn_button_disabled_9slice.png")
+const HUD_BLUE_TURN_BADGE := preload("res://assets/ui/generated/battle/battle_round_banner_9slice.png")
+const HUD_BLUE_PILE_PANEL := preload("res://assets/ui/generated/battle/battle_draw_pile_panel_9slice.png")
+const HUD_BATTLE_DISCARD_PILE_PANEL := preload("res://assets/ui/generated/battle/battle_discard_pile_panel_9slice.png")
+const HUD_BLUE_DECK_PANEL := preload("res://assets/ui/generated/battle/battle_deck_button_normal_9slice.png")
+const HUD_BATTLE_DECK_HOVER := preload("res://assets/ui/generated/battle/battle_deck_button_hover_9slice.png")
+const HUD_BATTLE_DECK_PRESSED := preload("res://assets/ui/generated/battle/battle_deck_button_pressed_9slice.png")
+const HUD_BLUE_TOP_LEFT_PANEL := preload("res://assets/ui/generated/battle/battle_player_identity_plate_9slice.png")
+const HUD_BATTLE_SETTINGS_NORMAL := preload("res://assets/ui/generated/battle/battle_settings_button_normal.png")
+const HUD_BATTLE_SETTINGS_HOVER := preload("res://assets/ui/generated/battle/battle_settings_button_hover.png")
+const HUD_BATTLE_SETTINGS_PRESSED := preload("res://assets/ui/generated/battle/battle_settings_button_pressed.png")
 
 
 static func add_backdrop(parent: Node, variant: String) -> InkBackdrop:
@@ -88,6 +105,30 @@ static func apply_demonic_button(button: Button, large := false) -> void:
 	button.add_theme_stylebox_override("hover", make_texture_style(HUD_END_TURN_PLATE, 42, 18, Color(1.16, 1.08, 0.92, 1.0)))
 	button.add_theme_stylebox_override("pressed", make_texture_style(HUD_END_TURN_PLATE, 42, 18, Color(0.72, 0.62, 0.58, 0.96)))
 	button.add_theme_stylebox_override("disabled", make_texture_style(HUD_END_TURN_PLATE, 42, 18, Color(0.42, 0.38, 0.36, 0.45)))
+
+
+static func apply_battle_blue_panel(panel: Control) -> void:
+	var style := make_texture_style(HUD_BLUE_PANEL_FRAME, 42, 18, Color(1, 1, 1, 0.96))
+	style.content_margin_left = 18
+	style.content_margin_top = 10
+	style.content_margin_right = 18
+	style.content_margin_bottom = 10
+	panel.add_theme_stylebox_override("panel", style)
+
+
+static func apply_battle_blue_button(button: Button, large := false) -> void:
+	button.add_theme_color_override("font_color", Color("fff0c2"))
+	button.add_theme_color_override("font_hover_color", Color("fff7d8"))
+	button.add_theme_color_override("font_pressed_color", Color("d6b16e"))
+	button.add_theme_color_override("font_disabled_color", Color(0.76, 0.60, 0.48, 0.45))
+	button.add_theme_color_override("font_shadow_color", Color(0.04, 0, 0, 0.95))
+	button.add_theme_constant_override("shadow_offset_x", 3)
+	button.add_theme_constant_override("shadow_offset_y", 3)
+	button.add_theme_font_size_override("font_size", 34 if large else 24)
+	button.add_theme_stylebox_override("normal", make_texture_style(HUD_BLUE_END_TURN_PLATE, 42, 28, Color(1, 1, 1, 0.98)))
+	button.add_theme_stylebox_override("hover", make_texture_style(HUD_BATTLE_END_TURN_HOVER, 42, 28, Color(1.08, 1.04, 0.98, 1.0)))
+	button.add_theme_stylebox_override("pressed", make_texture_style(HUD_BATTLE_END_TURN_PRESSED, 42, 28, Color(0.82, 0.72, 0.66, 0.98)))
+	button.add_theme_stylebox_override("disabled", make_texture_style(HUD_BATTLE_END_TURN_DISABLED, 42, 28, Color(0.62, 0.56, 0.52, 0.58)))
 
 
 static func make_style(bg: Color, border: Color, border_width := 1, radius := 4, shadow := Color(0, 0, 0, 0), shadow_size := 0) -> StyleBoxFlat:
