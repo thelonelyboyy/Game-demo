@@ -19,6 +19,7 @@ var _turn_count := 0
 var _turn_label: Label
 
 func _ready() -> void:
+	layer = 4
 	_polish_ui()
 	get_viewport().size_changed.connect(_layout_battle_controls)
 	Events.player_turn_started.connect(_on_player_turn_started)
@@ -80,6 +81,7 @@ func _add_turn_badge() -> void:
 	badge.name = "TurnBadge"
 	badge.custom_minimum_size = Vector2(300, 104)
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge.z_index = 100
 	badge.anchor_left = 0.5
 	badge.anchor_right = 0.5
 	badge.offset_left = -150.0
@@ -92,6 +94,8 @@ func _add_turn_badge() -> void:
 	_turn_label = Label.new()
 	_turn_label.name = "TurnLabel"
 	_turn_label.text = "回合"
+	_turn_label.custom_minimum_size = Vector2(220, 56)
+	_turn_label.z_index = 101
 	_turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_turn_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_turn_label.add_theme_font_size_override("font_size", 35)
@@ -181,11 +185,11 @@ func _layout_battle_controls() -> void:
 	var scale_factor: float = minf(viewport_size.x / REFERENCE_SIZE.x, viewport_size.y / REFERENCE_SIZE.y)
 	scale_factor = clampf(scale_factor, 0.78, 1.12)
 
-	_place_bottom_left(mana_ui, Vector2(42, 286), Vector2(216, 216), scale_factor)
-	_place_bottom_left($FlameWheelUI as Control, Vector2(20, 488), Vector2(300, 236), scale_factor)
-	_place_bottom_left(draw_pile_button, Vector2(42, 124), Vector2(190, 92), scale_factor)
-	_place_bottom_right(discard_pile_button, Vector2(42, 124), Vector2(190, 92), scale_factor)
-	_place_bottom_right(end_turn_button, Vector2(36, 236), Vector2(316, 104), scale_factor)
+	_place_bottom_left(mana_ui, Vector2(52, 142), Vector2(216, 216), scale_factor)
+	_place_bottom_left($FlameWheelUI as Control, Vector2(18, 342), Vector2(300, 236), scale_factor)
+	_place_bottom_left(draw_pile_button, Vector2(52, 74), Vector2(190, 92), scale_factor)
+	_place_bottom_right(discard_pile_button, Vector2(42, 74), Vector2(190, 92), scale_factor)
+	_place_bottom_right(end_turn_button, Vector2(36, 190), Vector2(316, 104), scale_factor)
 
 	hand.offset_top = -324.0 * scale_factor
 

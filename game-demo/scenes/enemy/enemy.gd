@@ -3,9 +3,9 @@ extends Area2D
 
 const ARROW_OFFSET := 5
 const WHITE_SPRITE_MATERIAL := preload("res://art/shaders/white_sprite_material.tres")
-const DEFAULT_ART_MAX_SIZE := 88.0
-const ELITE_ART_MAX_SIZE := 116.0
-const BOSS_ART_MAX_SIZE := 140.0
+const DEFAULT_ART_MAX_SIZE := 52.8
+const ELITE_ART_MAX_SIZE := 69.6
+const BOSS_ART_MAX_SIZE := 84.0
 const TARGET_HIGHLIGHT_PADDING := Vector2(5.0, 4.0)
 const TARGET_CORNER_MIN_LENGTH := 6.0
 const TARGET_CORNER_MAX_LENGTH := 13.0

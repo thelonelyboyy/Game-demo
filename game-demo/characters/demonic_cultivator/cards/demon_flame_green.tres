@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3 uid="uid://c4o0nymq0y2r2"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/ui/icons/status_sword_guard.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_flame_effect.gd" id="e2"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dvlkjs2n4kujl" path="res://art/ui/icons/status_sword_guard.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
+[ext_resource type="Script" uid="uid://d188jsaw7s537" path="res://custom_resources/effects/configured_flame_effect.gd" id="e2"]
 
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("e2")
@@ -21,7 +21,6 @@ effect_text = "获得 10 点护体（每有 1 种其它魔焰颜色额外 +5）�
 id = "demon_flame_green"
 type = 1
 rarity = 1
-target = 0
 cost = 1
 mechanic_tags = null
 display_name = "魔焰绿·镇煞"

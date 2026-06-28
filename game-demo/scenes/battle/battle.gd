@@ -220,8 +220,24 @@ func _setup_class_mechanic_handler() -> void:
 
 	# 魔修：焰轮从开局起常显（空时全暗），让玩家随时看到机制。
 	var flame_wheel := battle_ui.get_node_or_null("FlameWheelUI") as FlameWheelUI
-	if flame_wheel and class_mechanic_handler.is_demonic():
+	if flame_wheel and _should_show_flame_wheel():
 		flame_wheel.activate()
+
+
+func _should_show_flame_wheel() -> bool:
+	if class_mechanic_handler and class_mechanic_handler.is_demonic():
+		return true
+	if not char_stats:
+		return false
+	if char_stats.character_name == "魔修" or char_stats.battle_anim_id == "demonic_cultivator":
+		return true
+	var paths := [
+		char_stats.resource_path,
+		char_stats.starting_deck.resource_path if char_stats.starting_deck else "",
+		char_stats.draftable_cards.resource_path if char_stats.draftable_cards else "",
+	]
+	var source_text := "%s %s %s" % [paths[0], paths[1], paths[2]]
+	return source_text.contains("demonic_cultivator")
 
 
 func _setup_ink_backdrop() -> void:

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://piawqnepbnnq"
-path="res://.godot/imported/now.png-6c82337f82620860ecf18ae8dc97419b.ctex"
+uid="uid://cvxtqvgd3wf7m"
+path="res://.godot/imported/flame_wheel_lit_alignment_preview.png-2818cd9583d72b4b303989703fc9e483.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/design/now.png"
-dest_files=["res://.godot/imported/now.png-6c82337f82620860ecf18ae8dc97419b.ctex"]
+source_file="res://tmp/flame_wheel_lit_alignment_preview.png"
+dest_files=["res://.godot/imported/flame_wheel_lit_alignment_preview.png-2818cd9583d72b4b303989703fc9e483.ctex"]
 
 [params]
 

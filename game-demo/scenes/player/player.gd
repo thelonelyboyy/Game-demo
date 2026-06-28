@@ -1,7 +1,7 @@
 class_name Player
 extends Node2D
 
-const MAX_BATTLE_ART_HEIGHT := 82.0
+const MAX_BATTLE_ART_HEIGHT := 65.6
 const HEALTH_BAR_HALF_WIDTH := 124.0
 const STATUS_ROW_HALF_WIDTH := 30.0
 

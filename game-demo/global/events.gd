@@ -59,6 +59,7 @@ signal treasure_room_exited(found_relics: Array[Relic])
 
 # Relic-related events
 signal relic_tooltip_requested(relic: Relic)
+signal relic_tooltip_hide_requested
 
 # Random Event room-related events
 signal event_choice_resolved(effect: String, amount: int, character: CharacterStats, run_stats: RunStats)

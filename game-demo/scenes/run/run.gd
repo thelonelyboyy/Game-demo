@@ -9,6 +9,7 @@ const SHOP_SCENE := preload("res://scenes/shop/shop.tscn")
 const TREASURE_SCENE = preload("res://scenes/treasure/treasure.tscn")
 const WIN_SCREEN_SCENE := preload("res://scenes/win_screen/win_screen.tscn")
 const SPIRIT_ROOT_BADGE_SCENE := preload("res://scenes/ui/spirit_root_badge.tscn")
+const DEMONIC_HEAD_ICON := preload("res://art/characters/demonic_cultivator_head_icon.png")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
 const POTION_REWARD_PATHS := [
 	"res://potions/healing_pill.tres",
@@ -221,6 +222,8 @@ func _setup_top_bar():
 	
 	relic_handler.add_relic(character.starting_relic)
 	Events.relic_tooltip_requested.connect(relic_tooltip.show_tooltip)
+	if not Events.relic_tooltip_hide_requested.is_connected(relic_tooltip.hide):
+		Events.relic_tooltip_hide_requested.connect(relic_tooltip.hide)
 	
 	deck_button.card_pile = character.deck
 	deck_view.card_pile = character.deck
@@ -232,19 +235,17 @@ func _polish_top_bar() -> void:
 	var top_bar := $TopBar
 	var background := $TopBar/Background as TextureRect
 	if background:
-		background.show()
-		background.texture = InkTheme.HUD_BATTLE_TOP_BAR
-		background.custom_minimum_size = Vector2(0, 110)
-		background.offset_bottom = 110.0
-		background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		background.stretch_mode = TextureRect.STRETCH_SCALE
+		# 隐藏整条顶栏背景装饰框：各功能元素（身份牌/灵根/丹药/回合横幅/总牌库/设置）
+		# 都有各自独立的面板底图，这条横跨全宽的装饰框只会在中间空白处露出一段空凹槽。
+		background.hide()
 
 	var bar_items := $TopBar/BarItems as VBoxContainer
 	if bar_items:
-		bar_items.custom_minimum_size = Vector2(0, 110)
+		bar_items.custom_minimum_size = Vector2(0, 0)
 		bar_items.offset_left = 14.0
+		bar_items.offset_top = 0.0
 		bar_items.offset_right = -88.0
-		bar_items.offset_bottom = 110.0
+		bar_items.offset_bottom = 96.0
 		bar_items.add_theme_constant_override("separation", 0)
 
 	var top_row := $TopBar/BarItems/TopRow as HBoxContainer
@@ -258,10 +259,13 @@ func _polish_top_bar() -> void:
 		if not left_info.has_node("TopInfoSpacer"):
 			var spacer := Control.new()
 			spacer.name = "TopInfoSpacer"
-			spacer.custom_minimum_size = Vector2(86, 42)
+			spacer.custom_minimum_size = Vector2(88, 42)
 			spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			left_info.add_child(spacer)
 			left_info.move_child(spacer, 0)
+		var top_spacer := left_info.get_node_or_null("TopInfoSpacer") as Control
+		if top_spacer:
+			top_spacer.custom_minimum_size = Vector2(96, 42)
 		health_ui.custom_minimum_size = Vector2(142, 42)
 		gold_ui.custom_minimum_size = Vector2(112, 42)
 
@@ -275,9 +279,10 @@ func _polish_top_bar() -> void:
 		top_bar.move_child(panel, 1)
 	var left_panel := top_bar.get_node_or_null("TopLeftPanel") as TextureRect
 	if left_panel:
-		left_panel.position = Vector2(8, 7)
-		left_panel.size = Vector2(440, 88)
+		left_panel.position = Vector2(0, 0)
+		left_panel.size = Vector2(376, 88)
 		left_panel.texture = InkTheme.HUD_BLUE_TOP_LEFT_PANEL
+		left_panel.modulate = Color(1, 1, 1, 0.82)
 
 	if not top_bar.has_node("TopClassEmblem"):
 		var emblem := TextureRect.new()
@@ -289,8 +294,24 @@ func _polish_top_bar() -> void:
 		top_bar.add_child(emblem)
 	var emblem := top_bar.get_node_or_null("TopClassEmblem") as TextureRect
 	if emblem:
-		emblem.position = Vector2(9, 1)
+		emblem.position = Vector2(2, -2)
 		emblem.size = Vector2(96, 96)
+		emblem.visible = false
+
+	var portrait := top_bar.get_node_or_null("TopClassPortrait") as TextureRect
+	if not portrait:
+		portrait = TextureRect.new()
+		portrait.name = "TopClassPortrait"
+		portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		top_bar.add_child(portrait)
+	portrait.texture = DEMONIC_HEAD_ICON
+	portrait.position = Vector2(4, 0)
+	portrait.size = Vector2(92, 92)
+	portrait.modulate = Color(1, 1, 1, 1)
+	portrait.visible = true
+	top_bar.move_child(portrait, top_bar.get_child_count() - 1)
 
 	var class_title := top_bar.get_node_or_null("TopClassTitle") as Label
 	if not class_title:
@@ -308,8 +329,22 @@ func _polish_top_bar() -> void:
 	class_title.text = character.character_name if character and not character.character_name.is_empty() else ""
 
 	_style_top_stat_widgets()
+	_remove_skill_button()
 	_polish_relic_row()
 	_polish_settings_button()
+
+
+func _is_demonic_character() -> bool:
+	if not character:
+		return false
+	if character.battle_anim_id == "demonic_cultivator":
+		return true
+	var source_path := character.resource_path
+	if source_path.contains("demonic_cultivator"):
+		return true
+	if character.starting_deck and character.starting_deck.resource_path.contains("demonic_cultivator"):
+		return true
+	return false
 
 
 func _style_top_stat_widgets() -> void:
@@ -331,8 +366,18 @@ func _style_top_stat_widgets() -> void:
 		label.add_theme_constant_override("shadow_offset_y", 2)
 
 
+func _apply_compact_top_panel(panel: Control, panel_size: Vector2) -> void:
+	panel.custom_minimum_size = panel_size
+	var style := InkTheme.make_texture_style(InkTheme.HUD_BLUE_PILE_PANEL, 32, 18, Color(1, 1, 1, 0.96))
+	style.content_margin_left = 10
+	style.content_margin_top = 6
+	style.content_margin_right = 10
+	style.content_margin_bottom = 6
+	panel.add_theme_stylebox_override("panel", style)
+
+
 func _polish_deck_button() -> void:
-	deck_button.custom_minimum_size = Vector2(300, 82)
+	deck_button.custom_minimum_size = Vector2(268, 74)
 	deck_button.ignore_texture_size = true
 	deck_button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 	deck_button.texture_normal = null
@@ -353,6 +398,20 @@ func _polish_deck_button() -> void:
 	var deck_panel := deck_button.get_node_or_null("DeckPanel") as TextureRect
 	if deck_panel:
 		deck_panel.texture = InkTheme.HUD_BLUE_DECK_PANEL
+		deck_panel.modulate = Color(1, 1, 1, 0.95)
+
+	var deck_icon := deck_button.get_node_or_null("DeckIcon") as TextureRect
+	if not deck_icon:
+		deck_icon = TextureRect.new()
+		deck_icon.name = "DeckIcon"
+		deck_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		deck_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		deck_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		deck_button.add_child(deck_icon)
+	deck_icon.texture = InkTheme.HUD_BATTLE_DECK_ICON
+	deck_icon.position = Vector2(172, 11)
+	deck_icon.size = Vector2(72, 52)
+	deck_icon.modulate = Color(0.92, 0.88, 1.0, 0.92)
 
 	var title := deck_button.get_node_or_null("DeckTitle") as Label
 	if not title:
@@ -367,12 +426,12 @@ func _polish_deck_button() -> void:
 		title.add_theme_constant_override("shadow_offset_y", 2)
 		title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		deck_button.add_child(title)
-	title.position = Vector2(34, 16)
-	title.size = Vector2(104, 34)
+	title.position = Vector2(28, 12)
+	title.size = Vector2(104, 32)
 
 	if deck_button.counter:
-		deck_button.counter.position = Vector2(116, 42)
-		deck_button.counter.size = Vector2(64, 26)
+		deck_button.counter.position = Vector2(114, 39)
+		deck_button.counter.size = Vector2(60, 26)
 		deck_button.counter.add_theme_font_size_override("font_size", 22)
 		deck_button.counter.add_theme_color_override("font_color", Color("fff0c8"))
 		deck_button.counter.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
@@ -402,9 +461,29 @@ func _polish_settings_button() -> void:
 	settings_button.anchor_top = 0.0
 	settings_button.anchor_bottom = 0.0
 	settings_button.offset_left = -76.0
-	settings_button.offset_top = 13.0
+	settings_button.offset_top = 0.0
 	settings_button.offset_right = -12.0
-	settings_button.offset_bottom = 77.0
+	settings_button.offset_bottom = 64.0
+
+	var settings_icon := settings_button.get_node_or_null("SettingsIcon") as TextureRect
+	if not settings_icon:
+		settings_icon = TextureRect.new()
+		settings_icon.name = "SettingsIcon"
+		settings_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		settings_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		settings_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		settings_button.add_child(settings_icon)
+	settings_icon.texture = InkTheme.HUD_BATTLE_SETTINGS_ICON
+	settings_icon.position = Vector2(13, 13)
+	settings_icon.size = Vector2(38, 38)
+	settings_icon.modulate = Color(1, 0.92, 0.76, 0.96)
+
+
+func _remove_skill_button() -> void:
+	var top_bar := $TopBar
+	var skill_button := top_bar.get_node_or_null("TopSkillButton") as TextureButton
+	if skill_button:
+		skill_button.queue_free()
 
 
 func _open_pause_menu() -> void:
@@ -420,13 +499,15 @@ func _setup_spirit_root_badge() -> void:
 		bar_items.move_child(spirit_root_badge, gold_ui.get_index() + 1)
 
 	spirit_root_badge.character = character
+	spirit_root_badge.visible = true
+	_apply_compact_top_panel(spirit_root_badge, Vector2(140, 66))
 
 	# 丹药栏：复用灵根徽章的面板样式，放在其右侧
 	var badge_parent := spirit_root_badge.get_parent()
 	if not potion_bar_panel:
 		potion_bar_panel = PanelContainer.new()
 		potion_bar_panel.name = "PotionBar"
-		potion_bar_panel.custom_minimum_size = Vector2(152, 56)
+		potion_bar_panel.custom_minimum_size = Vector2(200, 66)
 		potion_bar_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		InkTheme.apply_battle_blue_panel(potion_bar_panel)
 		var hb := HBoxContainer.new()
@@ -434,8 +515,9 @@ func _setup_spirit_root_badge() -> void:
 		hb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		potion_bar_panel.add_child(hb)
 		var lbl := Label.new()
-		lbl.text = "丹"
-		lbl.add_theme_font_size_override("font_size", 18)
+		lbl.name = "PotionTitle"
+		lbl.text = "丹药"
+		lbl.add_theme_font_size_override("font_size", 20)
 		lbl.add_theme_color_override("font_color", Color("e2a36a"))
 		lbl.add_theme_color_override("font_shadow_color", Color(0.08, 0, 0, 0.9))
 		lbl.add_theme_constant_override("shadow_offset_x", 1)
@@ -446,6 +528,10 @@ func _setup_spirit_root_badge() -> void:
 		potion_handler.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		badge_parent.add_child(potion_bar_panel)
 	badge_parent.move_child(potion_bar_panel, spirit_root_badge.get_index() + 1)
+	potion_bar_panel.visible = true
+	_apply_compact_top_panel(potion_bar_panel, Vector2(200, 66))
+	potion_handler.custom_minimum_size = Vector2(154, 50)
+	potion_handler.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 
 	_polish_relic_row()
 
@@ -456,14 +542,20 @@ func _polish_relic_row() -> void:
 	if not relic_row:
 		return
 
+	var existing_backdrop := top_bar.get_node_or_null("RelicLaneBackdrop")
+	if existing_backdrop:
+		existing_backdrop.queue_free()
+
+	var left_info := health_ui.get_parent() as HBoxContainer
+	if left_info:
+		var relic_bar := left_info.get_node_or_null("RelicBar") as PanelContainer
+		if relic_bar:
+			relic_bar.queue_free()
+
 	relic_row.visible = true
 	relic_row.custom_minimum_size = Vector2(0, 120)
 	relic_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	relic_row.add_theme_constant_override("separation", 10)
-
-	var existing_backdrop := top_bar.get_node_or_null("RelicLaneBackdrop")
-	if existing_backdrop:
-		existing_backdrop.queue_free()
 
 	var relic_title := relic_row.get_node_or_null("RelicTitle") as Label
 	if relic_title:

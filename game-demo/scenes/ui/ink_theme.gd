@@ -27,6 +27,8 @@ const HUD_BLUE_TOP_LEFT_PANEL := preload("res://assets/ui/generated/battle/battl
 const HUD_BATTLE_SETTINGS_NORMAL := preload("res://assets/ui/generated/battle/battle_settings_button_normal.png")
 const HUD_BATTLE_SETTINGS_HOVER := preload("res://assets/ui/generated/battle/battle_settings_button_hover.png")
 const HUD_BATTLE_SETTINGS_PRESSED := preload("res://assets/ui/generated/battle/battle_settings_button_pressed.png")
+const HUD_BATTLE_SETTINGS_ICON := preload("res://assets/ui/generated/icons/icon_settings_gear.png")
+const HUD_BATTLE_DECK_ICON := preload("res://assets/ui/generated/icons/icon_card_deck_stack.png")
 
 
 static func add_backdrop(parent: Node, variant: String) -> InkBackdrop:

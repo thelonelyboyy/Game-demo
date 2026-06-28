@@ -10,17 +10,22 @@ var connected_deck: CardPile
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(132, 56)
+	custom_minimum_size = Vector2(140, 66)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	InkTheme.apply_battle_blue_panel(self)
+	var style := InkTheme.make_texture_style(InkTheme.HUD_BLUE_PILE_PANEL, 32, 18, Color(1, 1, 1, 0.96))
+	style.content_margin_left = 10
+	style.content_margin_top = 6
+	style.content_margin_right = 10
+	style.content_margin_bottom = 6
+	add_theme_stylebox_override("panel", style)
 
 	var content := HBoxContainer.new()
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	content.add_theme_constant_override("separation", 6)
+	content.add_theme_constant_override("separation", 7)
 	add_child(content)
 
 	icon_label = Label.new()
-	icon_label.custom_minimum_size = Vector2(30, 34)
+	icon_label.custom_minimum_size = Vector2(34, 40)
 	icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	icon_label.add_theme_font_size_override("font_size", 24)

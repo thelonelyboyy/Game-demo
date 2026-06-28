@@ -1,70 +1,7 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/codex.gd" id="1_codex"]
 [ext_resource type="Theme" uid="uid://c8cqncsqlplyu" path="res://main_theme.tres" id="2_theme"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_background"]
-bg_color = Color(0.02, 0.022, 0.02, 0.94)
-border_width_left = 0
-border_width_top = 0
-border_width_right = 0
-border_width_bottom = 0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.06, 0.065, 0.055, 0.88)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.58, 0.48, 0.26, 0.78)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-content_margin_left = 16.0
-content_margin_top = 16.0
-content_margin_right = 16.0
-content_margin_bottom = 16.0
-shadow_color = Color(0, 0, 0, 0.36)
-shadow_size = 14
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tree"]
-bg_color = Color(0.035, 0.038, 0.033, 0.72)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.39, 0.34, 0.22, 0.72)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tree_selected"]
-bg_color = Color(0.35, 0.27, 0.12, 0.86)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.88, 0.72, 0.34, 0.9)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_preview"]
-bg_color = Color(0.02, 0.022, 0.02, 0.55)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.45, 0.37, 0.20, 0.52)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
 [node name="Codex" type="Control"]
 visible = false
@@ -77,7 +14,7 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_codex")
 
-[node name="Background" type="Panel" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -85,144 +22,128 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_background")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="RootMargin" type="MarginContainer" parent="."]
+[node name="Atmosphere" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 36.0
-offset_top = 28.0
-offset_right = -36.0
-offset_bottom = -28.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
-theme_override_constants/margin_bottom = 0
+mouse_filter = 2
+color = Color(0.014, 0.012, 0.01, 0.58)
 
-[node name="RootVBox" type="VBoxContainer" parent="RootMargin"]
-layout_mode = 2
-theme_override_constants/separation = 16
+[node name="RootContent" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Title" type="Label" parent="RootMargin/RootVBox"]
+[node name="Title" type="Label" parent="RootContent"]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 1
 text = "修真图鉴"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Body" type="HBoxContainer" parent="RootMargin/RootVBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 18
-
-[node name="DirectoryPanel" type="PanelContainer" parent="RootMargin/RootVBox/Body"]
+[node name="DirectoryPanel" type="PanelContainer" parent="RootContent"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(420, 0)
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+layout_mode = 1
 
-[node name="DirectoryVBox" type="VBoxContainer" parent="RootMargin/RootVBox/Body/DirectoryPanel"]
+[node name="DirectoryMargin" type="MarginContainer" parent="RootContent/DirectoryPanel"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 10
 
-[node name="DirectoryTitle" type="Label" parent="RootMargin/RootVBox/Body/DirectoryPanel/DirectoryVBox"]
+[node name="DirectoryVBox" type="VBoxContainer" parent="RootContent/DirectoryPanel/DirectoryMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DirectoryTitle" type="Label" parent="RootContent/DirectoryPanel/DirectoryMargin/DirectoryVBox"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "目录"
-theme_override_colors/font_color = Color(0.94, 0.82, 0.52, 1)
-theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Directory" type="Tree" parent="RootMargin/RootVBox/Body/DirectoryPanel/DirectoryVBox"]
+[node name="Directory" type="Tree" parent="RootContent/DirectoryPanel/DirectoryMargin/DirectoryVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 hide_root = true
-theme_override_colors/font_color = Color(0.91, 0.86, 0.72, 1)
-theme_override_colors/font_hovered_color = Color(1, 0.94, 0.74, 1)
-theme_override_colors/font_selected_color = Color(1, 0.94, 0.74, 1)
-theme_override_constants/item_margin = 10
-theme_override_constants/inner_item_margin_top = 5
-theme_override_constants/inner_item_margin_bottom = 5
-theme_override_styles/panel = SubResource("StyleBoxFlat_tree")
-theme_override_styles/selected = SubResource("StyleBoxFlat_tree_selected")
-theme_override_styles/selected_focus = SubResource("StyleBoxFlat_tree_selected")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_focus")
+scroll_horizontal_enabled = false
 
-[node name="DetailPanel" type="PanelContainer" parent="RootMargin/RootVBox/Body"]
+[node name="DetailPanel" type="PanelContainer" parent="RootContent"]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="DetailMargin" type="MarginContainer" parent="RootContent/DetailPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="DetailMargin" type="MarginContainer" parent="RootMargin/RootVBox/Body/DetailPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 22
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 22
-theme_override_constants/margin_bottom = 18
-
-[node name="DetailVBox" type="VBoxContainer" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="DetailHeader" type="HBoxContainer" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="DetailIcon" type="TextureRect" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox/DetailHeader"]
+[node name="DetailVBox" type="VBoxContainer" parent="RootContent/DetailPanel/DetailMargin"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+
+[node name="DetailHeader" type="HBoxContainer" parent="RootContent/DetailPanel/DetailMargin/DetailVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HeaderRing" type="TextureRect" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DetailIcon" type="TextureRect" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="HeaderText" type="VBoxContainer" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox/DetailHeader"]
+[node name="HeaderText" type="VBoxContainer" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailHeader"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="DetailTitle" type="Label" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox/DetailHeader/HeaderText"]
+[node name="DetailTitle" type="Label" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailHeader/HeaderText"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "图鉴总览"
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="DetailMeta" type="Label" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox/DetailHeader/HeaderText"]
+[node name="DetailMeta" type="Label" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailHeader/HeaderText"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "从左侧目录选择条目查看详情"
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="DetailBody" type="HBoxContainer" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox"]
+[node name="DetailBody" type="HBoxContainer" parent="RootContent/DetailPanel/DetailMargin/DetailVBox"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 20
 
-[node name="PreviewPanel" type="PanelContainer" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox/DetailBody"]
-custom_minimum_size = Vector2(260, 0)
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_preview")
-
-[node name="PreviewSlot" type="CenterContainer" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox/DetailBody/PreviewPanel"]
+[node name="DetailLeftColumn" type="VBoxContainer" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailBody"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="DetailScroll" type="ScrollContainer" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox/DetailBody"]
+[node name="DetailScroll" type="ScrollContainer" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailBody/DetailLeftColumn"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="DetailText" type="RichTextLabel" parent="RootMargin/RootVBox/Body/DetailPanel/DetailMargin/DetailVBox/DetailBody/DetailScroll"]
+[node name="DetailText" type="RichTextLabel" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailBody/DetailLeftColumn/DetailScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -231,12 +152,52 @@ bbcode_enabled = true
 fit_content = true
 scroll_active = false
 
-[node name="Footer" type="HBoxContainer" parent="RootMargin/RootVBox"]
-layout_mode = 2
-alignment = 1
-
-[node name="BackButton" type="Button" parent="RootMargin/RootVBox/Footer"]
+[node name="PreviewPanel" type="Control" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailBody/DetailLeftColumn"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(170, 48)
 layout_mode = 2
+
+[node name="PreviewSlot" type="CenterContainer" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailBody/DetailLeftColumn/PreviewPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 36.0
+offset_top = 38.0
+offset_right = -36.0
+offset_bottom = -38.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PreviewFrame" type="TextureRect" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailBody/DetailLeftColumn/PreviewPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="OverviewStatsPanel" type="VBoxContainer" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailBody"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OverviewStatsTitle" type="Label" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailBody/OverviewStatsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "已接入资源"
+vertical_alignment = 1
+
+[node name="OverviewStats" type="VBoxContainer" parent="RootContent/DetailPanel/DetailMargin/DetailVBox/DetailBody/OverviewStatsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BackButton" type="Button" parent="RootContent"]
+unique_name_in_owner = true
+layout_mode = 1
 text = "返回"

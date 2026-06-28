@@ -9,6 +9,7 @@ const SIDE_SAFE_AREA := 720.0
 const FAN_ROTATION := 7.0
 const FAN_DROP := 38.0
 const CENTER_LIFT := 62.0
+const HAND_Y_OFFSET := 50.0
 const HOVER_SCALE := 1.38
 const HOVER_LIFT := 54.0
 const HOVER_Z_INDEX := 1000
@@ -104,7 +105,7 @@ func _layout_cards() -> void:
 
 	var total_width := CARD_SIZE.x + card_gap * float(card_count - 1)
 	var start_x := (size.x - total_width) * 0.5
-	var base_y := size.y - CARD_SIZE.y + 4.0
+	var base_y := size.y - CARD_SIZE.y + 4.0 + HAND_Y_OFFSET
 	var middle := float(card_count - 1) * 0.5
 	var divisor := maxf(middle, 1.0)
 
