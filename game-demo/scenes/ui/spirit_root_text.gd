@@ -37,15 +37,15 @@ static func element_color(element: Card.Element) -> Color:
 static func perfect_effect(element: Card.Element) -> String:
 	match element:
 		Card.Element.FIRE:
-			return "圆满：每打出一张火属性牌，对敌方全体造成该牌强化后主要数值 50% 的爆炸伤害。"
+			return "圆满：每回合第一张火属性攻击牌，选择伤害 ×1.5，或对主目标外所有敌人造成该牌最终实际伤害 50% 的余波。"
 		Card.Element.METAL:
-			return "圆满：每打出一张金属性牌，获得 1 点劲气。"
+			return "圆满：每回合第一张金属性牌，获得 1 点劲气。"
 		Card.Element.WATER:
-			return "圆满：每打出一张水属性牌，抽 1 张牌，并让抽到的牌本回合费用 -1。"
+			return "圆满：每回合第一张水属性牌，抽 1 张牌，并让抽到的第一张牌本回合费用 -1。"
 		Card.Element.WOOD:
-			return "圆满：玩家回合结束时，回复牌组内木属性卡牌数量的生命。"
+			return "圆满：回合结束时，若本回合打出过木属性牌，回复 3 点生命；若已满血，改为获得 3 点护体。"
 		Card.Element.EARTH:
-			return "圆满：每回合打出的第一张土属性牌，获得 1 层真元。真元会让护体牌额外获得护体。"
+			return "圆满：每回合第一张土属性牌，获得 1 点真元。真元会让护体牌额外获得护体。"
 		_:
 			return "未选择灵根。"
 
@@ -53,22 +53,18 @@ static func perfect_effect(element: Card.Element) -> String:
 static func stage_rule(stage: int) -> String:
 	match stage:
 		1:
-			return "小成：同元素卡牌数值提高 20%，向上取整后 +2。"
+			return "小成（4–6 张）：同元素牌主数值 = ceil(基础值 ×1.2) + 1。"
 		2:
-			return "大成：同元素卡牌数值提高 50%，向上取整后 +2。"
-		3:
-			return "圆满：同元素卡牌数值翻倍后 +2，并启用圆满效果。"
+			return "圆满（7 张及以上）：同元素牌主数值 = ceil(基础值 ×1.4) + 1，并启用圆满效果。"
 		_:
-			return "初悟：同元素卡牌数值 +2。"
+			return "初悟（0–3 张）：同元素牌主数值 +1。"
 
 
 static func next_stage_hint(count: int) -> String:
-	if count < 3:
-		return "距离小成还需 %s 张同元素牌。" % (3 - count)
-	if count < 5:
-		return "距离大成还需 %s 张同元素牌。" % (5 - count)
-	if count < 10:
-		return "距离圆满还需 %s 张同元素牌。" % (10 - count)
+	if count < 4:
+		return "距离小成还需 %s 张同元素牌。" % (4 - count)
+	if count < 7:
+		return "距离圆满还需 %s 张同元素牌。" % (7 - count)
 	return "灵根已圆满。"
 
 
@@ -79,11 +75,26 @@ static func status_tooltip(character: CharacterStats) -> String:
 	var count := character.count_spirit_root_cards()
 	var stage := character.get_spirit_root_stage()
 	var element := character.spirit_root
-	return "%s灵根 · %s\n同元素牌：%s 张\n%s\n%s\n\n%s" % [
+	var turn_state := _perfect_turn_state(character)
+	return "%s灵根 · %s\n同元素牌：%s 张\n%s\n%s%s\n\n%s" % [
 		element_name(element),
 		character.get_spirit_root_stage_name(),
 		count,
 		stage_rule(stage),
 		next_stage_hint(count),
+		turn_state,
 		perfect_effect(element),
 	]
+
+
+static func _perfect_turn_state(character: CharacterStats) -> String:
+	if not character.is_spirit_root_complete():
+		return ""
+
+	if character.spirit_root == Card.Element.WOOD:
+		var wood_state := "已打出木牌" if character.spirit_root_wood_played_this_turn else "未打出木牌"
+		var settle_state := "已结算" if character.spirit_root_perfect_triggered_this_turn else "待回合结束"
+		return "\n本回合圆满：%s，%s。 " % [wood_state, settle_state]
+
+	var state := "已触发" if character.spirit_root_perfect_triggered_this_turn else "未触发"
+	return "\n本回合圆满：%s。 " % state

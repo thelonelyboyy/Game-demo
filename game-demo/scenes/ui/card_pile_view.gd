@@ -12,6 +12,7 @@ const CARD_MENU_UI_SCENE := preload("res://scenes/ui/card_menu_ui.tscn")
 
 
 func _ready() -> void:
+	_apply_visuals()
 	back_button.pressed.connect(hide)
 	
 	for card: Node in cards.get_children():
@@ -52,3 +53,14 @@ func _update_view(randomized: bool) -> void:
 		new_card.tooltip_requested.connect(card_tooltip_popup.show_tooltip)
 		
 	show()
+
+
+func _apply_visuals() -> void:
+	var background := $Background as ColorRect
+	if background:
+		background.color = Color(0.018, 0.010, 0.010, 0.92)
+	InkTheme.apply_screen_title(title, 36)
+	InkTheme.apply_secondary_button(back_button)
+	back_button.custom_minimum_size = Vector2(132, 54)
+	cards.add_theme_constant_override("h_separation", 22)
+	cards.add_theme_constant_override("v_separation", 22)

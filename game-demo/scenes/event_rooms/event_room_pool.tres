@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EventRoomPool" load_steps=34 format=3 uid="uid://bncylsfojpqyu"]
+[gd_resource type="Resource" script_class="EventRoomPool" load_steps=44 format=3 uid="uid://bncylsfojpqyu"]
 
 [ext_resource type="Script" path="res://custom_resources/event_room_pool.gd" id="1_pool"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/helpful_boi_event.tscn" id="event_1"]
@@ -33,7 +33,17 @@
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/cloud_library_event.tscn" id="event_30"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/spirit_beast_tracks_event.tscn" id="event_31"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/tribulation_cloud_event.tscn" id="event_32"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/soul_lantern_cave_event.tscn" id="event_33"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/blood_jade_lotus_event.tscn" id="event_34"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/demon_market_dusk_event.tscn" id="event_35"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/broken_fate_abacus_event.tscn" id="event_36"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/ashen_sword_furnace_event.tscn" id="event_37"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/moon_bone_bridge_event.tscn" id="event_38"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/silent_demon_sutra_event.tscn" id="event_39"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/starfall_pillar_event.tscn" id="event_40"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/ghost_contract_pavilion_event.tscn" id="event_41"]
+[ext_resource type="PackedScene" path="res://scenes/event_rooms/crimson_inner_demon_mirror_event.tscn" id="event_42"]
 
 [resource]
 script = ExtResource("1_pool")
-event_rooms = Array[PackedScene]([ExtResource("event_1"), ExtResource("event_2"), ExtResource("event_3"), ExtResource("event_4"), ExtResource("event_5"), ExtResource("event_6"), ExtResource("event_7"), ExtResource("event_8"), ExtResource("event_9"), ExtResource("event_10"), ExtResource("event_11"), ExtResource("event_12"), ExtResource("event_13"), ExtResource("event_14"), ExtResource("event_15"), ExtResource("event_16"), ExtResource("event_17"), ExtResource("event_18"), ExtResource("event_19"), ExtResource("event_20"), ExtResource("event_21"), ExtResource("event_22"), ExtResource("event_23"), ExtResource("event_24"), ExtResource("event_25"), ExtResource("event_26"), ExtResource("event_27"), ExtResource("event_28"), ExtResource("event_29"), ExtResource("event_30"), ExtResource("event_31"), ExtResource("event_32")])
+event_rooms = Array[PackedScene]([ExtResource("event_33"), ExtResource("event_34"), ExtResource("event_35"), ExtResource("event_36"), ExtResource("event_37"), ExtResource("event_38"), ExtResource("event_39"), ExtResource("event_40"), ExtResource("event_41"), ExtResource("event_42")])

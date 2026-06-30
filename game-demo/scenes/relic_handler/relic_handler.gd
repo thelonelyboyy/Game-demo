@@ -42,6 +42,9 @@ func add_relics(relics_array: Array[Relic]) -> void:
 
 
 func add_relic(relic: Relic) -> void:
+	if not relic:
+		return
+
 	if has_relic(relic.id):
 		return
 	
@@ -49,6 +52,16 @@ func add_relic(relic: Relic) -> void:
 	relics.add_child(new_relic_ui)
 	new_relic_ui.relic = relic
 	new_relic_ui.relic.initialize_relic(new_relic_ui)
+
+
+func remove_relic(id: String) -> void:
+	if id.is_empty():
+		return
+
+	for relic_ui: RelicUI in _get_all_relic_ui_nodes():
+		if relic_ui.relic and relic_ui.relic.id == id:
+			relic_ui.queue_free()
+			return
 
 
 func has_relic(id: String) -> bool:

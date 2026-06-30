@@ -23,6 +23,8 @@ func add_card(card: Card) -> void:
 		card.bind_spirit_root_owner(owner_stats)
 	cards.append(card)
 	card_pile_size_changed.emit(cards.size())
+	if owner_stats:
+		owner_stats.refresh_spirit_root_bonus_cards()
 
 
 func remove_card(card: Card) -> bool:
@@ -32,6 +34,8 @@ func remove_card(card: Card) -> bool:
 
 	cards.remove_at(index)
 	card_pile_size_changed.emit(cards.size())
+	if owner_stats:
+		owner_stats.refresh_spirit_root_bonus_cards()
 	return true
 
 

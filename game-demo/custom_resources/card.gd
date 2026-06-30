@@ -38,6 +38,10 @@ const PROFESSION_NAMES := {
 	Card.Profession.BEASTMASTER: "驭兽师",
 }
 
+const SPIRIT_ROOT_FIRE_CHOICE := preload("res://custom_resources/spirit_root_fire_choice.gd")
+const META_SPIRIT_ROOT_FIRE_CHOICE := "spirit_root_fire_choice"
+const META_SPIRIT_ROOT_FIRE_CHOICE_USED := "spirit_root_fire_choice_used"
+
 @export_group("Card Attributes")
 @export var id: String
 @export var type: Type
@@ -92,16 +96,24 @@ func play(targets: Array[Node], char_stats: CharacterStats, modifiers: ModifierH
 	Events.card_played.emit(self)
 	char_stats.mana -= cost
 
+	var resolved_targets := targets if is_single_targeted() else _get_targets(targets)
+	var fire_choice = _create_spirit_root_fire_choice(resolved_targets, modifiers, char_stats)
+	if fire_choice:
+		Events.spirit_root_fire_choice_requested.emit(fire_choice)
+		if not fire_choice.resolved:
+			await fire_choice.completed
+		if fire_choice.selected_choice != SPIRIT_ROOT_FIRE_CHOICE.CHOICE_NONE:
+			set_meta(META_SPIRIT_ROOT_FIRE_CHOICE, fire_choice.selected_choice)
+			set_meta(META_SPIRIT_ROOT_FIRE_CHOICE_USED, false)
+
 	# Attack cards wait for the player's attack animation to finish before
 	# dealing damage, so the hit lands at the end of the swing. The player
 	# guarantees this signal fires (immediately if it has no attack animation).
 	if type == Type.ATTACK:
 		await Events.attack_animation_finished
 
-	if is_single_targeted():
-		apply_effects(targets, modifiers)
-	else:
-		apply_effects(_get_targets(targets), modifiers)
+	apply_effects(resolved_targets, modifiers)
+	_clear_spirit_root_fire_choice()
 
 
 func apply_effects(_targets: Array[Node], _modifiers: ModifierHandler) -> void:
@@ -172,6 +184,17 @@ func get_spirit_root_primary_value() -> int:
 	return 0
 
 
+func consume_spirit_root_fire_choice() -> int:
+	if not has_meta(META_SPIRIT_ROOT_FIRE_CHOICE):
+		return SPIRIT_ROOT_FIRE_CHOICE.CHOICE_NONE
+
+	if get_meta(META_SPIRIT_ROOT_FIRE_CHOICE_USED, false):
+		return SPIRIT_ROOT_FIRE_CHOICE.CHOICE_NONE
+
+	set_meta(META_SPIRIT_ROOT_FIRE_CHOICE_USED, true)
+	return int(get_meta(META_SPIRIT_ROOT_FIRE_CHOICE, SPIRIT_ROOT_FIRE_CHOICE.CHOICE_NONE))
+
+
 func reduce_cost_for_turn(amount: int) -> void:
 	if amount <= 0 or cost <= 0:
 		return
@@ -187,6 +210,31 @@ func reset_temporary_cost() -> void:
 
 	cost += temporary_cost_reduction
 	temporary_cost_reduction = 0
+
+
+func _create_spirit_root_fire_choice(
+	targets: Array[Node],
+	modifiers: ModifierHandler,
+	char_stats: CharacterStats
+):
+	if not char_stats or not char_stats.should_request_spirit_root_fire_choice(self):
+		return null
+
+	if Events.spirit_root_fire_choice_requested.get_connections().is_empty():
+		return null
+
+	var choice = SPIRIT_ROOT_FIRE_CHOICE.new()
+	choice.card = self
+	choice.targets = targets
+	choice.modifiers = modifiers
+	return choice
+
+
+func _clear_spirit_root_fire_choice() -> void:
+	if has_meta(META_SPIRIT_ROOT_FIRE_CHOICE):
+		remove_meta(META_SPIRIT_ROOT_FIRE_CHOICE)
+	if has_meta(META_SPIRIT_ROOT_FIRE_CHOICE_USED):
+		remove_meta(META_SPIRIT_ROOT_FIRE_CHOICE_USED)
 
 
 func get_element_name() -> String:

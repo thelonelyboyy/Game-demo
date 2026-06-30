@@ -4,6 +4,7 @@ extends Node2D
 const MAX_BATTLE_ART_HEIGHT := 65.6
 const HEALTH_BAR_HALF_WIDTH := 124.0
 const STATUS_ROW_HALF_WIDTH := 30.0
+const DEBUG_CONSOLE_STATE := preload("res://custom_resources/debug_console_state.gd")
 
 const ANIM_ROOT := "res://art/frame_animation/"
 # 各动画的帧率与是否循环
@@ -209,6 +210,7 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 		return
 
 	var modified_damage := maxi(0, modifier_handler.get_modified_value(damage, which_modifier))
+	modified_damage = DEBUG_CONSOLE_STATE.apply_next_taken(modified_damage)
 
 	# 受击动画播完后再扣血，与攻击节奏保持一致：怪物攻击 -> 角色受击动画 -> 扣血。
 	var hit_delay := 0.0

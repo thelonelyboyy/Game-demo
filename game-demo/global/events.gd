@@ -8,6 +8,7 @@ signal card_aim_ended(card_ui: CardUI)
 signal card_played(card: Card)
 signal card_drawn(card: Card)
 signal card_extra_drawn(card: Card)
+signal spirit_root_fire_choice_requested(choice)
 signal card_tooltip_requested(icon: Texture, text: String)
 signal tooltip_hide_requested
 

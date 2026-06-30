@@ -4,6 +4,7 @@ extends Node2D
 const PIXEL_WORLD_SCALE := 5.0
 const SPIRIT_ROOT_HANDLER := preload("res://scenes/battle/spirit_root_handler.gd")
 const CLASS_MECHANIC_HANDLER := preload("res://scenes/battle/class_mechanic_handler.gd")
+const DEFEAT_LEGACY := preload("res://custom_resources/defeat_legacy.gd")
 const BATTLE_BACKGROUND := preload("res://test2.png")
 const BATTLE_BACKDROP_TINT := Color(0.32, 0.44, 0.70, 1.0)
 const BATTLE_NIGHT_WASH := Color(0.015, 0.035, 0.085, 0.36)
@@ -91,6 +92,9 @@ func _on_enemy_turn_ended() -> void:
 func _on_player_died() -> void:
 	battle_active = false
 	Events.battle_over_screen_requested.emit("渡劫失败", BattleOverPanel.Type.LOSE)
+	var failed_run_relics: Array[Relic] = relics.get_all_relics() if relics else []
+	var starting_relic := char_stats.starting_relic if char_stats else null
+	DEFEAT_LEGACY.remember_failed_run(failed_run_relics, starting_relic)
 	SaveGame.delete_data()
 
 

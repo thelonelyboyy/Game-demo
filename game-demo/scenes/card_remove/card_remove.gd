@@ -18,6 +18,7 @@ var selected_card: Card
 
 
 func _ready() -> void:
+	_apply_visuals()
 	remove_button.pressed.connect(_on_remove_button_pressed)
 	back_button.pressed.connect(_on_back_button_pressed)
 	_refresh_cards()
@@ -97,3 +98,25 @@ func _on_remove_button_pressed() -> void:
 func _on_back_button_pressed() -> void:
 	closed.emit()
 	queue_free()
+
+
+func _apply_visuals() -> void:
+	var background := $Background as ColorRect
+	if background:
+		background.color = Color(0.018, 0.012, 0.012, 0.96)
+
+	var title := $Root/Main/Title as Label
+	if title:
+		InkTheme.apply_screen_title(title, 42)
+
+	var card_list_panel := $Root/Main/Body/CardListPanel as PanelContainer
+	if card_list_panel:
+		InkTheme.apply_screen_panel(card_list_panel)
+
+	var detail_panel := $Root/Main/Body/DetailPanel as PanelContainer
+	if detail_panel:
+		InkTheme.apply_side_panel(detail_panel, true)
+
+	InkTheme.apply_rich_text(info_label, 20)
+	InkTheme.apply_secondary_button(back_button)
+	InkTheme.apply_danger_button(remove_button)

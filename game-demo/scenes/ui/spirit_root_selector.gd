@@ -33,7 +33,7 @@ func _roll_spirit_roots() -> void:
 
 func _setup_buttons() -> void:
 	title.text = "选择灵根"
-	description.text = "从三种灵根中选择一种，开局会将一张打击或防御转化为所选元素。"
+	description.text = "从三种灵根中选择一种，开局会将一张打击或防御转化为所选元素，并获得一张对应元素的职业卡。"
 
 	for child: Node in buttons.get_children():
 		child.queue_free()
@@ -79,11 +79,7 @@ func _apply_content_layout() -> void:
 func _apply_title_style() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	title.add_theme_color_override("font_color", Color("f2c94f"))
-	title.add_theme_color_override("font_shadow_color", Color(0.02, 0.05, 0.07, 0.94))
-	title.add_theme_constant_override("shadow_offset_x", 4)
-	title.add_theme_constant_override("shadow_offset_y", 5)
-	title.add_theme_font_size_override("font_size", 58)
+	InkTheme.apply_screen_title(title, 58)
 
 
 func _apply_description_style() -> void:
@@ -91,11 +87,7 @@ func _apply_description_style() -> void:
 	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	description.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	description.add_theme_color_override("font_color", Color("d7eef4"))
-	description.add_theme_color_override("font_shadow_color", Color(0.01, 0.03, 0.05, 0.88))
-	description.add_theme_constant_override("shadow_offset_x", 2)
-	description.add_theme_constant_override("shadow_offset_y", 3)
-	description.add_theme_font_size_override("font_size", 24)
+	InkTheme.apply_subtitle(description, 24)
 
 
 func _create_root_row(root: Card.Element) -> Button:
@@ -174,9 +166,9 @@ func _create_root_row(root: Card.Element) -> Button:
 
 func _apply_root_button_style(button: Button, root: Card.Element) -> void:
 	var element_color := SpiritRootText.element_color(root)
-	button.add_theme_stylebox_override("normal", _make_round_style(Color(0.03, 0.22, 0.29, 0.72), element_color.darkened(0.22), 1, 8))
-	button.add_theme_stylebox_override("hover", _make_round_style(Color(0.05, 0.34, 0.42, 0.88), element_color.lightened(0.18), 2, 8, Color(element_color.r, element_color.g, element_color.b, 0.18), 10))
-	button.add_theme_stylebox_override("pressed", _make_round_style(Color(0.02, 0.18, 0.22, 0.92), Color("f2c94f"), 2, 8))
+	button.add_theme_stylebox_override("normal", _make_round_style(Color(0.045, 0.030, 0.028, 0.78), element_color.darkened(0.28), 1, 8))
+	button.add_theme_stylebox_override("hover", _make_round_style(Color(0.090, 0.045, 0.038, 0.90), element_color.lightened(0.18), 2, 8, Color(element_color.r, element_color.g, element_color.b, 0.16), 10))
+	button.add_theme_stylebox_override("pressed", _make_round_style(Color(0.030, 0.020, 0.020, 0.96), Color("f2c94f"), 2, 8))
 	button.add_theme_color_override("font_color", Color.TRANSPARENT)
 	button.add_theme_color_override("font_hover_color", Color.TRANSPARENT)
 	button.add_theme_color_override("font_pressed_color", Color.TRANSPARENT)

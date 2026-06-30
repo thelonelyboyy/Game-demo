@@ -1,0 +1,22 @@
+* text=auto
+
+*.gd text working-tree-encoding=UTF-8 eol=lf
+*.tscn text working-tree-encoding=UTF-8 eol=lf
+*.tres text working-tree-encoding=UTF-8 eol=lf
+*.json text working-tree-encoding=UTF-8 eol=lf
+*.md text working-tree-encoding=UTF-8 eol=lf
+*.cfg text working-tree-encoding=UTF-8 eol=lf
+*.uid text working-tree-encoding=UTF-8 eol=lf
+*.txt text working-tree-encoding=UTF-8 eol=lf
+*.import text working-tree-encoding=UTF-8 eol=lf
+*.gdshader text working-tree-encoding=UTF-8 eol=lf
+*.csv text working-tree-encoding=UTF-8 eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.xlsx binary
+*.docx binary
+*.pdf binary

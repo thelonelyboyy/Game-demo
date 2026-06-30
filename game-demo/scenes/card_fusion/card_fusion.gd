@@ -22,6 +22,7 @@ var preview_card: Card
 
 
 func _ready() -> void:
+	_apply_visuals()
 	fuse_button.pressed.connect(_on_fuse_button_pressed)
 	back_button.pressed.connect(_on_back_button_pressed)
 	_refresh_cards()
@@ -134,3 +135,36 @@ func _on_fuse_button_pressed() -> void:
 func _on_back_button_pressed() -> void:
 	closed.emit()
 	queue_free()
+
+
+func _apply_visuals() -> void:
+	var background := $Background as ColorRect
+	if background:
+		background.color = Color(0.018, 0.012, 0.012, 0.97)
+
+	var title := $Root/Main/Title as Label
+	if title:
+		InkTheme.apply_screen_title(title, 46)
+
+	var card_list_panel := $Root/Main/Body/CardListPanel as PanelContainer
+	if card_list_panel:
+		InkTheme.apply_screen_panel(card_list_panel)
+
+	var fusion_panel := $Root/Main/Body/FusionPanel as PanelContainer
+	if fusion_panel:
+		InkTheme.apply_screen_panel(fusion_panel)
+
+	for path in [
+		"Root/Main/Body/FusionPanel/FusionMargin/FusionContent/Slots/Plus",
+		"Root/Main/Body/FusionPanel/FusionMargin/FusionContent/Slots/Arrow",
+	]:
+		var symbol := get_node_or_null(path) as Label
+		if symbol:
+			symbol.add_theme_color_override("font_color", Color("f2c94f"))
+			symbol.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
+			symbol.add_theme_constant_override("shadow_offset_x", 2)
+			symbol.add_theme_constant_override("shadow_offset_y", 3)
+
+	InkTheme.apply_rich_text(info_label, 21)
+	InkTheme.apply_secondary_button(back_button)
+	InkTheme.apply_screen_button(fuse_button)

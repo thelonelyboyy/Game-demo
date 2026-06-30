@@ -9,11 +9,14 @@ const CARD_UPGRADE_SCENE := preload("res://scenes/card_upgrade/card_upgrade.tscn
 @onready var ui_layer: CanvasLayer = $UILayer
 @onready var rest_button: Button = %RestButton
 @onready var upgrade_button: Button = %UpgradeButton
+@onready var title: Label = $UILayer/UI/Title
+@onready var description: Label = $UILayer/UI/Description
 
 var active_card_upgrade: CardUpgrade
 
 
 func _ready() -> void:
+	_apply_visuals()
 	upgrade_button.pressed.connect(_on_upgrade_button_pressed)
 
 
@@ -64,3 +67,30 @@ func _set_action_buttons_disabled(disabled: bool) -> void:
 # at the end of 'fade-out'.
 func _on_fade_out_finished() -> void:
 	Events.campfire_exited.emit()
+
+
+func _apply_visuals() -> void:
+	_ensure_campfire_panel()
+	InkTheme.apply_screen_title(title, 42)
+	InkTheme.apply_subtitle(description, 21)
+	rest_button.custom_minimum_size = Vector2(220, 58)
+	upgrade_button.custom_minimum_size = Vector2(220, 58)
+	InkTheme.apply_screen_button(rest_button)
+	InkTheme.apply_screen_button(upgrade_button)
+
+
+func _ensure_campfire_panel() -> void:
+	if ui_layer.has_node("CampfirePanel"):
+		return
+
+	var panel := PanelContainer.new()
+	panel.name = "CampfirePanel"
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.offset_left = -210.0
+	panel.offset_top = -150.0
+	panel.offset_right = 210.0
+	panel.offset_bottom = 184.0
+	InkTheme.apply_screen_panel(panel, true)
+	ui_layer.add_child(panel)
+	ui_layer.move_child(panel, ui_layer.get_node("UI").get_index())

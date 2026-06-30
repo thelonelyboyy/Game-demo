@@ -7,6 +7,13 @@ const PAPER := Color("24251e")
 const PAPER_DARK := Color("151715")
 const GOLD := Color("b89648")
 const RED := Color("8b2f2a")
+const GOLD_BRIGHT := Color("f2c94f")
+const TEXT_WARM := Color("efe6d0")
+const TEXT_MUTED := Color("cdbf92")
+const DEMONIC_BG := Color(0.030, 0.023, 0.022, 0.90)
+const DEMONIC_PANEL_BG := Color(0.045, 0.030, 0.028, 0.88)
+const DEMONIC_BORDER := Color(0.68, 0.48, 0.23, 0.86)
+const DEMONIC_RED_BORDER := Color(0.58, 0.24, 0.17, 0.88)
 
 const HUD_PANEL_FRAME := preload("res://art/ui/battle_hud/demonic_red/panel_frame.png")
 const HUD_END_TURN_PLATE := preload("res://art/ui/battle_hud/demonic_red/end_turn_plate.png")
@@ -29,6 +36,13 @@ const HUD_BATTLE_SETTINGS_HOVER := preload("res://assets/ui/generated/battle/bat
 const HUD_BATTLE_SETTINGS_PRESSED := preload("res://assets/ui/generated/battle/battle_settings_button_pressed.png")
 const HUD_BATTLE_SETTINGS_ICON := preload("res://assets/ui/generated/icons/icon_settings_gear.png")
 const HUD_BATTLE_DECK_ICON := preload("res://assets/ui/generated/icons/icon_card_deck_stack.png")
+const SCREEN_PANEL := preload("res://assets/ui/generated/panels/codex_main_content_panel_9slice.png")
+const SIDE_PANEL := preload("res://assets/ui/generated/panels/codex_left_nav_panel_9slice.png")
+const SECTION_TITLE_PLATE := preload("res://assets/ui/generated/panels/codex_section_title_backplate_9slice.png")
+const MAIN_BUTTON_NORMAL := preload("res://assets/ui/generated/buttons/main_menu_button_normal_9slice.png")
+const MAIN_BUTTON_HOVER := preload("res://assets/ui/generated/buttons/main_menu_button_hover_9slice.png")
+const MAIN_BUTTON_PRESSED := preload("res://assets/ui/generated/buttons/main_menu_button_pressed_9slice.png")
+const MAIN_BUTTON_DISABLED := preload("res://assets/ui/generated/buttons/main_menu_button_disabled_9slice.png")
 
 
 static func add_backdrop(parent: Node, variant: String) -> InkBackdrop:
@@ -74,8 +88,78 @@ static func apply_body_label(label: Label, size := 24) -> void:
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 
+static func apply_screen_title(label: Label, size := 56) -> void:
+	label.add_theme_color_override("font_color", GOLD_BRIGHT)
+	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
+	label.add_theme_constant_override("shadow_offset_x", 4)
+	label.add_theme_constant_override("shadow_offset_y", 5)
+	label.add_theme_constant_override("outline_size", 1)
+	label.add_theme_color_override("font_outline_color", Color(0.17, 0.05, 0.02, 0.84))
+	label.add_theme_font_size_override("font_size", size)
+
+
+static func apply_subtitle(label: Label, size := 23) -> void:
+	label.add_theme_color_override("font_color", TEXT_WARM)
+	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.76))
+	label.add_theme_constant_override("shadow_offset_x", 2)
+	label.add_theme_constant_override("shadow_offset_y", 3)
+	label.add_theme_font_size_override("font_size", size)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+
+static func apply_small_note(label: Label, size := 17) -> void:
+	label.add_theme_color_override("font_color", TEXT_MUTED)
+	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.68))
+	label.add_theme_constant_override("shadow_offset_x", 1)
+	label.add_theme_constant_override("shadow_offset_y", 2)
+	label.add_theme_font_size_override("font_size", size)
+
+
+static func apply_rich_text(label: RichTextLabel, size := 20) -> void:
+	label.add_theme_color_override("default_color", TEXT_WARM)
+	label.add_theme_font_size_override("normal_font_size", size)
+	label.add_theme_font_size_override("bold_font_size", size + 2)
+	label.add_theme_constant_override("line_separation", 4)
+
+
 static func apply_panel(panel: Control) -> void:
 	panel.add_theme_stylebox_override("panel", make_style(Color(0.10, 0.11, 0.10, 0.82), Color(0.63, 0.52, 0.30, 0.72), 2, 6, Color(0, 0, 0, 0.42), 12))
+
+
+static func apply_screen_panel(panel: Control, compact := false) -> void:
+	var style := make_texture_style(SCREEN_PANEL, 48, 48, Color(0.94, 0.88, 0.78, 0.96))
+	style.content_margin_left = 16 if compact else 24
+	style.content_margin_top = 12 if compact else 18
+	style.content_margin_right = 16 if compact else 24
+	style.content_margin_bottom = 12 if compact else 18
+	panel.add_theme_stylebox_override("panel", style)
+
+
+static func apply_side_panel(panel: Control, compact := false) -> void:
+	var style := make_texture_style(SIDE_PANEL, 48, 48, Color(0.98, 0.90, 0.78, 0.95))
+	style.content_margin_left = 14 if compact else 22
+	style.content_margin_top = 10 if compact else 16
+	style.content_margin_right = 14 if compact else 22
+	style.content_margin_bottom = 10 if compact else 16
+	panel.add_theme_stylebox_override("panel", style)
+
+
+static func apply_flat_demonic_panel(panel: Control, compact := false) -> void:
+	var style := make_style(DEMONIC_PANEL_BG, DEMONIC_BORDER, 2, 6, Color(0, 0, 0, 0.54), 14)
+	style.content_margin_left = 12 if compact else 18
+	style.content_margin_top = 8 if compact else 14
+	style.content_margin_right = 12 if compact else 18
+	style.content_margin_bottom = 8 if compact else 14
+	panel.add_theme_stylebox_override("panel", style)
+
+
+static func apply_icon_panel(panel: Control) -> void:
+	var style := make_style(Color(0.022, 0.017, 0.016, 0.86), DEMONIC_RED_BORDER, 2, 6, Color(0.55, 0.12, 0.06, 0.20), 10)
+	style.content_margin_left = 10
+	style.content_margin_top = 10
+	style.content_margin_right = 10
+	style.content_margin_bottom = 10
+	panel.add_theme_stylebox_override("panel", style)
 
 
 static func apply_demonic_panel(panel: Control) -> void:
@@ -107,6 +191,35 @@ static func apply_demonic_button(button: Button, large := false) -> void:
 	button.add_theme_stylebox_override("hover", make_texture_style(HUD_END_TURN_PLATE, 42, 18, Color(1.16, 1.08, 0.92, 1.0)))
 	button.add_theme_stylebox_override("pressed", make_texture_style(HUD_END_TURN_PLATE, 42, 18, Color(0.72, 0.62, 0.58, 0.96)))
 	button.add_theme_stylebox_override("disabled", make_texture_style(HUD_END_TURN_PLATE, 42, 18, Color(0.42, 0.38, 0.36, 0.45)))
+
+
+static func apply_screen_button(button: Button, large := false) -> void:
+	button.add_theme_color_override("font_color", Color("f8e5c0"))
+	button.add_theme_color_override("font_hover_color", Color("fff4d8"))
+	button.add_theme_color_override("font_pressed_color", Color("d9a865"))
+	button.add_theme_color_override("font_disabled_color", Color(0.72, 0.60, 0.48, 0.46))
+	button.add_theme_color_override("font_shadow_color", Color(0.08, 0, 0, 0.9))
+	button.add_theme_constant_override("shadow_offset_x", 2)
+	button.add_theme_constant_override("shadow_offset_y", 2)
+	button.add_theme_font_size_override("font_size", 25 if large else 21)
+	button.add_theme_stylebox_override("normal", make_texture_style(MAIN_BUTTON_NORMAL, 32, 22, Color(1, 1, 1, 0.96)))
+	button.add_theme_stylebox_override("hover", make_texture_style(MAIN_BUTTON_HOVER, 32, 22, Color(1.08, 1.02, 0.94, 1.0)))
+	button.add_theme_stylebox_override("pressed", make_texture_style(MAIN_BUTTON_PRESSED, 32, 22, Color(0.82, 0.72, 0.64, 0.98)))
+	button.add_theme_stylebox_override("disabled", make_texture_style(MAIN_BUTTON_DISABLED, 32, 22, Color(0.56, 0.50, 0.46, 0.58)))
+	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+
+
+static func apply_secondary_button(button: Button, large := false) -> void:
+	apply_screen_button(button, large)
+	button.add_theme_color_override("font_color", Color("ead8b4"))
+	button.add_theme_color_override("font_hover_color", Color("fff0c6"))
+
+
+static func apply_danger_button(button: Button, large := false) -> void:
+	apply_screen_button(button, large)
+	button.add_theme_color_override("font_color", Color("ffd7c8"))
+	button.add_theme_color_override("font_hover_color", Color("fff1dc"))
+	button.add_theme_color_override("font_pressed_color", Color("e58568"))
 
 
 static func apply_battle_blue_panel(panel: Control) -> void:

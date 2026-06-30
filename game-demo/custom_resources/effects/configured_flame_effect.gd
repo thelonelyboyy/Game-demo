@@ -99,6 +99,7 @@ func _deal(card: CultivationCard, tgts: Array[Node], amount: int, modifiers: Mod
 		damage += handler.flame_damage_bonus()
 	if modifiers:
 		damage = modifiers.get_modified_value(damage, Modifier.Type.DMG_DEALT)
+	damage = DEBUG_CONSOLE_STATE.apply_next_dealt(damage)
 	if damage <= 0:
 		return
 	var damage_effect := DamageEffect.new()

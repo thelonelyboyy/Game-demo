@@ -16,6 +16,7 @@ var selected_card: Card
 
 
 func _ready() -> void:
+	_apply_visuals()
 	_clear_rewards()
 	
 	take_button.pressed.connect(
@@ -64,3 +65,14 @@ func set_rewards(new_cards: Array[Card]) -> void:
 		cards.add_child(new_card)
 		new_card.card = card
 		new_card.tooltip_requested.connect(_show_tooltip)
+
+
+func _apply_visuals() -> void:
+	color = Color(0.018, 0.010, 0.010, 0.90)
+	cards.add_theme_constant_override("separation", 28)
+	skip_card_reward.custom_minimum_size = Vector2(180, 54)
+	take_button.custom_minimum_size = Vector2(170, 52)
+	InkTheme.apply_secondary_button(skip_card_reward)
+	InkTheme.apply_screen_button(take_button)
+	card_tooltip_popup.background_color = Color(0.018, 0.010, 0.010, 0.92)
+	card_tooltip_popup.background.color = card_tooltip_popup.background_color

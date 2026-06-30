@@ -1,6 +1,8 @@
 class_name CardEffect
 extends Resource
 
+const DEBUG_CONSOLE_STATE := preload("res://custom_resources/debug_console_state.gd")
+
 enum TargetMode {CARD_TARGETS, PLAYER, ALL_ENEMIES, EVERYONE}
 enum ConditionType {ALWAYS, SELECTED_SPIRIT_ROOT, HAS_MECHANIC_TAG, CARD_TYPE, PLAYER_HAS_STATUS}
 
@@ -74,6 +76,25 @@ func get_targets(card: CultivationCard, original_targets: Array[Node], mode: Tar
 			return original_targets
 
 
+func execute_damage(card: CultivationCard, final_targets: Array[Node], damage: int, modifiers: ModifierHandler) -> void:
+	if not card or final_targets.is_empty() or damage <= 0:
+		return
+
+	var fire_choice := card.consume_spirit_root_fire_choice()
+	if fire_choice == Card.SPIRIT_ROOT_FIRE_CHOICE.CHOICE_AMPLIFY:
+		damage = ceili(damage * 1.5)
+
+	var damage_effect := DamageEffect.new()
+	damage_effect.amount = modifiers.get_modified_value(damage, Modifier.Type.DMG_DEALT) if modifiers else damage
+	damage_effect.amount = DEBUG_CONSOLE_STATE.apply_next_dealt(damage_effect.amount)
+	damage_effect.sound = card.sound
+	var main_target := final_targets[0]
+	var main_target_actual_damage := _preview_actual_damage(main_target, damage_effect.amount, damage_effect.receiver_modifier_type)
+	damage_effect.execute(final_targets)
+	if fire_choice == Card.SPIRIT_ROOT_FIRE_CHOICE.CHOICE_SPLASH:
+		_execute_fire_splash(main_target, main_target_actual_damage)
+
+
 func get_condition_description() -> String:
 	match condition_type:
 		ConditionType.SELECTED_SPIRIT_ROOT:
@@ -122,6 +143,46 @@ func _get_player(card: CultivationCard) -> Player:
 	if not tree:
 		return null
 	return tree.get_first_node_in_group("player") as Player
+
+
+func _execute_fire_splash(main_target: Node, main_target_actual_damage: int) -> void:
+	if not main_target or main_target_actual_damage <= 0:
+		return
+
+	var splash_amount := ceili(main_target_actual_damage * 0.5)
+	if splash_amount <= 0:
+		return
+
+	var tree := main_target.get_tree()
+	if not tree:
+		return
+
+	var splash_targets: Array[Node] = []
+	for enemy: Node in tree.get_nodes_in_group("enemies"):
+		if enemy != main_target:
+			splash_targets.append(enemy)
+	if splash_targets.is_empty():
+		return
+
+	var splash_effect := DamageEffect.new()
+	splash_effect.amount = splash_amount
+	splash_effect.receiver_modifier_type = Modifier.Type.NO_MODIFIER
+	splash_effect.execute(splash_targets)
+
+
+func _preview_actual_damage(target: Node, incoming_damage: int, receiver_modifier_type: Modifier.Type) -> int:
+	if not target or incoming_damage <= 0:
+		return 0
+
+	var modified_damage := incoming_damage
+	var target_modifiers = target.get("modifier_handler")
+	if target_modifiers and receiver_modifier_type != Modifier.Type.NO_MODIFIER:
+		modified_damage = target_modifiers.get_modified_value(incoming_damage, receiver_modifier_type)
+
+	var target_stats = target.get("stats")
+	if target_stats:
+		return maxi(modified_damage - target_stats.block, 0)
+	return modified_damage
 
 
 func _upgrade_number(value: int) -> int:

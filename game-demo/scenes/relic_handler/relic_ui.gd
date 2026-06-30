@@ -21,7 +21,7 @@ func set_relic(new_relic: Relic) -> void:
 
 	relic = new_relic
 	icon.texture = relic.icon
-	tooltip_text = relic.get_tooltip()
+	tooltip_text = ""
 	if _hovering:
 		Events.relic_tooltip_requested.emit(relic)
 

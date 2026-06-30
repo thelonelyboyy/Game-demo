@@ -1,6 +1,8 @@
 class_name CharacterStats
 extends Stats
 
+const SPIRIT_ROOT_BONUS_TAG := "spirit_root_bonus"
+
 @export_group("Visuals")
 @export var character_name: String
 @export_multiline var description: String
@@ -20,6 +22,8 @@ var mana: int : set = set_mana
 var deck: CardPile
 var discard: CardPile
 var draw_pile: CardPile
+var spirit_root_perfect_triggered_this_turn := false
+var spirit_root_wood_played_this_turn := false
 
 
 func set_mana(value: int) -> void:
@@ -51,6 +55,8 @@ func create_instance(selected_spirit_root: Card.Element = Card.Element.NONE) -> 
 	instance.spirit_root = selected_spirit_root
 	instance.deck.bind_cards_to_owner(instance)
 	instance.convert_random_starter_to_spirit_root()
+	instance.grant_spirit_root_profession_card()
+	instance.refresh_spirit_root_bonus_cards()
 	instance.draw_pile = CardPile.new()
 	instance.draw_pile.bind_cards_to_owner(instance)
 	instance.discard = CardPile.new()
@@ -68,12 +74,47 @@ func convert_random_starter_to_spirit_root() -> void:
 
 	var candidates: Array[Card] = []
 	for card: Card in deck.cards:
-		if card and (card.id == "strike" or card.id == "defend"):
+		if card and _is_basic_starter_card(card):
 			candidates.append(card)
 
 	var picked := RNG.array_pick_random(candidates) as Card
 	if picked:
 		picked.element = spirit_root
+
+
+func grant_spirit_root_profession_card() -> void:
+	if not has_spirit_root() or not deck or not draftable_cards:
+		return
+
+	var candidates := _get_spirit_root_profession_card_candidates(true)
+	if candidates.is_empty():
+		candidates = _get_spirit_root_profession_card_candidates(false)
+	if candidates.is_empty():
+		candidates = _get_any_spirit_root_card_candidates()
+	if candidates.is_empty():
+		return
+
+	var picked := RNG.array_pick_random(candidates) as Card
+	if not picked:
+		return
+
+	var bonus_card := picked.duplicate(true) as Card
+	bonus_card.element = spirit_root
+	if not bonus_card.mechanic_tags.has(SPIRIT_ROOT_BONUS_TAG):
+		bonus_card.mechanic_tags.append(SPIRIT_ROOT_BONUS_TAG)
+	deck.add_card(bonus_card)
+
+
+func refresh_spirit_root_bonus_cards() -> void:
+	if not has_spirit_root() or not deck:
+		return
+
+	if get_spirit_root_stage() < 1:
+		return
+
+	for card: Card in deck.cards:
+		if card and card.mechanic_tags.has(SPIRIT_ROOT_BONUS_TAG):
+			card.upgrade()
 
 
 func count_spirit_root_cards() -> int:
@@ -93,11 +134,9 @@ func count_cards_of_element(element: Card.Element) -> int:
 
 func get_spirit_root_stage() -> int:
 	var count := count_spirit_root_cards()
-	if count >= 10:
-		return 3
-	if count >= 5:
+	if count >= 7:
 		return 2
-	if count >= 3:
+	if count >= 4:
 		return 1
 	return 0
 
@@ -107,15 +146,13 @@ func get_spirit_root_stage_name() -> String:
 		1:
 			return "小成"
 		2:
-			return "大成"
-		3:
 			return "圆满"
 		_:
 			return "初悟"
 
 
 func is_spirit_root_complete() -> bool:
-	return has_spirit_root() and get_spirit_root_stage() >= 3
+	return has_spirit_root() and get_spirit_root_stage() >= 2
 
 
 func get_spirit_root_modified_value(value: int) -> int:
@@ -127,10 +164,88 @@ func get_spirit_root_modified_value(value: int) -> int:
 			return ceili(value * 1.2) + 1
 		2:
 			return ceili(value * 1.4) + 1
-		3:
-			return ceili(value * 1.8) + 1
 		_:
 			return value + 1
+
+
+func should_request_spirit_root_fire_choice(card: Card) -> bool:
+	return (
+		card
+		and has_spirit_root()
+		and is_spirit_root_complete()
+		and spirit_root == Card.Element.FIRE
+		and card.element == Card.Element.FIRE
+		and card.type == Card.Type.ATTACK
+		and not spirit_root_perfect_triggered_this_turn
+	)
+
+
+func reset_spirit_root_turn_flags() -> void:
+	spirit_root_perfect_triggered_this_turn = false
+	spirit_root_wood_played_this_turn = false
+	stats_changed.emit()
+
+
+func mark_spirit_root_perfect_triggered() -> void:
+	spirit_root_perfect_triggered_this_turn = true
+	stats_changed.emit()
+
+
+func mark_spirit_root_wood_played() -> void:
+	spirit_root_wood_played_this_turn = true
+	stats_changed.emit()
+
+
+func _is_basic_starter_card(card: Card) -> bool:
+	return (
+		card.id == "strike"
+		or card.id == "defend"
+		or card.id.ends_with("_strike")
+		or card.id.ends_with("_defend")
+		or card.display_name == "打击"
+		or card.display_name == "防御"
+	)
+
+
+func _get_spirit_root_profession_card_candidates(require_same_element: bool) -> Array[Card]:
+	var candidates: Array[Card] = []
+	var profession := _get_character_profession()
+	for card: Card in draftable_cards.cards:
+		if not card or card.get_profession() != profession:
+			continue
+		if require_same_element and card.element != spirit_root:
+			continue
+		candidates.append(card)
+	return candidates
+
+
+func _get_any_spirit_root_card_candidates() -> Array[Card]:
+	var candidates: Array[Card] = []
+	for card: Card in draftable_cards.cards:
+		if card and card.element == spirit_root:
+			candidates.append(card)
+	return candidates
+
+
+func _get_character_profession() -> Card.Profession:
+	var path := resource_path
+	if character_name.contains("体"):
+		return Card.Profession.BODY
+	if character_name.contains("剑"):
+		return Card.Profession.SWORD
+	if character_name.contains("魔"):
+		return Card.Profession.DEMONIC
+	if character_name.contains("兽"):
+		return Card.Profession.BEASTMASTER
+	if path.contains("body_cultivator"):
+		return Card.Profession.BODY
+	if path.contains("sword_cultivator"):
+		return Card.Profession.SWORD
+	if path.contains("demonic_cultivator"):
+		return Card.Profession.DEMONIC
+	if path.contains("beastmaster"):
+		return Card.Profession.BEASTMASTER
+	return Card.Profession.COMMON
 
 
 func bind_all_card_piles_to_owner() -> void:
@@ -140,6 +255,7 @@ func bind_all_card_piles_to_owner() -> void:
 		draw_pile.bind_cards_to_owner(self)
 	if discard:
 		discard.bind_cards_to_owner(self)
+	refresh_spirit_root_bonus_cards()
 
 
 func reset_temporary_card_costs() -> void:

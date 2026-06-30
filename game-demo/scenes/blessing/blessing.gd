@@ -75,7 +75,7 @@ func _build_ui() -> void:
 	add_child(background)
 
 	var dimmer := ColorRect.new()
-	dimmer.color = Color(0.00, 0.03, 0.06, 0.14)
+	dimmer.color = Color(0.03, 0.00, 0.00, 0.24)
 	dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dimmer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(dimmer)
@@ -89,11 +89,7 @@ func _build_ui() -> void:
 	title.offset_top = 330
 	title.offset_right = 360
 	title.offset_bottom = 410
-	title.add_theme_color_override("font_color", Color("f2c94f"))
-	title.add_theme_color_override("font_shadow_color", Color(0.02, 0.05, 0.07, 0.94))
-	title.add_theme_constant_override("shadow_offset_x", 4)
-	title.add_theme_constant_override("shadow_offset_y", 5)
-	title.add_theme_font_size_override("font_size", 58)
+	InkTheme.apply_screen_title(title, 58)
 	add_child(title)
 
 	var subtitle := Label.new()
@@ -105,11 +101,7 @@ func _build_ui() -> void:
 	subtitle.offset_top = 402
 	subtitle.offset_right = 420
 	subtitle.offset_bottom = 452
-	subtitle.add_theme_color_override("font_color", Color("d7eef4"))
-	subtitle.add_theme_color_override("font_shadow_color", Color(0.01, 0.03, 0.05, 0.88))
-	subtitle.add_theme_constant_override("shadow_offset_x", 2)
-	subtitle.add_theme_constant_override("shadow_offset_y", 3)
-	subtitle.add_theme_font_size_override("font_size", 25)
+	InkTheme.apply_subtitle(subtitle, 25)
 	add_child(subtitle)
 
 	var dialogue := PanelContainer.new()
@@ -119,7 +111,7 @@ func _build_ui() -> void:
 	dialogue.offset_top = 650
 	dialogue.offset_right = 420
 	dialogue.offset_bottom = 700
-	dialogue.add_theme_stylebox_override("panel", _make_panel_style(Color(0.05, 0.15, 0.18, 0.92), Color(0.15, 0.78, 0.95, 0.32), 2, 18))
+	dialogue.add_theme_stylebox_override("panel", _make_panel_style(Color(0.045, 0.030, 0.028, 0.88), Color(0.70, 0.48, 0.24, 0.64), 2, 8, Color(0, 0, 0, 0.46), 12))
 	add_child(dialogue)
 
 	var dialogue_label := Label.new()
@@ -127,7 +119,7 @@ func _build_ui() -> void:
 	dialogue_label.text = "聆听先古回响，择其一而行。"
 	dialogue_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	dialogue_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	dialogue_label.add_theme_color_override("font_color", Color("f2efe2"))
+	dialogue_label.add_theme_color_override("font_color", Color("efe6d0"))
 	dialogue_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.72))
 	dialogue_label.add_theme_constant_override("shadow_offset_x", 2)
 	dialogue_label.add_theme_constant_override("shadow_offset_y", 2)
@@ -352,9 +344,9 @@ func _grant_relics(count: int) -> void:
 
 
 func _apply_choice_button_style(button: Button) -> void:
-	button.add_theme_stylebox_override("normal", _make_panel_style(Color(0.03, 0.22, 0.29, 0.70), Color(0.08, 0.72, 0.92, 0.32), 1, 8))
-	button.add_theme_stylebox_override("hover", _make_panel_style(Color(0.05, 0.34, 0.42, 0.86), Color(0.45, 0.94, 1.0, 0.70), 2, 8, Color(0.20, 0.86, 1.0, 0.18), 10))
-	button.add_theme_stylebox_override("pressed", _make_panel_style(Color(0.02, 0.18, 0.22, 0.88), Color(0.94, 0.74, 0.25, 0.78), 2, 8))
+	button.add_theme_stylebox_override("normal", _make_panel_style(Color(0.045, 0.030, 0.028, 0.82), Color(0.58, 0.38, 0.20, 0.74), 1, 8))
+	button.add_theme_stylebox_override("hover", _make_panel_style(Color(0.090, 0.045, 0.038, 0.92), Color("f2c94f"), 2, 8, Color(0.72, 0.24, 0.10, 0.20), 10))
+	button.add_theme_stylebox_override("pressed", _make_panel_style(Color(0.030, 0.020, 0.020, 0.96), Color(0.86, 0.55, 0.25, 0.92), 2, 8))
 	button.add_theme_color_override("font_color", Color.TRANSPARENT)
 
 

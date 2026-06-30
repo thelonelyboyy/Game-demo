@@ -19,10 +19,7 @@ func execute(card: CultivationCard, targets: Array[Node], modifiers: ModifierHan
 	if damage <= 0:
 		return
 
-	var damage_effect := DamageEffect.new()
-	damage_effect.amount = modifiers.get_modified_value(damage, Modifier.Type.DMG_DEALT) if modifiers else damage
-	damage_effect.sound = card.sound if card else null
-	damage_effect.execute(final_targets)
+	execute_damage(card, final_targets, damage, modifiers)
 
 
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:

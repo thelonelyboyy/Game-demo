@@ -9,8 +9,10 @@ const SHOP_SCENE := preload("res://scenes/shop/shop.tscn")
 const TREASURE_SCENE = preload("res://scenes/treasure/treasure.tscn")
 const WIN_SCREEN_SCENE := preload("res://scenes/win_screen/win_screen.tscn")
 const SPIRIT_ROOT_BADGE_SCENE := preload("res://scenes/ui/spirit_root_badge.tscn")
+const DEBUG_CONSOLE := preload("res://scenes/debug/debug_console.gd")
 const DEMONIC_HEAD_ICON := preload("res://art/characters/demonic_cultivator_head_icon.png")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
+const DEFEAT_LEGACY := preload("res://custom_resources/defeat_legacy.gd")
 const POTION_REWARD_PATHS := [
 	"res://potions/healing_pill.tres",
 	"res://potions/qi_pill.tres",
@@ -68,6 +70,8 @@ var character: CharacterStats
 var save_data: SaveGame
 var spirit_root_badge: SpiritRootBadge
 var potion_bar_panel: PanelContainer
+var legacy_choice_layer: CanvasLayer
+var debug_console
 var current_chapter := 1
 
 
@@ -94,6 +98,7 @@ func _start_run() -> void:
 	
 	_setup_event_connections()
 	_setup_top_bar()
+	_setup_debug_console()
 
 	map.generate_new_map(current_chapter)
 	map.unlock_floor(0)
@@ -102,6 +107,7 @@ func _start_run() -> void:
 
 	save_data = SaveGame.new()
 	_save_run(true)
+	_show_defeat_legacy_choice_if_available.call_deferred()
 
 
 func _random_reward_potion() -> Potion:
@@ -122,6 +128,266 @@ func _grant_starter_potions() -> void:
 	for path in ["res://potions/healing_pill.tres", "res://potions/flame_talisman.tres"]:
 		if ResourceLoader.exists(path):
 			potion_handler.add_potion(load(path) as Potion)
+
+
+func _show_defeat_legacy_choice_if_available() -> void:
+	var candidates := _filter_defeat_legacy_relics(DEFEAT_LEGACY.load_relics())
+	if candidates.is_empty():
+		DEFEAT_LEGACY.delete_data()
+		return
+
+	_show_defeat_legacy_choice_panel(candidates)
+
+
+func _filter_defeat_legacy_relics(relics: Array[Relic]) -> Array[Relic]:
+	var candidates: Array[Relic] = []
+	var seen_ids := {}
+	var current_starting_relic_id := ""
+	if character and character.starting_relic:
+		current_starting_relic_id = character.starting_relic.id
+
+	for relic: Relic in relics:
+		if not relic:
+			continue
+		if relic.id.is_empty() or seen_ids.has(relic.id):
+			continue
+		if relic.id == current_starting_relic_id:
+			continue
+		seen_ids[relic.id] = true
+		candidates.append(relic)
+
+	return candidates
+
+
+func _show_defeat_legacy_choice_panel(candidates: Array[Relic]) -> void:
+	if legacy_choice_layer:
+		legacy_choice_layer.queue_free()
+
+	get_tree().paused = true
+
+	legacy_choice_layer = CanvasLayer.new()
+	legacy_choice_layer.name = "DefeatLegacyChoice"
+	legacy_choice_layer.layer = 8
+	legacy_choice_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(legacy_choice_layer)
+
+	var dim := ColorRect.new()
+	dim.name = "Dim"
+	dim.color = Color(0.012, 0.010, 0.014, 0.78)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	legacy_choice_layer.add_child(dim)
+
+	var panel := PanelContainer.new()
+	panel.name = "Panel"
+	panel.process_mode = Node.PROCESS_MODE_ALWAYS
+	panel.custom_minimum_size = Vector2(860, 520)
+	panel.add_theme_stylebox_override("panel", _make_legacy_panel_style())
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.offset_left = -430
+	panel.offset_top = -260
+	panel.offset_right = 430
+	panel.offset_bottom = 260
+	legacy_choice_layer.add_child(panel)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 30)
+	margin.add_theme_constant_override("margin_top", 26)
+	margin.add_theme_constant_override("margin_right", 30)
+	margin.add_theme_constant_override("margin_bottom", 26)
+	panel.add_child(margin)
+
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 14)
+	margin.add_child(content)
+
+	content.add_child(_make_legacy_label("劫灰遗宝", 38, Color("f2c94f"), HORIZONTAL_ALIGNMENT_CENTER))
+	content.add_child(_make_legacy_label(
+		"上一轮失败后，劫灰中留下了这些法宝。选择一件替换本命法宝，或保留当前本命法宝。",
+		20,
+		Color("e8d8b8"),
+		HORIZONTAL_ALIGNMENT_CENTER,
+		true
+	))
+	content.add_child(_create_current_starter_relic_row())
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(800, 250)
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content.add_child(scroll)
+
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 8)
+	scroll.add_child(list)
+
+	for relic: Relic in candidates:
+		list.add_child(_create_legacy_relic_button(relic))
+
+	var keep_button := Button.new()
+	keep_button.text = "保留当前本命法宝"
+	keep_button.custom_minimum_size = Vector2(360, 56)
+	keep_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	keep_button.focus_mode = Control.FOCUS_ALL
+	keep_button.pressed.connect(_complete_defeat_legacy_choice.bind(null))
+	_apply_legacy_button_text_style(keep_button, 24)
+	keep_button.add_theme_stylebox_override("normal", _make_legacy_button_style(Color(0.07, 0.055, 0.05, 0.92), Color(0.60, 0.48, 0.26, 0.84)))
+	keep_button.add_theme_stylebox_override("hover", _make_legacy_button_style(Color(0.12, 0.085, 0.06, 0.96), Color("f2c94f")))
+	keep_button.add_theme_stylebox_override("pressed", _make_legacy_button_style(Color(0.045, 0.035, 0.032, 0.98), Color(0.80, 0.54, 0.28, 0.94)))
+	content.add_child(keep_button)
+
+
+func _create_current_starter_relic_row() -> Control:
+	var row := HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 64)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+
+	row.add_child(_make_legacy_label("当前本命法宝", 20, Color("d8c49a")))
+
+	if character and character.starting_relic:
+		row.add_child(_create_relic_icon(character.starting_relic, 48))
+		row.add_child(_make_legacy_label(character.starting_relic.relic_name, 22, Color("fff0c2")))
+
+	return row
+
+
+func _create_legacy_relic_button(relic: Relic) -> Button:
+	var button := Button.new()
+	button.text = ""
+	button.custom_minimum_size = Vector2(780, 84)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.focus_mode = Control.FOCUS_ALL
+	button.pressed.connect(_complete_defeat_legacy_choice.bind(relic))
+	_apply_legacy_button_text_style(button, 20)
+	button.add_theme_stylebox_override("normal", _make_legacy_button_style(Color(0.035, 0.030, 0.035, 0.92), Color(0.50, 0.38, 0.21, 0.78)))
+	button.add_theme_stylebox_override("hover", _make_legacy_button_style(Color(0.08, 0.045, 0.055, 0.96), Color("f2c94f")))
+	button.add_theme_stylebox_override("pressed", _make_legacy_button_style(Color(0.025, 0.020, 0.024, 0.98), Color(0.82, 0.50, 0.24, 0.94)))
+
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	row.offset_left = 16
+	row.offset_top = 10
+	row.offset_right = -16
+	row.offset_bottom = -10
+	row.add_theme_constant_override("separation", 14)
+	button.add_child(row)
+
+	row.add_child(_create_relic_icon(relic, 56))
+
+	var text_box := VBoxContainer.new()
+	text_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text_box.add_theme_constant_override("separation", 2)
+	row.add_child(text_box)
+
+	text_box.add_child(_make_legacy_label(relic.relic_name, 22, Color("ffe7ad")))
+	text_box.add_child(_make_legacy_label(relic.get_tooltip(), 17, Color("d8c7a4"), HORIZONTAL_ALIGNMENT_LEFT, true))
+
+	return button
+
+
+func _create_relic_icon(relic: Relic, icon_size: int) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(icon_size, icon_size)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.texture = relic.icon if relic else null
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	return icon
+
+
+func _complete_defeat_legacy_choice(relic: Relic = null) -> void:
+	if relic and character:
+		var previous_relic := character.starting_relic
+		if previous_relic:
+			relic_handler.remove_relic(previous_relic.id)
+		character.starting_relic = relic
+		relic_handler.add_relic(relic)
+		_polish_relic_row()
+
+	DEFEAT_LEGACY.delete_data()
+	_close_defeat_legacy_choice_panel()
+	_save_run(true)
+
+
+func _close_defeat_legacy_choice_panel() -> void:
+	if legacy_choice_layer:
+		legacy_choice_layer.queue_free()
+		legacy_choice_layer = null
+	get_tree().paused = false
+
+
+func _make_legacy_label(
+	text: String,
+	font_size: int,
+	color: Color,
+	alignment := HORIZONTAL_ALIGNMENT_LEFT,
+	wrap := false
+) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.horizontal_alignment = alignment
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if wrap else TextServer.AUTOWRAP_OFF
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.84))
+	label.add_theme_constant_override("shadow_offset_x", 2)
+	label.add_theme_constant_override("shadow_offset_y", 2)
+	return label
+
+
+func _apply_legacy_button_text_style(button: Button, font_size: int) -> void:
+	button.add_theme_font_size_override("font_size", font_size)
+	button.add_theme_color_override("font_color", Color("ffe7ad"))
+	button.add_theme_color_override("font_hover_color", Color("fff6d6"))
+	button.add_theme_color_override("font_pressed_color", Color("d8a75e"))
+	button.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
+	button.add_theme_constant_override("shadow_offset_x", 2)
+	button.add_theme_constant_override("shadow_offset_y", 2)
+	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+
+
+func _make_legacy_panel_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.030, 0.024, 0.026, 0.96)
+	style.border_color = Color(0.72, 0.52, 0.25, 0.92)
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.corner_radius_top_left = 8
+	style.corner_radius_top_right = 8
+	style.corner_radius_bottom_left = 8
+	style.corner_radius_bottom_right = 8
+	style.shadow_color = Color(0, 0, 0, 0.58)
+	style.shadow_size = 18
+	return style
+
+
+func _make_legacy_button_style(bg: Color, border: Color) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.corner_radius_top_left = 6
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_left = 6
+	style.corner_radius_bottom_right = 6
+	style.content_margin_left = 12
+	style.content_margin_top = 8
+	style.content_margin_right = 12
+	style.content_margin_bottom = 8
+	style.shadow_color = Color(0, 0, 0, 0.38)
+	style.shadow_size = 8
+	return style
 
 
 func _save_run(was_on_map: bool) -> void:
@@ -161,6 +427,7 @@ func _load_run() -> void:
 	relic_handler.add_relics(save_data.relics)
 	potion_handler.load_potions(save_data.potions)
 	_setup_top_bar()
+	_setup_debug_console()
 	_setup_event_connections()
 	
 	map.load_map(save_data.map_data, save_data.floors_climbed, save_data.last_room)
@@ -221,14 +488,24 @@ func _setup_top_bar():
 	_setup_spirit_root_badge()
 	
 	relic_handler.add_relic(character.starting_relic)
-	Events.relic_tooltip_requested.connect(relic_tooltip.show_tooltip)
-	if not Events.relic_tooltip_hide_requested.is_connected(relic_tooltip.hide):
-		Events.relic_tooltip_hide_requested.connect(relic_tooltip.hide)
+	if not Events.relic_tooltip_requested.is_connected(relic_tooltip.show_tooltip):
+		Events.relic_tooltip_requested.connect(relic_tooltip.show_tooltip)
+	if Events.relic_tooltip_hide_requested.is_connected(relic_tooltip.hide):
+		Events.relic_tooltip_hide_requested.disconnect(relic_tooltip.hide)
+	if not Events.relic_tooltip_hide_requested.is_connected(relic_tooltip.hide_tooltip):
+		Events.relic_tooltip_hide_requested.connect(relic_tooltip.hide_tooltip)
 	
 	deck_button.card_pile = character.deck
 	deck_view.card_pile = character.deck
 	deck_button.pressed.connect(deck_view.show_current_view.bind("牌组"))
 	_polish_deck_button()
+
+
+func _setup_debug_console() -> void:
+	if not debug_console:
+		debug_console = DEBUG_CONSOLE.new()
+		add_child(debug_console)
+	debug_console.setup(character, stats, relic_handler, potion_handler)
 
 
 func _polish_top_bar() -> void:

@@ -66,7 +66,7 @@ func add_card_reward() -> void:
 	card_reward.reward_icon = CARD_ICON
 	card_reward.reward_text = CARD_TEXT
 	card_reward.reward_subtext = "从三张术法中选择一张"
-	card_reward.accent_color = Color("6fb2d8")
+	card_reward.accent_color = Color("b88ad8")
 	card_reward.auto_consume = false
 	card_reward.pressed.connect(_show_card_rewards.bind(card_reward))
 	rewards.add_child.call_deferred(card_reward)
@@ -283,34 +283,19 @@ func _apply_visuals() -> void:
 
 	_set_reward_copy("战利归匣", "收下战斗所得，再继续向洞府深处前行。")
 
-	reward_container.add_theme_stylebox_override("panel", _make_panel_style(
-		Color(0.03, 0.12, 0.14, 0.76),
-		Color(0.60, 0.48, 0.25, 0.76),
-		2,
-		8,
-		Color(0, 0, 0, 0.54),
-		18
-	))
+	InkTheme.apply_screen_panel(reward_container)
 	rewards.add_theme_constant_override("separation", 18)
-	_style_button(back_button, Color("b89648"))
+	_style_button(back_button)
 	queue_redraw()
 
 
 func _set_reward_copy(title_text: String, subtitle_text: String) -> void:
 	if title:
 		title.text = title_text
-		title.add_theme_color_override("font_color", Color("f2c94f"))
-		title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
-		title.add_theme_constant_override("shadow_offset_x", 4)
-		title.add_theme_constant_override("shadow_offset_y", 5)
-		title.add_theme_font_size_override("font_size", 56)
+		InkTheme.apply_screen_title(title, 56)
 	if subtitle:
 		subtitle.text = subtitle_text
-		subtitle.add_theme_color_override("font_color", Color("d7eef4"))
-		subtitle.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.76))
-		subtitle.add_theme_constant_override("shadow_offset_x", 2)
-		subtitle.add_theme_constant_override("shadow_offset_y", 3)
-		subtitle.add_theme_font_size_override("font_size", 23)
+		InkTheme.apply_subtitle(subtitle, 23)
 
 
 func _make_relic_summary(relic: Relic, fallback: String) -> String:
@@ -323,25 +308,17 @@ func _make_relic_summary(relic: Relic, fallback: String) -> String:
 	return text.substr(0, 42) + ("..." if text.length() > 42 else "")
 
 
-func _style_button(button: Button, accent: Color) -> void:
+func _style_button(button: Button) -> void:
 	button.text = "继续"
 	button.custom_minimum_size = Vector2(190, 54)
-	button.add_theme_font_size_override("font_size", 22)
-	button.add_theme_color_override("font_color", Color("f4efe4"))
-	button.add_theme_color_override("font_hover_color", Color("fff6dc"))
-	button.add_theme_color_override("font_pressed_color", Color("f2c94f"))
-	button.add_theme_color_override("font_disabled_color", Color(0.67, 0.63, 0.52, 0.48))
-	button.add_theme_stylebox_override("normal", _make_panel_style(Color(0.05, 0.20, 0.24, 0.88), accent.darkened(0.25), 1, 6))
-	button.add_theme_stylebox_override("hover", _make_panel_style(Color(0.08, 0.31, 0.36, 0.96), accent.lightened(0.20), 2, 6, Color(accent.r, accent.g, accent.b, 0.22), 10))
-	button.add_theme_stylebox_override("pressed", _make_panel_style(Color(0.03, 0.14, 0.17, 0.98), Color("f2c94f"), 2, 6))
-	button.add_theme_stylebox_override("disabled", _make_panel_style(Color(0.05, 0.06, 0.06, 0.68), Color(0.42, 0.38, 0.30, 0.48), 1, 6))
+	InkTheme.apply_screen_button(button)
 
 
 func _draw() -> void:
 	var center := size * Vector2(0.5, 0.54)
-	draw_circle(center, 260.0, Color(0.05, 0.36, 0.42, 0.10))
-	draw_arc(center, 314.0, -0.15, TAU - 0.15, 128, Color(0.78, 0.60, 0.26, 0.28), 2.0, true)
-	draw_arc(center, 240.0, 0.42, TAU + 0.42, 128, Color(0.50, 0.86, 0.96, 0.18), 1.6, true)
+	draw_circle(center, 260.0, Color(0.42, 0.06, 0.04, 0.10))
+	draw_arc(center, 314.0, -0.15, TAU - 0.15, 128, Color(0.78, 0.58, 0.25, 0.30), 2.0, true)
+	draw_arc(center, 240.0, 0.42, TAU + 0.42, 128, Color(0.64, 0.25, 0.80, 0.16), 1.6, true)
 
 
 func _make_panel_style(bg: Color, border: Color, border_width := 1, radius := 8, shadow := Color(0, 0, 0, 0.34), shadow_size := 8) -> StyleBoxFlat:

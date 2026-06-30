@@ -356,7 +356,7 @@ func _apply_shop_visuals() -> void:
 
 	var dimmer := ColorRect.new()
 	dimmer.name = "Dimmer"
-	dimmer.color = Color(0.00, 0.03, 0.05, 0.18)
+	dimmer.color = Color(0.03, 0.00, 0.00, 0.28)
 	dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dimmer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	$BackgroundLayer.add_child(dimmer)
@@ -366,11 +366,7 @@ func _apply_shop_visuals() -> void:
 	title.text = "坊市"
 	title.offset_top = -460.0
 	title.offset_bottom = -392.0
-	title.add_theme_color_override("font_color", Color("f2c94f"))
-	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
-	title.add_theme_constant_override("shadow_offset_x", 4)
-	title.add_theme_constant_override("shadow_offset_y", 5)
-	title.add_theme_font_size_override("font_size", 56)
+	InkTheme.apply_screen_title(title, 56)
 
 	_add_subtitle()
 	_add_market_panel()
@@ -392,10 +388,10 @@ func _apply_shop_visuals() -> void:
 	back_button.offset_right = -430.0
 	back_button.offset_bottom = 326.0
 	back_button.text = "离开"
-	_style_button(back_button, Color("b89648"))
+	_style_button(back_button)
 
 	remove_card_button.custom_minimum_size = Vector2(320, 54)
-	_style_button(remove_card_button, Color("6fb2d8"))
+	_style_button(remove_card_button)
 
 
 func _add_subtitle() -> void:
@@ -412,11 +408,7 @@ func _add_subtitle() -> void:
 	subtitle.offset_top = -384.0
 	subtitle.offset_right = 440.0
 	subtitle.offset_bottom = -342.0
-	subtitle.add_theme_color_override("font_color", Color("d7eef4"))
-	subtitle.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.76))
-	subtitle.add_theme_constant_override("shadow_offset_x", 2)
-	subtitle.add_theme_constant_override("shadow_offset_y", 3)
-	subtitle.add_theme_font_size_override("font_size", 23)
+	InkTheme.apply_subtitle(subtitle, 23)
 	ui_layer.add_child(subtitle)
 
 
@@ -432,14 +424,7 @@ func _add_market_panel() -> void:
 	panel.offset_top = -270.0
 	panel.offset_right = 660.0
 	panel.offset_bottom = 354.0
-	panel.add_theme_stylebox_override("panel", _make_panel_style(
-		Color(0.03, 0.12, 0.14, 0.70),
-		Color(0.60, 0.48, 0.25, 0.76),
-		2,
-		8,
-		Color(0, 0, 0, 0.54),
-		18
-	))
+	InkTheme.apply_screen_panel(panel)
 	ui_layer.add_child(panel)
 	ui_layer.move_child(panel, shop_content.get_index())
 
@@ -471,16 +456,8 @@ func _make_section_label(text: String) -> Label:
 	return label
 
 
-func _style_button(button: Button, accent: Color) -> void:
-	button.add_theme_font_size_override("font_size", 22)
-	button.add_theme_color_override("font_color", Color("f4efe4"))
-	button.add_theme_color_override("font_hover_color", Color("fff6dc"))
-	button.add_theme_color_override("font_pressed_color", Color("f2c94f"))
-	button.add_theme_color_override("font_disabled_color", Color(0.67, 0.63, 0.52, 0.48))
-	button.add_theme_stylebox_override("normal", _make_panel_style(Color(0.05, 0.20, 0.24, 0.86), accent.darkened(0.25), 1, 6))
-	button.add_theme_stylebox_override("hover", _make_panel_style(Color(0.08, 0.31, 0.36, 0.96), accent.lightened(0.20), 2, 6, Color(accent.r, accent.g, accent.b, 0.22), 10))
-	button.add_theme_stylebox_override("pressed", _make_panel_style(Color(0.03, 0.14, 0.17, 0.98), Color("f2c94f"), 2, 6))
-	button.add_theme_stylebox_override("disabled", _make_panel_style(Color(0.05, 0.06, 0.06, 0.68), Color(0.42, 0.38, 0.30, 0.48), 1, 6))
+func _style_button(button: Button) -> void:
+	InkTheme.apply_screen_button(button)
 
 
 func _make_panel_style(bg: Color, border: Color, border_width := 1, radius := 8, shadow := Color(0, 0, 0, 0.34), shadow_size := 8) -> StyleBoxFlat:

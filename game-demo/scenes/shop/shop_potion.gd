@@ -22,6 +22,17 @@ func _ready() -> void:
 	_apply_visuals()
 
 
+func _draw() -> void:
+	draw_style_box(_make_panel_style(
+		Color(0.045, 0.030, 0.028, 0.82),
+		Color(0.62, 0.42, 0.22, 0.76),
+		1,
+		8,
+		Color(0, 0, 0, 0.42),
+		10
+	), Rect2(Vector2.ZERO, size))
+
+
 func update(run_stats: RunStats) -> void:
 	if not price_label or not buy_button:
 		return
@@ -62,3 +73,32 @@ func _apply_visuals() -> void:
 	price_label.add_theme_font_size_override("font_size", 20)
 	buy_button.text = "购买"
 	buy_button.custom_minimum_size = Vector2(108, 40)
+	InkTheme.apply_screen_button(buy_button)
+	buy_button.add_theme_font_size_override("font_size", 19)
+	queue_redraw()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		queue_redraw()
+
+
+func _make_panel_style(bg: Color, border: Color, border_width := 1, radius := 8, shadow := Color(0, 0, 0, 0.34), shadow_size := 8) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg
+	style.border_color = border
+	style.border_width_left = border_width
+	style.border_width_top = border_width
+	style.border_width_right = border_width
+	style.border_width_bottom = border_width
+	style.corner_radius_top_left = radius
+	style.corner_radius_top_right = radius
+	style.corner_radius_bottom_left = radius
+	style.corner_radius_bottom_right = radius
+	style.content_margin_left = 10
+	style.content_margin_top = 8
+	style.content_margin_right = 10
+	style.content_margin_bottom = 8
+	style.shadow_color = shadow
+	style.shadow_size = shadow_size
+	return style

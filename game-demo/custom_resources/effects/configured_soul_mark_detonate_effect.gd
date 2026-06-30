@@ -30,6 +30,7 @@ func execute(card: CultivationCard, targets: Array[Node], modifiers: ModifierHan
 		var damage := damage_per_stack * consumed
 		if modifiers:
 			damage = modifiers.get_modified_value(damage, Modifier.Type.DMG_DEALT)
+		damage = DEBUG_CONSOLE_STATE.apply_next_dealt(damage)
 		if damage <= 0:
 			continue
 

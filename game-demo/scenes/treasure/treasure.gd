@@ -72,17 +72,13 @@ func _apply_visuals() -> void:
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	dimmer.color = Color(0.00, 0.03, 0.05, 0.20)
+	dimmer.color = Color(0.03, 0.00, 0.00, 0.26)
 	dimmer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	title.text = "秘藏宝匣"
 	title.offset_top = -350.0
 	title.offset_bottom = -286.0
-	title.add_theme_color_override("font_color", Color("f2c94f"))
-	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
-	title.add_theme_constant_override("shadow_offset_x", 4)
-	title.add_theme_constant_override("shadow_offset_y", 5)
-	title.add_theme_font_size_override("font_size", 56)
+	InkTheme.apply_screen_title(title, 56)
 
 	_add_subtitle()
 	_add_stage_panel()
@@ -105,11 +101,7 @@ func _add_subtitle() -> void:
 	subtitle.offset_top = -292.0
 	subtitle.offset_right = 520.0
 	subtitle.offset_bottom = -250.0
-	subtitle.add_theme_color_override("font_color", Color("d7eef4"))
-	subtitle.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.76))
-	subtitle.add_theme_constant_override("shadow_offset_x", 2)
-	subtitle.add_theme_constant_override("shadow_offset_y", 3)
-	subtitle.add_theme_font_size_override("font_size", 23)
+	InkTheme.apply_subtitle(subtitle, 23)
 	add_child(subtitle)
 
 
@@ -126,11 +118,11 @@ func _add_stage_panel() -> void:
 	stage.offset_right = 260.0
 	stage.offset_bottom = 258.0
 	stage.add_theme_stylebox_override("panel", _make_panel_style(
-		Color(0.03, 0.12, 0.14, 0.46),
-		Color(0.60, 0.48, 0.25, 0.62),
+		Color(0.045, 0.030, 0.028, 0.50),
+		Color(0.70, 0.48, 0.24, 0.64),
 		2,
 		8,
-		Color(0, 0, 0, 0.38),
+		Color(0, 0, 0, 0.42),
 		16
 	))
 	add_child(stage)
@@ -180,7 +172,7 @@ func _begin_open_effects() -> void:
 	var hint := get_node_or_null("OpenHint") as Label
 	if hint:
 		hint.text = "灵光涌现..."
-		hint.add_theme_color_override("font_color", Color("dffcff"))
+		hint.add_theme_color_override("font_color", Color("fff1c8"))
 
 	treasure_chest.scale = Vector2.ONE
 	var tween := create_tween()
@@ -197,15 +189,15 @@ func _set_burst_progress(value: float) -> void:
 
 func _draw() -> void:
 	var center := size * Vector2(0.5, 0.57)
-	draw_circle(center, 165.0, Color(0.18, 0.72, 0.78, 0.10))
+	draw_circle(center, 165.0, Color(0.54, 0.08, 0.05, 0.10))
 	draw_arc(center, 142.0, -0.22, TAU - 0.22, 96, Color(0.77, 0.58, 0.25, 0.42), 2.0, true)
-	draw_arc(center, 102.0, 0.42, TAU + 0.42, 96, Color(0.61, 0.92, 1.0, 0.30), 1.6, true)
+	draw_arc(center, 102.0, 0.42, TAU + 0.42, 96, Color(0.66, 0.24, 0.84, 0.24), 1.6, true)
 
 	if burst_progress <= 0.0:
 		return
 
 	draw_circle(center, 130.0 + 80.0 * burst_progress, Color(0.98, 0.78, 0.25, 0.20 * (1.0 - burst_progress)))
-	draw_arc(center, 118.0 + 96.0 * burst_progress, 0.0, TAU, 120, Color(0.92, 0.98, 1.0, 0.64 * (1.0 - burst_progress)), 3.0, true)
+	draw_arc(center, 118.0 + 96.0 * burst_progress, 0.0, TAU, 120, Color(1.0, 0.74, 0.42, 0.58 * (1.0 - burst_progress)), 3.0, true)
 
 
 func _make_panel_style(bg: Color, border: Color, border_width := 1, radius := 8, shadow := Color(0, 0, 0, 0.34), shadow_size := 8) -> StyleBoxFlat:

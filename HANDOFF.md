@@ -1,15 +1,22 @@
 ﻿# 万劫求仙项目交接文档
 
-更新时间：2026-06-26  
+更新时间：2026-07-01
 项目根目录：`E:\code\game-demo`  
 Godot 工程目录：`E:\code\game-demo\game-demo`  
 Godot 版本：4.5.2 stable mono  
 Godot 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe`
 Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64_console.exe`
 
-## 1. 当前状态（2026-06-26）
+## 1. 当前状态（2026-07-01）
 
 - 稳定运行的杀戮尖塔式修仙卡牌肉鸽 Demo。当前焦点：**把魔修打磨成完整 Demo**。
+- **当前开发策略**：暂时不继续精抠单个 UI，优先把魔修职业做成可完整通关、可调试、可扩展的 Demo 闭环。
+- **UI 风格统一已推进一轮**：`InkTheme` 扩展了暗黑修仙通用面板/按钮/标题样式，并已套到战斗奖励、商店、宝箱、祝福、篝火、删牌、升牌、融合、牌堆、胜负面板、暂停菜单、调试控制台、灵根选择等界面。后续新增页面应优先复用 `scenes/ui/ink_theme.gd`，不要各自重新写一套 StyleBox。
+- **事件池临时切换**：旧事件暂时禁用，当前 `event_room_pool.tres` 只开放最近新增的 10 个事件，便于集中验证新事件质量。
+- **调试控制台已加入**：Run 场景内按 **Ctrl + 反引号** 打开，不再使用 F8（Godot 编辑器里 F8 会直接停止运行）。可增删/升级/融合卡牌，调血量、金币、法宝、丹药，以及编辑下次造成/受到伤害，便于 Demo 调试。
+- **灵根机制已重做**：保留开局三选一与“打击/防御转元素”，新增同元素灵根职业卡、三段成长和圆满专属被动；旧圆满规则已禁用。详见第 4、6 节。
+- **失败遗产已加入**：失败后下一局进地图时，可从上一局获得的法宝中选 1 个替换本命法宝，也可以不替换。
+- **法宝说明交互已改**：法宝/遗物现在应使用鼠标悬停小 tooltip 显示效果，不再点击后全屏展示。
 - **主页/选人/战斗 UI 已按 `art/design` 目标图方向推进**：主页改成暗黑修仙主视觉；选人界面使用现有 UI 资产贴近目标图；魔修战斗界面改为暗蓝月夜战斗 HUD，底部法力球/焰轮/牌堆/结束回合按钮更接近 `art/design/target.png`。
 - **战斗 UI 最新资源位置**：新一批生成 HUD 资源在 `game-demo/assets/ui/generated/battle/`；旧一轮 `game-demo/art/ui/battle_hud/demonic_blue/` 仍保留给部分面板/历史对照。预览图在 `game-demo/art/design/run_battle_ui_preview.png` / `battle_ui_preview.png`。
 - **战斗顶栏最新约定**：Run 顶部使用黑金面板资源，角色名必须读取 `CharacterStats.character_name`；灵根/丹药仍在顶栏；总牌库按钮在右上；设置按钮在最右。法宝/遗物独占顶栏下方一栏，**不显示“法宝”标题**，放不下由 `HFlowContainer` 自动换第二行；不要再把法宝挤进顶栏小面板。
@@ -17,9 +24,9 @@ Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godo
 - **地图节点 hover/focus 说明已补**：精英战、营火、商店、机缘、宝箱等节点会给新玩家显示含义提示。
 - **新增「符箓丹药」系统**（可携带一次性消耗品，对标药水）：战斗奖励/商店获取、3 槽位、战斗内/部分战斗外使用。见第 4、6 节。
 - **魔修机制大改**（三系统，引爆倍率 X=3）：阶段1 煞气 ✅、阶段2 魂印引爆 ✅、阶段3 魔焰焰轮 ✅（含 7 色 rider 细化）。见第 4、6 节。
-- 最近一轮主干提交：`master` `d80c91a`（战斗 UI 与选人动画背景）；本轮继续追加 UI/资产/数值/文档更新。
+- 最近一轮主干提交：`master` `f7cf8cd`（战斗 UI 与视觉资产）；本轮继续追加 Demo 机制、事件、调试控制台、UI 统一、编码配置与文档更新。
 - `validate_project.py` 现在 **0 error / 0 warning**（校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
-- `run_godot_checks.py`：最近用 Godot exe 跑过全量检查，`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过。
+- `run_godot_checks.py`：2026-07-01 最近一次用 Godot exe 跑过全量检查，`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过。
 - **统一 Excel 数值总表**：`game_data.xlsx`（卡牌/祝福/怪物AI 三张数据表 + 说明）——改表回写 `.tres`/`.json`/`.tscn`，一个文件调全部数值平衡（见第 6、7 节）。旧的独立 `cards.xlsx` 已被它取代。
 - 开发路线图见根目录 `ROADMAP.md`。
 
@@ -116,7 +123,8 @@ E:\code\game-demo
 - **敌人意图系统**：`Intent.category`（12 种分类）驱动 `scenes/ui/intent_ui.gd` 的彩色气泡；攻击/防御/强化等分类用 `art/tiles/intent_*.png` 贴图、其余分类用代码绘制图标兜底。给敌人意图分类：在其 AI 场景（如 `enemies/crab/crab_enemy_ai.tscn`）的 Intent 子资源里设 `category`。
 - **存档自愈**：`SaveGame.load_data()` 加载前用 `get_dependencies` 检查依赖是否齐全，缺失/损坏则清理坏档并返回 null（`run.gd` 也会在空存档时返回主菜单）。注意：存档仍按路径内嵌大量资源引用，**移动/重命名被引用的资源会让旧存档失效**（架构隐患，见 ROADMAP 阶段 0）。
 - **章节难度爬升**：`scenes/map/map_generator.gd` 的 `CHAPTER_HEALTH/DAMAGE/GOLD_MULTIPLIERS` 让敌人血量/伤害/金币按章节递增（经 `_battle_for_room` 复制缩放，不污染战斗池）；进入新一章在 `run.gd._advance_to_next_chapter` 回满血；测试地图（`map_mode != ROGUELIKE`）开启 `Map.free_navigation`（所有节点可点，直接点 Boss 也能进章）。
-- **数值/平衡关键位置**：商店按稀有度定价 `shop_card.gd PRICE_BY_RARITY` + 法宝价位带 `shop_relic.gd`；暗金卡上架 `shop.gd MYTHIC_SHOP_CHANCE=0.04`；灵根缩放 `character_stats.gd get_spirit_root_modified_value`（初悟+1/小成×1.2+1/大成×1.4+1/圆满×1.8+1）；剑意上限 `statuses/sword_intent.gd MAX_STACKS=4`；灵气回蓝上限 `statuses/energy_charge.gd MAX_MANA_PER_TURN=2`；四职业每回合均抽 5 张。
+- **数值/平衡关键位置**：商店按稀有度定价 `shop_card.gd PRICE_BY_RARITY` + 法宝价位带 `shop_relic.gd`；暗金卡上架 `shop.gd MYTHIC_SHOP_CHANCE=0.04`；灵根缩放 `character_stats.gd get_spirit_root_modified_value`（初悟 0-3 张：主数值+1；小成 4-6 张：ceil(基础主数值×1.2)+1；圆满 7+ 张：ceil(基础主数值×1.4)+1，并解锁每回合最多一次的元素被动）；剑意上限 `statuses/sword_intent.gd MAX_STACKS=4`；灵气回蓝上限 `statuses/energy_charge.gd MAX_MANA_PER_TURN=2`；四职业每回合均抽 5 张。
+- **灵根圆满被动**：逻辑集中在 `scenes/battle/spirit_root_handler.gd` 与相关卡牌/效果钩子，回合开始可靠重置触发次数。火：每回合第一张火攻击牌弹选择，伤害×1.5 或按最终实际伤害 50% 溅射其它敌人；金：第一张金牌得 1 劲气；水：第一张水牌抽 1，抽到的第一张牌本回合费用 -1；土：第一张土牌得 1 真元；木：回合结束若本回合打出过木牌，回复 3 点生命，满血则得 3 护体。UI/tooltip/status 文案需要让玩家看懂本回合是否已触发。
 - **敌人行动延迟回调**：敌人攻击/格挡行动用 `get_tree().create_timer()`/补间 `finished` 回调发 `enemy_action_completed`，**必须捕获 `enemy.get_instance_id()` 而非节点本身**（否则补间未完成前敌人/战斗被释放会报 `Lambda capture freed`）。新增此类行动请照此写法。
 - **祝福系统（数据驱动）**：祝福内容在 `data/blessings.json`（5 类来源，`blessing.gd` 运行时读取），效果分发在 `blessing.gd._apply_effect`。可经 `game_data.xlsx` 的「祝福」表编辑回写。新增效果类型要同时在 `_apply_effect` 加分支 + `blessing_table.py EFFECT_TYPES` 登记。命格共鸣按 `_character_class()`（资源路径判职业）过滤。
 - **固定套路敌人 AI**：`EnemyActionPicker` 的 `fixed_sequence`（子节点下标数组）非空时按回合循环固定出招、忽略权重/条件；空时保持原随机逻辑。仅 4 个固定敌人（符纸兵/雾隐狼/牛魔/渊狱剑魂）用，各有专属 AI 场景。数值/序列可经 `game_data.xlsx` 的「怪物AI」表编辑。注意：AI 挂在敌人身上，正式地图出现这些敌人时也用此套路。
@@ -150,17 +158,29 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 最近检查结果：
 
-- `validate_project.py`：0 error / 0 warning（2026-06-25 UI 微调后已跑）。
-- `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过（最近一次完整跑通：2026-06-26）。
+- `validate_project.py`：0 error / 0 warning（最近 UI/系统改动后仍保持无校验错误）。
+- `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过（最近一次完整跑通：2026-07-01）。
 - 战斗 UI 预览：`art/design/run_battle_ui_preview.png` 与 `art/design/battle_ui_preview.png` 可用于人工对照；截图 helper 会临时写 marker，提交/交接前可删除 `*_marker.txt`。
 - `run_godot_checks.py` 已改用 UTF-8 解码 Godot 输出，修复了中文 Windows 上的 GBK 解码崩溃。
 - ⚠️ **新增/替换 PNG 后必须在 Godot 编辑器导入一次**（跑上面的 console exe `--editor --quit`），否则会出现「文件在但加载失败 / no loader found」的错误，而 `validate_project.py` 查不出（它只查文件是否存在、查不出"未导入"）。Godot 退出时偶尔有 RID/resource leak 警告；只要没有 `SCRIPT ERROR` / `Parse Error` / `Failed to load script`，通常不是本轮 UI 脚本问题。
 
 ## 6. 最近改动摘要
 
+### 本轮（2026-07-01）Demo 机制、事件、控制台与 UI 统一
+
+- **灵根机制重做**：开局仍随机三选一；选择后仍把一张打击或防御转成对应元素，同时新增一张随机同元素“灵根职业卡”。同元素永久牌计入成长，阶段改为初悟 0-3、小成 4-6、圆满 7+，并禁用旧圆满触发规则。
+- **灵根圆满被动落地**：火/金/水/土/木各自拥有每回合最多一次的圆满效果；回合开始重置触发状态；水的费用减免只持续本回合；木在回合结束按是否打出木牌结算；火的选择资源见 `custom_resources/spirit_root_fire_choice.gd`。
+- **失败遗产法宝替换**：新增 `custom_resources/defeat_legacy.gd`；失败后记录本局获得的法宝，下一局进入地图时可选一个替换角色本命法宝，也可保留原本命法宝。
+- **法宝 hover tooltip**：遗物/法宝说明改为鼠标悬停的小窗口，避免点击后进入全屏效果说明；相关文件在 `scenes/relic_handler/relic_tooltip.*`、`relic_ui.gd`、`relic_handler.gd`、`run.gd`。
+- **新增 10 个事件并临时只开放新事件池**：事件场景位于 `scenes/event_rooms/`，插图位于 `art/event_illustrations/`；`event_room_pool.tres` 当前只包含最近新增的 10 个事件，旧事件暂时不出现在地图事件房。
+- **调试控制台**：新增 `scenes/debug/debug_console.gd` 与 `custom_resources/debug_console_state.gd`，Run 场景按 Ctrl + 反引号打开。支持增删/升级/融合卡牌，改血量/金币/法宝/丹药，以及设置下次造成/受到伤害；伤害测试钩子已接到 `card_effect.gd`、`configured_flame_effect.gd`、`configured_soul_mark_detonate_effect.gd`、`player.gd`。
+- **全局 UI 风格统一一轮**：扩展 `scenes/ui/ink_theme.gd`，新增暗黑修仙通用标题、面板、按钮、图标底板等工具函数，并套到奖励、商店、宝箱、祝福、篝火、删牌、升牌、融合、牌堆、胜负面板、暂停菜单、调试控制台、灵根选择等界面。
+- **编码配置补强**：新增 `.editorconfig` 与 `.gitattributes`，目标是统一 UTF-8 和文本文件规范，减少 Windows 终端/编辑器里中文乱码与换行差异。
+- **验证结果**：2026-07-01 最近一次 `run_godot_checks.py` 全部 smoke 项通过；本轮收尾会再做轻量 diff 检查后提交推送。
+
 ### 本轮（2026-06-26）UI、资产与工具链更新
 
-- **Godot MCP 接入**：根目录新增 `.mcp.json`，用于在 Codex 内调用 Godot MCP 直接打开/分析场景。后续在 Codex 里明确说“用 Godot MCP 打开/分析某场景”即可触发相应工具（可用性取决于本机 MCP 服务是否已启动）。
+- **Godot MCP 配置**：根目录新增 `.mcp.json`，用于在 Codex 内调用 Godot MCP 直接打开/分析场景。注意：是否能实际调用取决于本机 MCP 服务是否启动、以及当前 Codex 线程是否暴露了 Godot MCP 工具；2026-07-01 这轮工具列表里没有可调用的 Godot MCP tool。
 - **主页目标图落地**：`main_menu.gd` / `main_menu.tscn` 改为暗黑修仙主界面方向，透明中心菜单、无九宫格外框、按钮 hover/focus 比默认态略长，取消“新的轮回”默认 focus 高亮；新增/替换主页背景资产 `art/backgrounds/main_menu_background_v2.png`。
 - **选人界面目标图落地**：`character_selector.gd` 和相关背景帧资源更新，剑修/魔修选择页更贴近 `art/design/选人界面目标.png`；动画背景帧做了数量与导入资源整理。
 - **地图节点可读性增强**：`map_room.gd` / `map.gd` 增加 hover/focus 说明，精英战、营火、商店、机缘、宝箱等节点对新玩家更清晰。
@@ -353,6 +373,24 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - `game-demo/scenes/card_ui/card_states/card_base_state.gd`
 - `game-demo/scenes/card_target_selector/card_target_selector.gd`
 
+### 灵根 / 失败遗产 / 调试控制台
+
+- `game-demo/scenes/ui/spirit_root_selector.gd`（灵根三选一、转元素、发灵根职业卡）
+- `game-demo/custom_resources/character_stats.gd`（灵根成长阶段与数值修正）
+- `game-demo/scenes/battle/spirit_root_handler.gd`（圆满被动、每回合触发次数、回合开始/结束重置）
+- `game-demo/custom_resources/spirit_root_fire_choice.gd`（火圆满选择结果资源）
+- `game-demo/custom_resources/defeat_legacy.gd`（失败后可继承的法宝列表）
+- `game-demo/scenes/debug/debug_console.gd`（Run 内调试控制台，Ctrl + 反引号打开）
+- `game-demo/custom_resources/debug_console_state.gd`（调试控制台跨系统状态，含下次伤害修正）
+
+### 事件 / 法宝说明
+
+- `game-demo/scenes/event_rooms/event_room_pool.tres`（当前仅开放 10 个新事件）
+- `game-demo/scenes/event_rooms/*_event.tscn`（事件场景）
+- `game-demo/art/event_illustrations/`（事件插图）
+- `game-demo/scenes/relic_handler/relic_tooltip.tscn` / `.gd`（法宝 hover 小 tooltip）
+- `game-demo/scenes/relic_handler/relic_ui.gd`
+
 ## 8. 当前注意事项与已知问题
 
 ### 美术现状
@@ -364,6 +402,10 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ### 已知问题
 
+- **Godot MCP 在当前 Codex 工具列表里未暴露**：仓库有 `.mcp.json`，但本轮实际没有可调用的 Godot MCP tool，因此最近 UI/场景检查主要通过文件、脚本和 Godot smoke 完成。若下一轮必须“用 Godot MCP 直接操作编辑器”，先确认 MCP 服务已启动且 Codex 当前线程工具列表里出现对应 Godot MCP 工具。
+- **UI 统一仍需人工视觉 QA**：这轮先用现有资产和 `InkTheme` 统一了大部分页面风格，没有继续精抠每个界面的像素级布局。后续若要达到目标图级品质，应逐页进 Godot 检查按钮状态、文本遮挡、面板透明度和不同分辨率下的间距。
+- **旧事件当前被临时禁用**：`event_room_pool.tres` 只开放 10 个新事件是为了集中验证。等新事件稳定后，记得决定是恢复旧事件、分章节混池，还是按权重轮换。
+- **调试控制台快捷键**：使用 Ctrl + 反引号，不要再绑定 F8。F8 在 Godot 编辑器运行时会停止项目，看起来像“按控制台键直接退出”。
 - **战斗数值待按 100 血重配平**：剑修/魔修血量已 30/32→100、费用 3→4，但敌人伤害（固定 AI 的处决 12/重砸 10 等）和 `map_generator.gd` 章节缩放仍按旧血量配置，现在战斗偏软。需重新配平敌人伤害 + 章节倍率（可经 `game_data.xlsx` 怪物AI 表 + `map_generator` 倍率调）。
 - **`run-flow` 偶发 `Lambda capture freed`**：完整流程约 2/12 偶发，还有一处多回合补间回调来源未根除（疑似 `status_handler`/`relic_handler`/弃牌结算）。非功能 bug（逻辑仍通过，重跑即过），但将来上 CI 会随机红灯。修法：把 `tween.finished` 的 lambda 改为捕获 `get_instance_id()` / 加 `is_instance_valid` 守卫。
 - **`validate_project.py` 仍有盲区**：查不出「文件在但未导入」（缺 `.import`）和字符串拼接路径。新增美术务必在编辑器导入。（注：默认值字段误报已修，现 0 error。）
