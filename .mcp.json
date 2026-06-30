@@ -1,8 +1,11 @@
 {
   "mcpServers": {
-    "godot-mcp": {
-      "command": "node",
-      "args": ["E:/code/Godot-MCP/server/dist/index.js"]
+    "godot": {
+      "command": "C:/Program Files/nodejs/node.exe",
+      "args": ["E:/code/Godot-MCP/server/dist/index.js"],
+      "env": {
+        "GODOT_MCP_URL": "ws://localhost:9085"
+      }
     }
   }
 }

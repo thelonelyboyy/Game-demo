@@ -17,6 +17,7 @@ Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godo
 - **灵根机制已重做**：保留开局三选一与“打击/防御转元素”，新增同元素灵根职业卡、三段成长和圆满专属被动；旧圆满规则已禁用。详见第 4、6 节。
 - **失败遗产已加入**：失败后下一局进地图时，可从上一局获得的法宝中选 1 个替换本命法宝，也可以不替换。
 - **法宝说明交互已改**：法宝/遗物现在应使用鼠标悬停小 tooltip 显示效果，不再点击后全屏展示。
+- **Godot MCP 已重新校准到 9085**：Codex 全局配置 `C:\Users\Administrator\.codex\config.toml` 的 `mcp_servers.godot` 现在指向 `E:\code\Godot-MCP\server\dist\index.js`，并显式设置 `GODOT_MCP_URL=ws://localhost:9085`；项目 `.mcp.json` 也同步为 `godot` server。2026-07-01 已用 MCP stdio client 验证可列出 16 个工具，并可通过 Godot WebSocket 返回 `get_project_info`。
 - **主页/选人/战斗 UI 已按 `art/design` 目标图方向推进**：主页改成暗黑修仙主视觉；选人界面使用现有 UI 资产贴近目标图；魔修战斗界面改为暗蓝月夜战斗 HUD，底部法力球/焰轮/牌堆/结束回合按钮更接近 `art/design/target.png`。
 - **战斗 UI 最新资源位置**：新一批生成 HUD 资源在 `game-demo/assets/ui/generated/battle/`；旧一轮 `game-demo/art/ui/battle_hud/demonic_blue/` 仍保留给部分面板/历史对照。预览图在 `game-demo/art/design/run_battle_ui_preview.png` / `battle_ui_preview.png`。
 - **战斗顶栏最新约定**：Run 顶部使用黑金面板资源，角色名必须读取 `CharacterStats.character_name`；灵根/丹药仍在顶栏；总牌库按钮在右上；设置按钮在最右。法宝/遗物独占顶栏下方一栏，**不显示“法宝”标题**，放不下由 `HFlowContainer` 自动换第二行；不要再把法宝挤进顶栏小面板。
@@ -180,7 +181,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ### 本轮（2026-06-26）UI、资产与工具链更新
 
-- **Godot MCP 配置**：根目录新增 `.mcp.json`，用于在 Codex 内调用 Godot MCP 直接打开/分析场景。注意：是否能实际调用取决于本机 MCP 服务是否启动、以及当前 Codex 线程是否暴露了 Godot MCP 工具；2026-07-01 这轮工具列表里没有可调用的 Godot MCP tool。
+- **Godot MCP 配置修复**：根目录 `.mcp.json` 使用 server 名 `godot`，命令为 `C:/Program Files/nodejs/node.exe E:/code/Godot-MCP/server/dist/index.js`，并设置 `GODOT_MCP_URL=ws://localhost:9085`。Codex 设置页的全局 `godot` server 也需保持同样路径和端口。若设置里启用了 godot 但模型工具列表没有 `mcp__godot__...`，优先检查全局配置是否仍指向旧的 `E:\code\game-demo\mcp-server-dist\index.js`；这份旧 server 默认连 `9090`，会导致 MCP 初始化超时。
 - **主页目标图落地**：`main_menu.gd` / `main_menu.tscn` 改为暗黑修仙主界面方向，透明中心菜单、无九宫格外框、按钮 hover/focus 比默认态略长，取消“新的轮回”默认 focus 高亮；新增/替换主页背景资产 `art/backgrounds/main_menu_background_v2.png`。
 - **选人界面目标图落地**：`character_selector.gd` 和相关背景帧资源更新，剑修/魔修选择页更贴近 `art/design/选人界面目标.png`；动画背景帧做了数量与导入资源整理。
 - **地图节点可读性增强**：`map_room.gd` / `map.gd` 增加 hover/focus 说明，精英战、营火、商店、机缘、宝箱等节点对新玩家更清晰。
@@ -402,7 +403,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ### 已知问题
 
-- **Godot MCP 在当前 Codex 工具列表里未暴露**：仓库有 `.mcp.json`，但本轮实际没有可调用的 Godot MCP tool，因此最近 UI/场景检查主要通过文件、脚本和 Godot smoke 完成。若下一轮必须“用 Godot MCP 直接操作编辑器”，先确认 MCP 服务已启动且 Codex 当前线程工具列表里出现对应 Godot MCP 工具。
+- **Godot MCP 工具注入时机**：MCP 修复后，当前已经开始的 Codex turn 不会热插入 `mcp__godot__...` 命名空间；需要新开一轮、重载线程或重启 Codex 让工具列表重新生成。验证命令可用 MCP stdio client 列工具，预期包含 `open_scene`、`get_project_info`、`list_nodes`、`execute_editor_script` 等 16 个工具；Godot 侧 `get_project_info` 应返回项目名「万劫求仙」和当前场景路径。
 - **UI 统一仍需人工视觉 QA**：这轮先用现有资产和 `InkTheme` 统一了大部分页面风格，没有继续精抠每个界面的像素级布局。后续若要达到目标图级品质，应逐页进 Godot 检查按钮状态、文本遮挡、面板透明度和不同分辨率下的间距。
 - **旧事件当前被临时禁用**：`event_room_pool.tres` 只开放 10 个新事件是为了集中验证。等新事件稳定后，记得决定是恢复旧事件、分章节混池，还是按权重轮换。
 - **调试控制台快捷键**：使用 Ctrl + 反引号，不要再绑定 F8。F8 在 Godot 编辑器运行时会停止项目，看起来像“按控制台键直接退出”。
