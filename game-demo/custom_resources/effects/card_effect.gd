@@ -4,7 +4,7 @@ extends Resource
 const DEBUG_CONSOLE_STATE := preload("res://custom_resources/debug_console_state.gd")
 
 enum TargetMode {CARD_TARGETS, PLAYER, ALL_ENEMIES, EVERYONE}
-enum ConditionType {ALWAYS, SELECTED_SPIRIT_ROOT, HAS_MECHANIC_TAG, CARD_TYPE, PLAYER_HAS_STATUS}
+enum ConditionType {ALWAYS, SELECTED_SPIRIT_ROOT, HAS_MECHANIC_TAG, CARD_TYPE, PLAYER_HAS_STATUS, FLAME_WHEEL_COLOR_COUNT}
 
 @export_group("Value")
 @export var amount := 0
@@ -16,6 +16,7 @@ enum ConditionType {ALWAYS, SELECTED_SPIRIT_ROOT, HAS_MECHANIC_TAG, CARD_TYPE, P
 @export var condition_tag := ""
 @export var condition_card_type := Card.Type.ATTACK
 @export var condition_status_id := ""
+@export var condition_amount := 0
 @export var bonus_amount := 0
 
 @export_group("Description")
@@ -77,20 +78,36 @@ func get_targets(card: CultivationCard, original_targets: Array[Node], mode: Tar
 
 
 func execute_damage(card: CultivationCard, final_targets: Array[Node], damage: int, modifiers: ModifierHandler) -> void:
-	if not card or final_targets.is_empty() or damage <= 0:
+	if final_targets.is_empty() or damage <= 0:
 		return
 
-	var fire_choice := card.consume_spirit_root_fire_choice()
+	var fire_choice := Card.SPIRIT_ROOT_FIRE_CHOICE.CHOICE_NONE
+	if card:
+		fire_choice = card.consume_spirit_root_fire_choice()
 	if fire_choice == Card.SPIRIT_ROOT_FIRE_CHOICE.CHOICE_AMPLIFY:
 		damage = ceili(damage * 1.5)
 
-	var damage_effect := DamageEffect.new()
-	damage_effect.amount = modifiers.get_modified_value(damage, Modifier.Type.DMG_DEALT) if modifiers else damage
-	damage_effect.amount = DEBUG_CONSOLE_STATE.apply_next_dealt(damage_effect.amount)
-	damage_effect.sound = card.sound
+	var handler := _get_class_mechanic_handler()
 	var main_target := final_targets[0]
-	var main_target_actual_damage := _preview_actual_damage(main_target, damage_effect.amount, damage_effect.receiver_modifier_type)
-	damage_effect.execute(final_targets)
+	var main_target_actual_damage := 0
+	for i in range(final_targets.size()):
+		var target := final_targets[i]
+		if not target:
+			continue
+		var target_damage := damage
+		if handler and handler.has_method("modify_attack_damage"):
+			target_damage = handler.modify_attack_damage(card, target, target_damage)
+		target_damage = modifiers.get_modified_value(target_damage, Modifier.Type.DMG_DEALT) if modifiers else target_damage
+		target_damage = DEBUG_CONSOLE_STATE.apply_next_dealt(target_damage)
+		if target_damage <= 0:
+			continue
+
+		var damage_effect := DamageEffect.new()
+		damage_effect.amount = target_damage
+		damage_effect.sound = card.sound if card else null
+		if i == 0:
+			main_target_actual_damage = _preview_actual_damage(main_target, damage_effect.amount, damage_effect.receiver_modifier_type)
+		damage_effect.execute([target])
 	if fire_choice == Card.SPIRIT_ROOT_FIRE_CHOICE.CHOICE_SPLASH:
 		_execute_fire_splash(main_target, main_target_actual_damage)
 
@@ -105,6 +122,8 @@ func get_condition_description() -> String:
 			return "卡牌类型匹配"
 		ConditionType.PLAYER_HAS_STATUS:
 			return "拥有状态：%s" % condition_status_id
+		ConditionType.FLAME_WHEEL_COLOR_COUNT:
+			return "焰轮已点亮至少 %s 色" % condition_amount
 		_:
 			return "无条件"
 
@@ -122,6 +141,11 @@ func _condition_matches(card: CultivationCard) -> bool:
 		ConditionType.PLAYER_HAS_STATUS:
 			var player := _get_player(card)
 			return player and player.status_handler and player.status_handler.get_status(condition_status_id)
+		ConditionType.FLAME_WHEEL_COLOR_COUNT:
+			var handler := _get_class_mechanic_handler()
+			if not handler or not handler.has_method("flame_color_count"):
+				return false
+			return handler.flame_color_count() >= condition_amount
 		_:
 			return false
 
@@ -143,6 +167,13 @@ func _get_player(card: CultivationCard) -> Player:
 	if not tree:
 		return null
 	return tree.get_first_node_in_group("player") as Player
+
+
+func _get_class_mechanic_handler() -> Node:
+	var tree := Engine.get_main_loop() as SceneTree
+	if not tree:
+		return null
+	return tree.get_first_node_in_group("class_mechanic")
 
 
 func _execute_fire_splash(main_target: Node, main_target_actual_damage: int) -> void:

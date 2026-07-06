@@ -831,7 +831,7 @@ func _show_card_detail(card: Card) -> void:
 	detail_meta.text = "卡牌 / %s / %s / %s费 / %s" % [
 		_card_profession_label(card),
 		_card_type_name(card.type),
-		card.cost,
+		card.get_cost_text(),
 		_card_rarity_name(card.rarity),
 	]
 	detail_text.text = _format_card_detail(card)
@@ -1031,7 +1031,7 @@ func _format_card_detail(card: Card) -> String:
 	lines.append("稀有度：%s" % _card_rarity_name(card.rarity))
 	lines.append("目标：%s" % _card_target_name(card.target))
 	lines.append("元素：%s" % _card_element_name(card.element))
-	lines.append("费用：%s" % card.cost)
+	lines.append("费用：%s" % card.get_cost_text())
 	if card.exhausts:
 		lines.append("特性：消耗")
 	if card.mechanic_tags.size() > 0:
@@ -1067,7 +1067,8 @@ func _resource_sort_name(resource) -> String:
 
 
 func _card_sort_key(card: Card) -> String:
-	return "%02d_%s_%s" % [card.cost, _card_profession_label(card), card.get_display_name()]
+	var sort_cost := 99 if card.is_x_cost() else card.cost
+	return "%02d_%s_%s" % [sort_cost, _card_profession_label(card), card.get_display_name()]
 
 
 func _scope_key_to_label(scope_key: String) -> String:

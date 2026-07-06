@@ -170,7 +170,7 @@ func _build_character_entries() -> void:
 		{
 			"stats": SWORD_CULTIVATOR_STATS,
 			"button": $CharacterButtons/SwordCultivatorButton,
-			"enabled": true,
+			"enabled": false,
 			"background": "res://art/backgrounds/sw.png",
 			"animated_background": "res://art/backgrounds/sw_selector_bg_frames",
 			"animated_background_fps": 16.0,

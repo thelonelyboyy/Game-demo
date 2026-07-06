@@ -193,7 +193,8 @@ def validate_cards(issues: list[Issue]) -> None:
             "type": (0, 2),
             "rarity": (0, 3),
             "target": (0, 3),
-            "cost": (0, 99),
+            # cost == -1 is the project convention for X-cost cards.
+            "cost": (-1, 99),
         }
         for key, (low, high) in required_ints.items():
             val = properties.get(key, "0")

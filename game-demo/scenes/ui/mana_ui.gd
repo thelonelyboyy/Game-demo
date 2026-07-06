@@ -3,6 +3,7 @@ extends Panel
 
 const ENERGY_ORB_FRAME := preload("res://assets/ui/generated/battle/battle_energy_orb_frame.png")
 const ENERGY_ORB_FILL := preload("res://assets/ui/generated/battle/battle_energy_orb_fill_mask.png")
+const BATTLE_ENERGY_ORB := preload("res://art/ui/battle_widgets/battle_energy_orb.png")
 
 @export var char_stats: CharacterStats : set = _set_char_stats
 
@@ -15,8 +16,9 @@ var _fill: TextureRect
 
 func _ready() -> void:
 	add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-	frame.texture = ENERGY_ORB_FRAME
+	frame.texture = BATTLE_ENERGY_ORB
 	frame.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	frame.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	_ensure_fill()
 	queue_redraw()
 
@@ -34,7 +36,7 @@ func _set_char_stats(value: CharacterStats) -> void:
 
 
 func _on_stats_changed() -> void:
-	mana_label.text = "%s/%s" % [char_stats.mana, char_stats.max_mana]
+	mana_label.text = str(char_stats.mana)
 	_active = char_stats.mana > 0
 	frame.modulate = Color.WHITE if _active else Color(0.55, 0.48, 0.48, 0.78)
 	mana_label.modulate = Color.WHITE if _active else Color(0.68, 0.72, 0.75, 0.72)

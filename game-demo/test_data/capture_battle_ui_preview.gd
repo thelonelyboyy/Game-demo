@@ -2,7 +2,7 @@ extends Node
 
 const BATTLE_SCENE_PATH := "res://scenes/battle/battle.tscn"
 const CHARACTER_PATH := "res://characters/demonic_cultivator/demonic_cultivator.tres"
-const BATTLE_STATS_PATH := "res://battles/demo_e_shadow_reaper.tres"
+const BATTLE_STATS_PATH := "res://battles/demo_e_bull_demon.tres"
 const RELIC_HANDLER_SCENE_PATH := "res://scenes/relic_handler/relic_handler.tscn"
 const OUTPUT_PATH := "res://art/design/battle_ui_preview.png"
 const MARKER_PATH := "res://art/design/battle_ui_preview_marker.txt"

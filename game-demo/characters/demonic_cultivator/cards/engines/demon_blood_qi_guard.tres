@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_blood_qi_guard.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_demonic_engine_effect.gd" id="4"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("4")
+engine = 0
+value = 2
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("E1")])
+id = "demon_blood_qi_guard"
+type = 2
+cost = 1
+element = 4
+profession = 3
+mechanic_tags = PackedStringArray("功法", "献祭")
+display_name = "血气护体"
+icon = ExtResource("2")
+sound = ExtResource("3")

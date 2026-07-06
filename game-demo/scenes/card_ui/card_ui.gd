@@ -44,6 +44,7 @@ func play() -> void:
 	if not card:
 		return
 	
+	Events.card_play_preview_requested.emit(card, get_global_rect().get_center())
 	card.play(targets, char_stats, player_modifiers)
 	queue_free()
 

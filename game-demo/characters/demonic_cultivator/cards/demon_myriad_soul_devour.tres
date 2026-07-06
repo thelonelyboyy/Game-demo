@@ -26,6 +26,7 @@ id = "demon_myriad_soul_devour"
 rarity = 3
 target = 2
 cost = 3
+exhausts = true
 upgrade_type = 1
 element = 4
 profession = 3

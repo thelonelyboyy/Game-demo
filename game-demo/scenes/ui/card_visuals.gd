@@ -42,7 +42,7 @@ func set_card(value: Card) -> void:
 		_clear_card()
 		return
 
-	cost.text = str(card.cost)
+	cost.text = card.get_cost_text()
 	card_name.text = card.get_display_name()
 	card_name.add_theme_font_size_override("font_size", _get_title_font_size(card_name.text))
 	description.text = "[center]%s[/center]" % style_helper.format_card_text(card, card.get_default_tooltip())

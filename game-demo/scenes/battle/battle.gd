@@ -9,11 +9,11 @@ const BATTLE_BACKGROUND := preload("res://test2.png")
 const BATTLE_BACKDROP_TINT := Color(0.32, 0.44, 0.70, 1.0)
 const BATTLE_NIGHT_WASH := Color(0.015, 0.035, 0.085, 0.36)
 const BATTLE_BOTTOM_SHADE := Color(0.0, 0.0, 0.0, 0.22)
-const PLAYER_SCREEN_ANCHOR := Vector2(0.22, 0.42)
-const ENEMY_SINGLE_SCREEN_ANCHOR := Vector2(0.74, 0.50)
-const ENEMY_ROW_START_RATIO := 0.61
-const ENEMY_ROW_END_RATIO := 0.84
-const ENEMY_GROUND_RATIO := 0.50
+const PLAYER_SCREEN_ANCHOR := Vector2(0.83, 0.78)
+const ENEMY_SINGLE_SCREEN_ANCHOR := Vector2(0.50, 0.31)
+const ENEMY_ROW_START_RATIO := 0.42
+const ENEMY_ROW_END_RATIO := 0.58
+const ENEMY_GROUND_RATIO := 0.31
 
 @export var battle_stats: BattleStats
 @export var char_stats: CharacterStats
@@ -59,6 +59,7 @@ func start_battle() -> void:
 	_setup_class_mechanic_handler()
 	_prepare_world_ui()
 	enemy_handler.reset_enemy_actions()
+	_sync_battle_ui_combatants()
 	
 	if not relics.relics_activated.is_connected(_on_relics_activated):
 		relics.relics_activated.connect(_on_relics_activated)
@@ -67,10 +68,12 @@ func start_battle() -> void:
 
 
 func _on_enemies_child_order_changed() -> void:
+	_sync_battle_ui_combatants.call_deferred()
 	_check_for_battle_victory.call_deferred()
 
 
 func _on_enemy_died_for_victory(_enemy: Enemy) -> void:
+	_sync_battle_ui_combatants.call_deferred()
 	_check_for_battle_victory.call_deferred()
 
 
@@ -205,6 +208,13 @@ func _get_live_enemies() -> Array[Enemy]:
 		if child is Enemy and not child.is_queued_for_deletion():
 			enemies.append(child)
 	return enemies
+
+
+func _sync_battle_ui_combatants() -> void:
+	if not battle_ui or not is_instance_valid(player):
+		return
+
+	battle_ui.setup_combatant_cards(player, _get_live_enemies())
 
 
 func _setup_spirit_root_handler() -> void:

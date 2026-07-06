@@ -6,6 +6,8 @@ const BEAST_PACK_STATUS = preload("res://statuses/beast_pack.tres")
 const GOLD_BODY_STATUS = preload("res://statuses/gold_body.tres")
 const MUSCLE_STATUS = preload("res://statuses/muscle.tres")
 const SHA_QI_STATUS = preload("res://statuses/sha_qi.tres")
+const SOUL_MARK_STATUS = preload("res://statuses/soul_mark.tres")
+const DEBUG_CONSOLE_STATE := preload("res://custom_resources/debug_console_state.gd")
 
 const SOUL_MARK_HEAL_PER_STACK := 1
 const FLAME_DETONATE_DAMAGE_PER_STACK := 3   # 红·焚界引爆：每层魂印伤害（与主动引爆一致）
@@ -17,6 +19,19 @@ const SHA_QI_DOUBLE_THRESHOLD := 6
 const SHA_QI_HEAVENLY_THRESHOLD := 10
 const SHA_QI_AFTER_HEAVENLY := 5
 
+enum DemonicEngine {
+	BLOOD_QI_GUARD,
+	BLOODTHIRST,
+	BLOOD_RECOMPENSE,
+	SOUL_MARK_SENSE,
+	SOUL_RITE,
+	SOUL_FLAME_CYCLE,
+	SOUL_ECHO,
+	FLAME_CONTINUITY,
+	FLAME_REFINING,
+	SHA_NURTURE,
+}
+
 var character: CharacterStats
 var player: Player
 var player_handler: PlayerHandler
@@ -27,10 +42,16 @@ var _heavenly_active := false           # 本回合处于天魔降世（×3）
 var _heavenly_penalty_pending := false  # 下回合开始结算代价
 var _flame_wheel := {}                  # 本回合焰轮里的魔焰颜色集合
 var _flame_damage_bonus := 0            # 本回合魔焰共鸣伤害加成（黄·狂烬累加，回合切换清空）
+var _last_flame_color := -1
+var _demonic_engines := {}
+var _self_damage_this_turn := 0
+var _blood_recompense_triggered := false
+var _bloodthirst_turn_bonus := 0
 # 一次性创建、原地更新的 modifier 值（避免 remove_value 的 queue_free 延迟问题）
 var _mv_dealt_flat: ModifierValue
 var _mv_dealt_mult: ModifierValue
 var _mv_taken_mult: ModifierValue
+var _mv_bloodthirst_flat: ModifierValue
 
 
 func setup(
@@ -54,6 +75,8 @@ func setup(
 		Events.enemy_died.connect(_on_enemy_died)
 	if not Events.player_hit.is_connected(_on_player_hit):
 		Events.player_hit.connect(_on_player_hit)
+	if not Events.player_self_damaged.is_connected(_on_player_self_damaged):
+		Events.player_self_damaged.connect(_on_player_self_damaged)
 	if not Events.player_turn_started.is_connected(_on_player_turn_started):
 		Events.player_turn_started.connect(_on_player_turn_started)
 	if not Events.player_turn_ended.is_connected(_on_player_turn_ended):
@@ -67,6 +90,8 @@ func _exit_tree() -> void:
 		Events.enemy_died.disconnect(_on_enemy_died)
 	if Events.player_hit.is_connected(_on_player_hit):
 		Events.player_hit.disconnect(_on_player_hit)
+	if Events.player_self_damaged.is_connected(_on_player_self_damaged):
+		Events.player_self_damaged.disconnect(_on_player_self_damaged)
 	if Events.player_turn_started.is_connected(_on_player_turn_started):
 		Events.player_turn_started.disconnect(_on_player_turn_started)
 	if Events.player_turn_ended.is_connected(_on_player_turn_ended):
@@ -91,6 +116,8 @@ func _on_card_played(card: Card) -> void:
 
 	# 卡牌可能通过 ConfiguredStatusEffect(sha_qi) 叠煞气，延迟一帧确保已应用后再接管。
 	if _is_demonic():
+		if _engine_value(DemonicEngine.FLAME_REFINING) > 0 and _is_flame_card(card):
+			reduce_flame_card_costs(_engine_value(DemonicEngine.FLAME_REFINING), card)
 		_ensure_sha_qi_connected.call_deferred()
 
 
@@ -114,8 +141,89 @@ func _add_status_to_player(status_resource: Status, stacks: int) -> void:
 	player.status_handler.add_status(status)
 
 
+func _add_status_to_enemy(enemy: Enemy, status_resource: Status, stacks: int) -> void:
+	if not enemy or not enemy.status_handler or stacks <= 0:
+		return
+
+	var status := status_resource.duplicate() as Status
+	status.stacks = stacks
+	enemy.status_handler.add_status(status)
+
+
 func _has_tag(card: Card, tag: String) -> bool:
 	return card.mechanic_tags.has(tag)
+
+
+func add_demonic_engine(engine: int, value: int = 1, threshold: int = 0) -> void:
+	if not _is_demonic():
+		return
+
+	var state: Dictionary = _demonic_engines.get(engine, {"value": 0, "threshold": 0})
+	state["value"] = int(state.get("value", 0)) + maxi(value, 0)
+	if threshold > 0:
+		state["threshold"] = threshold
+	_demonic_engines[engine] = state
+
+
+func modify_attack_damage(card: Card, target: Node, damage: int) -> int:
+	if not _is_demonic() or not card or card.type != Card.Type.ATTACK:
+		return damage
+
+	var bonus := _engine_value(DemonicEngine.SOUL_MARK_SENSE)
+	if bonus <= 0 or not target is Enemy:
+		return damage
+
+	var enemy := target as Enemy
+	if enemy.status_handler and enemy.status_handler.get_status_stacks("soul_mark") > 0:
+		return damage + bonus
+	return damage
+
+
+func notify_soul_mark_detonated(_card: Card, enemy: Enemy, consumed: int, modifiers: ModifierHandler) -> void:
+	if not _is_demonic() or consumed <= 0:
+		return
+
+	var draw_count := _engine_value(DemonicEngine.SOUL_FLAME_CYCLE)
+	if draw_count > 0 and player_handler:
+		player_handler.draw_cards(draw_count)
+	_apply_soul_echo(enemy, consumed, modifiers)
+
+
+func notify_soul_mark_consumed(_card: Card, enemy: Enemy, consumed: int, modifiers: ModifierHandler) -> void:
+	if not _is_demonic() or consumed <= 0:
+		return
+	_apply_soul_echo(enemy, consumed, modifiers)
+
+
+func flame_color_count() -> int:
+	return _flame_wheel.size()
+
+
+func _engine_value(engine: int) -> int:
+	var state: Dictionary = _demonic_engines.get(engine, {})
+	return int(state.get("value", 0))
+
+
+func _engine_threshold(engine: int, fallback: int = 0) -> int:
+	var state: Dictionary = _demonic_engines.get(engine, {})
+	return int(state.get("threshold", fallback))
+
+
+func _apply_soul_echo(enemy: Enemy, consumed: int, modifiers: ModifierHandler) -> void:
+	var per_stack := _engine_value(DemonicEngine.SOUL_ECHO)
+	if per_stack <= 0 or consumed <= 0 or not is_instance_valid(enemy):
+		return
+
+	var damage := per_stack * consumed
+	if modifiers:
+		damage = modifiers.get_modified_value(damage, Modifier.Type.DMG_DEALT)
+	damage = DEBUG_CONSOLE_STATE.apply_next_dealt(damage)
+	if damage <= 0:
+		return
+
+	var damage_effect := DamageEffect.new()
+	damage_effect.amount = damage
+	damage_effect.execute([enemy])
 
 
 # ----------------------------- 煞气 / 天魔降世 -----------------------------
@@ -142,6 +250,67 @@ func _on_player_hit() -> void:
 		return
 	_add_status_to_player(SHA_QI_STATUS, SHA_QI_ON_HIT)
 	_ensure_sha_qi_connected()
+
+
+func _on_player_self_damaged(amount: int) -> void:
+	if not _is_demonic() or amount <= 0:
+		return
+
+	_self_damage_this_turn += amount
+
+	var guard := _engine_value(DemonicEngine.BLOOD_QI_GUARD)
+	if guard > 0:
+		var block_effect := BlockEffect.new()
+		block_effect.amount = guard
+		block_effect.execute([player])
+
+	var bloodthirst := _engine_value(DemonicEngine.BLOODTHIRST)
+	if bloodthirst > 0:
+		_bloodthirst_turn_bonus += bloodthirst
+		_set_bloodthirst_bonus(_bloodthirst_turn_bonus)
+
+	var recompense := _engine_value(DemonicEngine.BLOOD_RECOMPENSE)
+	var threshold := _engine_threshold(DemonicEngine.BLOOD_RECOMPENSE, 7)
+	if recompense > 0 and not _blood_recompense_triggered and _self_damage_this_turn >= threshold:
+		_blood_recompense_triggered = true
+		_deal_fixed_damage_to_all_enemies(_self_damage_this_turn * recompense)
+
+
+func _set_bloodthirst_bonus(amount: int) -> void:
+	if not player or not player.modifier_handler:
+		return
+	var dealt := player.modifier_handler.get_modifier(Modifier.Type.DMG_DEALT)
+	if not dealt:
+		return
+	if not _mv_bloodthirst_flat:
+		_mv_bloodthirst_flat = ModifierValue.create_new_modifier("demonic_bloodthirst_turn", ModifierValue.Type.FLAT)
+		dealt.add_new_value(_mv_bloodthirst_flat)
+	_mv_bloodthirst_flat.flat_value = amount
+
+
+func _reset_blood_turn_state() -> void:
+	_self_damage_this_turn = 0
+	_blood_recompense_triggered = false
+	_bloodthirst_turn_bonus = 0
+	_set_bloodthirst_bonus(0)
+
+
+func _deal_fixed_damage_to_all_enemies(amount: int) -> void:
+	if amount <= 0:
+		return
+	var tree := get_tree()
+	if not tree:
+		return
+	var targets: Array[Node] = []
+	for enemy: Node in tree.get_nodes_in_group("enemies"):
+		if is_instance_valid(enemy):
+			targets.append(enemy)
+	if targets.is_empty():
+		return
+	var damage_effect := DamageEffect.new()
+	damage_effect.amount = DEBUG_CONSOLE_STATE.apply_next_dealt(amount)
+	damage_effect.receiver_modifier_type = Modifier.Type.NO_MODIFIER
+	damage_effect.execute(targets)
 
 
 func _sha_qi_status() -> Status:
@@ -216,6 +385,7 @@ func flame_other_color_count(color: int) -> int:
 
 
 func flame_add_color(color: int) -> void:
+	_last_flame_color = color
 	_flame_wheel[color] = true
 	Events.flame_wheel_changed.emit(_flame_wheel.keys())
 
@@ -306,8 +476,11 @@ func _is_flame_card(card: Card) -> bool:
 func _on_player_turn_started() -> void:
 	_clear_flame_wheel()
 	_flame_damage_bonus = 0
+	_reset_blood_turn_state()
 	if not _is_demonic():
 		return
+	_restore_retained_flame_color()
+	_apply_soul_rite()
 	if _heavenly_penalty_pending:
 		# 天魔降世代价：失去 50% 最大生命，煞气降至 5。
 		var loss := floori(player.stats.max_health * 0.5)
@@ -326,7 +499,35 @@ func _on_player_turn_ended() -> void:
 	# 回合结束清空焰轮与焰伤加成。
 	_clear_flame_wheel()
 	_flame_damage_bonus = 0
+	var sha_nurture := _engine_value(DemonicEngine.SHA_NURTURE)
+	if _is_demonic() and sha_nurture > 0:
+		_add_status_to_player(SHA_QI_STATUS, sha_nurture)
+		_ensure_sha_qi_connected()
+	_reset_blood_turn_state()
 	# 天魔降世的 ×3 仅持续本回合。
 	if _heavenly_active:
 		_heavenly_active = false
 		_update_sha_qi_modifiers()
+
+
+func _restore_retained_flame_color() -> void:
+	if _engine_value(DemonicEngine.FLAME_CONTINUITY) <= 0 or _last_flame_color < 0:
+		return
+	_flame_wheel[_last_flame_color] = true
+	Events.flame_wheel_changed.emit(_flame_wheel.keys())
+
+
+func _apply_soul_rite() -> void:
+	var stacks := _engine_value(DemonicEngine.SOUL_RITE)
+	if stacks <= 0:
+		return
+	var tree := get_tree()
+	if not tree:
+		return
+	var enemies: Array[Enemy] = []
+	for node in tree.get_nodes_in_group("enemies"):
+		if is_instance_valid(node) and node is Enemy:
+			enemies.append(node)
+	var picked := RNG.array_pick_random(enemies) as Enemy
+	if picked:
+		_add_status_to_enemy(picked, SOUL_MARK_STATUS, stacks)

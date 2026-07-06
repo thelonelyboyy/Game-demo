@@ -11,16 +11,19 @@ func execute(card: CultivationCard, targets: Array[Node], _modifiers: ModifierHa
 	if final_targets.is_empty() or damage <= 0:
 		return
 
-	var damage_effect := DamageEffect.new()
-	damage_effect.amount = damage
-	damage_effect.sound = card.sound if card else null
 	var player := final_targets[0] as Player
-	var initial_health := player.stats.health if player and player.stats else 0
-	damage_effect.execute(final_targets)
-	if player and player.stats:
-		var actual_lost := maxi(0, initial_health - player.stats.health)
-		if actual_lost > 0:
-			Events.player_self_damaged.emit(actual_lost)
+	if not player or not player.stats:
+		return
+
+	var initial_health := player.stats.health
+	player.stats.health = maxi(player.stats.health - damage, 0)
+	SFXPlayer.play(card.sound if card else null)
+	var actual_lost := maxi(0, initial_health - player.stats.health)
+	if actual_lost > 0:
+		Events.player_self_damaged.emit(actual_lost)
+		Events.player_hit.emit()
+	if player.stats.health <= 0:
+		Events.player_died.emit()
 
 
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:

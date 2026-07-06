@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_sha_return.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_consume_status_to_block_effect.gd" id="4"]
+
+[sub_resource type="Resource" id="E1"]
+script = ExtResource("4")
+status_id = "sha_qi"
+status_name = "煞气"
+block_per_stack = 1
+consume_all = true
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("E1")])
+id = "demon_sha_return"
+type = 1
+rarity = 1
+cost = 0
+exhausts = true
+profession = 3
+mechanic_tags = PackedStringArray("煞气")
+display_name = "归煞"
+icon = ExtResource("2")
+sound = ExtResource("3")

@@ -26,6 +26,7 @@ func execute(card: CultivationCard, targets: Array[Node], modifiers: ModifierHan
 
 		var consumed: int = status.stacks if consume_all else mini(consume_amount, status.stacks)
 		status.stacks -= consumed
+		_notify_class_handler(card, enemy, consumed, modifiers)
 
 		var damage := damage_per_stack * consumed
 		if modifiers:
@@ -46,3 +47,14 @@ func get_description(card: CultivationCard, player_modifiers: ModifierHandler = 
 	if consume_all:
 		return "消耗目标全部魂印，每层造成 %d 点伤害。" % damage_per_stack
 	return "消耗 %d 层魂印，造成 %d 点伤害。" % [consume_amount, damage_per_stack * consume_amount]
+
+
+func _notify_class_handler(card: CultivationCard, enemy: Enemy, consumed: int, modifiers: ModifierHandler) -> void:
+	if consumed <= 0:
+		return
+	var tree := Engine.get_main_loop() as SceneTree
+	if not tree:
+		return
+	var handler := tree.get_first_node_in_group("class_mechanic")
+	if handler and handler.has_method("notify_soul_mark_detonated"):
+		handler.notify_soul_mark_detonated(card, enemy, consumed, modifiers)

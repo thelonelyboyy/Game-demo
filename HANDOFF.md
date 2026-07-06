@@ -1,16 +1,17 @@
 ﻿# 万劫求仙项目交接文档
 
-更新时间：2026-07-01
+更新时间：2026-07-06
 项目根目录：`E:\code\game-demo`  
 Godot 工程目录：`E:\code\game-demo\game-demo`  
 Godot 版本：4.5.2 stable mono  
 Godot 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe`
 Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64_console.exe`
 
-## 1. 当前状态（2026-07-01）
+## 1. 当前状态（2026-07-06）
 
 - 稳定运行的杀戮尖塔式修仙卡牌肉鸽 Demo。当前焦点：**把魔修打磨成完整 Demo**。
 - **当前开发策略**：暂时不继续精抠单个 UI，优先把魔修职业做成可完整通关、可调试、可扩展的 Demo 闭环。
+- **Demo 职业范围已收束**：选人界面当前只开放魔修，体修/剑修/驭兽都暂时 disabled；代码和资源仍保留，后续可再恢复。
 - **UI 风格统一已推进一轮**：`InkTheme` 扩展了暗黑修仙通用面板/按钮/标题样式，并已套到战斗奖励、商店、宝箱、祝福、篝火、删牌、升牌、融合、牌堆、胜负面板、暂停菜单、调试控制台、灵根选择等界面。后续新增页面应优先复用 `scenes/ui/ink_theme.gd`，不要各自重新写一套 StyleBox。
 - **事件池临时切换**：旧事件暂时禁用，当前 `event_room_pool.tres` 只开放最近新增的 10 个事件，便于集中验证新事件质量。
 - **调试控制台已加入**：Run 场景内按 **Ctrl + 反引号** 打开，不再使用 F8（Godot 编辑器里 F8 会直接停止运行）。可增删/升级/融合卡牌，调血量、金币、法宝、丹药，以及编辑下次造成/受到伤害，便于 Demo 调试。
@@ -18,15 +19,15 @@ Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godo
 - **失败遗产已加入**：失败后下一局进地图时，可从上一局获得的法宝中选 1 个替换本命法宝，也可以不替换。
 - **法宝说明交互已改**：法宝/遗物现在应使用鼠标悬停小 tooltip 显示效果，不再点击后全屏展示。
 - **Godot MCP 已重新校准到 9085**：Codex 全局配置 `C:\Users\Administrator\.codex\config.toml` 的 `mcp_servers.godot` 现在指向 `E:\code\Godot-MCP\server\dist\index.js`，并显式设置 `GODOT_MCP_URL=ws://localhost:9085`；项目 `.mcp.json` 也同步为 `godot` server。2026-07-01 已用 MCP stdio client 验证可列出 16 个工具，并可通过 Godot WebSocket 返回 `get_project_info`。
-- **主页/选人/战斗 UI 已按 `art/design` 目标图方向推进**：主页改成暗黑修仙主视觉；选人界面使用现有 UI 资产贴近目标图；魔修战斗界面改为暗蓝月夜战斗 HUD，底部法力球/焰轮/牌堆/结束回合按钮更接近 `art/design/target.png`。
-- **战斗 UI 最新资源位置**：新一批生成 HUD 资源在 `game-demo/assets/ui/generated/battle/`；旧一轮 `game-demo/art/ui/battle_hud/demonic_blue/` 仍保留给部分面板/历史对照。预览图在 `game-demo/art/design/run_battle_ui_preview.png` / `battle_ui_preview.png`。
+- **主页/选人/战斗 UI 已按 `art/design` 目标图方向推进**：主页改成暗黑修仙主视觉；选人界面使用现有 UI 资产贴近目标图；魔修战斗界面已进入“卡牌式玩家/怪物信息框 + 中央战场 + 底部手牌”的布局方向。
+- **战斗 UI 最新资源位置**：新一批生成 HUD 资源在 `game-demo/assets/ui/generated/battle/`、`game-demo/art/ui/battle_cards/`、`game-demo/art/ui/battle_widgets/`；旧一轮 `game-demo/art/ui/battle_hud/demonic_blue/` 仍保留给部分面板/历史对照。预览图在 `game-demo/art/design/run_battle_ui_preview.png` / `battle_ui_preview.png`。
 - **战斗顶栏最新约定**：Run 顶部使用黑金面板资源，角色名必须读取 `CharacterStats.character_name`；灵根/丹药仍在顶栏；总牌库按钮在右上；设置按钮在最右。法宝/遗物独占顶栏下方一栏，**不显示“法宝”标题**，放不下由 `HFlowContainer` 自动换第二行；不要再把法宝挤进顶栏小面板。
 - **HUD 美术说明**：`assets/ui/generated/battle` 与 `demonic_blue` 中的 HUD PNG 多为程序化/生成式临时美术，逻辑和布局已接好；若追求目标图级精致度，后续可用同名 PNG 替换，脚本引用不必大改。
 - **地图节点 hover/focus 说明已补**：精英战、营火、商店、机缘、宝箱等节点会给新玩家显示含义提示。
 - **新增「符箓丹药」系统**（可携带一次性消耗品，对标药水）：战斗奖励/商店获取、3 槽位、战斗内/部分战斗外使用。见第 4、6 节。
 - **魔修机制大改**（三系统，引爆倍率 X=3）：阶段1 煞气 ✅、阶段2 魂印引爆 ✅、阶段3 魔焰焰轮 ✅（含 7 色 rider 细化）。见第 4、6 节。
-- 最近一轮主干提交：`master` `f7cf8cd`（战斗 UI 与视觉资产）；本轮继续追加 Demo 机制、事件、调试控制台、UI 统一、编码配置与文档更新。
-- `validate_project.py` 现在 **0 error / 0 warning**（校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
+- 本轮继续追加魔修功法引擎卡、战斗 UI 卡牌化布局、出牌预览动画、战斗总牌组 overlay 修复、符箓丹药伤害修复、选人职业收束与文档更新。
+- `validate_project.py` 现在 **0 error / 0 warning**（2026-07-06 复跑；校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
 - `run_godot_checks.py`：2026-07-01 最近一次用 Godot exe 跑过全量检查，`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过。
 - **统一 Excel 数值总表**：`game_data.xlsx`（卡牌/祝福/怪物AI 三张数据表 + 说明）——改表回写 `.tres`/`.json`/`.tscn`，一个文件调全部数值平衡（见第 6、7 节）。旧的独立 `cards.xlsx` 已被它取代。
 - 开发路线图见根目录 `ROADMAP.md`。
@@ -38,7 +39,7 @@ Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godo
 - 主菜单、新开局、继续游戏、角色选择、灵根选择。
 - 地图爬塔，包含普通战斗、精英、Boss、事件、商店、宝箱、篝火、祝福。
 - 回合制卡牌战斗，支持抽牌、弃牌、消耗、费用、目标选择、敌人意图和胜负结算。
-- 当前职业包括体修、剑修、魔修、驭兽。
+- 代码和资源中仍保留体修、剑修、魔修、驭兽；当前 Demo 入口暂只开放魔修。
 - 图鉴包含卡牌、法宝/遗物、怪物、词条等内容。
 - 近期视觉方向已转向云海仙山、国风修仙、暗金卡牌、肉鸽实体卡质感。
 
@@ -159,13 +160,24 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 最近检查结果：
 
-- `validate_project.py`：0 error / 0 warning（最近 UI/系统改动后仍保持无校验错误）。
+- `validate_project.py`：0 error / 0 warning（2026-07-06 最近一次复跑，最近 UI/系统改动后仍保持无校验错误）。
 - `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过（最近一次完整跑通：2026-07-01）。
-- 战斗 UI 预览：`art/design/run_battle_ui_preview.png` 与 `art/design/battle_ui_preview.png` 可用于人工对照；截图 helper 会临时写 marker，提交/交接前可删除 `*_marker.txt`。
+- 2026-07-06 针对性复现检查已过：攻击牌出牌预览坐标不再报错；无卡牌来源的攻击符箓/丹药可正常伤害敌人；战斗中打开总牌组会进入独立 `DeckViewLayer`，不再和顶栏 UI 错位。
+- 战斗 UI 预览：`art/design/run_battle_ui_preview.png` 与 `art/design/battle_ui_preview.png` 可用于人工对照；截图 helper 会临时写 marker，提交/交接前删除 `*_marker.txt`。
 - `run_godot_checks.py` 已改用 UTF-8 解码 Godot 输出，修复了中文 Windows 上的 GBK 解码崩溃。
 - ⚠️ **新增/替换 PNG 后必须在 Godot 编辑器导入一次**（跑上面的 console exe `--editor --quit`），否则会出现「文件在但加载失败 / no loader found」的错误，而 `validate_project.py` 查不出（它只查文件是否存在、查不出"未导入"）。Godot 退出时偶尔有 RID/resource leak 警告；只要没有 `SCRIPT ERROR` / `Parse Error` / `Failed to load script`，通常不是本轮 UI 脚本问题。
 
 ## 6. 最近改动摘要
+
+### 本轮（2026-07-06）魔修 Demo 收束、战斗 UI 与交互修复
+
+- **选人界面暂时只开放魔修**：`character_selector.gd` 中剑修也已 disabled，Demo 范围明确为“魔修单职业完整可通关”。
+- **新增魔修功法/引擎卡与配套牌**：落地 10 张功法引擎、4 张技能、2 张 X 费终结技；相关新插画在 `art/cards/demonic_cultivator/ai/demon_*.png`，新资源在 `characters/demonic_cultivator/cards/engines/` 与魔修卡池。
+- **战斗 UI 卡牌化布局推进**：新增 `battle_combatant_card.gd`，玩家/怪物信息逐步转为目标图方向的卡牌式信息框；抽牌堆、弃牌堆、焰轮、能量、结束回合、敌人意图等已接入新的黑金暗紫 HUD 资源。
+- **出牌预览动画**：`card_ui.gd` 出牌时发 `card_play_preview_requested`，`battle_ui.gd` 在战场中央放大悬停一会再淡出；修复了预览层 `to_local()` 坐标转换导致的攻击牌报错。
+- **战斗中总牌组错位修复**：`run.gd` 运行时把 `%DeckView` 移到独立 `CanvasLayer`（`DeckViewLayer`，layer 18），解决战斗打开总牌组时和顶栏/战斗 HUD 错位的问题。
+- **符箓丹药伤害修复**：`CardEffect.execute_damage()` 现在允许 `card == null`，攻击类丹药/符箓恢复对敌人生效；火灵根选择等只在真实卡牌来源时触发。
+- **交接给手感优化的文件地图已补**：第 7 节新增“战斗界面 / 手感优化重点（给 Claude）”，后续优化 tween、hover、拖拽、命中反馈、hit pause、目标选择反馈时优先看那里。
 
 ### 本轮（2026-07-01）Demo 机制、事件、控制台与 UI 统一
 
@@ -342,7 +354,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 ### 主菜单 / 选人
 
 - `game-demo/scenes/ui/main_menu.tscn` / `.gd`（标题已烤进 `art/backgrounds/background1.png`）
-- `game-demo/scenes/ui/character_selector.tscn` / `.gd`（体修/驭兽隐藏；无立绘；按职业背景：剑修 `art/backgrounds/sw.png`、魔修 `art/backgrounds/demonic_selector_bg.png`；无色罩/暗角）
+- `game-demo/scenes/ui/character_selector.tscn` / `.gd`（当前体修/剑修/驭兽均 disabled，只开放魔修；按职业背景：剑修 `art/backgrounds/sw.png`、魔修 `art/backgrounds/demonic_selector_bg.png`；无色罩/暗角）
 
 ### 数值工具 · 统一 Excel 管线
 
@@ -362,6 +374,24 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - `game-demo/scenes/ui/card_menu_ui.tscn`
 - `game-demo/scenes/ui/card_menu_ui.gd`
 - `game-demo/art/ui/cards/generated/`
+
+### 战斗界面 / 手感优化重点（给 Claude）
+
+- `game-demo/scenes/battle/battle.tscn` / `game-demo/scenes/battle/battle.gd`：战斗场景入口、背景、玩家/敌人节点、站位锚点、BattleUI 与战斗流程连接。不要在这里改核心结算，除非只是调整视觉站位或信号转接。
+- `game-demo/scenes/ui/battle_ui.gd`：战斗 HUD 总控，负责手牌、法力/能量、回合、抽牌堆/弃牌堆、结束回合、玩家/怪物卡片、敌人意图位置、出牌预览动画和 HUD 布局。
+- `game-demo/scenes/ui/battle_combatant_card.gd`：运行时玩家/怪物信息卡，头像、卡面、竖向血条/护体条、状态图标、敌人意图挂点都在这里。
+- `game-demo/scenes/ui/mana_ui.tscn` / `game-demo/scenes/ui/mana_ui.gd`：能量显示；当前是靠战斗 UI 运行时摆位，后续可优化数字 tween、脉冲和消耗反馈。
+- `game-demo/scenes/battle/flame_wheel_ui.gd`：魔修焰轮显示、颜色点亮、大小和左下角布局；焰轮逻辑来源在 `class_mechanic_handler.gd`。
+- `game-demo/scenes/ui/hand.gd`：底部手牌扇形布局、hover 放大、选中抬升、间距、角度、动画时长，是“丝滑手感”的核心文件之一。
+- `game-demo/scenes/card_ui/card_ui.gd` 与 `game-demo/scenes/card_ui/card_states/*.gd`：单张卡的输入状态机、hover/drag/aim/release/play 流程；出牌预览信号也从这里发出。
+- `game-demo/scenes/card_target_selector/card_target_selector.gd`：攻击牌瞄准线、目标检测、目标高亮；适合加更明显的吸附、轨迹、目标反馈。
+- `game-demo/scenes/ui/card_visuals.tscn` / `.gd` 与 `game-demo/scenes/ui/card_style.gd`：卡牌正面渲染、文本、插画、卡框、稀有度/类型风格。
+- `game-demo/scenes/ui/card_pile_view.gd` 与 `game-demo/scenes/ui/card_pile_opener.gd`：抽牌堆/弃牌堆/总牌组查看窗口。战斗总牌组现在由 `run.gd` 移到 `DeckViewLayer` 避免错位。
+- `game-demo/scenes/run/run.gd`：Run 顶栏、总牌库按钮、丹药/法宝/灵根栏、`DeckViewLayer`、进入战斗时的 UI 显隐。战斗 HUD 和 Run 顶栏有交界，改 overlay 前一定看这里。
+- `game-demo/scenes/player/player.gd` 与 `game-demo/scenes/enemy/enemy.gd`：玩家/敌人立绘、帧动画、受击/死亡表现、旧血条 overlay 显隐、伤害文字时序。
+- `game-demo/scenes/ui/ink_theme.gd`：暗黑修仙通用 StyleBox、按钮、面板、标题底板工具。新面板先复用这里，避免每个页面继续长出自己的皮肤。
+- 战斗 UI 资产重点目录：`game-demo/art/ui/battle_cards/`、`game-demo/art/ui/battle_widgets/`、`game-demo/assets/ui/generated/battle/`、`game-demo/art/design/run_battle_ui_preview.png`、`game-demo/art/design/battle_ui_preview.png`。
+- 给 Claude 的手感优化建议：优先处理 tween/easing、hover/drag inertia、目标吸附反馈、出牌悬停节奏、命中停顿、轻量屏幕震动、音效钩子和伤害数字节奏；在 UI 手感稳定前不要改卡牌数值、战斗结算或存档结构。
 
 ### 商店与奖励
 
@@ -397,6 +427,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 ### 美术现状
 
 - 剑修、魔修卡牌已接入 AI 生成大插画（`art/cards/<职业>/ai/`）；**体修、驭兽卡面仍是占位小图**，待补。
+- 新增魔修功法/配套牌插画统一放在 `art/cards/demonic_cultivator/ai/demon_*.png`，后续如重出图应继续参考现有魔修人物风格，避免卡面角色长相割裂。
 - 通用卡（打击/防御等 `common_cards/`）仍用 16px 占位图，放大后偏糊；魔修起手已用专属 `demon_strike`/`demon_defend`（AI 图）替代。
 - 卡框资源是 AI 生成贴图，插画窗已挖空透明；新卡框需保持相同窗口区域与透明窗，避免重改 UI。
 - `art/tiles/tile_*` 仍是 16px 占位像素图（**不要给它们开 mipmap**）；部分已被 `art/generated_icons/tile_replacements/` 替换。
@@ -407,6 +438,8 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **UI 统一仍需人工视觉 QA**：这轮先用现有资产和 `InkTheme` 统一了大部分页面风格，没有继续精抠每个界面的像素级布局。后续若要达到目标图级品质，应逐页进 Godot 检查按钮状态、文本遮挡、面板透明度和不同分辨率下的间距。
 - **旧事件当前被临时禁用**：`event_room_pool.tres` 只开放 10 个新事件是为了集中验证。等新事件稳定后，记得决定是恢复旧事件、分章节混池，还是按权重轮换。
 - **调试控制台快捷键**：使用 Ctrl + 反引号，不要再绑定 F8。F8 在 Godot 编辑器运行时会停止项目，看起来像“按控制台键直接退出”。
+- **战斗 UI 手感仍是下一阶段重点**：本轮已把总牌组 overlay、出牌预览报错、符箓丹药伤害修好，但手牌 hover/drag、攻击瞄准吸附、命中反馈、hit pause、伤害数字节奏和音效反馈还没做到成品级。详见第 7 节 Claude 文件地图。
+- **单体攻击符箓/丹药目标选择仍偏简单**：无卡牌来源的攻击效果已能生效，但如果没有显式目标，当前主要走第一个存活敌人的兜底逻辑。若要做成品手感，建议后续给攻击丹药/符箓增加一次性目标选择状态。
 - **战斗数值待按 100 血重配平**：剑修/魔修血量已 30/32→100、费用 3→4，但敌人伤害（固定 AI 的处决 12/重砸 10 等）和 `map_generator.gd` 章节缩放仍按旧血量配置，现在战斗偏软。需重新配平敌人伤害 + 章节倍率（可经 `game_data.xlsx` 怪物AI 表 + `map_generator` 倍率调）。
 - **`run-flow` 偶发 `Lambda capture freed`**：完整流程约 2/12 偶发，还有一处多回合补间回调来源未根除（疑似 `status_handler`/`relic_handler`/弃牌结算）。非功能 bug（逻辑仍通过，重跑即过），但将来上 CI 会随机红灯。修法：把 `tween.finished` 的 lambda 改为捕获 `get_instance_id()` / 加 `is_instance_valid` 守卫。
 - **`validate_project.py` 仍有盲区**：查不出「文件在但未导入」（缺 `.import`）和字符串拼接路径。新增美术务必在编辑器导入。（注：默认值字段误报已修，现 0 error。）
@@ -418,8 +451,9 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ## 9. 后续建议
 
-1. 为高频卡牌优先生成或绘制正式大插画，替换当前临时小图标。
-2. 对卡牌标题字体、描述字体补充更有国风感的正式字体资源。
-3. 给主页按钮增加轻微 hover 音效、灵光粒子或水墨扩散效果。
-4. 对地图、商店、宝箱、祝福页面做一次统一视觉 QA，检查字体大小、按钮状态和不同分辨率下的遮挡。
-5. 在提交前重新运行 `validate_project.py` 和 `run_godot_checks.py`，并人工进入战斗、商店、地图、奖励、主菜单确认视觉效果。
+1. 优先把魔修单职业 Demo 跑通：战斗、事件、商店、宝箱、篝火、Boss、失败/胜利、失败遗产都要完整体验一遍。
+2. 下一轮重点建议交给 Claude 优化战斗手感：手牌 hover/drag、目标吸附、出牌悬停、命中停顿、伤害数字、轻量震动、音效反馈。
+3. 为高频卡牌优先生成或绘制正式大插画，替换当前临时小图标；魔修卡面人物风格要统一。
+4. 对卡牌标题字体、描述字体补充更有国风感的正式字体资源。
+5. 对地图、商店、宝箱、祝福页面做一次统一视觉 QA，检查字体大小、按钮状态和不同分辨率下的遮挡。
+6. 提交前重新运行 `validate_project.py`；较大系统改动后再跑 `run_godot_checks.py`，并人工进入战斗、商店、地图、奖励、主菜单确认视觉效果。

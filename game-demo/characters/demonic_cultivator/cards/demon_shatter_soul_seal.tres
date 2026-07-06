@@ -22,6 +22,7 @@ script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
 effect_text = "造成 4 点伤害，施加 2 层魂印。"
 id = "demon_shatter_soul_seal"
+type = 1
 rarity = 1
 target = 1
 cost = 1

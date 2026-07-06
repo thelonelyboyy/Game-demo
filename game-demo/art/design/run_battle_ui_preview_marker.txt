@@ -1,1 +1,0 @@
-ok: res://art/design/run_battle_ui_preview.png

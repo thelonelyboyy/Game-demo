@@ -65,6 +65,7 @@ const META_SPIRIT_ROOT_FIRE_CHOICE_USED := "spirit_root_fire_choice_used"
 
 var spirit_root_owner: CharacterStats
 var temporary_cost_reduction := 0
+var last_x_paid := 0
 
 
 func is_single_targeted() -> bool:
@@ -94,7 +95,12 @@ func _get_targets(targets: Array[Node]) -> Array[Node]:
 
 func play(targets: Array[Node], char_stats: CharacterStats, modifiers: ModifierHandler) -> void:
 	Events.card_played.emit(self)
-	char_stats.mana -= cost
+	last_x_paid = 0
+	var mana_cost := cost
+	if is_x_cost():
+		mana_cost = maxi(char_stats.mana, 0)
+		last_x_paid = mana_cost
+	char_stats.mana = maxi(char_stats.mana - mana_cost, 0)
 
 	var resolved_targets := targets if is_single_targeted() else _get_targets(targets)
 	var fire_choice = _create_spirit_root_fire_choice(resolved_targets, modifiers, char_stats)
@@ -159,6 +165,18 @@ func get_profession_color() -> Color:
 
 func get_default_tooltip() -> String:
 	return tooltip_text
+
+
+func is_x_cost() -> bool:
+	return cost < 0
+
+
+func get_cost_text() -> String:
+	return "X" if is_x_cost() else str(cost)
+
+
+func get_x_cost_paid() -> int:
+	return last_x_paid
 
 
 func get_updated_tooltip(_player_modifiers: ModifierHandler, _enemy_modifiers: ModifierHandler) -> String:

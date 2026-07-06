@@ -497,8 +497,28 @@ func _setup_top_bar():
 	
 	deck_button.card_pile = character.deck
 	deck_view.card_pile = character.deck
+	_ensure_deck_view_overlay()
 	deck_button.pressed.connect(deck_view.show_current_view.bind("牌组"))
 	_polish_deck_button()
+
+
+func _ensure_deck_view_overlay() -> void:
+	var layer := get_node_or_null("DeckViewLayer") as CanvasLayer
+	if not layer:
+		layer = CanvasLayer.new()
+		layer.name = "DeckViewLayer"
+		layer.layer = 18
+		add_child(layer)
+
+	if deck_view.get_parent() != layer:
+		deck_view.reparent(layer)
+
+	deck_view.set_anchors_preset(Control.PRESET_FULL_RECT)
+	deck_view.offset_left = 0.0
+	deck_view.offset_top = 0.0
+	deck_view.offset_right = 0.0
+	deck_view.offset_bottom = 0.0
+	deck_view.hide()
 
 
 func _setup_debug_console() -> void:
