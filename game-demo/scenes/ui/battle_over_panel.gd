@@ -23,6 +23,26 @@ func show_screen(text: String, type: Type) -> void:
 	main_menu_button.visible = type == Type.LOSE
 	show()
 	get_tree().paused = true
+	# 树已暂停，入场动画的 tween 必须设 TWEEN_PAUSE_PROCESS 才会走。
+	_animate_entrance.call_deferred(type)
+
+
+func _animate_entrance(type: Type) -> void:
+	modulate = Color(1, 1, 1, 0.0)
+	label.pivot_offset = label.size * 0.5
+	label.scale = Vector2.ONE * (1.35 if type == Type.WIN else 0.8)
+	var visible_button := continue_button if type == Type.WIN else main_menu_button
+	visible_button.modulate = Color(1, 1, 1, 0.0)
+
+	var tween := create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.set_parallel(true)
+	tween.tween_property(self, "modulate:a", 1.0, 0.38) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "scale", Vector2.ONE, 0.60) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.set_parallel(false)
+	tween.tween_property(visible_button, "modulate:a", 1.0, 0.30)
 
 
 func _apply_visuals() -> void:

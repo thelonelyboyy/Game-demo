@@ -29,6 +29,7 @@ func _roll_card_price(rarity: Card.Rarity) -> int:
 
 func _ready() -> void:
 	_apply_visuals()
+	InkTheme.animate_item_entrance(self, 0.07)
 
 
 func _draw() -> void:
@@ -73,7 +74,12 @@ func set_card(new_card: Card) -> void:
 
 
 func _on_buy_button_pressed() -> void:
+	var from_center := global_position + size * 0.5
+	if current_card_ui and is_instance_valid(current_card_ui):
+		from_center = current_card_ui.get_global_rect().get_center()
 	Events.shop_card_bought.emit(card, gold_cost)
+	# 购买反馈：run 顶栏播放"卡牌飞向总牌库"动画。
+	Events.card_acquired_animation_requested.emit(card, from_center)
 	card_container.queue_free()
 	price.queue_free()
 	buy_button.queue_free()

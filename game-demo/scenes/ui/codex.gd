@@ -106,6 +106,7 @@ var display_font: SystemFont
 
 
 func _ready() -> void:
+	InkTheme.animate_screen_entrance(self)
 	back_button.pressed.connect(_on_back_pressed)
 	directory.item_selected.connect(_on_directory_item_selected)
 	get_viewport().size_changed.connect(_apply_layout)

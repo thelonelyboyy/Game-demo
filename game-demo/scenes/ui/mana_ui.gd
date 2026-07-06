@@ -12,6 +12,8 @@ const BATTLE_ENERGY_ORB := preload("res://art/ui/battle_widgets/battle_energy_or
 
 var _active := true
 var _fill: TextureRect
+var _last_mana := -1
+var _pulse_tween: Tween
 
 
 func _ready() -> void:
@@ -44,7 +46,26 @@ func _on_stats_changed() -> void:
 		var mana_ratio := clampf(float(char_stats.mana) / float(maxi(char_stats.max_mana, 1)), 0.0, 1.0)
 		_fill.modulate = Color(0.56, 0.20, 1.0, 0.28 + 0.52 * mana_ratio) if _active else Color(0.28, 0.20, 0.38, 0.18)
 		_fill.scale = Vector2.ONE * (0.86 + 0.10 * mana_ratio)
+
+	if _last_mana >= 0 and char_stats.mana != _last_mana:
+		_pulse(char_stats.mana > _last_mana)
+	_last_mana = char_stats.mana
 	queue_redraw()
+
+
+# 灵气变化脉冲：消耗时数字缩一下弹回，回蓝/回合刷新时数字与球体一起亮起。
+func _pulse(increased: bool) -> void:
+	if _pulse_tween and _pulse_tween.is_running():
+		_pulse_tween.kill()
+
+	mana_label.pivot_offset = mana_label.size * 0.5
+	mana_label.scale = Vector2.ONE * (1.3 if increased else 0.78)
+	_pulse_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_pulse_tween.tween_property(mana_label, "scale", Vector2.ONE, 0.35)
+	if increased and _active:
+		frame.modulate = Color(1.4, 1.32, 1.18)
+		_pulse_tween.tween_property(frame, "modulate", Color.WHITE, 0.45) \
+				.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
 func _draw() -> void:

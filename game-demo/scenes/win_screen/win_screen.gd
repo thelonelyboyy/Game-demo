@@ -14,6 +14,7 @@ const MESSAGE := "%s\n渡劫功成！"
 
 
 func _ready() -> void:
+	InkTheme.animate_screen_entrance(self, 0.45)
 	_apply_visuals()
 
 

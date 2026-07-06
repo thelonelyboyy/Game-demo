@@ -19,6 +19,7 @@ var gold_cost := 0
 
 func _ready() -> void:
 	_apply_visuals()
+	InkTheme.animate_item_entrance(self, 0.07)
 
 
 func _draw() -> void:

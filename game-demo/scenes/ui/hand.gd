@@ -13,12 +13,22 @@ const HAND_Y_OFFSET := 50.0
 const HOVER_SCALE := 1.38
 const HOVER_LIFT := 54.0
 const HOVER_Z_INDEX := 1000
-const LAYOUT_DURATION := 0.18
+const LAYOUT_DURATION := 0.24
+# 牌数变化（抽牌/打出/弃牌）引起的补位用弹簧曲线，比 hover 重排慢一点、带回弹。
+const REFLOW_DURATION := 0.48
+# 聚焦卡响应要比整体重排更快，配合回弹曲线让 hover 有"跳出来"的手感。
+const FOCUS_DURATION := 0.15
+# 聚焦卡放大后会盖住邻牌，两侧卡牌按与聚焦卡的距离让位。
+const NEIGHBOR_PUSH := 46.0
+const NEIGHBOR_PUSH_FALLOFF := 0.45
 
 @export var player: Player
 @export var char_stats: CharacterStats
 
 var focused_card: CardUI
+# 抽牌飞入起点（抽牌堆按钮中心的全局坐标），由 battle_ui 布局时更新；为零时新卡直接出现在手牌位。
+var draw_origin_global := Vector2.ZERO
+var _last_layout_count := -1
 
 
 func _ready() -> void:
@@ -34,12 +44,23 @@ func add_card(card: Card) -> void:
 	new_card_ui.parent = self
 	new_card_ui.char_stats = char_stats
 	new_card_ui.player_modifiers = player.modifier_handler
+
+	if draw_origin_global != Vector2.ZERO:
+		new_card_ui.position = draw_origin_global - global_position - CARD_SIZE * 0.5
+		new_card_ui.scale = Vector2.ONE * 0.3
+		new_card_ui.rotation_degrees = -14.0
+		new_card_ui.modulate = Color(1, 1, 1, 0.0)
+		var fade := new_card_ui.create_tween()
+		fade.tween_property(new_card_ui, "modulate:a", 1.0, 0.18)
+
 	_layout_cards()
 
 
 func discard_card(card: CardUI) -> void:
 	if focused_card == card:
 		focused_card = null
+	if card.card:
+		Events.card_discarded.emit(card.card, card.get_global_rect().get_center())
 	card.queue_free()
 	_layout_cards.call_deferred()
 
@@ -109,6 +130,10 @@ func _layout_cards() -> void:
 	var middle := float(card_count - 1) * 0.5
 	var divisor := maxf(middle, 1.0)
 
+	var focus_index := cards.find(focused_card) if focused_card else -1
+	var reflow := card_count != _last_layout_count
+	_last_layout_count = card_count
+
 	for card_index in range(card_count):
 		var card_ui := cards[card_index]
 		var normalized_position := (float(card_index) - middle) / divisor
@@ -119,8 +144,14 @@ func _layout_cards() -> void:
 		)
 		var target_rotation := normalized_position * FAN_ROTATION
 		var target_scale := Vector2.ONE
+		var is_focused := card_ui == focused_card
 
-		if card_ui == focused_card:
+		if focus_index >= 0 and not is_focused:
+			var distance := card_index - focus_index
+			var push := NEIGHBOR_PUSH * pow(NEIGHBOR_PUSH_FALLOFF, absf(distance) - 1.0)
+			target_position.x += push * signf(distance)
+
+		if is_focused:
 			target_position.y -= HOVER_LIFT
 			target_rotation = 0.0
 			target_scale = Vector2.ONE * HOVER_SCALE
@@ -128,13 +159,21 @@ func _layout_cards() -> void:
 		else:
 			card_ui.z_index = card_index
 
+		var springy := reflow and not is_focused
+		var duration := FOCUS_DURATION if is_focused else (REFLOW_DURATION if springy else LAYOUT_DURATION)
 		card_ui.pivot_offset = Vector2(CARD_SIZE.x * 0.5, CARD_SIZE.y)
 		if card_ui.tween and card_ui.tween.is_running():
 			card_ui.tween.kill()
-		card_ui.tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		card_ui.tween.tween_property(card_ui, "position", target_position, LAYOUT_DURATION)
-		card_ui.tween.tween_property(card_ui, "rotation_degrees", target_rotation, LAYOUT_DURATION)
-		card_ui.tween.tween_property(card_ui, "scale", target_scale, LAYOUT_DURATION)
+		card_ui.tween = create_tween().set_parallel(true) \
+				.set_trans(Tween.TRANS_SPRING if springy else Tween.TRANS_CUBIC) \
+				.set_ease(Tween.EASE_OUT)
+		card_ui.tween.tween_property(card_ui, "position", target_position, duration)
+		card_ui.tween.tween_property(card_ui, "rotation_degrees", target_rotation, duration)
+		if is_focused:
+			card_ui.tween.tween_property(card_ui, "scale", target_scale, duration) \
+					.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		else:
+			card_ui.tween.tween_property(card_ui, "scale", target_scale, duration)
 
 
 func _get_card_uis() -> Array[CardUI]:

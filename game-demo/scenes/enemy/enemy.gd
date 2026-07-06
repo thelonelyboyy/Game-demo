@@ -28,6 +28,11 @@ var current_action: EnemyAction : set = set_current_action
 var target_highlight: Node2D
 var target_highlight_lines: Array[Line2D] = []
 var sprite_visible_size := Vector2.ZERO
+var _highlight_tween: Tween
+var _dying := false
+# 战斗信息卡尺寸（画布像素）。battle_ui 把本节点对齐到信息卡时写入，
+# 之后碰撞体/选中框/飘字/特效全部以信息卡为基准。
+var aligned_feedback_extents := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -62,8 +67,15 @@ func setup_ai() -> void:
 	enemy_action_picker.enemy = self
 
 
+var _last_seen_health := -1
+
+
 func update_stats() -> void:
 	stats_ui.update_stats(stats)
+	# 血量回升 = 战斗内治疗（敌人疗愈意图等），绿色 +N 飘字。
+	if _last_seen_health >= 0 and stats.health > _last_seen_health and is_inside_tree() and not _dying:
+		FloatingCombatText.spawn_heal(self, stats.health - _last_seen_health, _damage_text_offset())
+	_last_seen_health = stats.health
 
 
 func update_action() -> void:
@@ -166,12 +178,55 @@ func _control_scale(control: Control) -> float:
 
 
 func do_turn() -> void:
+	if _dying or stats.health <= 0:
+		return
+
 	stats.block = 0
-	
+
 	if not current_action:
 		return
-	
+
+	_play_attack_telegraph()
 	current_action.perform_action()
+
+
+# 攻击特效：出攻击类招式的瞬间在本单位信息卡位置闪一圈红色冲击，
+# 提示"是谁在出手"。纯表现，不参与伤害结算时序。
+func _play_attack_telegraph() -> void:
+	if not current_action or not current_action.intent:
+		return
+
+	var category: int = current_action.intent.category
+	if (
+		category != Intent.Category.ATTACK
+		and category != Intent.Category.MULTI_ATTACK
+		and category != Intent.Category.ATTACK_DEFEND
+	):
+		return
+
+	GameSfx.play(GameSfx.SWISH, -8.0)
+	HitEffect.spawn(self, _feedback_radius() * 1.15, Color(1.0, 0.34, 0.26, 0.92))
+
+
+# 对齐到信息卡：世界节点移动由 battle_ui 完成，这里同步放大碰撞体与选中框。
+func align_feedback_to_card(extents_px: Vector2) -> void:
+	aligned_feedback_extents = extents_px
+	var total_scale := get_global_transform_with_canvas().get_scale()
+	if total_scale.x <= 0.0 or total_scale.y <= 0.0:
+		return
+
+	var world_size := extents_px / total_scale
+	var rectangle := collision_shape.shape as RectangleShape2D
+	if rectangle:
+		rectangle.size = world_size * 0.92
+	_update_target_highlight(world_size * 0.86)
+
+
+func _feedback_radius() -> float:
+	var total_scale := get_global_transform_with_canvas().get_scale().y
+	if aligned_feedback_extents.y > 0.0 and total_scale > 0.0:
+		return aligned_feedback_extents.y / total_scale * 0.30
+	return maxf(sprite_visible_size.y * 0.42, 14.0)
 
 
 func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
@@ -180,9 +235,10 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 	
 	sprite_2d.material = WHITE_SPRITE_MATERIAL
 	var modified_damage := maxi(0, modifier_handler.get_modified_value(damage, which_modifier))
-	
+
 	var tween := create_tween()
 	tween.tween_callback(Shaker.shake.bind(self, 16, 0.15))
+	tween.tween_callback(_spawn_damage_feedback.bind(modified_damage))
 	tween.tween_callback(stats.take_damage.bind(modified_damage))
 	tween.tween_interval(0.17)
 
@@ -194,18 +250,96 @@ func _on_damage_tween_finished() -> void:
 		sprite_2d.material = null
 
 	if stats.health <= 0:
-		Events.enemy_died.emit(self)
-		queue_free()
+		_play_death_dissolve()
+
+
+# 死亡表现：染红压扁下沉淡出 ~0.45s，播完再发 enemy_died / 释放。
+# 期间关闭碰撞并隐藏意图，避免溶解中的敌人还能被瞄准或出招。
+func _play_death_dissolve() -> void:
+	if _dying:
+		return
+	_dying = true
+
+	collision_shape.set_deferred("disabled", true)
+	if intent_ui:
+		intent_ui.hide()
+	if target_highlight:
+		target_highlight.hide()
+	_stop_highlight_pulse()
+	GameSfx.play(GameSfx.ENEMY_DIE, -2.0)
+
+	var death_tween := create_tween().set_parallel(true)
+	death_tween.tween_property(sprite_2d, "modulate", Color(1.5, 0.65, 0.55, 0.0), 0.62) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	death_tween.tween_property(sprite_2d, "scale", sprite_2d.scale * Vector2(1.12, 0.78), 0.62) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	death_tween.tween_property(sprite_2d, "position:y", sprite_2d.position.y + 7.0, 0.62) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	death_tween.set_parallel(false)
+	death_tween.tween_callback(_finish_death)
+
+
+func _finish_death() -> void:
+	Events.enemy_died.emit(self)
+	queue_free()
+
+
+# 伤害落地瞬间的飘字：先按当前护体拆出"被格挡"和"实际扣血"两部分。
+func _spawn_damage_feedback(amount: int) -> void:
+	if amount <= 0 or not stats:
+		return
+
+	var blocked := mini(stats.block, amount)
+	var lost := amount - blocked
+	var offset := _damage_text_offset()
+	if lost > 0:
+		FloatingCombatText.spawn_damage(self, lost, offset)
+		HitEffect.spawn(self, _feedback_radius())
+		HitPause.trigger()
+		GameSfx.play(GameSfx.HIT, -2.0)
+	if blocked > 0:
+		FloatingCombatText.spawn_block(self, blocked, offset + Vector2(44.0, 20.0))
+		GameSfx.play(GameSfx.BLOCK, -6.0)
+
+
+func _damage_text_offset() -> Vector2:
+	if aligned_feedback_extents.y > 0.0:
+		return Vector2(0.0, -aligned_feedback_extents.y * 0.5 - 24.0)
+	var canvas_scale := get_global_transform_with_canvas().get_scale().y
+	return Vector2(0.0, -(sprite_visible_size.y * 0.5 * canvas_scale) - 26.0)
 
 
 func _on_area_entered(_area: Area2D) -> void:
 	if target_highlight:
 		target_highlight.show()
+		_start_highlight_pulse()
 
 
 func _on_area_exited(_area: Area2D) -> void:
 	if target_highlight:
 		target_highlight.hide()
+		_stop_highlight_pulse()
+
+
+# 被瞄准时四角框先回弹收拢，再进入呼吸循环，明确"当前锁定的是我"。
+func _start_highlight_pulse() -> void:
+	_stop_highlight_pulse()
+	target_highlight.modulate = Color.WHITE
+	target_highlight.scale = Vector2.ONE * 1.22
+	_highlight_tween = create_tween()
+	_highlight_tween.tween_property(target_highlight, "scale", Vector2.ONE, 0.22) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_highlight_tween.tween_property(target_highlight, "modulate:a", 0.55, 0.60)
+	_highlight_tween.tween_property(target_highlight, "modulate:a", 1.0, 0.60)
+	_highlight_tween.set_loops()
+
+
+func _stop_highlight_pulse() -> void:
+	if _highlight_tween and _highlight_tween.is_running():
+		_highlight_tween.kill()
+	if target_highlight:
+		target_highlight.modulate = Color.WHITE
+		target_highlight.scale = Vector2.ONE
 
 
 func _setup_target_highlight() -> void:

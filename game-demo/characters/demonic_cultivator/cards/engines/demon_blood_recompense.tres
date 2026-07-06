@@ -1,14 +1,13 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3 uid="uid://dmrn6k283dxnb"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_blood_recompense.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_demonic_engine_effect.gd" id="4"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dsork3tkhc2bm" path="res://art/cards/demonic_cultivator/ai/demon_blood_recompense.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://cnqve7dtqjghp" path="res://art/audio/true_strength.ogg" id="3"]
+[ext_resource type="Script" uid="uid://b7qlo75fm10ve" path="res://custom_resources/effects/configured_demonic_engine_effect.gd" id="4"]
 
 [sub_resource type="Resource" id="E1"]
 script = ExtResource("4")
 engine = 2
-value = 1
 threshold = 7
 
 [resource]

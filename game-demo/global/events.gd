@@ -6,6 +6,10 @@ signal card_drag_ended(card_ui: CardUI)
 signal card_aim_started(card_ui: CardUI)
 signal card_aim_ended(card_ui: CardUI)
 signal card_play_preview_requested(card: Card, start_global_center: Vector2)
+# 回合结束弃牌时发出，战斗 UI 用它播放"幽灵卡飞向弃牌堆"动画。
+signal card_discarded(card: Card, from_global_center: Vector2)
+# 弃牌堆洗回抽牌堆时发出（携带洗入张数），战斗 UI 播放洗牌提示动画。
+signal deck_reshuffled(card_count: int)
 signal card_played(card: Card)
 signal card_drawn(card: Card)
 signal card_extra_drawn(card: Card)
@@ -27,6 +31,10 @@ signal player_died
 signal attack_animation_finished
 # 魔焰焰轮变化（携带本回合已点亮的颜色 int 数组），战斗内焰轮 UI 监听刷新。
 signal flame_wheel_changed(colors: Array)
+# 煞气档位变化（0=无 1=≥3卡伤+1 2=≥6伤害×2 3=天魔降世×3），战斗 UI 播放阈值演出。
+signal sha_qi_tier_changed(tier: int, stacks: int)
+# 商店购卡等场合获得新卡，UI 播放"卡牌飞向总牌库"动画。
+signal card_acquired_animation_requested(card: Card, from_global_center: Vector2)
 
 # Enemy-related events
 signal enemy_action_completed(enemy: Enemy)

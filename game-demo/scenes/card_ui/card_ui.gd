@@ -20,7 +20,8 @@ var original_index := 0
 var parent: Control
 var tween: Tween
 var playable := true : set = _set_playable
-var disabled := true
+var disabled := true : set = _set_disabled
+var _shake_tween: Tween
 
 
 func _ready() -> void:
@@ -95,6 +96,18 @@ func get_active_enemy_modifiers() -> ModifierHandler:
 	return targets[0].modifier_handler
 
 
+# 费用不足点击反馈：摇卡面子节点（不动 CardUI 本体，避免和手牌布局 tween 打架）+ 费用闪红。
+func shake_unplayable() -> void:
+	if _shake_tween and _shake_tween.is_running():
+		return
+
+	GameSfx.play(GameSfx.ERROR, -6.0)
+	_shake_tween = create_tween()
+	for offset in [10.0, -8.0, 6.0, -3.0, 0.0]:
+		_shake_tween.tween_property(card_visuals, "position:x", offset, 0.06)
+	card_visuals.flash_cost_insufficient()
+
+
 func is_hovered() -> bool:
 	var rect := Rect2(Vector2.ZERO, self.size)
 	return rect.has_point(get_local_mouse_position())
@@ -130,6 +143,17 @@ func _set_card(value: Card) -> void:
 func _set_playable(value: bool) -> void:
 	playable = value
 	card_visuals.set_disabled_visual(not playable)
+	_refresh_playable_glow()
+
+
+func _set_disabled(value: bool) -> void:
+	disabled = value
+	_refresh_playable_glow()
+
+
+func _refresh_playable_glow() -> void:
+	if card_visuals:
+		card_visuals.set_playable_glow(playable and not disabled)
 
 
 func _set_char_stats(value: CharacterStats) -> void:

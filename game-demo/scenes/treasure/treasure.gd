@@ -25,6 +25,7 @@ var burst_progress := 0.0
 
 
 func _ready() -> void:
+	InkTheme.animate_screen_entrance(self)
 	_apply_visuals()
 
 
@@ -62,6 +63,8 @@ func _on_treasure_chest_gui_input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("left_mouse"):
 		opening_started = true
+		GameSfx.play(GameSfx.CHEST_OPEN, -2.0)
+		GameSfx.play(GameSfx.GEM, -4.0)
 		_begin_open_effects()
 		animation_player.play("open")
 

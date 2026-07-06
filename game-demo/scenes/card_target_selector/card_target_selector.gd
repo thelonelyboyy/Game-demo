@@ -2,6 +2,8 @@ extends Node2D
 
 const ARC_POINTS := 8
 const ARROW_COLOR := Color(0.88, 0.04, 0.02, 0.88)
+# 吸附锁定敌人后箭头转为亮金，给出"已锁定"的确认。
+const ARROW_LOCKED_COLOR := Color(1.0, 0.80, 0.28, 0.96)
 const ARROW_SHADOW_COLOR := Color(0.12, 0, 0, 0.58)
 
 @onready var area_2d: Area2D = $Area2D
@@ -11,6 +13,8 @@ var current_card: CardUI
 var targeting := false
 var arrow_shadow: Line2D
 var arrow_head: Polygon2D
+var _was_locked := false
+var _arrow_pop_tween: Tween
 
 
 func _ready() -> void:
@@ -28,6 +32,26 @@ func _process(_delta: float) -> void:
 	arrow_shadow.points = points
 	card_arc.points = points
 	_update_arrow_head(points)
+	_update_lock_feedback()
+
+
+func _update_lock_feedback() -> void:
+	var locked := _get_current_enemy_target() != null
+	var target_color := ARROW_LOCKED_COLOR if locked else ARROW_COLOR
+	card_arc.default_color = card_arc.default_color.lerp(target_color, 0.28)
+	arrow_head.color = card_arc.default_color
+
+	if locked and not _was_locked:
+		_pop_arrow_head()
+	_was_locked = locked
+
+
+func _pop_arrow_head() -> void:
+	if _arrow_pop_tween and _arrow_pop_tween.is_running():
+		_arrow_pop_tween.kill()
+	arrow_head.scale = Vector2.ONE * 1.45
+	_arrow_pop_tween = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_arrow_pop_tween.tween_property(arrow_head, "scale", Vector2.ONE, 0.28)
 
 
 func _get_points() -> PackedVector2Array:
@@ -86,6 +110,9 @@ func _on_card_aim_started(card: CardUI) -> void:
 	current_card = card
 	current_card.targets.clear()
 	Events.tooltip_hide_requested.emit()
+	_was_locked = false
+	card_arc.default_color = ARROW_COLOR
+	arrow_head.color = ARROW_COLOR
 	arrow_shadow.show()
 	card_arc.show()
 	arrow_head.show()

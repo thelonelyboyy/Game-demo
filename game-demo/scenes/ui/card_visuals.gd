@@ -25,6 +25,8 @@ enum VisualState { NORMAL, HOVER, DRAG }
 
 var visual_state: int = VisualState.NORMAL
 var disabled_visual := false
+# 我方回合且费用足够时，卡牌带一圈暖金辉光提示"可打出"。
+var playable_glow := false
 var style_helper: CardStyle = CARD_STYLE.new()
 
 
@@ -79,6 +81,20 @@ func apply_hover_style() -> void:
 
 func apply_drag_style() -> void:
 	visual_state = VisualState.DRAG
+	if card:
+		_apply_card_style(card, visual_state)
+
+
+func flash_cost_insufficient() -> void:
+	cost.modulate = Color(2.2, 0.4, 0.35)
+	var tween := cost.create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(cost, "modulate", Color.WHITE, 0.60)
+
+
+func set_playable_glow(value: bool) -> void:
+	if playable_glow == value:
+		return
+	playable_glow = value
 	if card:
 		_apply_card_style(card, visual_state)
 
@@ -156,6 +172,9 @@ func _apply_card_style(card_to_style: Card, state: int = VisualState.NORMAL) -> 
 		frame_modulate = frame_modulate * Color(1.20, 1.16, 1.10, 1.0)
 		shadow_color = Color(highlight.r, highlight.g, highlight.b, 0.52)
 		shadow_size = 28
+	elif playable_glow:
+		shadow_color = Color(bright_gold.r, bright_gold.g, bright_gold.b, 0.20)
+		shadow_size = 14
 
 	if disabled_visual:
 		frame_modulate = Color(0.48, 0.48, 0.48, 0.72)

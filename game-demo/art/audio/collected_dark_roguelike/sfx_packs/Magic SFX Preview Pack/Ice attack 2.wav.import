@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://r1hv84mir3po"
+path="res://.godot/imported/Ice attack 2.wav-4871cedb8f9fb02a938da0bc540c7b76.sample"
+
+[deps]
+
+source_file="res://art/audio/collected_dark_roguelike/sfx_packs/Magic SFX Preview Pack/Ice attack 2.wav"
+dest_files=["res://.godot/imported/Ice attack 2.wav-4871cedb8f9fb02a938da0bc540c7b76.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

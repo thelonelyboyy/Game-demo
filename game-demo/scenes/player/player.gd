@@ -25,12 +25,16 @@ const ANIM_DEFS := {
 
 var sprite_visible_size := Vector2.ZERO
 var animated_sprite: AnimatedSprite2D
+# 战斗信息卡尺寸（画布像素），battle_ui 对齐世界节点时写入；飘字/特效以卡为基准。
+var aligned_feedback_extents := Vector2.ZERO
 
 
 func _ready() -> void:
 	status_handler.status_owner = self
 	if not Events.card_played.is_connected(_on_card_played):
 		Events.card_played.connect(_on_card_played)
+	if not Events.player_self_damaged.is_connected(_on_self_damaged):
+		Events.player_self_damaged.connect(_on_self_damaged)
 
 
 func set_character_stats(value: CharacterStats) -> void:
@@ -162,8 +166,16 @@ func _control_scale(control: Control) -> float:
 	return maxf(control.scale.x, 0.001)
 
 
+var _last_seen_health := -1
+
+
 func update_stats() -> void:
 	stats_ui.update_stats(stats)
+	# 血量回升 = 战斗内治疗（丹药/摄魂续元/灵根木被动等），绿色 +N 飘字 + 治疗音。
+	if _last_seen_health >= 0 and stats.health > _last_seen_health and is_inside_tree():
+		FloatingCombatText.spawn_heal(self, stats.health - _last_seen_health, _damage_text_offset())
+		GameSfx.play(GameSfx.HEAL, -4.0)
+	_last_seen_health = stats.health
 
 
 func _on_card_played(card: Card) -> void:
@@ -221,10 +233,56 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 	var tween := create_tween()
 	if hit_delay > 0.0:
 		tween.tween_interval(hit_delay)
+	tween.tween_callback(_spawn_damage_feedback.bind(modified_damage))
 	tween.tween_callback(stats.take_damage.bind(modified_damage))
 	tween.tween_interval(0.17)
 
 	tween.finished.connect(_on_damage_tween_finished)
+
+
+# 伤害落地瞬间的飘字：按当前护体拆出"被格挡"和"实际扣血"。
+func _spawn_damage_feedback(amount: int) -> void:
+	if amount <= 0 or not stats:
+		return
+
+	var blocked := mini(stats.block, amount)
+	var lost := amount - blocked
+	var offset := _damage_text_offset()
+	if lost > 0:
+		FloatingCombatText.spawn_damage(self, lost, offset)
+		HitEffect.spawn(self, _feedback_radius(), Color(1.0, 0.42, 0.36, 0.95))
+		# 玩家挨打比敌人挨打更重：停顿略长 + 自身震动 + 战场微震 + 重击音。
+		GameSfx.play(GameSfx.HEAVY_HIT, -2.0)
+		HitPause.trigger(0.12)
+		Shaker.shake(self, 10, 0.24)
+		var battle_root := get_parent() as Node2D
+		if battle_root:
+			Shaker.shake(battle_root, 3, 0.30)
+	if blocked > 0:
+		FloatingCombatText.spawn_block(self, blocked, offset + Vector2(44.0, 20.0))
+		GameSfx.play(GameSfx.BLOCK, -6.0)
+
+
+# 自损（血祭/献祭类效果直接扣血、不走 take_damage），用暗红飘字区分敌方伤害。
+func _on_self_damaged(amount: int) -> void:
+	if amount <= 0 or not is_inside_tree():
+		return
+	GameSfx.play(GameSfx.HIT, -8.0)
+	FloatingCombatText.spawn_self_damage(self, amount, _damage_text_offset())
+
+
+func _damage_text_offset() -> Vector2:
+	if aligned_feedback_extents.y > 0.0:
+		return Vector2(0.0, -aligned_feedback_extents.y * 0.5 - 24.0)
+	var canvas_scale := get_global_transform_with_canvas().get_scale().y
+	return Vector2(0.0, -(sprite_visible_size.y * 0.5 * canvas_scale) - 26.0)
+
+
+func _feedback_radius() -> float:
+	var total_scale := get_global_transform_with_canvas().get_scale().y
+	if aligned_feedback_extents.y > 0.0 and total_scale > 0.0:
+		return aligned_feedback_extents.y / total_scale * 0.30
+	return maxf(sprite_visible_size.y * 0.42, 14.0)
 
 
 func _on_damage_tween_finished() -> void:

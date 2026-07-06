@@ -32,9 +32,10 @@ func _input(event: InputEvent) -> void:
 func show_current_view(new_title: String, randomized: bool = false) -> void:
 	for card: Node in cards.get_children():
 		card.queue_free()
-		
+
 	card_tooltip_popup.hide_tooltip()
 	title.text = new_title
+	InkTheme.animate_screen_entrance(self, 0.2)
 	_update_view.call_deferred(randomized)
 
 

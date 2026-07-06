@@ -18,6 +18,7 @@ func _ready() -> void:
 	set_reward_icon(reward_icon)
 	set_reward_text(reward_text)
 	set_reward_subtext(reward_subtext)
+	InkTheme.animate_item_entrance(self, 0.09)
 
 
 func set_reward_icon(new_icon: Texture) -> void:

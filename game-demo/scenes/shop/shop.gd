@@ -75,6 +75,7 @@ var remove_service_used := false
 
 
 func _ready() -> void:
+	InkTheme.animate_screen_entrance(self)
 	_apply_shop_visuals()
 	ui_layer.move_child(back_button, ui_layer.get_child_count() - 1)
 	if not back_button.pressed.is_connected(_on_back_button_pressed):
@@ -232,6 +233,7 @@ func _on_shop_potion_bought(potion: Potion, gold_cost: int) -> void:
 		return
 	potion_handler.add_potion(potion)
 	run_stats.gold -= gold_cost
+	GameSfx.play(GameSfx.COINS, -4.0)
 	_update_items()
 
 
@@ -328,12 +330,14 @@ func _on_back_button_pressed() -> void:
 func _on_shop_card_bought(card: Card, gold_cost: int) -> void:
 	char_stats.deck.add_card(card)
 	run_stats.gold -= gold_cost
+	GameSfx.play(GameSfx.COINS, -4.0)
 	_update_items()
 
 
 func _on_shop_relic_bought(relic: Relic, gold_cost: int) -> void:
 	relic_handler.add_relic(relic)
 	run_stats.gold -= gold_cost
+	GameSfx.play(GameSfx.COINS, -4.0)
 
 	if relic is CouponsRelic:
 		var coupons_relic := relic as CouponsRelic

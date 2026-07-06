@@ -35,6 +35,7 @@ const PIP_POSITIONS := [
 
 var _pips: Array[TextureRect] = []
 var _active := false
+var _lit_colors := {}
 
 
 func _ready() -> void:
@@ -100,9 +101,38 @@ func activate() -> void:
 func _on_flame_wheel_changed(colors: Array) -> void:
 	for i in _pips.size():
 		var lit := colors.has(i)
+		var was_lit: bool = _lit_colors.has(i)
 		_pips[i].visible = lit
-		_pips[i].modulate = ACTIVE_MODULATES[i] if lit else Color(1, 1, 1, 0)
+		if lit and not was_lit:
+			_flash_pip(i)
+		elif lit:
+			_pips[i].modulate = ACTIVE_MODULATES[i]
+		else:
+			_pips[i].modulate = Color(1, 1, 1, 0)
+
+	_lit_colors.clear()
+	for color in colors:
+		_lit_colors[color] = true
 	visible = _active
+
+
+# 新点亮的色珠：放大回落 + 从高亮闪到常态，让"这张魔焰加了色"看得见。
+func _flash_pip(index: int) -> void:
+	var pip := _pips[index]
+	var target: Color = ACTIVE_MODULATES[index]
+	pip.pivot_offset = GLOW_SIZE * 0.5
+	pip.scale = Vector2.ONE * 1.7
+	pip.modulate = Color(
+		minf(target.r * 2.2 + 0.4, 3.0),
+		minf(target.g * 2.2 + 0.4, 3.0),
+		minf(target.b * 2.2 + 0.4, 3.0),
+		1.0
+	)
+	var tween := pip.create_tween().set_parallel(true)
+	tween.tween_property(pip, "scale", Vector2.ONE, 0.46) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(pip, "modulate", target, 0.55) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
 func _exit_tree() -> void:

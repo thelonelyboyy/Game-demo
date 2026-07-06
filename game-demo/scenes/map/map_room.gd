@@ -112,6 +112,7 @@ func activate() -> void:
 		return
 
 	room.selected = true
+	GameSfx.play(GameSfx.MAP_SELECT, -4.0)
 	clicked.emit(room)
 	_refresh_visual_state()
 	queue_redraw()

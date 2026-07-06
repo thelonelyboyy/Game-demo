@@ -16,7 +16,13 @@ func enter() -> void:
 
 
 func on_gui_input(event: InputEvent) -> void:
-	if not card_ui.playable or card_ui.disabled:
+	if card_ui.disabled:
+		return
+
+	if not card_ui.playable:
+		# 费用不够时点牌：摇头 + 费用闪红，代替无反应。
+		if mouse_over_card and event.is_action_pressed("left_mouse"):
+			card_ui.shake_unplayable()
 		return
 
 	if mouse_over_card and event.is_action_pressed("left_mouse"):

@@ -3,6 +3,8 @@ extends Control
 const CHAR_SELECTOR_SCENE := preload("res://scenes/ui/character_selector.tscn")
 const RUN_SCENE = preload("res://scenes/run/run.tscn")
 const MENU_BACKGROUND := preload("res://art/backgrounds/background1.png")
+# 主菜单 BGM：暗黑氛围曲（CC0，已带循环导入）。
+const MENU_MUSIC := preload("res://art/audio/dark_theme_jaggedstone.ogg")
 
 const OUTER_FRAME_TEXTURE := preload("res://assets/ui/generated/decorations/main_menu_outer_frame_9slice.png")
 const CENTER_PANEL_TEXTURE := preload("res://assets/ui/generated/panels/main_menu_center_panel_9slice.png")
@@ -44,10 +46,17 @@ const MENU_PANEL_Y_OFFSET := 26.0
 
 func _ready() -> void:
 	get_tree().paused = false
+	InkTheme.animate_screen_entrance(self, 0.5)
+	MusicPlayer.play(MENU_MUSIC, true)
 	_polish_scene()
 	get_viewport().size_changed.connect(_apply_layout)
 	var has_save := SaveGame.load_data() != null
 	continue_button.disabled = not has_save
+	# 菜单按钮错落浮现。
+	for child in menu_vbox.get_children():
+		var control := child as Control
+		if control:
+			InkTheme.animate_item_entrance(control, 0.07)
 
 
 func _on_continue_pressed() -> void:

@@ -46,6 +46,7 @@ var card_rarity_weights := {
 
 
 func _ready() -> void:
+	InkTheme.animate_screen_entrance(self)
 	_apply_visuals()
 	for node: Node in rewards.get_children():
 		node.queue_free()

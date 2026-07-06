@@ -27,10 +27,31 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+func open() -> void:
+	_pause()
+
+
 func _pause() -> void:
 	show()
 	get_tree().paused = true
 	back_to_game_button.grab_focus()
+	_animate_open.call_deferred()
+
+
+# 开启动画：树已暂停，tween 需 TWEEN_PAUSE_PROCESS。
+func _animate_open() -> void:
+	if not panel:
+		return
+	panel.pivot_offset = panel.size * 0.5
+	panel.scale = Vector2.ONE * 0.9
+	panel.modulate = Color(1, 1, 1, 0.0)
+	var tween := create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.set_parallel(true)
+	tween.tween_property(panel, "modulate:a", 1.0, 0.20) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(panel, "scale", Vector2.ONE, 0.28) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _unpause() -> void:

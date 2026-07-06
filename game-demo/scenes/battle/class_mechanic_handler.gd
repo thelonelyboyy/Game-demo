@@ -40,6 +40,7 @@ var enemy_handler: EnemyHandler
 var _sha_qi_connected := false
 var _heavenly_active := false           # 本回合处于天魔降世（×3）
 var _heavenly_penalty_pending := false  # 下回合开始结算代价
+var _last_sha_tier := 0                 # 上次广播的煞气档位，变化时发 sha_qi_tier_changed
 var _flame_wheel := {}                  # 本回合焰轮里的魔焰颜色集合
 var _flame_damage_bonus := 0            # 本回合魔焰共鸣伤害加成（黄·狂烬累加，回合切换清空）
 var _last_flame_color := -1
@@ -374,6 +375,18 @@ func _update_sha_qi_modifiers() -> void:
 		mult = 1.0  # ×2
 	_mv_dealt_mult.percent_value = mult
 	_mv_taken_mult.percent_value = mult
+
+	# 档位变化广播给战斗 UI 做阈值演出（气场染色 / 横幅）。
+	var tier := 0
+	if _heavenly_active:
+		tier = 3
+	elif sha >= SHA_QI_DOUBLE_THRESHOLD:
+		tier = 2
+	elif sha >= SHA_QI_FLAT_THRESHOLD:
+		tier = 1
+	if tier != _last_sha_tier:
+		_last_sha_tier = tier
+		Events.sha_qi_tier_changed.emit(tier, sha)
 
 
 func flame_other_color_count(color: int) -> int:

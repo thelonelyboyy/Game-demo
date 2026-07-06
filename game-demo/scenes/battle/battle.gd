@@ -10,6 +10,11 @@ const BATTLE_BACKDROP_TINT := Color(0.32, 0.44, 0.70, 1.0)
 const BATTLE_NIGHT_WASH := Color(0.015, 0.035, 0.085, 0.36)
 const BATTLE_BOTTOM_SHADE := Color(0.0, 0.0, 0.0, 0.22)
 const PLAYER_SCREEN_ANCHOR := Vector2(0.83, 0.78)
+# 战斗 BGM（CC0，来源见 art/audio/collected_dark_roguelike/THIRD_PARTY_AUDIO.md）：
+# 普通/精英=紧张管弦，Boss=交响金属循环。两者 .import 已开循环。
+const MUSIC_BATTLE_NORMAL := preload("res://art/audio/battle_theme_normal.mp3")
+const MUSIC_BATTLE_BOSS := preload("res://art/audio/battle_theme_boss.wav")
+const BOSS_MUSIC_IDS := ["bone_dragon", "black_lotus_matriarch", "sky_palace_guardian", "abyssal_sword_soul", "eclipse_tyrant"]
 const ENEMY_SINGLE_SCREEN_ANCHOR := Vector2(0.50, 0.31)
 const ENEMY_ROW_START_RATIO := 0.42
 const ENEMY_ROW_END_RATIO := 0.58
@@ -48,12 +53,12 @@ func start_battle() -> void:
 	get_tree().paused = false
 	battle_active = false
 	victory_resolving = false
-	MusicPlayer.play(music, true)
-	
+
 	battle_ui.char_stats = char_stats
 	player.stats = char_stats
 	player_handler.relics = relics
 	enemy_handler.setup_enemies(battle_stats)
+	_play_battle_music()
 	_arrange_combatants()
 	_setup_spirit_root_handler()
 	_setup_class_mechanic_handler()
@@ -65,6 +70,17 @@ func start_battle() -> void:
 		relics.relics_activated.connect(_on_relics_activated)
 	battle_active = true
 	relics.activate_relics_by_type(Relic.Type.START_OF_COMBAT)
+
+
+# 敌群含 Boss 时切 Boss 曲，否则用普通战斗曲；旧的 music 导出字段保留作兜底。
+func _play_battle_music() -> void:
+	var stream: AudioStream = MUSIC_BATTLE_NORMAL if MUSIC_BATTLE_NORMAL else music
+	for child: Node in enemy_handler.get_children():
+		var enemy := child as Enemy
+		if enemy and enemy.stats and BOSS_MUSIC_IDS.has(enemy.stats.id):
+			stream = MUSIC_BATTLE_BOSS
+			break
+	MusicPlayer.play(stream, true)
 
 
 func _on_enemies_child_order_changed() -> void:

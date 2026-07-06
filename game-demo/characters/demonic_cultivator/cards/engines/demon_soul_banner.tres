@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="CultivationCard" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=9 format=3 uid="uid://dkykhypfngyqn"]
 
-[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_soul_banner.png" id="2"]
-[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_status_effect.gd" id="4"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="5"]
+[ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dgnwvhnadlq6n" path="res://art/cards/demonic_cultivator/ai/demon_soul_banner.png" id="2"]
+[ext_resource type="AudioStream" uid="uid://cnqve7dtqjghp" path="res://art/audio/true_strength.ogg" id="3"]
+[ext_resource type="Script" uid="uid://dpgu18d4ll1s7" path="res://custom_resources/effects/configured_status_effect.gd" id="4"]
+[ext_resource type="Script" uid="uid://37ewyomluh2u" path="res://custom_resources/effects/configured_draw_effect.gd" id="5"]
 [ext_resource type="Resource" path="res://statuses/soul_mark.tres" id="6"]
 
 [sub_resource type="Resource" id="E1"]

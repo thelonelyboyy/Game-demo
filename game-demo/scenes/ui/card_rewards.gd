@@ -19,17 +19,29 @@ func _ready() -> void:
 	_apply_visuals()
 	_clear_rewards()
 	
-	take_button.pressed.connect(
-		func(): 
-			card_reward_selected.emit(selected_card)
-			queue_free()
-	)
+	take_button.pressed.connect(_on_take_button_pressed)
 	
 	skip_card_reward.pressed.connect(
 		func(): 
 			card_reward_selected.emit(null)
 			queue_free()
 	)
+
+
+func _on_take_button_pressed() -> void:
+	# 领取动画：选中的卡从当前位置飞向顶栏总牌库（run.gd 统一处理该信号）。
+	if selected_card:
+		Events.card_acquired_animation_requested.emit(selected_card, _selected_card_global_center())
+	card_reward_selected.emit(selected_card)
+	queue_free()
+
+
+func _selected_card_global_center() -> Vector2:
+	for child in cards.get_children():
+		var menu := child as CardMenuUI
+		if menu and menu.card == selected_card:
+			return menu.get_global_rect().get_center()
+	return get_global_rect().get_center()
 
 
 func _input(event: InputEvent) -> void:

@@ -9,6 +9,7 @@ const SHOP_SCENE := preload("res://scenes/shop/shop.tscn")
 const TREASURE_SCENE = preload("res://scenes/treasure/treasure.tscn")
 const WIN_SCREEN_SCENE := preload("res://scenes/win_screen/win_screen.tscn")
 const SPIRIT_ROOT_BADGE_SCENE := preload("res://scenes/ui/spirit_root_badge.tscn")
+const CARD_VISUALS_SCENE := preload("res://scenes/ui/card_visuals.tscn")
 const DEBUG_CONSOLE := preload("res://scenes/debug/debug_console.gd")
 const DEMONIC_HEAD_ICON := preload("res://art/characters/demonic_cultivator_head_icon.png")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
@@ -471,6 +472,8 @@ func _setup_event_connections() -> void:
 	Events.treasure_room_exited.connect(_on_treasure_room_exited)
 	Events.event_room_exited.connect(_show_map)
 	Events.blessing_exited.connect(_show_map)
+	if not Events.card_acquired_animation_requested.is_connected(_on_card_acquired_animation):
+		Events.card_acquired_animation_requested.connect(_on_card_acquired_animation)
 	
 	battle_button.pressed.connect(_change_view.bind(BATTLE_SCENE))
 	campfire_button.pressed.connect(_change_view.bind(CAMPFIRE_SCENE))
@@ -478,6 +481,47 @@ func _setup_event_connections() -> void:
 	rewards_button.pressed.connect(_change_view.bind(BATTLE_REWARD_SCENE))
 	shop_button.pressed.connect(_change_view.bind(SHOP_SCENE))
 	treasure_button.pressed.connect(_change_view.bind(TREASURE_SCENE))
+
+
+# 获得新卡（商店购买等）：幽灵卡从来源位置飞向顶栏总牌库按钮 + 计数 punch。
+func _on_card_acquired_animation(card: Card, from_global_center: Vector2) -> void:
+	if not card or not deck_button or not is_inside_tree():
+		return
+
+	var layer := get_node_or_null("DeckViewLayer") as CanvasLayer
+	if not layer:
+		return
+
+	var ghost := CARD_VISUALS_SCENE.instantiate() as CardVisuals
+	ghost.name = "AcquiredCardGhost"
+	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var ghost_size := Vector2(224, 322)
+	ghost.size = ghost_size
+	ghost.pivot_offset = ghost_size * 0.5
+	ghost.scale = Vector2.ONE * 0.72
+	layer.add_child(ghost)
+	ghost.card = card
+	ghost.position = from_global_center - ghost_size * 0.5
+
+	var target := deck_button.get_global_rect().get_center() - ghost_size * 0.5
+	var tween := ghost.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tween.tween_property(ghost, "position", target, 0.60)
+	tween.tween_property(ghost, "scale", Vector2.ONE * 0.10, 0.60)
+	tween.tween_property(ghost, "rotation_degrees", 16.0, 0.60)
+	tween.tween_property(ghost, "modulate:a", 0.45, 0.60)
+	tween.set_parallel(false)
+	tween.tween_callback(_punch_deck_counter)
+	tween.tween_callback(ghost.queue_free)
+
+
+func _punch_deck_counter() -> void:
+	if not deck_button or not deck_button.counter:
+		return
+	var counter := deck_button.counter
+	counter.pivot_offset = counter.size * 0.5
+	counter.scale = Vector2.ONE * 1.5
+	var tween := counter.create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(counter, "scale", Vector2.ONE, 0.4)
 
 
 func _setup_top_bar():
@@ -784,8 +828,7 @@ func _remove_skill_button() -> void:
 
 
 func _open_pause_menu() -> void:
-	pause_menu.show()
-	get_tree().paused = true
+	pause_menu.open()
 
 
 func _setup_spirit_root_badge() -> void:
@@ -956,6 +999,8 @@ func _on_event_room_entered(room: Room) -> void:
 	event_room.character_stats = character
 	event_room.run_stats = stats
 	event_room.setup()
+	# 事件场景众多且各有 _ready，入场淡入统一在这里做。
+	InkTheme.animate_screen_entrance(event_room)
 
 
 func _on_blessing_room_entered() -> void:

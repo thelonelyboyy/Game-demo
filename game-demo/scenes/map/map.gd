@@ -34,6 +34,33 @@ var tooltip_description: Label
 var tooltip_status: Label
 var tooltip_target: MapRoom
 var focused_map_room: MapRoom
+var player_marker: PlayerMarker
+# 平滑滚动：滚轮改目标值，_process 里插值逼近
+var _scroll_target_y := 0.0
+# 可选路径连线脉冲
+var _pulse_lines: Array[Line2D] = []
+var _pulse_time := 0.0
+# 顶部章节/层数进度
+var progress_panel: PanelContainer
+var progress_label: Label
+
+
+# 「当前位置」标记：金色脉冲光环，落在最后走过的节点上；选新节点时滑过去。
+class PlayerMarker:
+	extends Node2D
+
+	var _time := 0.0
+
+	func _process(delta: float) -> void:
+		_time += delta
+		queue_redraw()
+
+	func _draw() -> void:
+		var pulse := 0.5 + 0.5 * sin(_time * 4.0)
+		var ring_radius := 8.5 + pulse * 1.8
+		draw_arc(Vector2.ZERO, ring_radius, 0.0, TAU, 32, Color(1.0, 0.82, 0.35, 0.50 + 0.35 * pulse), 1.5, true)
+		draw_circle(Vector2.ZERO, 5.0, Color(1.0, 0.75, 0.30, 0.30))
+		draw_circle(Vector2.ZERO, 3.2, Color(1.0, 0.88, 0.52, 0.95))
 
 
 func _ready() -> void:
@@ -46,12 +73,37 @@ func _ready() -> void:
 	camera_2d.offset = get_viewport_rect().size / 2.0
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	_create_tooltip()
+	_create_progress_panel()
 	_update_camera_limits()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if tooltip_panel and tooltip_panel.visible and is_instance_valid(tooltip_target):
 		_position_tooltip(tooltip_target)
+
+	if not visible:
+		return
+
+	# 平滑滚动：向目标值插值逼近。
+	if absf(camera_2d.position.y - _scroll_target_y) > 0.5:
+		camera_2d.position.y = lerpf(camera_2d.position.y, _scroll_target_y, minf(1.0, delta * 10.0))
+
+	# 可选路径连线 + 可选节点的呼吸脉冲。
+	_pulse_time += delta
+	var pulse := 0.5 + 0.5 * sin(_pulse_time * 3.0)
+	for line in _pulse_lines:
+		if is_instance_valid(line):
+			var base_alpha: float = line.get_meta("base_alpha", 0.9)
+			line.default_color.a = base_alpha * (0.62 + 0.38 * pulse)
+	for child: Node in rooms.get_children():
+		var map_room := child as MapRoom
+		if not map_room:
+			continue
+		if map_room.available:
+			var glow := 1.0 + 0.14 * pulse
+			map_room.modulate = Color(glow, glow, glow * 0.97, 1.0)
+		elif map_room.modulate != Color.WHITE:
+			map_room.modulate = Color.WHITE
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -72,17 +124,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	if event.is_action_pressed("scroll_up"):
-		camera_2d.position.y -= SCROLL_SPEED * MAP_VISUAL_SCALE
+		_scroll_target_y -= SCROLL_SPEED * MAP_VISUAL_SCALE * 2.4
 	elif event.is_action_pressed("scroll_down"):
-		camera_2d.position.y += SCROLL_SPEED * MAP_VISUAL_SCALE
+		_scroll_target_y += SCROLL_SPEED * MAP_VISUAL_SCALE * 2.4
 
-	_clamp_camera_position()
+	_scroll_target_y = clampf(_scroll_target_y, camera_min_y, camera_max_y)
 
 
 func generate_new_map(chapter: int = 1) -> void:
 	floors_climbed = 0
 	last_room = null
 	camera_2d.position = Vector2.ZERO
+	_scroll_target_y = 0.0
 	map_generator.current_chapter = chapter
 	map_data = map_generator.generate_map()
 	create_map()
@@ -119,6 +172,70 @@ func create_map() -> void:
 	var content_width := MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1)
 	var content_height := MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0)
 	_layout_map_visuals(content_width, content_height)
+	_ensure_player_marker()
+	_animate_map_entrance()
+	_update_progress_label()
+
+
+# 开图演出：节点自下而上按层错落浮现，连线整体淡入。
+# 只在 create_map（新章/读档）时触发，回到地图不重播。
+func _animate_map_entrance() -> void:
+	lines.modulate = Color(1, 1, 1, 0.0)
+	var lines_tween := lines.create_tween()
+	lines_tween.tween_property(lines, "modulate:a", 1.0, 0.7) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+	for child: Node in rooms.get_children():
+		var map_room := child as MapRoom
+		if not map_room or not map_room.room:
+			continue
+		var delay := 0.05 * map_room.room.row + 0.015 * map_room.room.column
+		map_room.scale = Vector2.ZERO
+		var tween := map_room.create_tween()
+		tween.tween_interval(delay)
+		tween.tween_property(map_room, "scale", Vector2.ONE, 0.38) \
+				.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+func _ensure_player_marker() -> void:
+	if is_instance_valid(player_marker):
+		player_marker.queue_free()
+
+	player_marker = PlayerMarker.new()
+	player_marker.name = "PlayerMarker"
+	player_marker.z_index = 25
+	rooms.get_parent().add_child(player_marker)
+
+	if last_room:
+		player_marker.position = rooms.position + last_room.position
+		player_marker.show()
+	else:
+		player_marker.hide()
+
+
+func _move_player_marker(room: Room) -> void:
+	if not is_instance_valid(player_marker) or not room:
+		return
+
+	var target := rooms.position + room.position
+	if not player_marker.visible:
+		# 本章第一次选点：原地弹出，没有旅程可走。
+		player_marker.position = target
+		player_marker.scale = Vector2.ONE * 1.7
+		player_marker.show()
+		var pop := player_marker.create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		pop.tween_property(player_marker, "scale", Vector2.ONE, 0.4)
+		return
+
+	# 在节点 select 动画窗口内滑过去，带一个小跳跃感。
+	var tween := player_marker.create_tween()
+	tween.tween_property(player_marker, "position", target, 0.65) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	var hop := player_marker.create_tween()
+	hop.tween_property(player_marker, "scale", Vector2.ONE * 1.4, 0.33) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	hop.tween_property(player_marker, "scale", Vector2.ONE, 0.33) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 
 
 func unlock_floor(which_floor: int = floors_climbed) -> void:
@@ -155,6 +272,9 @@ func _unlock_all_rooms() -> void:
 func show_map() -> void:
 	show()
 	camera_2d.enabled = true
+	_update_progress_label()
+	if progress_panel:
+		progress_panel.show()
 
 
 func hide_map() -> void:
@@ -162,6 +282,49 @@ func hide_map() -> void:
 	camera_2d.enabled = false
 	_hide_tooltip()
 	_set_focused_map_room(null)
+	if progress_panel:
+		progress_panel.hide()
+
+
+# 顶部「第X章 · 已登 Y / Z 层」进度牌（挂在 tooltip 同一 CanvasLayer，随地图显隐）。
+func _create_progress_panel() -> void:
+	progress_panel = PanelContainer.new()
+	progress_panel.name = "MapProgressPanel"
+	progress_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_panel.add_theme_stylebox_override("panel", _make_tooltip_style())
+	progress_panel.anchor_left = 0.5
+	progress_panel.anchor_right = 0.5
+	progress_panel.offset_left = -130.0
+	progress_panel.offset_right = 130.0
+	progress_panel.offset_top = 100.0
+	progress_panel.offset_bottom = 142.0
+	progress_panel.hide()
+	tooltip_layer.add_child(progress_panel)
+
+	progress_label = Label.new()
+	progress_label.name = "ProgressLabel"
+	progress_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	progress_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	progress_label.add_theme_font_size_override("font_size", 21)
+	progress_label.add_theme_color_override("font_color", Color("f2dfae"))
+	progress_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
+	progress_label.add_theme_constant_override("shadow_offset_x", 2)
+	progress_label.add_theme_constant_override("shadow_offset_y", 2)
+	progress_panel.add_child(progress_label)
+
+
+func _update_progress_label() -> void:
+	if not progress_label:
+		return
+
+	var chapter_names := ["一", "二", "三"]
+	var chapter: int = clampi(map_generator.current_chapter, 1, chapter_names.size())
+	progress_label.text = "第%s章 · 已登 %d / %d 层" % [
+		chapter_names[chapter - 1],
+		clampi(floors_climbed, 0, get_floor_count()),
+		get_floor_count(),
+	]
 
 
 func _spawn_room(room: Room) -> void:
@@ -198,6 +361,7 @@ func _on_map_room_clicked(room: Room) -> void:
 		if map_room.room.row == room.row:
 			map_room.available = false
 
+	_move_player_marker(room)
 	_update_line_states()
 
 
@@ -209,6 +373,7 @@ func _on_map_room_selected(room: Room) -> void:
 	else:
 		floors_climbed += 1
 	_update_line_states()
+	_update_progress_label()
 	Events.map_exited.emit(room)
 
 
@@ -273,6 +438,7 @@ func _update_camera_limits() -> void:
 
 func _clamp_camera_position() -> void:
 	camera_2d.position.y = clamp(camera_2d.position.y, camera_min_y, camera_max_y)
+	_scroll_target_y = clampf(_scroll_target_y, camera_min_y, camera_max_y)
 
 
 func _on_viewport_size_changed() -> void:
@@ -321,6 +487,7 @@ func _layout_scroll_board(content_width: float, content_height: float, viewport_
 
 
 func _update_line_states() -> void:
+	_pulse_lines.clear()
 	for line: Line2D in lines.get_children():
 		var from_room := line.get_meta("from_room") as Room
 		var to_room := line.get_meta("to_room") as Room
@@ -329,8 +496,10 @@ func _update_line_states() -> void:
 			_style_map_line(line, "selected")
 		elif last_room and from_room == last_room and last_room.next_rooms.has(to_room):
 			_style_map_line(line, "available")
+			_pulse_lines.append(line)
 		elif _is_room_available(from_room):
 			_style_map_line(line, "available")
+			_pulse_lines.append(line)
 		else:
 			_style_map_line(line, "normal")
 
@@ -338,11 +507,14 @@ func _update_line_states() -> void:
 func _style_map_line(line: Line2D, state: String) -> void:
 	match state:
 		"selected":
-			line.width = 4.0
-			line.default_color = Color(0.22, 0.16, 0.10, 0.96)
+			# 走过的路：染金发光，一眼读出来时的轨迹。
+			line.width = 4.6
+			line.default_color = Color(0.88, 0.68, 0.30, 0.95)
 		"available":
-			line.width = 3.8
-			line.default_color = Color(0.15, 0.13, 0.23, 0.92)
+			# 可选去向：暖亮色，_process 里做呼吸脉冲。
+			line.width = 4.0
+			line.default_color = Color(0.80, 0.74, 0.52, 0.90)
+			line.set_meta("base_alpha", 0.90)
 		_:
 			line.width = 3.4
 			line.default_color = Color(0.13, 0.12, 0.18, 0.78)

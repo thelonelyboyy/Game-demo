@@ -14,9 +14,9 @@ func setup_enemies(battle_stats: BattleStats) -> void:
 	if not battle_stats:
 		return
 	
-	for enemy: Enemy in get_children():
-		remove_child(enemy)
-		enemy.queue_free()
+	for child in get_children():
+		remove_child(child)
+		child.queue_free()
 	
 	var all_new_enemies := battle_stats.enemies.instantiate()
 	
@@ -45,23 +45,30 @@ func _apply_battle_modifiers(enemy: Enemy, battle_stats: BattleStats) -> void:
 
 
 func reset_enemy_actions() -> void:
-	for enemy: Enemy in get_children():
+	for enemy: Enemy in get_live_enemies():
 		enemy.current_action = null
 		enemy.update_action()
 
 
 func start_turn() -> void:
-	if get_child_count() == 0:
+	var enemies := get_live_enemies()
+	if enemies.is_empty():
 		return
 	
 	acting_enemies.clear()
-	for enemy: Enemy in get_children():
+	for enemy: Enemy in enemies:
 		acting_enemies.append(enemy)
 
 	_start_next_enemy_turn()
 
 
 func _start_next_enemy_turn() -> void:
+	while not acting_enemies.is_empty() and (
+			not is_instance_valid(acting_enemies[0])
+			or acting_enemies[0].is_queued_for_deletion()
+	):
+		acting_enemies.pop_front()
+
 	if acting_enemies.is_empty():
 		Events.enemy_turn_ended.emit()
 		return
@@ -91,5 +98,14 @@ func _on_enemy_action_completed(enemy: Enemy) -> void:
 
 
 func _on_player_hand_drawn() -> void:
-	for enemy: Enemy in get_children():
+	for enemy: Enemy in get_live_enemies():
 		enemy.update_intent()
+
+
+func get_live_enemies() -> Array[Enemy]:
+	var enemies: Array[Enemy] = []
+	for child in get_children():
+		var enemy := child as Enemy
+		if enemy and not enemy.is_queued_for_deletion():
+			enemies.append(enemy)
+	return enemies

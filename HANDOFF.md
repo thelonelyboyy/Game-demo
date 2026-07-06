@@ -1,19 +1,20 @@
 ﻿# 万劫求仙项目交接文档
 
-更新时间：2026-07-06
+更新时间：2026-07-07（提交前整理：手感/音频/地图/MCP bugfix）
 项目根目录：`E:\code\game-demo`  
 Godot 工程目录：`E:\code\game-demo\game-demo`  
 Godot 版本：4.5.2 stable mono  
 Godot 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe`
 Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64_console.exe`
 
-## 1. 当前状态（2026-07-06）
+## 1. 当前状态（2026-07-07）
 
 - 稳定运行的杀戮尖塔式修仙卡牌肉鸽 Demo。当前焦点：**把魔修打磨成完整 Demo**。
 - **当前开发策略**：暂时不继续精抠单个 UI，优先把魔修职业做成可完整通关、可调试、可扩展的 Demo 闭环。
 - **Demo 职业范围已收束**：选人界面当前只开放魔修，体修/剑修/驭兽都暂时 disabled；代码和资源仍保留，后续可再恢复。
 - **UI 风格统一已推进一轮**：`InkTheme` 扩展了暗黑修仙通用面板/按钮/标题样式，并已套到战斗奖励、商店、宝箱、祝福、篝火、删牌、升牌、融合、牌堆、胜负面板、暂停菜单、调试控制台、灵根选择等界面。后续新增页面应优先复用 `scenes/ui/ink_theme.gd`，不要各自重新写一套 StyleBox。
 - **事件池临时切换**：旧事件暂时禁用，当前 `event_room_pool.tres` 只开放最近新增的 10 个事件，便于集中验证新事件质量。
+- **地图已切回正式 ROGUELIKE 模式**（2026-07-06）：`map.tscn` `map_mode = 1`，测试线性地图与自由导航已关闭；地图同轮加了走过路径染金、可选节点/连线呼吸、开图错落浮现、章节层数进度牌、平滑滚动与位置标记。
 - **调试控制台已加入**：Run 场景内按 **Ctrl + 反引号** 打开，不再使用 F8（Godot 编辑器里 F8 会直接停止运行）。可增删/升级/融合卡牌，调血量、金币、法宝、丹药，以及编辑下次造成/受到伤害，便于 Demo 调试。
 - **灵根机制已重做**：保留开局三选一与“打击/防御转元素”，新增同元素灵根职业卡、三段成长和圆满专属被动；旧圆满规则已禁用。详见第 4、6 节。
 - **失败遗产已加入**：失败后下一局进地图时，可从上一局获得的法宝中选 1 个替换本命法宝，也可以不替换。
@@ -27,8 +28,10 @@ Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godo
 - **新增「符箓丹药」系统**（可携带一次性消耗品，对标药水）：战斗奖励/商店获取、3 槽位、战斗内/部分战斗外使用。见第 4、6 节。
 - **魔修机制大改**（三系统，引爆倍率 X=3）：阶段1 煞气 ✅、阶段2 魂印引爆 ✅、阶段3 魔焰焰轮 ✅（含 7 色 rider 细化）。见第 4、6 节。
 - 本轮继续追加魔修功法引擎卡、战斗 UI 卡牌化布局、出牌预览动画、战斗总牌组 overlay 修复、符箓丹药伤害修复、选人职业收束与文档更新。
-- `validate_project.py` 现在 **0 error / 0 warning**（2026-07-06 复跑；校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
-- `run_godot_checks.py`：2026-07-01 最近一次用 Godot exe 跑过全量检查，`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过。
+- **战斗手感优化专场已完成（2026-07-06，约 25 项）**：手牌 hover/拖拽/补位、飘字/命中特效/命中停顿、回合横幅/Boss 名牌/煞气阈值演出、抽弃牌飞行、洗牌提示、死亡溶解、金币滚动、地图标记、功法牌演出等全部落地；同轮已补 CC0 音效与战斗/主菜单 BGM。详见第 6 节「战斗手感优化专场」与第 7 节文件地图。
+- **2026-07-07 Godot MCP 修复**：修复 `HitEffect` 被挂进 `EnemyHandler` 后，下一回合 typed 遍历把 `hit_effect.gd` 当 `enemy.gd` 导致崩溃的问题；特效改挂战斗世界层，`EnemyHandler` 遍历统一过滤 `Enemy`。
+- `validate_project.py` 现在 **0 error / 0 warning**（2026-07-07 复跑；校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
+- `run_godot_checks.py`：2026-07-07 最近一次用 Godot exe 跑过全量检查，`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过。
 - **统一 Excel 数值总表**：`game_data.xlsx`（卡牌/祝福/怪物AI 三张数据表 + 说明）——改表回写 `.tres`/`.json`/`.tscn`，一个文件调全部数值平衡（见第 6、7 节）。旧的独立 `cards.xlsx` 已被它取代。
 - 开发路线图见根目录 `ROADMAP.md`。
 
@@ -160,14 +163,105 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 最近检查结果：
 
-- `validate_project.py`：0 error / 0 warning（2026-07-06 最近一次复跑，最近 UI/系统改动后仍保持无校验错误）。
-- `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过（最近一次完整跑通：2026-07-01）。
-- 2026-07-06 针对性复现检查已过：攻击牌出牌预览坐标不再报错；无卡牌来源的攻击符箓/丹药可正常伤害敌人；战斗中打开总牌组会进入独立 `DeckViewLayer`，不再和顶栏 UI 错位。
+- `validate_project.py`：0 error / 0 warning（2026-07-07 最近一次复跑，最近 UI/系统改动后仍保持无校验错误）。
+- `run_godot_checks.py`：`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过（最近一次完整跑通：2026-07-07）。
+- 2026-07-06/07 针对性复现检查已过：攻击牌出牌预览坐标不再报错；无卡牌来源的攻击符箓/丹药可正常伤害敌人；战斗中打开总牌组会进入独立 `DeckViewLayer`，不再和顶栏 UI 错位；敌人受击 `HitEffect` 不再污染 `EnemyHandler`，下一轮 `reset_enemy_actions()` 不再类型崩溃。
 - 战斗 UI 预览：`art/design/run_battle_ui_preview.png` 与 `art/design/battle_ui_preview.png` 可用于人工对照；截图 helper 会临时写 marker，提交/交接前删除 `*_marker.txt`。
 - `run_godot_checks.py` 已改用 UTF-8 解码 Godot 输出，修复了中文 Windows 上的 GBK 解码崩溃。
 - ⚠️ **新增/替换 PNG 后必须在 Godot 编辑器导入一次**（跑上面的 console exe `--editor --quit`），否则会出现「文件在但加载失败 / no loader found」的错误，而 `validate_project.py` 查不出（它只查文件是否存在、查不出"未导入"）。Godot 退出时偶尔有 RID/resource leak 警告；只要没有 `SCRIPT ERROR` / `Parse Error` / `Failed to load script`，通常不是本轮 UI 脚本问题。
 
 ## 6. 最近改动摘要
+
+### 本轮（2026-07-07）MCP 修复与提交前整理
+
+- **修复截图中的 Godot 报错**：`HitEffect.spawn()` 原先把命中特效加到受击敌人的父节点；敌人的父节点是 `EnemyHandler`，导致下一轮 `for enemy: Enemy in get_children()` 把 `HitEffect` 当 `Enemy` 遍历并报 `Trying to assign value of type 'hit_effect.gd' to a variable of type 'enemy.gd'`。
+- **修复方式**：`hit_effect.gd` 新增父节点选择逻辑，遇到 `EnemyHandler` 时把特效挂到其父级战斗世界层；`enemy_handler.gd` 新增 `get_live_enemies()`，重置行动、敌方回合、手牌刷新意图都只遍历真正的 `Enemy`，并清理无效/待删除的 acting enemy。
+- **验证**：`validate_project.py` 与 `run_godot_checks.py` 全量通过；另用临时回归场景验证“敌人受击生成 HitEffect 后再 reset_enemy_actions”通过，临时测试文件已删除。
+- **提交范围提醒**：本次提交包含此前手感/音频/地图/非战斗界面动画/敌人卡图等一整批工作树改动，并删除旧 `cards.xlsx` 与 `game-demo/cards_config.xlsx`；当前数值总表以根目录 `game_data.xlsx` 为准。
+
+### 本轮（2026-07-06）战斗手感优化专场（Claude 完成）
+
+> 一次性落地约 25 项战斗界面手感/反馈优化，随后补上 CC0 音效/BGM 与非战斗界面入场/hover 动效；已通过 `validate_project.py`（0 error）与 `run_godot_checks.py` 全量 smoke。
+
+**新增文件**（均在 `game-demo/scenes/battle/`）：
+
+- `floating_text.gd`（`FloatingCombatText`）：战斗飘字。伤害红 / 格挡蓝"盾 N" / 自损暗红 / 治疗绿。世界节点经 `get_global_transform_with_canvas` 换算画布坐标，飘字挂 `ui_layer` 组（BattleUI），不受世界缩放影响。
+- `hit_pause.gd`（`HitPause`）：命中停顿。实际扣血瞬间 `Engine.time_scale` 压到 0.05 持续 80ms（玩家挨打 120ms），恢复计时器用 `ignore_time_scale`。⚠️ **无头模式直接跳过**——否则会拖慢 smoke 测试里受 time_scale 影响的计时器，曾把 boss-battle 推过 60s 上限。
+- `hit_effect.gd`（`HitEffect`）：命中冲击特效，代码绘制放射冲击线+中心闪光 0.26s。敌人命中橙金、玩家受击红、功法吸收/天魔降世金红。挂战斗世界层（会从 EnemyHandler 逃逸到其父节点），受击者释放不影响播完。
+
+**新增 Events 信号**：`card_discarded`（弃牌动画）、`deck_reshuffled`（洗牌提示）、`sha_qi_tier_changed`（煞气档位演出）、`card_acquired_animation_requested`（购卡飞牌库）。
+
+**手牌/卡牌交互**（`hand.gd`、`card_ui.gd`、`card_states/*`、`card_visuals.gd`）：
+
+- Hover：聚焦响应 0.11s + `TRANS_BACK` 回弹放大，邻牌按距离衰减让位（`NEIGHBOR_PUSH=46`）。
+- 补位：牌数变化的重排用 `TRANS_SPRING` 0.36s（弹簧感）；hover 让位仍走快速 cubic，两者分开。
+- 抽牌从抽牌堆位置飞入（起点由 battle_ui 布局时写入 `hand.draw_origin_global`）；弃牌用 CardVisuals 幽灵卡飞向弃牌堆（不动 CardUI 状态机）。
+- 拖拽惯性：自由拖拽按鼠标横向速度倾斜 ±9°，停下 0.3s 回正。
+- 可打出的卡（我方回合且费用够）带暖金辉光（`card_visuals.playable_glow`，由 `card_ui` 的 `playable`/`disabled` setter 联动）；费用不足点击 → 卡面摇头 + 费用数字闪红。
+- 结束回合按钮在无牌可打时亮度呼吸提示（battle_ui `_update_end_turn_breath`，0.2s 轮询）。
+
+**数值条与信息卡**（`battle_combatant_card.gd`、`mana_ui.gd`）：
+
+- 血条/护体条 0.45s tween 过渡 + 变化闪白/闪蓝 + 标签 punch；有 0.12s 轮询，**只在数值真正变化时启动动画**（diff 检测，重绑定时重置）。
+- 状态图标改签名比对刷新：新词条弹出+淡入、层数变化数字 punch（原先每 0.12s 全量重建，动画活不过一帧）。
+- 敌人意图文本变化（换招）→ 徽章弹跳+闪亮；能量球增减脉冲。
+
+**打击感**（`enemy.gd`、`player.gd`）：
+
+- 伤害落地按当前护体拆成"扣血红字 + 格挡蓝字"两条飘字；治疗经 `update_stats` 血量增量检测统一挂绿字（丹药/摄魂续元/木灵根/敌人疗愈全覆盖）；DoT（魂印灼烧/流血）走 `DamageEffect→take_damage`，飘字天然覆盖。
+- 玩家受击：命中停顿 0.09s + 自身震动 + 战场根节点微震（敌人原有白闪+震动保留）。
+- 敌人死亡溶解：染红压扁下沉淡出 0.62s 再发 `enemy_died`/释放；溶解中关碰撞、藏意图，`do_turn` 有 `_dying` 守卫。⚠️ 若再放慢需注意 boss_battle_smoke 击杀后只等 1.0s 就断言胜利面板。
+
+**演出**（`battle_ui.gd`、`battle_over_panel.gd`、`flame_wheel_ui.gd`、`card_target_selector.gd`）：
+
+- 敌我回合切换中央横幅（金「我方回合」/红「敌方回合」）+ 回合徽章脉冲；Boss 战开场延迟 1.45s 显示 Boss 名牌（`BOSS_IDS` 与 enemy.gd Boss 名单一致，紫色、停留 1.6s）。
+- 煞气阈值演出：`class_mechanic_handler` 档位(0-3)变化发 `sha_qi_tier_changed`；升档弹横幅（凝聚/翻涌/天魔降世），玩家立绘按档位渐进染红（常驻气场），天魔降世附带战场震动+红色爆发。
+- 瞄准锁定：锁定敌人时弧线/箭头红→亮金渐变+箭头 pop；目标四角框回弹收拢+呼吸脉冲。
+- 焰轮新点亮色珠 1.7 倍放大回落+高亮闪烁（黑色魔焰有提亮兜底）。
+- 功法（POWER）牌出牌演出：中央悬停后化金光飞向角色融入+金色爆发，与普通牌"上浮淡出"区分。
+- 弃牌堆洗回抽牌堆：幽灵卡背错落飞向抽牌堆+计数 punch（原先是无提示暗改）。
+- 胜负面板入场：淡入+标题回弹（树已暂停，tween 用 `TWEEN_PAUSE_PROCESS`）。
+
+**战斗外**（`gold_ui.gd`、`run.gd`、`shop_card.gd`、`map.gd`）：
+
+- 顶栏金币数字滚动（0.5s）+ 加钱闪金/花钱闪红，覆盖奖励/商店/事件；首次同步不滚。
+- 商店购卡：幽灵卡从卡位飞向顶栏总牌库按钮（`DeckViewLayer`）+ 牌库计数 punch。
+- 地图「当前位置」标记：`map.gd` 内部类 `PlayerMarker`（金色脉冲光环），落在最后走过的节点；点击新节点在 select 动画窗口内滑过去，本章首选原地弹出。
+
+**调参入口**：各文件顶部常量——`hand.gd`（hover/让位/弹簧时长）、`floating_text.gd`（颜色/时长/字号）、`hit_pause.gd`（停顿时长/倍率）、`hit_effect.gd`（寿命/半径）、`battle_ui.gd`（横幅颜色/停留、辉光在 `card_visuals.gd` alpha 0.20）。
+
+**节奏基线（2026-07-06 第二轮）**：试玩反馈"动画偏快"，已全局放慢约 35%（手牌布局 0.24s / 补位弹簧 0.48s / 飘字全程 ~1.05s / 命中特效 0.36s / 横幅停留 0.8s / 死亡溶解 0.62s / 金币滚动 0.7s 等）。再调快/慢按同比例缩放这批常量即可。
+
+**第三轮补充（同日）**：
+
+- **敌人攻击特效**（`enemy.gd _play_attack_telegraph`）：出攻击类意图（ATTACK/MULTI_ATTACK/ATTACK_DEFEND）的瞬间在其信息卡位置闪红色冲击特效。⚠️ 曾做过"位置突进前摇"但**无效**——当前战斗 UI 每帧隐藏世界立绘（`battle_ui._hide_legacy_combatant_overlays`），战斗单位只显示为信息卡，移动世界节点看不见；给战斗单位加表现一律作用到信息卡或经画布坐标锚定。
+- **世界节点对齐信息卡（重要修复）**：`battle_ui._align_world_combatants`——布局后把敌人/玩家的世界 Area2D 移到各自信息卡中心（画布坐标反变换），碰撞体与四角选中框放大到卡尺寸（`enemy.align_feedback_to_card`），飘字/特效锚点走 `aligned_feedback_extents`。修掉了"选中框和怪物位置对不上（多怪更明显）"的 bug；新增战斗内世界定位逻辑时**必须**考虑这层对齐。
+- **飘字再放慢一倍**（试玩反馈）：`floating_text.gd` 弹出 0.38 / 停留 0.76 / 淡出 0.96（全程 ~2.1s），`hit_effect.gd` 寿命 0.55。
+- **煞气常驻徽章**：玩家信息卡顶上方常驻「煞气 N」徽章（`battle_combatant_card._refresh_sha_badge`，0 层隐藏，按 3/6/10 档位变色发光、层数变化 punch）；档位气场染色改为染**信息卡立绘**（`set_aura_tint`，世界立绘隐藏染了白染）；档位横幅停留加长（升档 1.6s / 天魔降世 2.4s）。
+
+**音频接入（同日，全部 CC0）**：
+
+- **音效库** `global/game_sfx.gd`（`GameSfx` 静态类）：从 `art/audio/collected_dark_roguelike/` 精选 CC0 素材（来源/授权见该目录 `THIRD_PARTY_AUDIO.md`，CC-BY 素材刻意未用，零署名义务）。变体用 `randi` 随机——**不走 RNG autoload**，避免音效消耗存档种子影响战斗复现。`sound_player.gd play()` 新增 `volume_db` 参数。
+- **挂点**：抽牌 card-slide×4 / 出牌 playcard / 弃牌 card-shove×4(-10dB) / 洗牌 shuffle / 结束回合 Passturn / 费用不足 error / 敌人受击 hit×4 / 玩家受击 slam×3 / 格挡 metal×3 / 敌人攻击挥砍 swish×3 / 敌人死亡 creature_die / 治疗 spell_01 / 功法吸收 spell_02 / 金币 item_coins×4 / 煞气升档锣 gong_01（天魔降世 gong_02）/ Boss 名牌钟 bell_03 / 地图选点 paper_01。
+- **战斗 BGM**（`battle.gd _play_battle_music`）：普通/精英=`art/audio/battle_theme_normal.mp3`（Wolfgang_ Battle Theme，CC0），Boss（按敌群 id 检测）=`art/audio/battle_theme_boss.wav`（nene Boss Battle #2 Symphonic Metal，CC0）。两文件是从收集目录复制的干净命名副本（原 boss 文件名带 `#`，res:// 路径风险），`.import` 已开循环（mp3 `loop=true` / wav `edit/loop_mode=1`）。旧 `music` 导出字段保留作兜底。
+- **音量基线**：BGM 原音量、SFX 按挂点 -2~-10dB（高频事件更低）。整体混音未精调，实际试玩后按需在 `GameSfx.play` 调用点改 dB。
+
+**非战斗界面统一优化（同日）**：
+
+- **全局按钮音**：`InkTheme.apply_screen_button` 自动给按钮挂 hover(tap -14dB)/点击(card-place -8dB)音，meta 标记幂等——所有走该函数的界面（主菜单/商店/奖励/篝火/祝福/暂停菜单/胜负面板/删升融牌等）一次覆盖，disabled 按钮不响。战斗蓝按钮（`apply_battle_blue_button`）未挂，结束回合有自己的音。
+- **界面入场淡入**：新增 `InkTheme.animate_screen_entrance(root, duration)`，已应用：商店/战斗奖励/宝箱/篝火/祝福/胜利/图鉴（0.3s）、牌堆查看（0.2s）、主菜单（0.5s）。新界面记得加一行。
+- **场景音**：宝箱开启=木箱开+宝石；篝火休整=治疗音、升级卡=书页；商店三类购买=铜钱（花钱侧，金币 UI 只响加钱侧）。
+- **主菜单 BGM**：`dark_theme_jaggedstone.ogg`（CC0、循环）在 main_menu._ready 播放；进战斗被战斗曲替换，回主菜单再切回。地图/商店暂无独立 BGM（战斗曲会延续），备选 `vampires_piano_tad_cc0.mp3`（CC0）适合商店/营火，待定。
+
+**非战斗界面视觉优化（同日第二批）**：
+
+- **CardMenuUI 通用交互**（`card_menu_ui.gd`）：hover 浮起（scale 1.05 + z_index 抬高防邻卡遮挡）+ 错落 pop-in 入场（按容器下标延迟，封顶 20 个；先隐身等布局完成再弹，pivot 才正确）。商店卡/奖励三选一/牌堆网格/删牌/升牌/融合全部界面一次覆盖。
+- **列表项错落淡入 helper**：`InkTheme.animate_item_entrance(item, stagger)`——已应用：奖励按钮（reward_button，含宝箱二选一）、商店三类货架（shop_card/relic/potion）、主菜单按钮。
+- **选卡奖励飞向牌库**：`card_rewards.gd` 领取时发 `card_acquired_animation_requested`（从选中卡的位置起飞），与商店购卡共用 run.gd 的幽灵卡动画。
+- **暂停菜单开启动画**：`pause_menu.gd` 新增 `open()`（run.gd 设置按钮已改走它），面板缩放回弹+淡入，tween 用 `TWEEN_PAUSE_PROCESS`。
+- **事件界面淡入**：事件场景众多且各有 `_ready`，统一在 `run.gd._on_event_room_entered` 里做 `animate_screen_entrance`。
+- **地图视觉五连**（`map.gd`）：①走过的连线染金（"selected"态）、可选连线暖亮+呼吸脉冲（`_pulse_lines`）；②可选节点根节点 modulate 呼吸发光（与 AnimationPlayer 的 Visuals 子节点动画不冲突）；③开图演出——节点按层错落浮现（`_animate_map_entrance`，仅 create_map 时播，回图不重播）、连线淡入；④顶部「第X章 · 已登 Y/Z 层」进度牌（`progress_panel`，挂 tooltip 层，随地图显隐）；⑤滚轮平滑滚动（`_scroll_target_y` 目标值 + _process 插值，步长 ×2.4）。
+- **测试地图已关**：`map.tscn` 的 `map_mode` 从 2（TEST_ELITE_LINEAR）改回 **1（ROGUELIKE）**，`free_navigation` 随之关闭，正式随机地图生效。要再进测试地图改回 0/2 即可。
 
 ### 本轮（2026-07-06）魔修 Demo 收束、战斗 UI 与交互修复
 
@@ -391,7 +485,8 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - `game-demo/scenes/player/player.gd` 与 `game-demo/scenes/enemy/enemy.gd`：玩家/敌人立绘、帧动画、受击/死亡表现、旧血条 overlay 显隐、伤害文字时序。
 - `game-demo/scenes/ui/ink_theme.gd`：暗黑修仙通用 StyleBox、按钮、面板、标题底板工具。新面板先复用这里，避免每个页面继续长出自己的皮肤。
 - 战斗 UI 资产重点目录：`game-demo/art/ui/battle_cards/`、`game-demo/art/ui/battle_widgets/`、`game-demo/assets/ui/generated/battle/`、`game-demo/art/design/run_battle_ui_preview.png`、`game-demo/art/design/battle_ui_preview.png`。
-- 给 Claude 的手感优化建议：优先处理 tween/easing、hover/drag inertia、目标吸附反馈、出牌悬停节奏、命中停顿、轻量屏幕震动、音效钩子和伤害数字节奏；在 UI 手感稳定前不要改卡牌数值、战斗结算或存档结构。
+- **手感优化已完成一轮（2026-07-06，见第 6 节「战斗手感优化专场」）**：tween/easing、hover/drag inertia、目标吸附反馈、命中停顿、屏幕震动、伤害数字等约 25 项已落地。新增 `game-demo/scenes/battle/floating_text.gd` / `hit_pause.gd` / `hit_effect.gd` 三个手感组件，新增 4 个 Events 信号（`card_discarded`/`deck_reshuffled`/`sha_qi_tier_changed`/`card_acquired_animation_requested`）。音效/BGM 已接入，下一步重点是实际试玩混音与节奏微调。
+- ⚠️ 手感组件注意：`HitPause` 在无头模式必须保持跳过（smoke 计时器会被 time_scale 拖慢）；`battle_combatant_card` 有 0.12s 轮询，新加动画务必走 diff 检测，否则活不过一帧；胜负面板动画需 `TWEEN_PAUSE_PROCESS`（树已暂停）。
 
 ### 商店与奖励
 
@@ -438,7 +533,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **UI 统一仍需人工视觉 QA**：这轮先用现有资产和 `InkTheme` 统一了大部分页面风格，没有继续精抠每个界面的像素级布局。后续若要达到目标图级品质，应逐页进 Godot 检查按钮状态、文本遮挡、面板透明度和不同分辨率下的间距。
 - **旧事件当前被临时禁用**：`event_room_pool.tres` 只开放 10 个新事件是为了集中验证。等新事件稳定后，记得决定是恢复旧事件、分章节混池，还是按权重轮换。
 - **调试控制台快捷键**：使用 Ctrl + 反引号，不要再绑定 F8。F8 在 Godot 编辑器运行时会停止项目，看起来像“按控制台键直接退出”。
-- **战斗 UI 手感仍是下一阶段重点**：本轮已把总牌组 overlay、出牌预览报错、符箓丹药伤害修好，但手牌 hover/drag、攻击瞄准吸附、命中反馈、hit pause、伤害数字节奏和音效反馈还没做到成品级。详见第 7 节 Claude 文件地图。
+- **战斗 UI 手感已完成一轮（2026-07-06）**：手牌 hover/drag、瞄准吸附反馈、命中反馈、hit pause、伤害数字、回合/Boss/煞气演出、音效/BGM 等已落地（第 6 节专场小节）。动效节奏为静态验证 + smoke 通过，**整体叠加后的节奏与混音还需人工进战斗跑几场做主观校验**，参数入口见第 6 节「调参入口」。
 - **单体攻击符箓/丹药目标选择仍偏简单**：无卡牌来源的攻击效果已能生效，但如果没有显式目标，当前主要走第一个存活敌人的兜底逻辑。若要做成品手感，建议后续给攻击丹药/符箓增加一次性目标选择状态。
 - **战斗数值待按 100 血重配平**：剑修/魔修血量已 30/32→100、费用 3→4，但敌人伤害（固定 AI 的处决 12/重砸 10 等）和 `map_generator.gd` 章节缩放仍按旧血量配置，现在战斗偏软。需重新配平敌人伤害 + 章节倍率（可经 `game_data.xlsx` 怪物AI 表 + `map_generator` 倍率调）。
 - **`run-flow` 偶发 `Lambda capture freed`**：完整流程约 2/12 偶发，还有一处多回合补间回调来源未根除（疑似 `status_handler`/`relic_handler`/弃牌结算）。非功能 bug（逻辑仍通过，重跑即过），但将来上 CI 会随机红灯。修法：把 `tween.finished` 的 lambda 改为捕获 `get_instance_id()` / 加 `is_instance_valid` 守卫。
@@ -452,7 +547,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 ## 9. 后续建议
 
 1. 优先把魔修单职业 Demo 跑通：战斗、事件、商店、宝箱、篝火、Boss、失败/胜利、失败遗产都要完整体验一遍。
-2. 下一轮重点建议交给 Claude 优化战斗手感：手牌 hover/drag、目标吸附、出牌悬停、命中停顿、伤害数字、轻量震动、音效反馈。
+2. 下一轮重点建议人工试玩魔修完整流程，按实感微调战斗动效节奏、SFX/BGM 音量和地图/商店/奖励界面的视觉密度。
 3. 为高频卡牌优先生成或绘制正式大插画，替换当前临时小图标；魔修卡面人物风格要统一。
 4. 对卡牌标题字体、描述字体补充更有国风感的正式字体资源。
 5. 对地图、商店、宝箱、祝福页面做一次统一视觉 QA，检查字体大小、按钮状态和不同分辨率下的遮挡。

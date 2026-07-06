@@ -193,7 +193,45 @@ static func apply_demonic_button(button: Button, large := false) -> void:
 	button.add_theme_stylebox_override("disabled", make_texture_style(HUD_END_TURN_PLATE, 42, 18, Color(0.42, 0.38, 0.36, 0.45)))
 
 
+# 列表项错落淡入：按节点在父容器里的下标错开延迟（封顶 20 个），
+# 奖励按钮/商店货架/菜单按钮等容器子项通用。
+static func animate_item_entrance(item: Control, stagger := 0.08, duration := 0.25) -> void:
+	if not item:
+		return
+	item.modulate = Color(1, 1, 1, 0.0)
+	var delay: float = minf(float(item.get_index()), 20.0) * stagger
+	var tween := item.create_tween()
+	if delay > 0.0:
+		tween.tween_interval(delay)
+	tween.tween_property(item, "modulate:a", 1.0, duration) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+
+# 界面入场淡入：任意场景根节点通用，_ready 里调用一行即可。
+static func animate_screen_entrance(root: CanvasItem, duration := 0.3) -> void:
+	if not root:
+		return
+	root.modulate = Color(1, 1, 1, 0.0)
+	var tween := root.create_tween()
+	tween.tween_property(root, "modulate:a", 1.0, duration) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+
+# 所有走 apply_screen_button 的按钮自动带 hover/点击音（meta 标记保证幂等）。
+static func _play_button_hover(button: Button) -> void:
+	if button and not button.disabled:
+		GameSfx.play(GameSfx.UI_HOVER, -14.0)
+
+
+static func _play_button_press() -> void:
+	GameSfx.play(GameSfx.UI_CLICK, -8.0)
+
+
 static func apply_screen_button(button: Button, large := false) -> void:
+	if not button.has_meta("ink_sfx_wired"):
+		button.set_meta("ink_sfx_wired", true)
+		button.mouse_entered.connect(_play_button_hover.bind(button))
+		button.pressed.connect(_play_button_press)
 	button.add_theme_color_override("font_color", Color("f8e5c0"))
 	button.add_theme_color_override("font_hover_color", Color("fff4d8"))
 	button.add_theme_color_override("font_pressed_color", Color("d9a865"))

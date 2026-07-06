@@ -124,10 +124,14 @@ func reshuffle_deck_from_discard() -> void:
 	if not character.draw_pile.empty():
 		return
 
+	var reshuffled_count := 0
 	while not character.discard.empty():
 		character.draw_pile.add_card(character.discard.draw_card())
+		reshuffled_count += 1
 
 	character.draw_pile.shuffle()
+	if reshuffled_count > 0:
+		Events.deck_reshuffled.emit(reshuffled_count)
 
 
 func _on_card_played(card: Card) -> void:

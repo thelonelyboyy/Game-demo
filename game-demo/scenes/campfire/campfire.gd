@@ -16,6 +16,7 @@ var active_card_upgrade: CardUpgrade
 
 
 func _ready() -> void:
+	InkTheme.animate_screen_entrance(self)
 	_apply_visuals()
 	upgrade_button.pressed.connect(_on_upgrade_button_pressed)
 
@@ -25,6 +26,7 @@ func _on_rest_button_pressed() -> void:
 	var heal_amount := ceili(char_stats.max_health * 0.3)
 	var initial_health := char_stats.health
 	char_stats.heal(heal_amount)
+	GameSfx.play(GameSfx.HEAL, -2.0)
 	Events.campfire_rested.emit(char_stats, maxi(0, char_stats.health - initial_health))
 	animation_player.play("fade_out")
 
@@ -43,6 +45,7 @@ func _on_upgrade_button_pressed() -> void:
 
 func _on_card_upgraded(card: Card) -> void:
 	if card:
+		GameSfx.play(GameSfx.BOOK, -4.0)
 		Events.campfire_card_upgraded.emit(char_stats, card)
 
 	if active_card_upgrade:

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://civrsdnd0770k" path="res://art/ui/icons/status_soul_mark.png" id="2"]
 [ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/audio/slash.ogg" id="3"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_soul_mark_detonate_effect.gd" id="e1"]
+[ext_resource type="Script" uid="uid://bnx0yul2vtmmn" path="res://custom_resources/effects/configured_soul_mark_detonate_effect.gd" id="e1"]
 
 [sub_resource type="Resource" id="E1"]
 script = ExtResource("e1")

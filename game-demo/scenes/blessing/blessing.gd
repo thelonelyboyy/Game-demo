@@ -35,6 +35,7 @@ var choice_rows: Array[Dictionary] = []
 
 
 func _ready() -> void:
+	InkTheme.animate_screen_entrance(self)
 	_load_sources()
 	_build_ui()
 

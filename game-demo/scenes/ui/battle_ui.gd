@@ -20,12 +20,23 @@ const CARD_VISUALS_SCENE := preload("res://scenes/ui/card_visuals.tscn")
 const PHASE_B_GUIDES_VISIBLE := false
 const PLAYED_CARD_PREVIEW_SIZE := Vector2(224.0, 322.0)
 const PLAYED_CARD_PREVIEW_SCALE := 1.45
-const PLAYED_CARD_PREVIEW_IN_DURATION := 0.18
-const PLAYED_CARD_PREVIEW_HOLD_DURATION := 0.42
-const PLAYED_CARD_PREVIEW_OUT_DURATION := 0.22
+const PLAYED_CARD_PREVIEW_IN_DURATION := 0.24
+const PLAYED_CARD_PREVIEW_HOLD_DURATION := 0.60
+const PLAYED_CARD_PREVIEW_OUT_DURATION := 0.30
+
+const PHASE_BANNER_COLOR_PLAYER := Color("f2c94f")
+const PHASE_BANNER_COLOR_ENEMY := Color("e0503c")
+const BOSS_BANNER_COLOR := Color("b04ae0")
+# 与 enemy.gd _get_target_art_max_size 的 Boss 名单保持一致。
+const BOSS_IDS := ["bone_dragon", "black_lotus_matriarch", "sky_palace_guardian", "abyssal_sword_soul", "eclipse_tyrant"]
 
 var _turn_count := 0
 var _turn_label: Label
+var _phase_banner: PanelContainer
+var _phase_banner_label: Label
+var _phase_banner_tween: Tween
+var _end_turn_breath_tween: Tween
+var _breath_check_elapsed := 0.0
 var _layout_guides: Control
 var _combatant_layer: Control
 var _battlefield_frame: PanelContainer
@@ -40,7 +51,13 @@ func _ready() -> void:
 	_polish_ui()
 	get_viewport().size_changed.connect(_layout_battle_controls)
 	Events.card_play_preview_requested.connect(_on_card_play_preview_requested)
+	Events.card_discarded.connect(_on_card_discarded)
+	Events.deck_reshuffled.connect(_on_deck_reshuffled)
+	Events.sha_qi_tier_changed.connect(_on_sha_qi_tier_changed)
+	Events.card_drawn.connect(_on_card_drawn_sfx)
+	Events.card_played.connect(_on_card_played_sfx)
 	Events.player_turn_started.connect(_on_player_turn_started)
+	Events.player_turn_ended.connect(_on_player_turn_ended_for_banner)
 	Events.player_hand_drawn.connect(_on_player_hand_drawn)
 	end_turn_button.pressed.connect(_on_end_turn_button_pressed)
 	draw_pile_button.pressed.connect(draw_pile_view.show_current_view.bind("抽牌堆", true))
@@ -55,11 +72,79 @@ func initialize_card_pile_ui() -> void:
 	discard_pile_view.card_pile = char_stats.discard
 
 
+var _boss_banner_shown := false
+var _last_sha_tier_ui := 0
+
+# 煞气档位气场：档位越高玩家信息卡立绘染得越红。
+const SHA_TIER_TINTS := [
+	Color.WHITE,
+	Color(1.05, 0.82, 0.78),
+	Color(1.10, 0.62, 0.55),
+	Color(1.18, 0.42, 0.36),
+]
+const SHA_TIER_BANNERS := [
+	"",
+	"煞气凝聚 · 卡牌伤害 +1",
+	"煞气翻涌 · 造成与受到伤害 ×2",
+	"天魔降世 · 伤害 ×3",
+]
+
+
+# 煞气跨档演出：升档弹横幅 + 玩家信息卡立绘染红气场（世界立绘已隐藏，染卡才看得见）。
+func _on_sha_qi_tier_changed(tier: int, _stacks: int) -> void:
+	var tier_index := clampi(tier, 0, SHA_TIER_TINTS.size() - 1)
+
+	if _player_card:
+		_player_card.set_aura_tint(SHA_TIER_TINTS[tier_index])
+
+	if tier_index > _last_sha_tier_ui:
+		var accent := Color("d0342c") if tier_index >= 3 else Color("c05a3c")
+		var hold := 2.4 if tier_index >= 3 else 1.6
+		var font_size := 52 if tier_index >= 3 else 42
+		# 煞气升档用锣声做国风重音，天魔降世用更重的一记。
+		GameSfx.play(GameSfx.GONG_HEAVY if tier_index >= 3 else GameSfx.GONG, -2.0)
+		_show_phase_banner(SHA_TIER_BANNERS[tier_index], accent, hold, font_size)
+		if is_instance_valid(_tracked_player):
+			HitEffect.spawn(_tracked_player, _tracked_player._feedback_radius() * 1.2, Color(1.0, 0.30, 0.24, 0.95))
+		if tier_index >= 3 and is_instance_valid(_tracked_player):
+			# 天魔降世：附带战场震动。
+			var battle_root := _tracked_player.get_parent() as Node2D
+			if battle_root:
+				Shaker.shake(battle_root, 5, 0.4)
+	_last_sha_tier_ui = tier_index
+
+
 func setup_combatant_cards(player: Player, enemies: Array[Enemy]) -> void:
 	_tracked_player = player
 	_tracked_enemies = enemies.duplicate()
 	_rebuild_combatant_cards()
 	_layout_battle_controls()
+	_maybe_show_boss_banner()
+
+
+# Boss 战开场名牌：等回合横幅（~0.95s）播完后出场，停留更久、深紫强调色。
+func _maybe_show_boss_banner() -> void:
+	if _boss_banner_shown:
+		return
+
+	var boss_name := ""
+	for enemy in _tracked_enemies:
+		if is_instance_valid(enemy) and enemy.stats and BOSS_IDS.has(enemy.stats.id):
+			boss_name = enemy.stats.display_name
+			break
+	if boss_name.is_empty():
+		return
+
+	_boss_banner_shown = true
+	var timer := get_tree().create_timer(1.45, false)
+	timer.timeout.connect(_show_boss_banner_now.bind(boss_name))
+
+
+func _show_boss_banner_now(boss_name: String) -> void:
+	if not is_inside_tree():
+		return
+	GameSfx.play(GameSfx.BOSS_BELL, -2.0)
+	_show_phase_banner("—— %s ——" % boss_name, BOSS_BANNER_COLOR, 1.6, 50)
 
 
 func _set_char_stats(value: CharacterStats) -> void:
@@ -76,11 +161,112 @@ func _on_player_turn_started() -> void:
 	_turn_count += 1
 	if _turn_label:
 		_turn_label.text = "回合 %s" % _turn_count
+	_pulse_turn_badge()
+	_show_phase_banner("我方回合", PHASE_BANNER_COLOR_PLAYER)
+
+
+func _on_player_turn_ended_for_banner() -> void:
+	_show_phase_banner("敌方回合", PHASE_BANNER_COLOR_ENEMY)
+
+
+func _pulse_turn_badge() -> void:
+	var badge := get_node_or_null("TurnBadge") as Control
+	if not badge:
+		return
+	badge.pivot_offset = badge.size * 0.5
+	badge.scale = Vector2.ONE * 1.10
+	var tween := badge.create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(badge, "scale", Vector2.ONE, 0.40)
+
+
+func _ensure_phase_banner() -> void:
+	if _phase_banner:
+		return
+
+	_phase_banner = PanelContainer.new()
+	_phase_banner.name = "PhaseBanner"
+	_phase_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_phase_banner.z_index = 2600
+	_phase_banner.custom_minimum_size = Vector2(420, 92)
+	_phase_banner.anchor_left = 0.5
+	_phase_banner.anchor_right = 0.5
+	_phase_banner.anchor_top = 0.30
+	_phase_banner.anchor_bottom = 0.30
+	_phase_banner.offset_left = -210.0
+	_phase_banner.offset_right = 210.0
+	_phase_banner.offset_top = -46.0
+	_phase_banner.offset_bottom = 46.0
+	_phase_banner.hide()
+	add_child(_phase_banner)
+
+	_phase_banner_label = Label.new()
+	_phase_banner_label.name = "PhaseLabel"
+	_phase_banner_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_phase_banner_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_phase_banner_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_phase_banner_label.add_theme_font_size_override("font_size", 44)
+	_phase_banner_label.add_theme_color_override("font_shadow_color", Color(0, 0.01, 0.05, 0.94))
+	_phase_banner_label.add_theme_constant_override("shadow_offset_x", 3)
+	_phase_banner_label.add_theme_constant_override("shadow_offset_y", 3)
+	_phase_banner.add_child(_phase_banner_label)
+
+
+# 敌我回合切换的中央横幅：弹入 → 停留 → 上浮淡出，重复触发时打断重放。
+func _show_phase_banner(text: String, accent: Color, hold := 0.80, font_size := 44) -> void:
+	_ensure_phase_banner()
+
+	_phase_banner_label.text = text
+	_phase_banner_label.add_theme_font_size_override("font_size", font_size)
+	_phase_banner_label.add_theme_color_override("font_color", accent.lightened(0.28))
+	var style := InkTheme.make_style(
+		Color(0.016, 0.024, 0.052, 0.88),
+		Color(accent.r, accent.g, accent.b, 0.88),
+		2,
+		10,
+		Color(accent.r, accent.g, accent.b, 0.30),
+		20
+	)
+	style.content_margin_left = 44
+	style.content_margin_right = 44
+	style.content_margin_top = 12
+	style.content_margin_bottom = 12
+	_phase_banner.add_theme_stylebox_override("panel", style)
+
+	if _phase_banner_tween and _phase_banner_tween.is_running():
+		_phase_banner_tween.kill()
+
+	_phase_banner.show()
+	_phase_banner.pivot_offset = _phase_banner.size * 0.5
+	_phase_banner.modulate = Color(1, 1, 1, 0.0)
+	_phase_banner.scale = Vector2.ONE * 0.84
+
+	_phase_banner_tween = create_tween()
+	_phase_banner_tween.set_parallel(true)
+	_phase_banner_tween.tween_property(_phase_banner, "modulate:a", 1.0, 0.20)
+	_phase_banner_tween.tween_property(_phase_banner, "scale", Vector2.ONE, 0.32) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_phase_banner_tween.set_parallel(false)
+	_phase_banner_tween.tween_interval(hold)
+	_phase_banner_tween.set_parallel(true)
+	_phase_banner_tween.tween_property(_phase_banner, "modulate:a", 0.0, 0.36)
+	_phase_banner_tween.tween_property(_phase_banner, "scale", Vector2.ONE * 1.05, 0.36) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_phase_banner_tween.set_parallel(false)
+	_phase_banner_tween.tween_callback(_phase_banner.hide)
 
 
 func _on_end_turn_button_pressed() -> void:
 	end_turn_button.disabled = true
+	GameSfx.play(GameSfx.END_TURN, -6.0)
 	Events.player_turn_ended.emit()
+
+
+func _on_card_drawn_sfx(_card: Card) -> void:
+	GameSfx.play(GameSfx.DRAW, -6.0)
+
+
+func _on_card_played_sfx(_card: Card) -> void:
+	GameSfx.play(GameSfx.PLAY_CARD, -2.0)
 
 
 func _on_card_play_preview_requested(card: Card, start_global_center: Vector2) -> void:
@@ -116,10 +302,126 @@ func _on_card_play_preview_requested(card: Card, start_global_center: Vector2) -
 	tween.parallel().tween_property(preview, "scale", Vector2.ONE * PLAYED_CARD_PREVIEW_SCALE, PLAYED_CARD_PREVIEW_IN_DURATION)
 	tween.parallel().tween_property(preview, "modulate:a", 1.0, PLAYED_CARD_PREVIEW_IN_DURATION * 0.75)
 	tween.tween_interval(PLAYED_CARD_PREVIEW_HOLD_DURATION)
+
+	if card.type == Card.Type.POWER:
+		# 功法牌：悬停后化作金光飞向角色融入，与普通牌"上浮淡出"区分。
+		var absorb_target := _power_card_absorb_position()
+		tween.tween_property(preview, "position", absorb_target - PLAYED_CARD_PREVIEW_SIZE * 0.5, 0.46) \
+				.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+		tween.parallel().tween_property(preview, "scale", Vector2.ONE * 0.10, 0.46) \
+				.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+		tween.parallel().tween_property(preview, "modulate", Color(1.8, 1.5, 0.7, 0.55), 0.46)
+		tween.tween_callback(_burst_power_absorb)
+		tween.tween_callback(preview.queue_free)
+		return
+
 	tween.tween_property(preview, "position", target_position + Vector2(0, -34), PLAYED_CARD_PREVIEW_OUT_DURATION)
 	tween.parallel().tween_property(preview, "scale", Vector2.ONE * (PLAYED_CARD_PREVIEW_SCALE * 0.96), PLAYED_CARD_PREVIEW_OUT_DURATION)
 	tween.parallel().tween_property(preview, "modulate:a", 0.0, PLAYED_CARD_PREVIEW_OUT_DURATION)
 	tween.tween_callback(preview.queue_free)
+
+
+# 功法牌吸收落点：优先玩家立绘的画布位置，取不到则退回右下玩家信息卡。
+func _power_card_absorb_position() -> Vector2:
+	if is_instance_valid(_tracked_player):
+		return _tracked_player.get_global_transform_with_canvas().origin - _played_card_preview_layer.get_global_rect().position
+	if _player_card:
+		return _player_card.get_global_rect().get_center() - _played_card_preview_layer.get_global_rect().position
+	var viewport_size := get_viewport().get_visible_rect().size
+	return Vector2(viewport_size.x * 0.5, viewport_size.y * 0.6)
+
+
+func _burst_power_absorb() -> void:
+	GameSfx.play(GameSfx.POWER_UP, -2.0)
+	if is_instance_valid(_tracked_player):
+		HitEffect.spawn(_tracked_player, _tracked_player._feedback_radius(), Color(1.0, 0.85, 0.42, 0.95))
+
+
+# 弃牌动画：真卡立即释放，用轻量 CardVisuals 幽灵卡飞向弃牌堆，避免动 CardUI 状态机。
+func _on_card_discarded(card: Card, from_global_center: Vector2) -> void:
+	if not card or not is_inside_tree() or not discard_pile_button:
+		return
+
+	GameSfx.play(GameSfx.DISCARD, -10.0)
+
+	if not _played_card_preview_layer:
+		_add_played_card_preview_layer()
+
+	var ghost := CARD_VISUALS_SCENE.instantiate() as CardVisuals
+	ghost.name = "DiscardGhost"
+	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ghost.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	ghost.size = PLAYED_CARD_PREVIEW_SIZE
+	ghost.custom_minimum_size = PLAYED_CARD_PREVIEW_SIZE
+	ghost.pivot_offset = PLAYED_CARD_PREVIEW_SIZE * 0.5
+	_played_card_preview_layer.add_child(ghost)
+	ghost.card = card
+
+	var layer_origin := _played_card_preview_layer.get_global_rect().position
+	ghost.position = from_global_center - layer_origin - PLAYED_CARD_PREVIEW_SIZE * 0.5
+	var target_center := discard_pile_button.get_global_rect().get_center() - layer_origin
+	var target_position := target_center - PLAYED_CARD_PREVIEW_SIZE * 0.5
+
+	var tween := ghost.create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tween.tween_property(ghost, "position", target_position, 0.44)
+	tween.tween_property(ghost, "scale", Vector2.ONE * 0.16, 0.44)
+	tween.tween_property(ghost, "rotation_degrees", 24.0, 0.44)
+	tween.tween_property(ghost, "modulate:a", 0.35, 0.44)
+	tween.set_parallel(false)
+	tween.tween_callback(ghost.queue_free)
+
+
+# 洗牌提示：几张空白幽灵卡背从弃牌堆错落飞向抽牌堆 + 抽牌堆计数 punch，
+# 让"弃牌堆洗回抽牌堆"这个暗改动作可见。
+func _on_deck_reshuffled(card_count: int) -> void:
+	if not is_inside_tree() or not draw_pile_button or not discard_pile_button:
+		return
+
+	GameSfx.play(GameSfx.SHUFFLE, -4.0)
+
+	if not _played_card_preview_layer:
+		_add_played_card_preview_layer()
+
+	var layer_origin := _played_card_preview_layer.get_global_rect().position
+	var from := discard_pile_button.get_global_rect().get_center() - layer_origin
+	var to := draw_pile_button.get_global_rect().get_center() - layer_origin
+	var ghost_count := mini(card_count, 4)
+	var ghost_size := Vector2(78.0, 112.0)
+
+	for i in range(ghost_count):
+		var ghost := CARD_VISUALS_SCENE.instantiate() as CardVisuals
+		ghost.name = "ReshuffleGhost%d" % i
+		ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		ghost.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		ghost.size = PLAYED_CARD_PREVIEW_SIZE
+		ghost.pivot_offset = PLAYED_CARD_PREVIEW_SIZE * 0.5
+		ghost.scale = Vector2.ONE * (ghost_size.x / PLAYED_CARD_PREVIEW_SIZE.x)
+		ghost.position = from - PLAYED_CARD_PREVIEW_SIZE * 0.5
+		ghost.modulate = Color(1, 1, 1, 0.0)
+		_played_card_preview_layer.add_child(ghost)
+
+		var tween := ghost.create_tween()
+		tween.tween_interval(0.09 * i)
+		tween.tween_property(ghost, "modulate:a", 0.9, 0.11)
+		tween.set_parallel(true)
+		tween.tween_property(ghost, "position", to - PLAYED_CARD_PREVIEW_SIZE * 0.5, 0.46) \
+				.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(ghost, "rotation_degrees", -18.0, 0.46)
+		tween.set_parallel(false)
+		tween.tween_property(ghost, "modulate:a", 0.0, 0.14)
+		tween.tween_callback(ghost.queue_free)
+
+	_punch_pile_counter(draw_pile_button)
+
+
+func _punch_pile_counter(button: CardPileOpener) -> void:
+	if not button or not button.counter:
+		return
+	var counter := button.counter
+	counter.pivot_offset = counter.size * 0.5
+	counter.scale = Vector2.ONE * 1.5
+	var tween := counter.create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(counter, "scale", Vector2.ONE, 0.42)
 
 
 func _polish_ui() -> void:
@@ -423,10 +725,46 @@ func _layout_battle_controls() -> void:
 			_turn_label.add_theme_font_size_override("font_size", roundi(35.0 * scale_factor))
 
 	end_turn_button.add_theme_font_size_override("font_size", roundi(36.0 * scale_factor))
+	_update_hand_draw_origin.call_deferred()
 
 
-func _process(_delta: float) -> void:
+func _update_hand_draw_origin() -> void:
+	if hand and draw_pile_button:
+		hand.draw_origin_global = draw_pile_button.get_global_rect().get_center()
+
+
+func _process(delta: float) -> void:
 	_hide_legacy_combatant_overlays()
+	_breath_check_elapsed += delta
+	if _breath_check_elapsed >= 0.2:
+		_breath_check_elapsed = 0.0
+		_update_end_turn_breath()
+
+
+# 无牌可打（费用不够或手牌空）时结束回合按钮呼吸发亮，提示玩家该收手了。
+func _update_end_turn_breath() -> void:
+	var should_breathe := not end_turn_button.disabled and not _hand_has_playable_card()
+	var breathing := _end_turn_breath_tween and _end_turn_breath_tween.is_running()
+
+	if should_breathe and not breathing:
+		_end_turn_breath_tween = create_tween().set_loops()
+		_end_turn_breath_tween.tween_property(end_turn_button, "modulate", Color(1.24, 1.16, 1.0), 0.75) \
+				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		_end_turn_breath_tween.tween_property(end_turn_button, "modulate", Color.WHITE, 0.75) \
+				.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	elif not should_breathe and breathing:
+		_end_turn_breath_tween.kill()
+		end_turn_button.modulate = Color.WHITE
+
+
+func _hand_has_playable_card() -> bool:
+	if not hand:
+		return false
+	for child in hand.get_children():
+		var card_ui := child as CardUI
+		if card_ui and card_ui.playable:
+			return true
+	return false
 
 
 func _layout_combatant_cards(viewport_size: Vector2, scale_factor: float) -> void:
@@ -464,6 +802,36 @@ func _layout_combatant_cards(viewport_size: Vector2, scale_factor: float) -> voi
 
 	if _player_card:
 		_place_bottom_right(_player_card, Vector2(70, 56), Vector2(318, 306), scale_factor)
+
+	# 世界立绘已隐藏、战斗单位只显示为信息卡，但瞄准/选中框/飘字仍挂在世界节点上。
+	# 把世界节点对齐到各自信息卡中心，否则选中框和卡的位置对不上（敌人越多偏得越远）。
+	_align_world_combatants.call_deferred()
+
+
+func _align_world_combatants() -> void:
+	if not is_inside_tree():
+		return
+	for card in _enemy_cards:
+		_align_world_combatant(card)
+	_align_world_combatant(_player_card)
+
+
+func _align_world_combatant(card: BattleCombatantCard) -> void:
+	if not card:
+		return
+	var combatant := card.combatant as Node2D
+	if not is_instance_valid(combatant) or not combatant.is_inside_tree():
+		return
+
+	var rect := card.get_global_rect()
+	var center := rect.position + rect.size * 0.5
+	var canvas_xform := combatant.get_viewport().get_canvas_transform()
+	combatant.global_position = canvas_xform.affine_inverse() * center
+
+	if combatant is Enemy:
+		(combatant as Enemy).align_feedback_to_card(rect.size)
+	elif combatant is Player:
+		(combatant as Player).aligned_feedback_extents = rect.size
 
 
 func _hide_legacy_combatant_overlays() -> void:
@@ -569,5 +937,17 @@ func _exit_tree() -> void:
 		get_viewport().size_changed.disconnect(_layout_battle_controls)
 	if Events.card_play_preview_requested.is_connected(_on_card_play_preview_requested):
 		Events.card_play_preview_requested.disconnect(_on_card_play_preview_requested)
+	if Events.card_discarded.is_connected(_on_card_discarded):
+		Events.card_discarded.disconnect(_on_card_discarded)
+	if Events.deck_reshuffled.is_connected(_on_deck_reshuffled):
+		Events.deck_reshuffled.disconnect(_on_deck_reshuffled)
+	if Events.sha_qi_tier_changed.is_connected(_on_sha_qi_tier_changed):
+		Events.sha_qi_tier_changed.disconnect(_on_sha_qi_tier_changed)
+	if Events.card_drawn.is_connected(_on_card_drawn_sfx):
+		Events.card_drawn.disconnect(_on_card_drawn_sfx)
+	if Events.card_played.is_connected(_on_card_played_sfx):
+		Events.card_played.disconnect(_on_card_played_sfx)
 	if Events.player_turn_started.is_connected(_on_player_turn_started):
 		Events.player_turn_started.disconnect(_on_player_turn_started)
+	if Events.player_turn_ended.is_connected(_on_player_turn_ended_for_banner):
+		Events.player_turn_ended.disconnect(_on_player_turn_ended_for_banner)
