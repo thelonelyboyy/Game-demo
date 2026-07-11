@@ -4,34 +4,7 @@ extends Control
 const SHOP_CARD = preload("res://scenes/shop/shop_card.tscn")
 const SHOP_RELIC = preload("res://scenes/shop/shop_relic.tscn")
 const SHOP_POTION = preload("res://scenes/shop/shop_potion.tscn")
-const SHOP_POTION_PATHS := [
-	"res://potions/healing_pill.tres",
-	"res://potions/qi_pill.tres",
-	"res://potions/draw_talisman.tres",
-	"res://potions/flame_talisman.tres",
-	"res://potions/frost_talisman.tres",
-	"res://potions/blood_rite_talisman.tres",
-	"res://potions/greater_healing_pill.tres",
-	"res://potions/jade_skin_pill.tres",
-	"res://potions/spirit_surge_pill.tres",
-	"res://potions/clarity_pill.tres",
-	"res://potions/gold_body_pill.tres",
-	"res://potions/true_essence_pill.tres",
-	"res://potions/marrow_strength_pill.tres",
-	"res://potions/sword_heart_pill.tres",
-	"res://potions/demon_blood_pill.tres",
-	"res://potions/beast_lure_pill.tres",
-	"res://potions/thunder_talisman.tres",
-	"res://potions/five_thunder_talisman.tres",
-	"res://potions/expose_talisman.tres",
-	"res://potions/bleed_talisman.tres",
-	"res://potions/warding_talisman.tres",
-	"res://potions/cloudstep_talisman.tres",
-	"res://potions/qi_barrier_talisman.tres",
-	"res://potions/sword_guard_talisman.tres",
-	"res://potions/soul_snare_talisman.tres",
-	"res://potions/soul_burst_talisman.tres",
-]
+const SHOP_POTION_PATHS := PotionRewardPool.POTION_PATHS
 const SHOP_POTION_COUNT := 2
 const CARD_REMOVE_SCENE := preload("res://scenes/card_remove/card_remove.tscn")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
@@ -213,11 +186,16 @@ func _generate_shop_potions() -> void:
 		if potion and potion.can_appear_as_reward(char_stats):
 			available.append(potion)
 
-	RNG.array_shuffle(available)
-	for i in range(mini(SHOP_POTION_COUNT, available.size())):
+	var shop_choices := PotionRewardPool.pick_choices(
+		available,
+		SHOP_POTION_COUNT,
+		run_stats.current_chapter if run_stats else 1,
+		PotionRewardPool.RewardContext.SHOP
+	)
+	for potion: Potion in shop_choices:
 		var new_shop_potion := SHOP_POTION.instantiate() as ShopPotion
 		potions.add_child(new_shop_potion)
-		new_shop_potion.potion = available[i]
+		new_shop_potion.potion = potion
 		new_shop_potion.gold_cost = _get_updated_shop_cost(new_shop_potion.gold_cost)
 		new_shop_potion.update(run_stats)
 

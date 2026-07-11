@@ -14,34 +14,7 @@ const DEBUG_CONSOLE := preload("res://scenes/debug/debug_console.gd")
 const DEMONIC_HEAD_ICON := preload("res://art/characters/demonic_cultivator_head_icon.png")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
 const DEFEAT_LEGACY := preload("res://custom_resources/defeat_legacy.gd")
-const POTION_REWARD_PATHS := [
-	"res://potions/healing_pill.tres",
-	"res://potions/qi_pill.tres",
-	"res://potions/draw_talisman.tres",
-	"res://potions/flame_talisman.tres",
-	"res://potions/frost_talisman.tres",
-	"res://potions/blood_rite_talisman.tres",
-	"res://potions/greater_healing_pill.tres",
-	"res://potions/jade_skin_pill.tres",
-	"res://potions/spirit_surge_pill.tres",
-	"res://potions/clarity_pill.tres",
-	"res://potions/gold_body_pill.tres",
-	"res://potions/true_essence_pill.tres",
-	"res://potions/marrow_strength_pill.tres",
-	"res://potions/sword_heart_pill.tres",
-	"res://potions/demon_blood_pill.tres",
-	"res://potions/beast_lure_pill.tres",
-	"res://potions/thunder_talisman.tres",
-	"res://potions/five_thunder_talisman.tres",
-	"res://potions/expose_talisman.tres",
-	"res://potions/bleed_talisman.tres",
-	"res://potions/warding_talisman.tres",
-	"res://potions/cloudstep_talisman.tres",
-	"res://potions/qi_barrier_talisman.tres",
-	"res://potions/sword_guard_talisman.tres",
-	"res://potions/soul_snare_talisman.tres",
-	"res://potions/soul_burst_talisman.tres",
-]
+const POTION_REWARD_PATHS := PotionRewardPool.POTION_PATHS
 const POTION_DROP_CHANCE := 0.4
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 const TOTAL_CHAPTERS := 3
@@ -116,7 +89,7 @@ func _start_run() -> void:
 	_show_defeat_legacy_choice_if_available.call_deferred()
 
 
-func _random_reward_potion() -> Potion:
+func _random_reward_potion(context := PotionRewardPool.RewardContext.STANDARD) -> Potion:
 	var pool: Array[Potion] = []
 	for path in POTION_REWARD_PATHS:
 		if not ResourceLoader.exists(path):
@@ -126,7 +99,7 @@ func _random_reward_potion() -> Potion:
 			pool.append(potion)
 	if pool.is_empty():
 		return null
-	return RNG.array_pick_random(pool)
+	return PotionRewardPool.pick(pool, current_chapter, context)
 
 
 func _grant_starter_potions() -> void:
@@ -1014,7 +987,7 @@ func _show_regular_battle_rewards() -> void:
 	reward_scene.add_card_reward()
 	# 普通战斗有概率掉落符箓丹药（槽位满则不掉）。
 	if not potion_handler.is_full() and RNG.instance.randf_range(0.0, 1.0) < POTION_DROP_CHANCE:
-		reward_scene.add_potion_reward(_random_reward_potion())
+		reward_scene.add_potion_reward(_random_reward_potion(PotionRewardPool.RewardContext.STANDARD))
 
 
 func _show_elite_battle_rewards() -> void:
@@ -1031,7 +1004,7 @@ func _show_elite_battle_rewards() -> void:
 	reward_scene.add_card_fusion_reward()
 	# 精英战必掉一个符箓丹药（槽位满则跳过）。
 	if not potion_handler.is_full():
-		reward_scene.add_potion_reward(_random_reward_potion())
+		reward_scene.add_potion_reward(_random_reward_potion(PotionRewardPool.RewardContext.ELITE))
 
 
 func _show_boss_battle_rewards() -> void:
@@ -1049,7 +1022,7 @@ func _show_boss_battle_rewards() -> void:
 	)
 	reward_scene.add_relic_choice_rewards(relic_choices)
 	if not potion_handler.is_full():
-		reward_scene.add_potion_reward(_random_reward_potion())
+		reward_scene.add_potion_reward(_random_reward_potion(PotionRewardPool.RewardContext.BOSS))
 
 
 func _on_battle_reward_exited() -> void:
