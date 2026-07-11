@@ -657,7 +657,6 @@ func _add_hero_skill_button() -> void:
 	hero_skill_button = Button.new()
 	hero_skill_button.name = "HeroSkillButton"
 	hero_skill_button.text = "魔焰焚心"
-	hero_skill_button.tooltip_text = "魔焰焚心：受到 2 点伤害，生成 1 张临时随机魔修卡（不含攻击与基础防御）。临时牌离开手牌后移除。每回合限用一次。"
 	hero_skill_button.custom_minimum_size = Vector2(156, 76)
 	hero_skill_button.focus_mode = Control.FOCUS_NONE
 	hero_skill_button.disabled = true
@@ -1025,6 +1024,7 @@ func _sync_hero_skill_visibility() -> void:
 func _update_hero_skill_button_state() -> void:
 	if not hero_skill_button:
 		return
+	_update_hero_skill_tooltip()
 
 	if not _is_demonic_character():
 		hero_skill_button.hide()
@@ -1037,6 +1037,22 @@ func _update_hero_skill_button_state() -> void:
 		or _hero_skill_used_this_turn
 		or not char_stats
 		or char_stats.health <= 0
+	)
+
+
+func _update_hero_skill_tooltip() -> void:
+	if not hero_skill_button:
+		return
+	var stage := clampi(char_stats.hero_skill_stage if char_stats else 1, 1, 3)
+	var stage_effect := ""
+	match stage:
+		2:
+			stage_effect = "生成的牌已突破。"
+		3:
+			stage_effect = "生成的牌已突破且本回合费用降低 1。"
+	hero_skill_button.tooltip_text = (
+		"魔焰焚心·%s阶：受到 %s 点伤害，生成 1 张临时随机魔修卡（不含攻击与基础防御）。%s临时牌离开手牌后移除。每回合限用一次。"
+		% [stage, 1 if stage >= 3 else 2, stage_effect]
 	)
 
 

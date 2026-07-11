@@ -32,6 +32,7 @@ func _run_smoke() -> void:
 	_check_discovery_request()
 	_check_card_reward_choices()
 	_check_demonic_pool_depth()
+	_check_hero_skill_growth()
 	_finish()
 
 
@@ -159,6 +160,25 @@ func _check_demonic_pool_depth() -> void:
 			_check(upgraded.upgrade(), "%s upgrade resolves" % card.id)
 	_check(unique_ids.size() == 75, "demonic draft pool contains seventy-five unique cards")
 	_check(found_new.size() == NEW_DEMONIC_CARD_IDS.size(), "all seven construction bridge cards are in draft pool")
+
+
+func _check_hero_skill_growth() -> void:
+	var character_resource := load(DEMONIC_CHARACTER_PATH) as CharacterStats
+	var handler := PlayerHandler.new()
+	handler.character = character_resource.create_instance()
+	for stage in range(1, 4):
+		handler.character.hero_skill_stage = stage
+		var generated := handler._create_demonic_hero_skill_card()
+		_check(generated != null and generated.is_temporary_card(), "hero skill stage %s creates a temporary card" % stage)
+		if not generated:
+			continue
+		_check(generated.type != Card.Type.ATTACK, "hero skill stage %s excludes attacks" % stage)
+		_check(not generated.upgraded if stage == 1 else (generated.upgraded or not generated.can_upgrade()), "hero skill stage %s applies expected upgrade state" % stage)
+		var base_cost := generated.cost + generated.temporary_cost_reduction
+		var expected_reduction := mini(1, base_cost) if stage >= 3 else 0
+		_check(generated.temporary_cost_reduction == expected_reduction, "hero skill stage %s applies expected temporary discount" % stage)
+	_check(handler._get_hero_skill_self_damage() == 1, "hero skill final stage lowers self damage")
+	handler.free()
 
 
 func _check(condition: bool, message: String) -> void:

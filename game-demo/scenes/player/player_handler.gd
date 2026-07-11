@@ -12,6 +12,7 @@ extends Node
 const HAND_DRAW_INTERVAL := 0.25
 const HAND_DISCARD_INTERVAL := 0.25
 const DEMONIC_HERO_SKILL_SELF_DAMAGE := 2
+const DEMONIC_HERO_SKILL_FINAL_SELF_DAMAGE := 1
 
 @export var relics: RelicHandler
 @export var player: Player
@@ -97,9 +98,8 @@ func use_hero_skill(origin_global := Vector2.ZERO) -> void:
 		return
 
 	_hero_skill_used_this_turn = true
-	# 代价走真实伤害结算：会被护体吸收、吃伤害修正（含煞气受伤加成），
-	# 与"受到 2 点伤害"的文案一致。致死由 take_damage 内部时序结算。
-	player.take_damage(DEMONIC_HERO_SKILL_SELF_DAMAGE, Modifier.Type.DMG_TAKEN)
+	# 代价走真实伤害结算：会被护体吸收并吃伤害修正，致死沿用角色受伤时序。
+	player.take_damage(_get_hero_skill_self_damage(), Modifier.Type.DMG_TAKEN)
 	if not battle_running:
 		return
 
@@ -359,8 +359,18 @@ func _create_demonic_hero_skill_card() -> Card:
 	var generated := picked.duplicate(true) as Card
 	generated.temporary = true
 	generated.ensure_mechanic_tag(Card.TEMPORARY_MECHANIC_TAG)
+	if character.hero_skill_stage >= 2:
+		generated.upgrade()
+	if character.hero_skill_stage >= 3:
+		generated.reduce_cost_for_turn(1)
 	generated.bind_spirit_root_owner(character)
 	return generated
+
+
+func _get_hero_skill_self_damage() -> int:
+	if character and character.hero_skill_stage >= 3:
+		return DEMONIC_HERO_SKILL_FINAL_SELF_DAMAGE
+	return DEMONIC_HERO_SKILL_SELF_DAMAGE
 
 
 func _is_valid_demonic_hero_skill_candidate(card: Card) -> bool:

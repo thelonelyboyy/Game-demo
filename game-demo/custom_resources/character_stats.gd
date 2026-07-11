@@ -15,6 +15,7 @@ const SPIRIT_ROOT_BONUS_TAG := "spirit_root_bonus"
 @export var max_mana: int
 @export var starting_relic: Relic
 @export var spirit_root: Card.Element = Card.Element.NONE
+@export_range(1, 3) var hero_skill_stage := 1
 # 战斗帧动画前缀：非空时玩家在战斗里用 art/frame_animation/<id>_standby|attack|attacked 帧动画
 @export var battle_anim_id: String = ""
 

@@ -72,6 +72,7 @@ func _start_run() -> void:
 	stats = RunStats.new()
 	stats.configure_difficulty(run_startup.difficulty_level)
 	current_chapter = 1
+	character.hero_skill_stage = current_chapter
 	stats.apply_chapter_card_weights(current_chapter)
 	character.health = stats.get_starting_health(character.max_health)
 	
@@ -402,6 +403,7 @@ func _load_run() -> void:
 	stats.refresh_difficulty_modifiers(false)
 	character = save_data.char_stats
 	current_chapter = maxi(save_data.current_chapter, 1)
+	character.hero_skill_stage = clampi(current_chapter, 1, TOTAL_CHAPTERS)
 	stats.apply_chapter_card_weights(current_chapter)
 	if save_data.spirit_root != Card.Element.NONE:
 		character.spirit_root = save_data.spirit_root
@@ -1198,6 +1200,7 @@ func _on_battle_won() -> void:
 
 func _advance_to_next_chapter() -> void:
 	current_chapter += 1
+	character.hero_skill_stage = clampi(current_chapter, 1, TOTAL_CHAPTERS)
 	stats.apply_chapter_card_weights(current_chapter)
 	character.heal(stats.get_chapter_recovery_amount(character.health, character.max_health))
 	_configure_map_difficulty()
