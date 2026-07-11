@@ -17,6 +17,11 @@ const RARE_PITY_MAX_BONUS := 12.0
 const RARE_PITY_HARD_LIMIT := 6
 const ARCHETYPE_SYNERGY_PER_CARD := 0.18
 const ARCHETYPE_SYNERGY_MAX_BONUS := 0.90
+const CHAPTER_UPGRADE_CHANCES := {
+	1: 0.0,
+	2: 0.15,
+	3: 0.30,
+}
 const REWARD_RARITY_ORDER := [
 	Card.Rarity.COMMON,
 	Card.Rarity.UNCOMMON,
@@ -174,6 +179,7 @@ func _generate_card_reward_choices() -> Array[Card]:
 		if not picked_card:
 			break
 
+		_maybe_upgrade_reward_card(picked_card)
 		picked_card.bind_spirit_root_owner(character_stats)
 		card_reward_array.append(picked_card)
 		available_cards = available_cards.filter(
@@ -183,6 +189,17 @@ func _generate_card_reward_choices() -> Array[Card]:
 
 	_update_card_reward_pity(card_reward_array)
 	return card_reward_array
+
+
+func _maybe_upgrade_reward_card(card: Card, forced_roll := -1.0) -> bool:
+	if not card or not card.can_upgrade():
+		return false
+	var chapter := clampi(run_stats.current_chapter if run_stats else 1, 1, 3)
+	var chance: float = CHAPTER_UPGRADE_CHANCES.get(chapter, 0.0)
+	var roll := forced_roll if forced_roll >= 0.0 else RNG.instance.randf()
+	if roll >= chance:
+		return false
+	return card.upgrade()
 
 
 func _pick_reward_card(available_cards: Array[Card]) -> Card:

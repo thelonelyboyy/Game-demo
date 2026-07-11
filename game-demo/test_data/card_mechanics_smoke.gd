@@ -32,6 +32,7 @@ func _run_smoke() -> void:
 	_check_discovery_request()
 	_check_card_reward_choices()
 	_check_card_reward_archetype_synergy()
+	_check_card_reward_chapter_upgrades()
 	_check_demonic_pool_depth()
 	_check_hero_skill_growth()
 	_finish()
@@ -163,6 +164,26 @@ func _check_card_reward_archetype_synergy() -> void:
 	blood_candidate.id = "blood_candidate"
 	blood_candidate.mechanic_tags = PackedStringArray(["献祭"])
 	_check(is_equal_approx(reward._get_card_synergy_weight(blood_candidate), 1.0), "unbuilt archetypes remain available at base weight")
+	reward.free()
+
+
+func _check_card_reward_chapter_upgrades() -> void:
+	var source := load("res://characters/demonic_cultivator/cards/demon_strike.tres") as Card
+	var reward := BattleReward.new()
+	reward.run_stats = RunStats.new()
+	var chapter_one := source.duplicate(true) as Card
+	reward.run_stats.current_chapter = 1
+	_check(not reward._maybe_upgrade_reward_card(chapter_one, 0.0) and not chapter_one.upgraded, "chapter one rewards never arrive upgraded")
+	var chapter_two_hit := source.duplicate(true) as Card
+	reward.run_stats.current_chapter = 2
+	_check(reward._maybe_upgrade_reward_card(chapter_two_hit, 0.149) and chapter_two_hit.upgraded, "chapter two upgrades rolls below fifteen percent")
+	var chapter_two_miss := source.duplicate(true) as Card
+	_check(not reward._maybe_upgrade_reward_card(chapter_two_miss, 0.15) and not chapter_two_miss.upgraded, "chapter two keeps rolls at the boundary unupgraded")
+	var chapter_three_hit := source.duplicate(true) as Card
+	reward.run_stats.current_chapter = 3
+	_check(reward._maybe_upgrade_reward_card(chapter_three_hit, 0.299) and chapter_three_hit.upgraded, "chapter three upgrades rolls below thirty percent")
+	var chapter_three_miss := source.duplicate(true) as Card
+	_check(not reward._maybe_upgrade_reward_card(chapter_three_miss, 0.30) and not chapter_three_miss.upgraded, "chapter three keeps rolls at the boundary unupgraded")
 	reward.free()
 
 
