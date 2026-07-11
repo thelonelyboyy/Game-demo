@@ -35,6 +35,7 @@ func _run_smoke() -> void:
 	_check_card_reward_chapter_upgrades()
 	_check_demonic_pool_depth()
 	_check_hero_skill_growth()
+	_check_hand_size_limit()
 	_finish()
 
 
@@ -223,6 +224,34 @@ func _check_hero_skill_growth() -> void:
 		var expected_reduction := mini(1, base_cost) if stage >= 3 else 0
 		_check(generated.temporary_cost_reduction == expected_reduction, "hero skill stage %s applies expected temporary discount" % stage)
 	_check(handler._get_hero_skill_self_damage() == 1, "hero skill final stage lowers self damage")
+	handler.free()
+
+
+func _check_hand_size_limit() -> void:
+	var full_hand := Hand.new()
+	for _i in Hand.MAX_HAND_SIZE:
+		full_hand.add_child(Node.new())
+	_check(full_hand.is_full() and full_hand.available_slots() == 0, "hand caps at ten cards")
+
+	var handler := PlayerHandler.new()
+	handler.hand = full_hand
+	handler.character = CharacterStats.new()
+	handler.character.draw_pile = CardPile.new()
+	handler.character.discard = CardPile.new()
+	handler.battle_running = true
+	var queued_draw := Card.new()
+	queued_draw.id = "queued_draw"
+	handler.character.draw_pile.add_card(queued_draw)
+	handler.draw_card()
+	_check(handler.character.draw_pile.cards.size() == 1, "drawing with a full hand leaves the draw pile unchanged")
+
+	var discovered := Card.new()
+	discovered.id = "overflow_discovery"
+	handler.add_discovered_cards_to_hand([discovered])
+	_check(handler.character.discard.cards.size() == 1 and handler.character.discard.cards[0] == discovered, "discovery overflow enters the discard pile")
+
+	full_hand.free()
+	handler.hand = null
 	handler.free()
 
 

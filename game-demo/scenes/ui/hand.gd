@@ -2,6 +2,7 @@ class_name Hand
 extends Control
 
 const CARD_UI_SCENE := preload("res://scenes/card_ui/card_ui.tscn")
+const MAX_HAND_SIZE := 10
 const CARD_SIZE := Vector2(224.0, 322.0)
 const MAX_CARD_GAP := 172.0
 const MIN_CARD_GAP := 92.0
@@ -36,7 +37,9 @@ func _ready() -> void:
 	resized.connect(_layout_cards)
 
 
-func add_card(card: Card, use_draw_origin := true, origin_global := Vector2.ZERO) -> void:
+func add_card(card: Card, use_draw_origin := true, origin_global := Vector2.ZERO) -> bool:
+	if not card or is_full():
+		return false
 	var new_card_ui := CARD_UI_SCENE.instantiate() as CardUI
 	add_child(new_card_ui)
 	_prepare_card(new_card_ui)
@@ -56,6 +59,15 @@ func add_card(card: Card, use_draw_origin := true, origin_global := Vector2.ZERO
 		fade.tween_property(new_card_ui, "modulate:a", 1.0, 0.18)
 
 	_layout_cards()
+	return true
+
+
+func is_full() -> bool:
+	return get_child_count() >= MAX_HAND_SIZE
+
+
+func available_slots() -> int:
+	return maxi(MAX_HAND_SIZE - get_child_count(), 0)
 
 
 func discard_card(card: CardUI, play_discard_animation := true) -> void:

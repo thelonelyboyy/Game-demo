@@ -23,6 +23,7 @@ var battle_running := false
 var player_actions_enabled := false
 # 英雄技能每回合限一次，回合开始重置。
 var _hero_skill_used_this_turn := false
+var _hand_full_notice_emitted_this_turn := false
 var draw_tween: Tween
 var discard_tween: Tween
 
@@ -61,6 +62,7 @@ func start_turn() -> void:
 
 	player_actions_enabled = false
 	_hero_skill_used_this_turn = false
+	_hand_full_notice_emitted_this_turn = false
 	character.block = 0
 	character.reset_mana()
 	Events.player_turn_started.emit()
@@ -90,6 +92,7 @@ func can_use_hero_skill() -> bool:
 		and player.stats != null
 		and player.stats.health > 0
 		and hand != null
+		and not hand.is_full()
 	)
 
 
@@ -117,6 +120,9 @@ func use_hero_skill(origin_global := Vector2.ZERO) -> void:
 func draw_card(is_start_of_turn_draw := false) -> void:
 	if not _can_use_card_piles() or not hand:
 		return
+	if hand.is_full():
+		_notify_hand_full()
+		return
 
 	reshuffle_deck_from_discard()
 	if not character.draw_pile or character.draw_pile.empty():
@@ -125,7 +131,10 @@ func draw_card(is_start_of_turn_draw := false) -> void:
 	var card := character.draw_pile.draw_card()
 	if not card:
 		return
-	hand.add_card(card)
+	if not hand.add_card(card):
+		character.draw_pile.add_card_to_top(card)
+		_notify_hand_full()
+		return
 	Events.card_drawn.emit(card)
 	if not is_start_of_turn_draw:
 		Events.card_extra_drawn.emit(card)
@@ -281,15 +290,29 @@ func add_discovered_cards_to_hand(cards: Array[Card], origin_global := Vector2.Z
 	if not battle_running or not hand:
 		return
 
+	var overflow_count := 0
 	for card: Card in cards:
 		if not card:
 			continue
 		card.temporary = false
 		card.bind_spirit_root_owner(character)
-		hand.add_card(card, false, origin_global)
-		Events.card_drawn.emit(card)
+		if hand.add_card(card, false, origin_global):
+			Events.card_drawn.emit(card)
+		else:
+			card.reset_temporary_cost()
+			character.discard.add_card(card)
+			overflow_count += 1
+	if overflow_count > 0:
+		Events.ui_notice_requested.emit("手牌已满，%s 张发现牌进入弃牌堆" % overflow_count)
 	if player_actions_enabled:
 		hand.enable_hand()
+
+
+func _notify_hand_full() -> void:
+	if _hand_full_notice_emitted_this_turn:
+		return
+	_hand_full_notice_emitted_this_turn = true
+	Events.ui_notice_requested.emit("手牌已满（最多 %s 张）" % Hand.MAX_HAND_SIZE)
 
 
 func discard_card_from_hand(card_ui: CardUI, play_discard_animation := true) -> void:

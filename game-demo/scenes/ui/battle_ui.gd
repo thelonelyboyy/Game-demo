@@ -1037,6 +1037,7 @@ func _update_hero_skill_button_state() -> void:
 		or _hero_skill_used_this_turn
 		or not char_stats
 		or char_stats.health <= 0
+		or (hand and hand.is_full())
 	)
 
 

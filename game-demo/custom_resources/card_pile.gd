@@ -27,6 +27,17 @@ func add_card(card: Card) -> void:
 		owner_stats.refresh_spirit_root_bonus_cards()
 
 
+func add_card_to_top(card: Card) -> void:
+	if not card:
+		return
+	if owner_stats:
+		card.bind_spirit_root_owner(owner_stats)
+	cards.push_front(card)
+	card_pile_size_changed.emit(cards.size())
+	if owner_stats:
+		owner_stats.refresh_spirit_root_bonus_cards()
+
+
 func remove_card(card: Card) -> bool:
 	var index := cards.find(card)
 	if index == -1:
