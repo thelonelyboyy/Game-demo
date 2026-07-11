@@ -67,6 +67,7 @@ signal shop_exited
 # Campfire-related events
 signal campfire_rested(character: CharacterStats, heal_amount: int)
 signal campfire_card_upgraded(character: CharacterStats, card: Card)
+signal campfire_card_removed(character: CharacterStats, card: Card, max_health_cost: int)
 signal campfire_exited
 
 # Battle Reward-related events

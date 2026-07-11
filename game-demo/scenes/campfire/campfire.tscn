@@ -193,9 +193,16 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "卡牌突破"
 
+[node name="BloodRefineButton" type="Button" parent="UILayer/UI"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "血炼术法（-5 最大生命）"
+
 [node name="Description" type="Label" parent="UILayer/UI"]
 layout_mode = 2
-text = "恢复 30% 生命"
+text = "选择一种修炼方式"
 horizontal_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

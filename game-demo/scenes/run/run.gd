@@ -1082,8 +1082,7 @@ func _on_treasure_room_exited(relic_choices: Array[Relic]) -> void:
 
 func _on_campfire_entered() -> void:
 	var campfire := _change_view(CAMPFIRE_SCENE) as Campfire
-	campfire.char_stats = character
-	campfire.run_stats = stats
+	campfire.setup(character, stats)
 
 
 func _on_shop_entered() -> void:

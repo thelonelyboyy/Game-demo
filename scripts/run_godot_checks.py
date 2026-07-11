@@ -33,6 +33,7 @@ CHECKS = [
     {"name": "fusion-suite", "args": ["res://test_data/fusion_suite_smoke.tscn"], "quit": False, "required_marker": "FUSION_SUITE_SMOKE_OK"},
     {"name": "potion-economy", "args": ["res://test_data/potion_economy_smoke.tscn"], "quit": False, "required_marker": "POTION_ECONOMY_SMOKE_OK"},
     {"name": "run-history", "args": ["res://test_data/run_history_smoke.tscn"], "quit": False, "required_marker": "RUN_HISTORY_SMOKE_OK"},
+    {"name": "campfire-choices", "args": ["res://test_data/campfire_choices_smoke.tscn"], "quit": False, "required_marker": "CAMPFIRE_CHOICES_SMOKE_OK"},
 ]
 CHECK_TIMEOUT_SECONDS = 90
 
