@@ -34,11 +34,16 @@ func _run_smoke() -> void:
 				_check(battle.is_available_in_chapter(chapter), "chapter-filtered battle accepts active chapter")
 			ids_by_tier_and_chapter["%s:%s" % [tier, chapter]] = ids
 
+			var first_cycle := {}
 			for i in range(30):
 				var picked := pool.get_random_battle_for_tier(tier)
 				_check(picked != null, "chapter %s tier %s always selects an encounter" % [chapter, tier])
 				if picked:
-					_check(ids.has(_battle_id(picked)), "random encounter stays inside chapter pool")
+					var picked_id := _battle_id(picked)
+					_check(ids.has(picked_id), "random encounter stays inside chapter pool")
+					if i < expected_count:
+						first_cycle[picked_id] = true
+			_check(first_cycle.size() == expected_count, "chapter %s tier %s does not repeat before bag exhaustion" % [chapter, tier])
 
 	for tier in range(3):
 		for first_chapter in range(1, 4):
