@@ -12,6 +12,9 @@ const CARD_ICON := preload("res://art/ui/rewards/card_reward_icon.png")
 const FUSION_ICON := preload("res://art/map/nodes/map_node_elite.png")
 const FUSION_TEXT := "术法熔炼"
 const CARD_TEXT := "择取新术法"
+const RARE_PITY_WEIGHT_PER_MISS := 2.0
+const RARE_PITY_MAX_BONUS := 12.0
+const RARE_PITY_HARD_LIMIT := 6
 const REWARD_RARITY_ORDER := [
 	Card.Rarity.COMMON,
 	Card.Rarity.UNCOMMON,
@@ -66,7 +69,7 @@ func add_card_reward() -> void:
 	var card_reward := REWARD_BUTTON.instantiate() as RewardButton
 	card_reward.reward_icon = CARD_ICON
 	card_reward.reward_text = CARD_TEXT
-	card_reward.reward_subtext = "从三张术法中选择一张"
+	card_reward.reward_subtext = "从 %s 张术法中选择一张" % (run_stats.card_rewards if run_stats else 3)
 	card_reward.accent_color = Color("b88ad8")
 	card_reward.auto_consume = false
 	card_reward.pressed.connect(_show_card_rewards.bind(card_reward))
@@ -158,9 +161,14 @@ func _generate_card_reward_choices() -> Array[Card]:
 	var card_reward_array: Array[Card] = []
 	var available_cards: Array[Card] = character_stats.draftable_cards.duplicate_cards()
 
+	var guarantee_rare := run_stats.card_reward_miss_streak >= RARE_PITY_HARD_LIMIT
 	for i in run_stats.card_rewards:
 		_setup_card_chances()
-		var picked_card := _pick_reward_card(available_cards)
+		var picked_card: Card
+		if guarantee_rare and i == 0:
+			picked_card = _get_random_available_card(available_cards, Card.Rarity.RARE)
+		else:
+			picked_card = _pick_reward_card(available_cards)
 		if not picked_card:
 			break
 
@@ -171,6 +179,7 @@ func _generate_card_reward_choices() -> Array[Card]:
 				return candidate and candidate.id != picked_card.id
 		)
 
+	_update_card_reward_pity(card_reward_array)
 	return card_reward_array
 
 
@@ -199,11 +208,28 @@ func _show_card_fusion(fusion_reward: RewardButton) -> void:
 
 
 func _setup_card_chances() -> void:
-	card_reward_total_weight = run_stats.common_weight + run_stats.uncommon_weight + run_stats.rare_weight + run_stats.mythic_weight
-	card_rarity_weights[Card.Rarity.COMMON] = run_stats.common_weight
-	card_rarity_weights[Card.Rarity.UNCOMMON] = run_stats.common_weight + run_stats.uncommon_weight
-	card_rarity_weights[Card.Rarity.RARE] = run_stats.common_weight + run_stats.uncommon_weight + run_stats.rare_weight
+	var pity_bonus := minf(run_stats.card_reward_miss_streak * RARE_PITY_WEIGHT_PER_MISS, RARE_PITY_MAX_BONUS)
+	var adjusted_common := maxf(run_stats.common_weight - pity_bonus, 0.0)
+	var adjusted_rare := run_stats.rare_weight + pity_bonus
+	card_reward_total_weight = adjusted_common + run_stats.uncommon_weight + adjusted_rare + run_stats.mythic_weight
+	card_rarity_weights[Card.Rarity.COMMON] = adjusted_common
+	card_rarity_weights[Card.Rarity.UNCOMMON] = adjusted_common + run_stats.uncommon_weight
+	card_rarity_weights[Card.Rarity.RARE] = adjusted_common + run_stats.uncommon_weight + adjusted_rare
 	card_rarity_weights[Card.Rarity.MYTHIC] = card_reward_total_weight
+
+
+func _update_card_reward_pity(choices: Array[Card]) -> void:
+	var has_high_rarity := choices.any(
+		func(card: Card):
+			return card and card.rarity >= Card.Rarity.RARE
+	)
+	if has_high_rarity:
+		run_stats.card_reward_miss_streak = 0
+	else:
+		run_stats.card_reward_miss_streak = mini(
+			run_stats.card_reward_miss_streak + 1,
+			RARE_PITY_HARD_LIMIT
+		)
 
 
 func _get_random_available_card(available_cards: Array[Card], with_rarity: Card.Rarity) -> Card:
@@ -232,10 +258,11 @@ func _on_gold_reward_taken(amount: int) -> void:
 
 func _on_card_reward_taken(card: Card, card_reward: RewardButton) -> void:
 	active_card_rewards = null
-	if not character_stats or not card:
+	if not character_stats:
 		return
 
-	character_stats.deck.add_card(card)
+	if card:
+		character_stats.deck.add_card(card)
 	card_reward_choices.clear()
 	if is_instance_valid(card_reward):
 		card_reward.queue_free()

@@ -66,6 +66,7 @@ const CHAPTER_CARD_RARITY_WEIGHTS := {
 @export var campfires_visited := 0
 @export var gold_spent := 0
 @export var potions_used := 0
+@export var card_reward_miss_streak := 0
 
 
 func set_gold(new_amount: int) -> void:

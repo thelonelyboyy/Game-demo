@@ -120,6 +120,24 @@ func _check_card_reward_choices() -> void:
 			ids[card.id] = true
 		_check(choices.size() == reward.run_stats.card_rewards, "card reward returns configured choice count")
 		_check(ids.size() == choices.size(), "card reward choices never repeat an id")
+
+	reward.run_stats.card_reward_miss_streak = BattleReward.RARE_PITY_HARD_LIMIT
+	var guaranteed_choices := reward._generate_card_reward_choices()
+	_check(guaranteed_choices.any(func(card: Card): return card.rarity >= Card.Rarity.RARE), "hard pity guarantees a rare card")
+	_check(reward.run_stats.card_reward_miss_streak == 0, "seeing a rare card resets pity")
+
+	var common_card := load("res://characters/demonic_cultivator/cards/demon_strike.tres") as Card
+	reward._update_card_reward_pity([common_card])
+	_check(reward.run_stats.card_reward_miss_streak == 1, "all-low-rarity reward increments pity")
+	reward._setup_card_chances()
+	_check(reward.card_rarity_weights[Card.Rarity.COMMON] == reward.run_stats.common_weight - BattleReward.RARE_PITY_WEIGHT_PER_MISS, "pity shifts common weight toward rare")
+
+	var reward_button := RewardButton.new()
+	reward.card_reward_choices = [common_card]
+	reward._on_card_reward_taken(null, reward_button)
+	_check(reward.card_reward_choices.is_empty(), "skipping consumes cached card choices")
+	_check(reward_button.is_queued_for_deletion(), "skipping consumes the card reward button")
+	reward_button.free()
 	reward.free()
 
 
