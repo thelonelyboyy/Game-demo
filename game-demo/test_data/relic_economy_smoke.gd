@@ -26,10 +26,12 @@ func _run_smoke() -> void:
 	_check(pool.relics.size() == 45, "reward pool still contains forty-five relics")
 	for rarity in Relic.Rarity.values():
 		_check(rarity_counts[rarity] > 0, "rarity %s has at least one relic" % rarity)
+	_check(rarity_counts[Relic.Rarity.BOSS] == 6, "demonic reward pool contains six boss relics")
 
 	_check_context(pool, character, RelicRewardPool.RewardContext.STANDARD, false, true)
 	_check_context(pool, character, RelicRewardPool.RewardContext.SHOP, false, true)
 	_check_context(pool, character, RelicRewardPool.RewardContext.BOSS, true, false)
+	await _check_three_chapter_boss_choices(pool, character)
 
 	var choices := pool.get_random_available_choices(
 		character, null, 4, 3, RelicRewardPool.RewardContext.TREASURE
@@ -60,8 +62,33 @@ func _check_context(
 			continue
 		if require_non_common:
 			_check(relic.rarity != Relic.Rarity.COMMON, "boss rewards exclude common relics")
+		if context == RelicRewardPool.RewardContext.BOSS:
+			_check(relic.rarity == Relic.Rarity.BOSS, "boss rewards contain only boss relics")
 		if require_non_boss:
 			_check(relic.rarity != Relic.Rarity.BOSS, "non-boss rewards exclude boss relics")
+
+
+func _check_three_chapter_boss_choices(pool: RelicRewardPool, character: CharacterStats) -> void:
+	var handler_scene := load("res://scenes/relic_handler/relic_handler.tscn") as PackedScene
+	var handler := handler_scene.instantiate() as RelicHandler
+	add_child(handler)
+	await get_tree().process_frame
+	# Simulate carrying one boss relic through defeat legacy before a new run.
+	handler.add_relic(load("res://relics/demon_wraith_banner.tres") as Relic)
+	for chapter in range(1, 4):
+		var choices := pool.get_random_available_choices(
+			character, handler, 3, chapter, RelicRewardPool.RewardContext.BOSS
+		)
+		_check(choices.size() == 3, "chapter %s offers three boss relic choices after legacy carryover" % chapter)
+		var unique_ids := {}
+		for relic: Relic in choices:
+			unique_ids[relic.id] = true
+			_check(relic.rarity == Relic.Rarity.BOSS, "chapter %s choice is boss rarity" % chapter)
+		_check(unique_ids.size() == 3, "chapter %s boss choices are unique" % chapter)
+		if not choices.is_empty():
+			handler.add_relic(choices[0])
+	handler.queue_free()
+	await get_tree().process_frame
 
 
 func _check_price_ladder() -> void:

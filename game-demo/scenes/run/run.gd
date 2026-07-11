@@ -1037,7 +1037,7 @@ func _show_boss_battle_rewards() -> void:
 	reward_scene.add_gold_reward(map.last_room.battle_stats.roll_gold_reward())
 	reward_scene.add_card_reward()
 	var relic_choices := RELIC_REWARD_POOL.get_random_available_choices(
-		character, relic_handler, 2, current_chapter, RelicRewardPool.RewardContext.BOSS
+		character, relic_handler, 3, current_chapter, RelicRewardPool.RewardContext.BOSS
 	)
 	reward_scene.add_relic_choice_rewards(relic_choices)
 	if not potion_handler.is_full():

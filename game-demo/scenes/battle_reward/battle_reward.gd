@@ -93,7 +93,7 @@ func add_relic_choice_rewards(relics: Array[Relic]) -> void:
 		add_relic_reward(relics[0])
 		return
 
-	_set_reward_copy("秘匣择宝", "两件法宝显形，只可取其一。")
+	_set_reward_copy("秘匣择宝", "%s 件法宝显形，只可取其一。" % relics.size())
 	back_button.disabled = true
 	back_button.text = "先择一件法宝"
 	for relic: Relic in relics:
