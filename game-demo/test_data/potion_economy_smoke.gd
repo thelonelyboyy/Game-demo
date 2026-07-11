@@ -1,6 +1,7 @@
 extends Node
 
 const CHARACTER_PATH := "res://characters/demonic_cultivator/demonic_cultivator.tres"
+const POTION_HANDLER_SCENE_PATH := "res://scenes/potion_handler/potion_handler.tscn"
 
 var failures: PackedStringArray = []
 
@@ -49,6 +50,7 @@ func _run_smoke() -> void:
 	_check(choices[0].id != choices[1].id, "shop consumable choices do not repeat")
 	_check_weight_curves()
 	_check_standard_drop_pity()
+	await _check_potion_discard(available[0])
 	_finish()
 
 
@@ -77,6 +79,31 @@ func _check_standard_drop_pity() -> void:
 	_check(is_equal_approx(stats.get_standard_potion_drop_chance(), 1.0), "three misses arm guaranteed drop")
 	_check(stats.roll_standard_potion_drop(1.0), "hard pity ignores even a maximum forced roll")
 	_check(stats.potion_drop_miss_streak == 0, "hard pity drop resets miss streak")
+
+
+func _check_potion_discard(potion: Potion) -> void:
+	var handler_scene := load(POTION_HANDLER_SCENE_PATH) as PackedScene
+	var handler := handler_scene.instantiate() as PotionHandler if handler_scene else null
+	_check(handler != null, "potion handler scene loads for discard check")
+	if not handler:
+		return
+	add_child(handler)
+	await get_tree().process_frame
+	_check(handler.add_potion(potion), "potion can enter an empty slot")
+	var occupied_ui: PotionUI = null
+	for ui: PotionUI in handler.get_children():
+		if ui.potion:
+			occupied_ui = ui
+			break
+	_check(occupied_ui != null, "occupied potion slot is available for discard")
+	if occupied_ui:
+		handler._aiming_ui = occupied_ui
+		handler._on_discard_requested(occupied_ui)
+		_check(handler.count() == 1 and handler._aiming_ui == null, "right-click while aiming cancels targeting without discarding")
+		handler._on_discard_requested(occupied_ui)
+		_check(handler.count() == 0 and occupied_ui.potion == null, "right-click discard clears the occupied slot")
+	handler.queue_free()
+	await get_tree().process_frame
 
 
 func _check(condition: bool, message: String) -> void:

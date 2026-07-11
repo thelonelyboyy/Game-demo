@@ -2,6 +2,7 @@ class_name PotionHandler
 extends HBoxContainer
 
 signal potion_used(potion: Potion)
+signal potion_discarded(potion: Potion)
 
 const MAX_SLOTS := 3
 const POTION_UI := preload("res://scenes/potion_handler/potion_ui.tscn")
@@ -83,6 +84,19 @@ func _on_use_requested(ui: PotionUI) -> void:
 	_apply(potion)
 	ui.clear_potion()
 	potion_used.emit(potion)
+
+
+func _on_discard_requested(ui: PotionUI) -> void:
+	if not is_instance_valid(ui) or not ui.potion:
+		return
+	if _aiming_ui:
+		_cancel_aiming()
+		Events.ui_notice_requested.emit("已取消符箓目标选择")
+		return
+	var potion := ui.potion
+	ui.clear_potion()
+	potion_discarded.emit(potion)
+	Events.ui_notice_requested.emit("已丢弃「%s」" % potion.potion_name)
 
 
 func _alive_enemies() -> Array[Enemy]:
@@ -171,6 +185,7 @@ func _add_empty_slot() -> PotionUI:
 	var ui := POTION_UI.instantiate() as PotionUI
 	add_child(ui)
 	ui.use_requested.connect(_on_use_requested)
+	ui.discard_requested.connect(_on_discard_requested)
 	ui.potion = null
 	return ui
 
