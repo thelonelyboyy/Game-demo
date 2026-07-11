@@ -48,6 +48,7 @@ func _run_smoke() -> void:
 	_check(choices.size() == 2, "shop produces two consumable choices")
 	_check(choices[0].id != choices[1].id, "shop consumable choices do not repeat")
 	_check_weight_curves()
+	_check_standard_drop_pity()
 	_finish()
 
 
@@ -62,6 +63,20 @@ func _check_weight_curves() -> void:
 			_check(is_equal_approx(total, 100.0), "potion context %s chapter %s weights total 100" % [context, chapter_index + 1])
 			_check(float(weights[Card.Rarity.RARE]) >= previous_rare, "potion context %s rare chance does not fall by chapter" % context)
 			previous_rare = float(weights[Card.Rarity.RARE])
+
+
+func _check_standard_drop_pity() -> void:
+	var stats := RunStats.new()
+	_check(is_equal_approx(stats.get_standard_potion_drop_chance(), 0.40), "standard consumable drop starts at forty percent")
+	_check(not stats.roll_standard_potion_drop(0.40), "roll at the base boundary misses")
+	_check(stats.potion_drop_miss_streak == 1 and is_equal_approx(stats.get_standard_potion_drop_chance(), 0.55), "first miss raises drop chance to fifty-five percent")
+	_check(stats.roll_standard_potion_drop(0.54), "raised chance can produce a drop")
+	_check(stats.potion_drop_miss_streak == 0, "successful drop resets pity")
+	for _i in RunStats.POTION_DROP_HARD_PITY:
+		_check(not stats.roll_standard_potion_drop(1.0), "eligible misses advance hard pity")
+	_check(is_equal_approx(stats.get_standard_potion_drop_chance(), 1.0), "three misses arm guaranteed drop")
+	_check(stats.roll_standard_potion_drop(1.0), "hard pity ignores even a maximum forced roll")
+	_check(stats.potion_drop_miss_streak == 0, "hard pity drop resets miss streak")
 
 
 func _check(condition: bool, message: String) -> void:

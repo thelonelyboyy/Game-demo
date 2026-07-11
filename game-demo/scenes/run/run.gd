@@ -15,7 +15,6 @@ const DEMONIC_HEAD_ICON := preload("res://art/characters/demonic_cultivator_head
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
 const DEFEAT_LEGACY := preload("res://custom_resources/defeat_legacy.gd")
 const POTION_REWARD_PATHS := PotionRewardPool.POTION_PATHS
-const POTION_DROP_CHANCE := 0.4
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 const TOTAL_CHAPTERS := 3
 
@@ -1006,8 +1005,8 @@ func _show_regular_battle_rewards() -> void:
 	reward_scene.potion_handler = potion_handler
 	reward_scene.add_gold_reward(map.last_room.battle_stats.roll_gold_reward())
 	reward_scene.add_card_reward()
-	# 普通战斗有概率掉落符箓丹药（槽位满则不掉）。
-	if not potion_handler.is_full() and RNG.instance.randf_range(0.0, 1.0) < POTION_DROP_CHANCE:
+	# 只有槽位可用时才推进掉落保底；连续三次未掉后下一次必定出现。
+	if not potion_handler.is_full() and stats.roll_standard_potion_drop():
 		reward_scene.add_potion_reward(_random_reward_potion(PotionRewardPool.RewardContext.STANDARD))
 
 

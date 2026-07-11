@@ -11,6 +11,9 @@ const BASE_RARE_WEIGHT := 5.0
 const BASE_MYTHIC_WEIGHT := 0.0
 const BASE_CARD_REMOVE_COST := 100
 const CARD_REMOVE_COST_INCREMENT := 25
+const BASE_POTION_DROP_CHANCE := 0.40
+const POTION_DROP_CHANCE_PER_MISS := 0.15
+const POTION_DROP_HARD_PITY := 3
 const MAX_DIFFICULTY_LEVEL := 15
 const DIFFICULTY_RULES := [
 	"标准规则。",
@@ -67,6 +70,7 @@ const CHAPTER_CARD_RARITY_WEIGHTS := {
 @export var gold_spent := 0
 @export var potions_used := 0
 @export var card_reward_miss_streak := 0
+@export var potion_drop_miss_streak := 0
 
 
 func set_gold(new_amount: int) -> void:
@@ -170,6 +174,27 @@ func apply_gold_reward_multiplier(amount: int) -> int:
 
 func apply_shop_cost_multiplier(amount: int) -> int:
 	return maxi(0, ceili(amount * shop_cost_multiplier))
+
+
+func get_standard_potion_drop_chance() -> float:
+	if potion_drop_miss_streak >= POTION_DROP_HARD_PITY:
+		return 1.0
+	return minf(
+		BASE_POTION_DROP_CHANCE + potion_drop_miss_streak * POTION_DROP_CHANCE_PER_MISS,
+		1.0
+	)
+
+
+func roll_standard_potion_drop(forced_roll := -1.0) -> bool:
+	if potion_drop_miss_streak >= POTION_DROP_HARD_PITY:
+		potion_drop_miss_streak = 0
+		return true
+	var roll := forced_roll if forced_roll >= 0.0 else RNG.instance.randf()
+	if roll < get_standard_potion_drop_chance():
+		potion_drop_miss_streak = 0
+		return true
+	potion_drop_miss_streak = mini(potion_drop_miss_streak + 1, POTION_DROP_HARD_PITY)
+	return false
 
 
 func get_campfire_heal_amount(max_health: int) -> int:
