@@ -14,6 +14,8 @@ const TEST_ELITE_FLOORS := 8
 const MAP_WIDTH := 7
 const PATHS := 4
 const FIRST_ROW_MONSTER_CAP := 1
+const MIN_SHOP_ROOMS := 2
+const MIN_CAMPFIRE_ROOMS := 2
 const MONSTER_ROOM_WEIGHT := 7.0
 const ELITE_ROOM_WEIGHT := 2.4
 const EVENT_ROOM_WEIGHT := 7.0
@@ -86,6 +88,8 @@ func generate_map() -> Array[Array]:
 	_setup_random_room_weights()
 	_setup_room_types()
 	_ensure_elite_room_exists()
+	_ensure_minimum_support_rooms(Room.Type.SHOP, MIN_SHOP_ROOMS)
+	_ensure_minimum_support_rooms(Room.Type.CAMPFIRE, MIN_CAMPFIRE_ROOMS)
 	_prepend_blessing_room()
 	
 	return map_data
@@ -325,13 +329,14 @@ func _set_room_randomly(room_to_set: Room) -> void:
 	var consecutive_elite := true
 	var elite_too_early_or_late := true
 	var campfire_too_late := true
+	var third_consecutive_combat := true
 	var boss_row := map_data.size() - 1
 	var latest_elite_row := maxi(4, boss_row - 3)
 	var forced_campfire_row := boss_row - 1
 	
 	var type_candidate: Room.Type
 	
-	while campfire_below_4 or consecutive_campfire or consecutive_shop or consecutive_elite or elite_too_early_or_late or campfire_too_late:
+	while campfire_below_4 or consecutive_campfire or consecutive_shop or consecutive_elite or elite_too_early_or_late or campfire_too_late or third_consecutive_combat:
 		type_candidate = _get_random_room_type_by_weight(room_to_set.row)
 		
 		var is_campfire := type_candidate == Room.Type.CAMPFIRE
@@ -347,12 +352,15 @@ func _set_room_randomly(room_to_set: Room) -> void:
 		consecutive_elite = is_elite and has_elite_parent
 		elite_too_early_or_late = is_elite and (room_to_set.row < 3 or room_to_set.row > latest_elite_row)
 		campfire_too_late = is_campfire and room_to_set.row >= forced_campfire_row - 1
+		third_consecutive_combat = _is_combat_type(type_candidate) and _has_two_combat_ancestors(room_to_set)
 		
 	_apply_room_type(room_to_set, type_candidate)
 
 
 func _apply_room_type(room_to_set: Room, type_candidate: Room.Type) -> void:
 	room_to_set.type = type_candidate
+	room_to_set.battle_stats = null
+	room_to_set.event_scene = null
 
 	if type_candidate == Room.Type.ELITE:
 		_setup_elite_battle(room_to_set)
@@ -474,6 +482,8 @@ func _ensure_elite_room_exists() -> void:
 				continue
 			if room.type == Room.Type.TREASURE or room.type == Room.Type.CAMPFIRE:
 				continue
+			if not _is_combat_type(room.type) and _would_create_three_combat_chain(room):
+				continue
 			candidates.append(room)
 
 	if candidates.is_empty():
@@ -481,6 +491,35 @@ func _ensure_elite_room_exists() -> void:
 
 	var elite_room := RNG.array_pick_random(candidates) as Room
 	_apply_room_type(elite_room, Room.Type.ELITE)
+
+
+func _ensure_minimum_support_rooms(type: Room.Type, minimum: int) -> void:
+	while _count_active_rooms_of_type(type) < minimum:
+		var candidates: Array[Room] = []
+		var boss_row := map_data.size() - 1
+		for row_index in range(1, boss_row - 1):
+			if type == Room.Type.CAMPFIRE and row_index < 3:
+				continue
+			for room: Room in map_data[row_index]:
+				if room.next_rooms.is_empty():
+					continue
+				if room.type != Room.Type.MONSTER and room.type != Room.Type.EVENT:
+					continue
+				if _room_has_parent_of_type(room, type) or _room_has_child_of_type(room, type):
+					continue
+				candidates.append(room)
+		if candidates.is_empty():
+			return
+		_apply_room_type(RNG.array_pick_random(candidates) as Room, type)
+
+
+func _count_active_rooms_of_type(type: Room.Type) -> int:
+	var count := 0
+	for row: Array in map_data:
+		for room: Room in row:
+			if room.type == type and (room.next_rooms.size() > 0 or type == Room.Type.BOSS):
+				count += 1
+	return count
 
 
 func _has_room_type(type: Room.Type) -> bool:
@@ -493,6 +532,13 @@ func _has_room_type(type: Room.Type) -> bool:
 
 
 func _room_has_parent_of_type(room: Room, type: Room.Type) -> bool:
+	for parent: Room in _get_room_parents(room):
+		if parent.type == type:
+			return true
+	return false
+
+
+func _get_room_parents(room: Room) -> Array[Room]:
 	var parents: Array[Room] = []
 	# left parent
 	if room.column > 0 and room.row > 0:
@@ -510,11 +556,45 @@ func _room_has_parent_of_type(room: Room, type: Room.Type) -> bool:
 		if parent_candidate.next_rooms.has(room):
 			parents.append(parent_candidate)
 	
-	for parent: Room in parents:
-		if parent.type == type:
+	return parents
+
+
+func _room_has_child_of_type(room: Room, type: Room.Type) -> bool:
+	for child: Room in room.next_rooms:
+		if child.type == type:
 			return true
-	
 	return false
+
+
+func _has_two_combat_ancestors(room: Room) -> bool:
+	for parent: Room in _get_room_parents(room):
+		if not _is_combat_type(parent.type):
+			continue
+		for grandparent: Room in _get_room_parents(parent):
+			if _is_combat_type(grandparent.type):
+				return true
+	return false
+
+
+func _would_create_three_combat_chain(room: Room) -> bool:
+	if _has_two_combat_ancestors(room):
+		return true
+	var has_combat_parent := _get_room_parents(room).any(
+		func(parent: Room): return _is_combat_type(parent.type)
+	)
+	for child: Room in room.next_rooms:
+		if not _is_combat_type(child.type):
+			continue
+		if has_combat_parent:
+			return true
+		for grandchild: Room in child.next_rooms:
+			if _is_combat_type(grandchild.type):
+				return true
+	return false
+
+
+func _is_combat_type(type: Room.Type) -> bool:
+	return type == Room.Type.MONSTER or type == Room.Type.ELITE
 
 
 func _get_random_room_type_by_weight(row := -1) -> Room.Type:

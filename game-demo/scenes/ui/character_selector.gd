@@ -642,6 +642,10 @@ func _apply_animated_background(entry: Dictionary) -> void:
 	# 每个角色可单独覆盖动画帧率，缺省回退全局值。
 	animated_background_fps = entry.get("animated_background_fps", ANIMATED_BACKGROUND_FPS)
 	_pending_apply_dir = frame_dir
+	# Headless smoke 会在首帧立即退出；此时启动后台纹理加载会与渲染器销毁竞态。
+	if DisplayServer.get_name() == "headless":
+		_stop_animated_background()
+		return
 
 	if frame_dir.is_empty():
 		_stop_animated_background()

@@ -22,6 +22,7 @@ CHECKS = [
     {"name": "content-progression", "args": ["res://test_data/content_progression_smoke.tscn"], "quit": False, "required_marker": "CONTENT_PROGRESSION_SMOKE_OK"},
     {"name": "battle", "args": ["res://scenes/battle/battle.tscn"], "quit": True},
     {"name": "map", "args": ["res://scenes/map/map.tscn"], "quit": True},
+    {"name": "map-generation", "args": ["res://test_data/map_generation_smoke.tscn"], "quit": False, "required_marker": "MAP_GENERATION_SMOKE_OK"},
     {"name": "run-flow", "args": ["res://test_data/run_flow_smoke.tscn"], "quit": False, "required_marker": "RUN_FLOW_SMOKE_OK"},
     {"name": "boss-battle", "args": ["res://test_data/boss_battle_smoke.tscn"], "quit": False, "required_marker": "BOSS_BATTLE_SMOKE_OK"},
     {"name": "elite-tactics", "args": ["res://test_data/elite_tactics_smoke.tscn"], "quit": False, "required_marker": "ELITE_TACTICS_SMOKE_OK"},
