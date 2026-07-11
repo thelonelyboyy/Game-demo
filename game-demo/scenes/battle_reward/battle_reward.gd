@@ -15,6 +15,8 @@ const CARD_TEXT := "择取新术法"
 const RARE_PITY_WEIGHT_PER_MISS := 2.0
 const RARE_PITY_MAX_BONUS := 12.0
 const RARE_PITY_HARD_LIMIT := 6
+const ARCHETYPE_SYNERGY_PER_CARD := 0.18
+const ARCHETYPE_SYNERGY_MAX_BONUS := 0.90
 const REWARD_RARITY_ORDER := [
 	Card.Rarity.COMMON,
 	Card.Rarity.UNCOMMON,
@@ -246,7 +248,51 @@ func _get_random_available_card(available_cards: Array[Card], with_rarity: Card.
 	if all_possible_cards.is_empty():
 		all_possible_cards = available_cards
 
-	return RNG.array_pick_random(all_possible_cards)
+	return _pick_synergy_weighted_card(all_possible_cards)
+
+
+func _pick_synergy_weighted_card(cards: Array[Card]) -> Card:
+	if cards.is_empty():
+		return null
+	var total_weight := 0.0
+	for card: Card in cards:
+		total_weight += _get_card_synergy_weight(card)
+	var roll := RNG.instance.randf_range(0.0, total_weight)
+	for card: Card in cards:
+		roll -= _get_card_synergy_weight(card)
+		if roll <= 0.0:
+			return card
+	return cards.back()
+
+
+func _get_card_synergy_weight(candidate: Card) -> float:
+	if not candidate or not character_stats or not character_stats.deck:
+		return 1.0
+	var candidate_archetypes := _get_card_archetypes(candidate)
+	if candidate_archetypes.is_empty():
+		return 1.0
+	var matching_cards := 0
+	for deck_card: Card in character_stats.deck.cards:
+		var deck_archetypes := _get_card_archetypes(deck_card)
+		for archetype: String in candidate_archetypes:
+			if deck_archetypes.has(archetype):
+				matching_cards += 1
+				break
+	return 1.0 + minf(matching_cards * ARCHETYPE_SYNERGY_PER_CARD, ARCHETYPE_SYNERGY_MAX_BONUS)
+
+
+func _get_card_archetypes(card: Card) -> PackedStringArray:
+	var archetypes := PackedStringArray()
+	if not card:
+		return archetypes
+	var searchable := (" ".join(card.mechanic_tags) + " " + card.get_default_tooltip() + " " + card.id).to_lower()
+	if searchable.contains("献祭") or searchable.contains("失去") or searchable.contains("self_damage") or searchable.contains("blood"):
+		archetypes.append("blood")
+	if searchable.contains("煞气") or searchable.contains("魔焰") or searchable.contains("焰轮") or searchable.contains("sha") or searchable.contains("flame"):
+		archetypes.append("flame")
+	if searchable.contains("魂印") or searchable.contains("soul_mark") or searchable.contains("soul"):
+		archetypes.append("soul")
+	return archetypes
 
 
 func _on_gold_reward_taken(amount: int) -> void:

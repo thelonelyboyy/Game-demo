@@ -31,6 +31,7 @@ func _run_smoke() -> void:
 	_check_discover_card()
 	_check_discovery_request()
 	_check_card_reward_choices()
+	_check_card_reward_archetype_synergy()
 	_check_demonic_pool_depth()
 	_check_hero_skill_growth()
 	_finish()
@@ -139,6 +140,29 @@ func _check_card_reward_choices() -> void:
 	_check(reward.card_reward_choices.is_empty(), "skipping consumes cached card choices")
 	_check(reward_button.is_queued_for_deletion(), "skipping consumes the card reward button")
 	reward_button.free()
+	reward.free()
+
+
+func _check_card_reward_archetype_synergy() -> void:
+	var reward := BattleReward.new()
+	reward.character_stats = CharacterStats.new()
+	reward.character_stats.deck = CardPile.new()
+	for i in range(6):
+		var support := Card.new()
+		support.id = "soul_support_%s" % i
+		support.mechanic_tags = PackedStringArray(["魂印"])
+		reward.character_stats.deck.add_card(support)
+	var soul_candidate := Card.new()
+	soul_candidate.id = "soul_candidate"
+	soul_candidate.mechanic_tags = PackedStringArray(["魂印"])
+	var neutral_candidate := Card.new()
+	neutral_candidate.id = "neutral_candidate"
+	_check(is_equal_approx(reward._get_card_synergy_weight(neutral_candidate), 1.0), "neutral rewards keep base weight")
+	_check(is_equal_approx(reward._get_card_synergy_weight(soul_candidate), 1.9), "archetype reward bonus reaches its configured cap")
+	var blood_candidate := Card.new()
+	blood_candidate.id = "blood_candidate"
+	blood_candidate.mechanic_tags = PackedStringArray(["献祭"])
+	_check(is_equal_approx(reward._get_card_synergy_weight(blood_candidate), 1.0), "unbuilt archetypes remain available at base weight")
 	reward.free()
 
 
