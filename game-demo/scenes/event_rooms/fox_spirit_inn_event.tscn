@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "狐仙客栈"
 event_body = "客栈门口灯火温柔，掌柜笑得过分好看。"
-choice_texts = PackedStringArray("住一晚：失去 35 灵石，回复 16 生命", "讲故事抵账：获得 30 灵石", "不进门")
-choice_effects = PackedStringArray("lose_gold:35|heal:16", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(0, 30, 0)
+choice_texts = PackedStringArray("住一晚：失去 40 灵石，回复 29 生命", "讲故事抵账：获得 35 灵石", "不进门")
+choice_effects = PackedStringArray("lose_gold:40|heal:29", "gain_gold", "skip")
+choice_amounts = PackedInt32Array(0, 35, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

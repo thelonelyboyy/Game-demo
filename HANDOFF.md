@@ -1,13 +1,13 @@
 ﻿# 万劫求仙项目交接文档
 
-更新时间：2026-07-07（提交前整理：手感/音频/地图/MCP bugfix）
+更新时间：2026-07-11（魔修完整 Demo 内容、难度、法宝经济）
 项目根目录：`E:\code\game-demo`  
 Godot 工程目录：`E:\code\game-demo\game-demo`  
 Godot 版本：4.5.2 stable mono  
 Godot 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64.exe`
 Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64\Godot_v4.5.2-stable_mono_win64_console.exe`
 
-## 1. 当前状态（2026-07-07）
+## 1. 当前状态（2026-07-11）
 
 - 稳定运行的杀戮尖塔式修仙卡牌肉鸽 Demo。当前焦点：**把魔修打磨成完整 Demo**。
 - **当前开发策略**：暂时不继续精抠单个 UI，优先把魔修职业做成可完整通关、可调试、可扩展的 Demo 闭环。
@@ -31,7 +31,7 @@ Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godo
 - **战斗手感优化专场已完成（2026-07-06，约 25 项）**：手牌 hover/拖拽/补位、飘字/命中特效/命中停顿、回合横幅/Boss 名牌/煞气阈值演出、抽弃牌飞行、洗牌提示、死亡溶解、金币滚动、地图标记、功法牌演出等全部落地；同轮已补 CC0 音效与战斗/主菜单 BGM。详见第 6 节「战斗手感优化专场」与第 7 节文件地图。
 - **2026-07-07 Godot MCP 修复**：修复 `HitEffect` 被挂进 `EnemyHandler` 后，下一回合 typed 遍历把 `hit_effect.gd` 当 `enemy.gd` 导致崩溃的问题；特效改挂战斗世界层，`EnemyHandler` 遍历统一过滤 `Enemy`。
 - `validate_project.py` 现在 **0 error / 0 warning**（2026-07-07 复跑；校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
-- `run_godot_checks.py`：2026-07-07 最近一次用 Godot exe 跑过全量检查，`main`/`character-selector`/`codex`/`battle`/`map`/`run-flow`/`boss-battle` 全部通过。
+- `run_godot_checks.py`：2026-07-11 最近一次全量运行 14 项检查全部通过，覆盖主流程、卡牌机制、三章内容、9 Boss、精英战术、心魔难度、魔修牌组/法宝和法宝经济。
 - **统一 Excel 数值总表**：`game_data.xlsx`（卡牌/祝福/怪物AI 三张数据表 + 说明）——改表回写 `.tres`/`.json`/`.tscn`，一个文件调全部数值平衡（见第 6、7 节）。旧的独立 `cards.xlsx` 已被它取代。
 - 开发路线图见根目录 `ROADMAP.md`。
 
@@ -127,11 +127,14 @@ E:\code\game-demo
 - **战斗角色帧动画**：`CharacterStats.battle_anim_id` 非空时，玩家在战斗中改用 `art/frame_animation/<id>_<动作>/` 逐帧动画（`scenes/player/player.gd` 运行时构建 SpriteFrames，贴图缺失则回退静态立绘）。动作：`standby`(待机循环)/`attack`/`attacked`/`Spellcasting`(出非攻击牌)/`death`(死亡，停在末帧)。已配置：魔修=`demonic_cultivator`(5 套全)、剑修=`sword_cultivator`(standby/attack/attacked)。帧率 `ANIM_DEFS` 当前统一 **20fps**。**攻击/受击时序**：出攻击牌→播攻击动画→动画结束才结算伤害（`card.gd` 经 `Events.attack_animation_finished` 门控）；受击同理——受击动画播完才扣血（`player.take_damage`）。新增帧文件夹后务必在编辑器导入。
 - **敌人意图系统**：`Intent.category`（12 种分类）驱动 `scenes/ui/intent_ui.gd` 的彩色气泡；攻击/防御/强化等分类用 `art/tiles/intent_*.png` 贴图、其余分类用代码绘制图标兜底。给敌人意图分类：在其 AI 场景（如 `enemies/crab/crab_enemy_ai.tscn`）的 Intent 子资源里设 `category`。
 - **存档自愈**：`SaveGame.load_data()` 加载前用 `get_dependencies` 检查依赖是否齐全，缺失/损坏则清理坏档并返回 null（`run.gd` 也会在空存档时返回主菜单）。注意：存档仍按路径内嵌大量资源引用，**移动/重命名被引用的资源会让旧存档失效**（架构隐患，见 ROADMAP 阶段 0）。
-- **章节难度爬升**：`scenes/map/map_generator.gd` 的 `CHAPTER_HEALTH/DAMAGE/GOLD_MULTIPLIERS` 让敌人血量/伤害/金币按章节递增（经 `_battle_for_room` 复制缩放，不污染战斗池）；进入新一章在 `run.gd._advance_to_next_chapter` 回满血；测试地图（`map_mode != ROGUELIKE`）开启 `Map.free_navigation`（所有节点可点，直接点 Boss 也能进章）。
+- **章节难度爬升**：`scenes/map/map_generator.gd` 的 `CHAPTER_HEALTH/DAMAGE/GOLD_MULTIPLIERS` 让敌人血量/伤害/金币按章节递增（经 `_battle_for_room` 复制缩放，不污染战斗池）；凡境进章回满，心魔 10 起只恢复一半已损生命；测试地图（`map_mode != ROGUELIKE`）开启 `Map.free_navigation`（所有节点可点，直接点 Boss 也能进章）。
 - **数值/平衡关键位置**：商店按稀有度定价 `shop_card.gd PRICE_BY_RARITY` + 法宝价位带 `shop_relic.gd`；暗金卡上架 `shop.gd MYTHIC_SHOP_CHANCE=0.04`；灵根缩放 `character_stats.gd get_spirit_root_modified_value`（初悟 0-3 张：主数值+1；小成 4-6 张：ceil(基础主数值×1.2)+1；圆满 7+ 张：ceil(基础主数值×1.4)+1，并解锁每回合最多一次的元素被动）；剑意上限 `statuses/sword_intent.gd MAX_STACKS=4`；灵气回蓝上限 `statuses/energy_charge.gd MAX_MANA_PER_TURN=2`；四职业每回合均抽 5 张。
 - **灵根圆满被动**：逻辑集中在 `scenes/battle/spirit_root_handler.gd` 与相关卡牌/效果钩子，回合开始可靠重置触发次数。火：每回合第一张火攻击牌弹选择，伤害×1.5 或按最终实际伤害 50% 溅射其它敌人；金：第一张金牌得 1 劲气；水：第一张水牌抽 1，抽到的第一张牌本回合费用 -1；土：第一张土牌得 1 真元；木：回合结束若本回合打出过木牌，回复 3 点生命，满血则得 3 护体。UI/tooltip/status 文案需要让玩家看懂本回合是否已触发。
 - **敌人行动延迟回调**：敌人攻击/格挡行动用 `get_tree().create_timer()`/补间 `finished` 回调发 `enemy_action_completed`，**必须捕获 `enemy.get_instance_id()` 而非节点本身**（否则补间未完成前敌人/战斗被释放会报 `Lambda capture freed`）。新增此类行动请照此写法。
-- **祝福系统（数据驱动）**：祝福内容在 `data/blessings.json`（5 类来源，`blessing.gd` 运行时读取），效果分发在 `blessing.gd._apply_effect`。可经 `game_data.xlsx` 的「祝福」表编辑回写。新增效果类型要同时在 `_apply_effect` 加分支 + `blessing_table.py EFFECT_TYPES` 登记。命格共鸣按 `_character_class()`（资源路径判职业）过滤。
+- **祝福系统（数据驱动，2026-07-06 Neow 化重做）**：祝福内容在 `data/blessings.json`（5 类来源，`blessing.gd` 运行时读取），效果分发在 `blessing.gd._apply_effect`。可经 `game_data.xlsx` 的「祝福」表编辑回写。新增效果类型要同时在 `_apply_effect` 加分支 + `blessing_table.py EFFECT_TYPES` 登记。命格共鸣按 `_character_class()`（资源路径判职业）过滤。
+  - **选择结构（杀戮尖塔 Neow 式）**：不再"抽 1 个来源出 3 个同质选项"，而是打乱 5 个来源、每个来源各出 1 条，凑 4 个选项同台——稳妥（灵脉余泽·绿）/ 改牌（补天盟密阵·蓝）/ 以劫换福（残仙遗蜕·红）/ 豪赌（照命石审判·金）/ 命格专属（命格共鸣·紫，按职业过滤，无匹配则跳过该来源）。每行带来源徽记（`SOURCE_COLORS`）。
+  - **新效果类型**：`remove_strike_defend`（只删打击/防御，id contains 匹配兼容 demon_strike）/ `add_random_cards`（随机职业卡）/ `add_random_rare_card`（随机金卡，无金卡退全池）/ `transform_card`（删起手牌换职业卡）/ `gain_potion`（经 "run" 组借 run 的丹药奖池发放，未改 run.gd）/ `lose_all_gold` / `weaken_next_battles`（发消耗性法宝）。
+  - **破劫之印**（`relics/blessing_broken_seal.gd/.tres`，祝福专属、不入奖励池）：START_OF_COMBAT 使敌人以七成气血入场，`battles_left` 计数用尽后 `owner.queue_free()` 自碎；计数是 @export 字段随存档持久化。
 - **固定套路敌人 AI**：`EnemyActionPicker` 的 `fixed_sequence`（子节点下标数组）非空时按回合循环固定出招、忽略权重/条件；空时保持原随机逻辑。仅 4 个固定敌人（符纸兵/雾隐狼/牛魔/渊狱剑魂）用，各有专属 AI 场景。数值/序列可经 `game_data.xlsx` 的「怪物AI」表编辑。注意：AI 挂在敌人身上，正式地图出现这些敌人时也用此套路。
 
 ## 5. 快速验证命令
@@ -237,6 +240,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **敌人攻击特效**（`enemy.gd _play_attack_telegraph`）：出攻击类意图（ATTACK/MULTI_ATTACK/ATTACK_DEFEND）的瞬间在其信息卡位置闪红色冲击特效。⚠️ 曾做过"位置突进前摇"但**无效**——当前战斗 UI 每帧隐藏世界立绘（`battle_ui._hide_legacy_combatant_overlays`），战斗单位只显示为信息卡，移动世界节点看不见；给战斗单位加表现一律作用到信息卡或经画布坐标锚定。
 - **世界节点对齐信息卡（重要修复）**：`battle_ui._align_world_combatants`——布局后把敌人/玩家的世界 Area2D 移到各自信息卡中心（画布坐标反变换），碰撞体与四角选中框放大到卡尺寸（`enemy.align_feedback_to_card`），飘字/特效锚点走 `aligned_feedback_extents`。修掉了"选中框和怪物位置对不上（多怪更明显）"的 bug；新增战斗内世界定位逻辑时**必须**考虑这层对齐。
 - **飘字再放慢一倍**（试玩反馈）：`floating_text.gd` 弹出 0.38 / 停留 0.76 / 淡出 0.96（全程 ~2.1s），`hit_effect.gd` 寿命 0.55。
+- **飘字进一步放大放慢**（试玩反馈"看不清"）：`floating_text.gd` 字号伤害 38→52 / 格挡 30→42 / 自损 32→44 / 治疗 32→42，描边 6→9，文本框 180×48→280×80（防裁切），弹出改"过冲 1.25 倍再回落"，停留 0.76→1.30 / 淡出 0.96→1.20 / 上浮 62→72（全程 ~3s）。要再调只动这些顶部常量与 spawn_* 里的字号。
 - **煞气常驻徽章**：玩家信息卡顶上方常驻「煞气 N」徽章（`battle_combatant_card._refresh_sha_badge`，0 层隐藏，按 3/6/10 档位变色发光、层数变化 punch）；档位气场染色改为染**信息卡立绘**（`set_aura_tint`，世界立绘隐藏染了白染）；档位横幅停留加长（升档 1.6s / 天魔降世 2.4s）。
 
 **音频接入（同日，全部 CC0）**：
@@ -260,6 +264,48 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **选卡奖励飞向牌库**：`card_rewards.gd` 领取时发 `card_acquired_animation_requested`（从选中卡的位置起飞），与商店购卡共用 run.gd 的幽灵卡动画。
 - **暂停菜单开启动画**：`pause_menu.gd` 新增 `open()`（run.gd 设置按钮已改走它），面板缩放回弹+淡入，tween 用 `TWEEN_PAUSE_PROCESS`。
 - **事件界面淡入**：事件场景众多且各有 `_ready`，统一在 `run.gd._on_event_room_entered` 里做 `animate_screen_entrance`。
+
+**地图杀戮尖塔化（同日第三批，`map.gd` / `map_room.gd`）**：
+
+- **虚线路径**：连线改虚线贴图（运行时生成一次 dash 纹理 + `Line2D.LINE_TEXTURE_TILE`），颜色仍走 `default_color`（金=走过 / 暖亮脉冲=可选 / 近隐=错过 / 暗=未知）。
+- **手绘弯曲**：直线改二次贝塞尔（8 段采样），弯度由端点坐标哈希决定——确定性、重建地图不变、不消耗 RNG。
+- **错过支线变暗**：`row < floors_climbed` 且未选的节点压到 50% 灰 50% 透明，其连线加 "missed" 样式近乎隐去——在场分支一目了然。
+- **节点 hover 放大**：可选节点悬停 1.18 倍回弹 + 轻音，移开缩回。⚠️ 与开图入场动画同用根节点 scale，入场期间 hover 可能打架（罕见，可接受）。
+- **Boss 节点红光**：Boss 房常驻红色脉冲光环（仅 Boss 节点开 `_process`），隔半张地图可感。
+
+**开局祝福 Neow 化重做（同日）**：详见第 4 节「祝福系统」条目。要点：跨来源四选一（每次必同台四种性格的取舍）、7 个新效果类型、消耗性法宝「破劫之印」、来源徽记配色、选定祝福锣声；`blessings.json` 全量重写，`blessing_table.py EFFECT_TYPES` 已登记，`game_data.xlsx` 已重导出。顺手修了选人界面初始灵石显示与实际不一致（99→70，实际值在 `run_stats.gd STARTING_GOLD`）。**平衡数值未实战校验**（如 -12~-16 最大生命的代价档、破劫之印 3 场七成血），试玩后按体感调 JSON 即可。
+
+**地图卷轴拉高 + 主页动画增强（同日）**：
+
+- **地图卷轴**：`map.gd SCROLL_FLOOR_CAPACITY` 15→**20**——卷轴背景按 20 层节点的高度绘制，`map_generator.gd FLOORS`（当前 13）拉到 20 以内都放得下，相机滚动范围自动跟随。要做 20 层章节直接改 FLOORS 即可。
+- ~~主页动画增强~~（已按用户要求**回滚**：Ken Burns/鼠标视差/挂牌摇摆/龙饰呼吸/按钮hover放大全部移除，主页保持原有的灵光粒子+背景呼吸辉光+入场淡入）。
+
+**Boss 专属出招 + 丹药目标选择 + 事件配平（同日）**：
+
+- **Boss 出招差异化**：此前 4/5 Boss 共用小怪 AI（天阙镇将=crab 系、黑莲圣母/蚀日妖皇/骨龙=toxic_ghost 系），打起来只是大号小怪。已用 `fixed_sequence` 各建专属 AI 场景并改 `.tres` 指向：**天阙镇将**（镇守型：格挡30→戟击16→天雷26→戟击循环）、**黑莲圣母**（成长施法：+3力量→莲刺12(吃力量加成)→格挡22→莲刺循环，越拖越痛）、**蚀日妖皇**（蓄力大招：爪击14→蓄势(格挡15,CHARGE意图明牌)→**蚀日之啮34**三拍循环）、**骨龙**（猛攻型：2x11双爪→龙息18→双爪→骨甲18，几乎不防）。新场景在各 Boss 目录下；数值是基线，另有战斗 dmg_mult 1.15-1.25 与章节倍率叠加，**未实战校验**。
+- **攻击符箓/丹药目标选择**（已知问题清偿）：`potion_handler.gd` 加瞄准模式——单体攻击丹药在**多敌**时点击后进入选目标状态（toast 提示 + 悬停亮敌人四角框 + 右键取消），单敌保持直接使用。命中测试用信息卡对齐后的画布矩形（`aligned_feedback_extents`）。
+- **事件房配平**（40 个事件场景，含暂禁用的旧事件）：治疗 ×1.8、伤害代价 ×1.6、金币 ×1.2（取5倍数），生命上限不动；**选项文案数字与效果值脚本同步重写**；修复古战场"文案说失去 6 生命、效果却不扣血"的不符 bug。当前对 100 血：回血 14-29、代价 6-19、金币 30-110。
+
+**战斗界面细节修缮（同日，用户选定"布局不动只抠细节"）**：
+
+- **血量数字裁切 bug 修复**（`battle_combatant_card.gd`）：竖条底部的数字标签原先向卡外伸 23px，被 frame 的 `clip_contents` 裁切（"100/100"显示成"00/100"）。改为血条标签向卡内右伸、护体条标签向卡内左伸（`_layout_vertical_bar_label` 加 `align_right` 参数），字号 13→16。
+- **卡内立绘放大**：左右边距从 44px 收到「条宽+4px」（约 34px），立绘占满卡窗，削弱黑盒感。
+- **手牌防裁切**：`hand.gd HAND_Y_OFFSET` 50→26，卡底描述不再被屏幕边缘切掉。
+- **英雄技能按钮代价角标**：魔焰焚心按钮右下角常驻红字「-2 生命」，不看 tooltip 也知道代价。
+- **技能行移至角色牌下方**：右下角重排——玩家信息卡上移收窄（318×236，从底 124px），魔焰焚心（156×76）在其正下方偏左；右侧**留白**给未来第二技能（原「未悟」占位面板已按用户要求删除，加第二技能时放 from-right (70, 40) 尺寸 154×76 即可）。按钮边框与结束回合同款（`apply_battle_blue_button`）；「-2 生命」常驻角标已删，代价说明只在悬停 tooltip（文案：受到 2 点伤害，每回合限用一次）。
+- **技能机制修订**：①**每回合限一次**——`player_handler._hero_skill_used_this_turn` 回合开始重置、施放置位（`can_use_hero_skill` 拦截），UI 侧经新信号 `Events.hero_skill_used` 同步禁用按钮到下回合；②代价改为**真实受到 2 点伤害**（`player.take_damage(2, DMG_TAKEN)`）——会被护体吸收（有护体时等于免费用）、吃伤害修正（**煞气≥6 时代价×2=4**）、命中会触发 player_hit（照常叠煞气）、受击演出（音效/震动/停顿）齐全；旧的直扣血函数 `_apply_hero_skill_self_damage` 已删除。致死由 take_damage 内部时序结算。
+- 状态图标（32px）与玩家护体徽章隐藏逻辑此前已由另一轮改进覆盖，未重复改动。
+
+**祝福平衡收口 + 随机效果播报（同日第二轮）**：
+
+- **消除跨来源支配关系**：设计原则——同类效果跨来源必须有档位差，免费版永远是最小档。灵脉余泽**不再做任何牌组操作**（免费升1/删1会被补天盟的免费升2/删2严格支配），改纯资源（新增「行脚盘缠」金+丹药）；残仙遗蜕的付费档全部高于补天免费档一级（嗜血淬炼升 **3** 张 -8 血、蜕骨夺珍 **2** 张金卡 -14 血）；照命石审判豪赌档拉开（舍身得宝 **2** 件法宝 -16 血、富贵险中 250 灵石 -20 血）。
+- **随机效果结果播报**：新信号 `Events.ui_notice_requested(text)` + `run.gd` 居中 toast（NoticeLayer，layer 21，逐条堆叠淡入淡出 ~3s）。祝福的随机突破/移除/复制/发牌/法宝/丹药、事件房（generic_event 的 upgrade_random/remove_random、helpful_boi 的复制）全部播报被随机到的名字，如「突破：『打击』『聚煞』」。以后任何随机效果都应发这个信号。
+
+**图鉴 / 选人界面优化（同日第四批）**：
+
+- **InkTheme.wire_button_sfx(button)**：给自定义贴图样式的按钮（不走 `apply_screen_button` 的）单独挂 hover/点击音，`apply_screen_button` 内部也改走它。
+- **图鉴**（`codex.gd`）：条目切换时详情面板 0.18s 淡入 + 翻书音（`GameSfx.BOOK`，主题贴切）；返回按钮挂音；预览卡牌的 pop-in 由 CardMenuUI 组件自动带。
+- **选人**（`character_selector.gd`）：入场淡入 0.4s（只动 modulate，不干扰异步背景加载）；切换角色时信息面板 0.24s 淡入过渡；新选中的角色卡 punch 弹跳（`_last_punched_index` 守卫防布局刷新重复弹）；角色/开始/返回按钮挂音；**开始修行按下时一记锣**（`GameSfx.GONG`）做仪式感。
 - **地图视觉五连**（`map.gd`）：①走过的连线染金（"selected"态）、可选连线暖亮+呼吸脉冲（`_pulse_lines`）；②可选节点根节点 modulate 呼吸发光（与 AnimationPlayer 的 Visuals 子节点动画不冲突）；③开图演出——节点按层错落浮现（`_animate_map_entrance`，仅 create_map 时播，回图不重播）、连线淡入；④顶部「第X章 · 已登 Y/Z 层」进度牌（`progress_panel`，挂 tooltip 层，随地图显隐）；⑤滚轮平滑滚动（`_scroll_target_y` 目标值 + _process 插值，步长 ×2.4）。
 - **测试地图已关**：`map.tscn` 的 `map_mode` 从 2（TEST_ELITE_LINEAR）改回 **1（ROGUELIKE）**，`free_navigation` 随之关闭，正式随机地图生效。要再进测试地图改回 0/2 即可。
 
@@ -535,11 +581,16 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **调试控制台快捷键**：使用 Ctrl + 反引号，不要再绑定 F8。F8 在 Godot 编辑器运行时会停止项目，看起来像“按控制台键直接退出”。
 - **战斗 UI 手感已完成一轮（2026-07-06）**：手牌 hover/drag、瞄准吸附反馈、命中反馈、hit pause、伤害数字、回合/Boss/煞气演出、音效/BGM 等已落地（第 6 节专场小节）。动效节奏为静态验证 + smoke 通过，**整体叠加后的节奏与混音还需人工进战斗跑几场做主观校验**，参数入口见第 6 节「调参入口」。
 - **单体攻击符箓/丹药目标选择仍偏简单**：无卡牌来源的攻击效果已能生效，但如果没有显式目标，当前主要走第一个存活敌人的兜底逻辑。若要做成品手感，建议后续给攻击丹药/符箓增加一次性目标选择状态。
-- **战斗数值待按 100 血重配平**：剑修/魔修血量已 30/32→100、费用 3→4，但敌人伤害（固定 AI 的处决 12/重砸 10 等）和 `map_generator.gd` 章节缩放仍按旧血量配置，现在战斗偏软。需重新配平敌人伤害 + 章节倍率（可经 `game_data.xlsx` 怪物AI 表 + `map_generator` 倍率调）。
+- ~~**战斗数值待按 100 血重配平**~~（2026-07-06 已完成，见下）：
+  - **基线**：三套共享 AI 脚本默认值上调——bat 系（银月狼/劫灰小鬼/雷羽鹰/血纹虎/劫雷鹏）攻 4→6（双击共12）格 4→9；crab 系（铜傀儡/幽暗鹰/玄铁傀/碧鳞蛟/寒潭蛇/天阙镇将/山魈石怪）攻 7→11 格 6→11 大格 15→26；toxic_ghost 系（黑莲圣母/蚀日妖皇/幽冢灯/碧玉蛛/摄魂影/骨龙/瘴毒蛾）攻 8→13 格 10→18。4 个固定套路场景：符纸兵 9/12、雾隐狼 10/7、牛魔 格18/重砸20/13、渊狱剑魂 15/格22/9/处决25。
+  - **血量**：普通 ×~2.7-3.0（银月狼 20 … 铜傀儡 80）、精英 ×~2.7-3.0（牛魔 105 … 碧鳞蛟 155）、Boss ×~2.4-2.6（渊狱剑魂 235 / 黑莲圣母 245 / 天阙镇将 265 / 蚀日妖皇 290）；**骨龙 40→210**（原值严重偏低，同时其战斗 hp_mult 1.25→1.00 防双重加成）。
+  - **精英每场伤害倍率**拉开档次：血纹虎群/劫雷鹏 1.35、玄铁傀/碧鳞蛟/摄魂影 1.30、牛魔 1.15。章节倍率（HP 1.0/1.3/1.65、伤害 1.0/1.15/1.3）保持不动。
+  - **设计目标**：普通战 2-3 回合、耗 ~10-20 血；精英 4-6 回合、耗 ~25-40；Boss 6-10 回合。`game_data.xlsx` 已重导出同步。**未实战校验，需人工打一局按体感微调**——最快的调法是改三套共享脚本的 @export 默认值和精英战 .tres 倍率。
+- **`character-selector` smoke 偶发 `Parameter "t" is null`**：该检查用 `--quit`（首帧即退），与入场 tween 拆场存在竞态，偶发红灯、重跑即过。与 run-flow 偶发同性质，上 CI 前一并处理。
 - **`run-flow` 偶发 `Lambda capture freed`**：完整流程约 2/12 偶发，还有一处多回合补间回调来源未根除（疑似 `status_handler`/`relic_handler`/弃牌结算）。非功能 bug（逻辑仍通过，重跑即过），但将来上 CI 会随机红灯。修法：把 `tween.finished` 的 lambda 改为捕获 `get_instance_id()` / 加 `is_instance_valid` 守卫。
 - **`validate_project.py` 仍有盲区**：查不出「文件在但未导入」（缺 `.import`）和字符串拼接路径。新增美术务必在编辑器导入。（注：默认值字段误报已修，现 0 error。）
 - **存档跨资源移动会失效**：存档按路径内嵌资源引用，移动/重命名被引用资源后旧档加载失败（有自愈清档兜底，但丢进度）。彻底修复需改成"按 id 重建"（ROADMAP 阶段 0）。
-- **魔修待办**：~~`demon_flame`/`demon_flame_heart` 重名~~（已改：群伤献祭的 `demon_flame`→「魔焰燎原」，单体破绽的 `demon_flame_heart` 保留「魔焰焚心」）；~~血祭白卡偏强~~（已调：血祭斩 9→7、血盾 10→8，`cards.xlsx` 同步）；~~魔焰 rider 待细化~~（已细化，见第 6 节）；魂印仍可补更多"引爆" payoff 卡；确认 37 张魔修卡都进了 `demonic_cultivator_draftable_cards.tres`。
+- **魔修待办**：~~`demon_flame`/`demon_flame_heart` 重名~~、~~血祭白卡偏强~~、~~魔焰 rider 待细化~~、~~魂印引爆 payoff 偏少~~均已处理；当前 `demonic_cultivator_draftable_cards.tres` 含 75 个唯一魔修卡 ID，后续重点转为实战平衡与正式插画替换。
 - **符箓丹药图标**：已接入 6 张专属图标到 `art/potions/icons/`（healing_pill/qi_pill/draw_talisman/flame_talisman/frost_talisman/blood_rite_talisman），替换原借用的通用图标。⚠️ 新增 PNG 务必在编辑器导入一次（`--headless --editor --quit`），否则潜在丹药 `.tres` 加载失败、`main/codex/run-flow/boss-battle` 全红。
 - 调整卡牌比例时，要同步检查战斗手牌、奖励三选一、商店、图鉴/预览、升级、删除、融合界面（当前卡 224×322，详见第 6 节 1.4x 改动）。
 - 主菜单标题已烤进背景图 `art/backgrounds/background1.png`（旧 `baijie_chengxian_title.png` 已删）；战斗/选人背景部分仍硬编码在项目根 `test1.png`/`test2.png`（见 `art/README.md`）。
@@ -552,3 +603,72 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 4. 对卡牌标题字体、描述字体补充更有国风感的正式字体资源。
 5. 对地图、商店、宝箱、祝福页面做一次统一视觉 QA，检查字体大小、按钮状态和不同分辨率下的遮挡。
 6. 提交前重新运行 `validate_project.py`；较大系统改动后再跑 `run_godot_checks.py`，并人工进入战斗、商店、地图、奖励、主菜单确认视觉效果。
+
+## 10. 魔修 Demo 内容深化（2026-07-11）
+
+- 卡牌机制已扩展：临时、消耗、保留、固有、虚无、不可打出、状态/诅咒、弃牌触发、消耗触发、成长、固定卡池发现。
+- 新机制已落到实牌：
+  - `血偿`：弃牌时获得 4 护体。
+  - `血膜`：消耗时获得 1 灵力。
+  - `血祭斩`：每次打出后伤害 +2，本场最多成长 6。
+  - 新金卡 `窥心魔典`：消耗；从 7 张固定禁术池随机展示 3 张，基础选 1，突破后选 2；加入手牌并参与本场抽弃循环。
+- 新增 `心魔` 诅咒牌；黑莲圣母会把它塞入玩家弃牌堆，后续洗牌进入手牌形成牌库污染。
+- 新增 `蚀痕` 状态牌（不可打出、虚无）；蚀日妖皇第二招“聚蚀”保留 15 护体并将其塞入弃牌堆，进入抽弃循环后若留在手中会于回合结束移除。复合动作位于 `enemies/shared/block_and_add_card_action.gd`，可供后续敌人复用。
+- 三章遭遇已独立分池：
+  - 第一章：普通 8 / 精英 3 / Boss 3。
+  - 第二章：普通 8 / 精英 3 / Boss 3。
+  - 第三章：普通 8 / 精英 3 / Boss 3。
+  - 新增 14 个普通战混编：月狼群、灰烬狼、傀儡兵阵、灯蛾、蛇蛛、铜灯、石鹰、咒蚀前锋、狼蛛伏击、灰羽突袭、纸灯阵、铜傀毒蛾、蛇石同巢、鹰蛛猎群。
+  - 新增 3 个战术精英：血月狼王令全队获得劲气；铜傀督军为全队提供护体；蚀魂祭司用蚀痕/毒念污染牌序并庇护同伴。三者复用现有美术，但拥有独立名称、属性和固定行动序列。
+  - 各层级三章不重复，章节缩放仍保留。
+- 修复 `crab_attack_action.gd` / `bat_attack_action.gd` 未读取敌方 `DMG_DEALT` 的问题：章节/精英伤害倍率和劲气现在同时影响实际伤害与意图数字。
+- 9 个 Boss 均有数据驱动二阶段：血量阈值触发一次护体、永久增伤并切换后半程固定招式序列。
+- 第一、二章 Boss 击败后不再直接跳章：现在进入 Boss 奖励页，包含金币、卡牌三选一、法宝二选一，丹药槽未满时追加丹药；退出奖励后再进入下一章，并按当前心魔规则恢复生命。
+- 战斗卡牌奖励同一组三选一按卡牌 ID 去重，仍保留奖励池重复资源提供的首抽权重。
+- 卡牌稀有度随章节提升：第一章 85/10/5/0，第二章 72/18/9/1，第三章 60/23/14/3（白/蓝/金/暗金，合计 100）。
+- 新增自动化：
+  - `card-mechanics`：成长上限、触发配置、发现池、发现升级、奖励池接入。
+  - `content-progression`：三章遭遇数量、跨章不重复、随机抽取不越池。
+  - `boss-battle`：新增二阶段、黑莲心魔污染、蚀日聚蚀/虚无状态污染断言。
+  - `elite-tactics`：实跑三场新精英首回合，验证全队劲气、全队护体和蚀痕污染。
+- `game_data.xlsx` 已重新导出同步。
+- 2026-07-11 验证：`validate_project.py` 为 0 error / 0 warning；13 项 `run_godot_checks.py` 全绿。
+
+## 11. 心魔难度系统（2026-07-11）
+
+- 新增 0–15 级累计难度：凡境为标准规则，心魔 1–15 逐级叠加敌人生命、商店涨价、金币衰减、篝火削弱、敌人伤害、精英/Boss 专属强化、卡牌奖励二选一、初始灵石降低、跨章恢复削弱、初始伤血等规则。
+- 规则集中在 `custom_resources/run_stats.gd`；地图、商店、篝火和章节推进调用统一计算接口，继续游戏会刷新规则但不会重置当前金币。
+- 独立进度档为 `user://difficulty_profile.tres`，不随局内 `savegame.tres` 在胜利/失败时删除；通关当前等级解锁并默认选择下一等级，最高封顶 15。
+- 选人页开始按钮上方新增最小难度下拉入口，只显示已解锁等级；每项 tooltip 显示该级新增规则。通关页显示本次克服等级与新解锁等级。
+- 新增 `difficulty` smoke：覆盖凡境、心魔 8、心魔 15、普通/精英/Boss 地图缩放、金币/商店/恢复、加载不重置经济、进度保存/重载/封顶。
+
+## 12. 魔修牌池达到 75 张（2026-07-11）
+
+- 魔修唯一卡牌数从 68 补到 75，新增 7 张构筑桥梁牌：命血逆流、血债清算、血铸魔甲、煞刃、七焰回环、魂灯续燃、万印归墟。
+- 自损路线新增回能过牌、保留防御和按本回合累计自损成长的终结技；煞气新增主动伤害消耗口；魔焰新增低费过牌衔接；魂印新增回能转化和多目标全量引爆。
+- 新增通用效果 `configured_self_damage_scaling_damage_effect.gd` 与 `configured_consume_status_to_damage_effect.gd`，后续卡牌可以数据化复用。
+- `card-mechanics` 验证 75 个唯一 ID、奖励池接入和全部新牌可突破；新增 `demonic-card-suite` 实战验证血债、自损计数、耗煞伤害和双敌魂印引爆。
+
+## 13. 三章 Boss 达到 3 选 1（2026-07-11）
+
+- Boss 总数从 5 扩充到 9，三章现在均为 3 名独立 Boss 随机轮换；`content-progression` 验证每章数量和跨章隔离。
+- 第一章新增血月妖王（强化后连击）与铜甲尸王（结甲、蓄力重击）；第二章新增万蛊母皇（将 2 张浊气直接混入抽牌堆）；第三章新增幽冥判官（用持久状态牌“判牒”污染抽弃循环）。
+- 新增通用敌方动作 `add_card_to_draw_action.gd` 和状态牌 `underworld_writ.tres`；Boss 音乐、开场名牌和大尺寸立绘识别列表均已同步。
+- 4 名新 Boss 暂时复用既有敌人美术，但拥有独立名称、生命、AI、奖励、阶段阈值、阶段增伤和后半程行动序列；后续可同路径替换正式 Boss 美术。
+- `boss-battle` 现逐场实跑 9 名 Boss，验证首回合专属机制、二阶段与胜利结算；单项超时上限为 90 秒，当前约 64 秒。
+
+## 14. 魔修专属法宝套件（2026-07-11）
+
+- 奖励法宝池从 39 件扩充到 45 件，魔修专属从 3 件扩充到 9 件；职业过滤保证其它职业不会抽到。
+- 自损路线新增血炼炉（每次自损得 3 护体）与赤髓葫（每回合首次自损抽 1）；魂印路线新增摄魂铃（首次消费魂印回 1 灵力）与万鬼幡（首次消费魂印按层对全体补伤）；煞气/魔焰新增镇煞瓮（开战 2 煞气）与焰轮心核（首张魔焰抽 1）。
+- 新增 `Events.soul_mark_spent` 与通用 `soul_mark_spent_relic.gd`；`card_play_draw_relic.gd` 支持按卡牌 ID 前缀匹配，后续可复用到其它成套卡牌。
+- 新增 `demonic-relic` 实战测试，覆盖开战、重复自损、每回合一次、魂印消费、全体伤害、魔焰过牌、奖励池数量和职业过滤。
+
+## 15. 法宝稀有度与奖励经济（2026-07-11）
+
+- `Relic` 新增普通、少见、稀有、首领四档稀有度；45 件奖励池法宝已完成首轮分级，首领法宝不会进入普通奖励或商店。
+- `RelicRewardPool` 改为按“章节 + 来源”加权且多选不重复。普通、精英、宝箱、首领、商店各自有三章权重；章节越后，少见/稀有占比越高。
+- 精英奖励使用精英权重，宝箱使用宝箱权重，Boss 二选一只会出现少见/稀有/首领档；祈福保持普通来源，商店只展示非首领档。
+- 商店法宝基础价按档位分层：普通 150–190、少见 210–260、稀有 300–380、首领 450–520；随后继续叠加折券和心魔商店倍率。
+- `RunStats.current_chapter` 统一保存当前章节，使商店和奖励曲线与继续游戏保持一致。
+- 新增 `relic-economy` smoke，覆盖四档池完整性、来源隔离、无重复多选、章节保存和价格阶梯；全量检查现为 14 项。

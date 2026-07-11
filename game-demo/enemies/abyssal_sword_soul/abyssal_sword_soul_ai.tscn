@@ -19,7 +19,7 @@ category = 0
 
 [sub_resource type="Resource" id="IntentParry"]
 script = ExtResource("5")
-base_text = "10"
+base_text = "22"
 icon = ExtResource("7")
 category = 2
 
@@ -44,25 +44,25 @@ script = ExtResource("2")
 intent = SubResource("IntentSlash")
 sound = ExtResource("9")
 type = 1
-damage = 7
+damage = 15
 
 [node name="ParryAction" type="Node" parent="."]
 script = ExtResource("3")
 intent = SubResource("IntentParry")
 sound = ExtResource("10")
 type = 1
-block = 10
+block = 22
 
 [node name="FlurryAction" type="Node" parent="."]
 script = ExtResource("4")
 intent = SubResource("IntentFlurry")
 sound = ExtResource("9")
 type = 1
-damage = 4
+damage = 9
 
 [node name="ExecuteAction" type="Node" parent="."]
 script = ExtResource("2")
 intent = SubResource("IntentExecute")
 sound = ExtResource("9")
 type = 1
-damage = 12
+damage = 25

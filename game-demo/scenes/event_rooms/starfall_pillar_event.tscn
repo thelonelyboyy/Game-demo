@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "坠星石柱"
 event_body = "星屑嵌在黑石里，像一场迟迟未熄的天火。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("汲取星髓：生命上限 +4，失去 6 生命", "采集星铁：获得 75 灵石", "避开星芒")
-choice_effects = PackedStringArray("max_hp:4|damage:6", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(0, 75, 0)
+choice_texts = PackedStringArray("汲取星髓：生命上限 +4，失去 10 生命", "采集星铁：获得 90 灵石", "避开星芒")
+choice_effects = PackedStringArray("max_hp:4|damage:10", "gain_gold", "skip")
+choice_amounts = PackedInt32Array(0, 90, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

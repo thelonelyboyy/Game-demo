@@ -10,6 +10,7 @@ relic_name = "鬼契"
 id = "ghost_contract"
 type = 1
 character_type = 0
+rarity = 1
 starter_relic = false
 icon = ExtResource("2")
 tooltip = "鬼契\n战斗开始时，给予所有敌人 1 层魂印。"

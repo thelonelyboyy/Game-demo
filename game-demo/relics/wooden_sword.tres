@@ -11,6 +11,7 @@ relic_name = "桃木剑"
 id = "wooden_sword"
 type = 4
 character_type = 0
+rarity = 1
 starter_relic = false
 icon = ExtResource("1_ub7wh")
 tooltip = "每回合打出 3 张技能牌时，对所有敌人造成 5 点伤害。"

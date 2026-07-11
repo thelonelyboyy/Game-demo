@@ -9,6 +9,7 @@ relic_name = "云剑残卷"
 id = "sword_cloud_manual"
 type = 4
 character_type = 2
+rarity = 2
 icon = ExtResource("2")
 tooltip = "剑修专属。每回合第一次打出剑修牌时，抽 1 张牌。"
 match_profession = 2

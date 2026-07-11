@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "月骨桥"
 event_body = "骨桥横跨云渊，桥下传来温柔的劝返声。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("踏桥而过：失去 5 生命，获得 70 灵石", "祭骨避险：失去 25 灵石，回复 12 生命", "另寻道路")
-choice_effects = PackedStringArray("damage:5|gain_gold:70", "lose_gold:25|heal:12", "skip")
+choice_texts = PackedStringArray("踏桥而过：失去 8 生命，获得 85 灵石", "祭骨避险：失去 30 灵石，回复 22 生命", "另寻道路")
+choice_effects = PackedStringArray("damage:8|gain_gold:85", "lose_gold:30|heal:22", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

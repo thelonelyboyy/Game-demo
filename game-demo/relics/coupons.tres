@@ -9,6 +9,7 @@ relic_name = "坊市折券"
 id = "coupons"
 type = 4
 character_type = 0
+rarity = 1
 starter_relic = false
 icon = ExtResource("1_xmg3w")
 tooltip = "[color=\"ffdf00\"]坊市折券[/color]

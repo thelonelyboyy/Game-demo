@@ -14,7 +14,7 @@ const PLAYER_SCREEN_ANCHOR := Vector2(0.83, 0.78)
 # 普通/精英=紧张管弦，Boss=交响金属循环。两者 .import 已开循环。
 const MUSIC_BATTLE_NORMAL := preload("res://art/audio/battle_theme_normal.mp3")
 const MUSIC_BATTLE_BOSS := preload("res://art/audio/battle_theme_boss.wav")
-const BOSS_MUSIC_IDS := ["bone_dragon", "black_lotus_matriarch", "sky_palace_guardian", "abyssal_sword_soul", "eclipse_tyrant"]
+const BOSS_MUSIC_IDS := ["bone_dragon", "black_lotus_matriarch", "sky_palace_guardian", "abyssal_sword_soul", "eclipse_tyrant", "blood_moon_demon_king", "bronze_corpse_king", "venom_broodmother", "underworld_judge"]
 const ENEMY_SINGLE_SCREEN_ANCHOR := Vector2(0.50, 0.31)
 const ENEMY_ROW_START_RATIO := 0.42
 const ENEMY_ROW_END_RATIO := 0.58
@@ -321,7 +321,7 @@ func _prepare_combatant_presentation(world_node: Node, _is_player := false) -> v
 
 	var sprite := world_node.get_node_or_null("Sprite2D") as Sprite2D
 	if sprite:
-		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 		sprite.modulate = Color(0.82, 0.88, 1.0, 0.95)
 
 	var stand := Node2D.new()

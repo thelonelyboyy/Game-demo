@@ -44,6 +44,9 @@ func animate_to_position(new_position: Vector2, duration: float) -> void:
 func play() -> void:
 	if not card:
 		return
+	if char_stats and not char_stats.can_play_card(card):
+		shake_unplayable()
+		return
 	
 	Events.card_play_preview_requested.emit(card, get_global_rect().get_center())
 	card.play(targets, char_stats, player_modifiers)

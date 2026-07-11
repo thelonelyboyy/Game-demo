@@ -29,11 +29,11 @@ script = ExtResource("2")
 intent = SubResource("IntentBite")
 sound = ExtResource("7")
 type = 1
-damage = 5
+damage = 10
 
 [node name="PounceAction" type="Node" parent="."]
 script = ExtResource("3")
 intent = SubResource("IntentPounce")
 sound = ExtResource("7")
 type = 1
-damage = 3
+damage = 7

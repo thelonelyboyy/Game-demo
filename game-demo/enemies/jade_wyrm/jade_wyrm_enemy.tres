@@ -10,5 +10,5 @@ id = "jade_wyrm"
 display_name = "碧鳞蛟"
 description = "未化龙的碧鳞蛟，攻势与鳞甲同样棘手。"
 ai = ExtResource("3_ai")
-max_health = 58
+max_health = 155
 art = ExtResource("2_art")

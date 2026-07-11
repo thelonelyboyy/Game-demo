@@ -10,6 +10,7 @@
 script = ExtResource("auto_self")
 amount = 2
 affected_by_spirit_root = false
+affected_by_card_growth = false
 
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("auto_dmg")
@@ -18,6 +19,9 @@ amount = 7
 [resource]
 script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
+growth_trigger = 1
+growth_amount = 2
+growth_limit = 6
 effect_text = "失去 2 点生命，造成 7 点伤害。"
 id = "demon_blood_rite_slash"
 target = 1
@@ -25,7 +29,7 @@ cost = 1
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("献祭")
+mechanic_tags = PackedStringArray("献祭", "成长")
 display_name = "血祭斩"
 icon = ExtResource("2")
 sound = ExtResource("3")

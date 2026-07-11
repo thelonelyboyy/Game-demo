@@ -15,8 +15,10 @@ MAX_EFFECTS = 3
 # 可用效果类型（下拉框用）
 EFFECT_TYPES = [
     "max_health", "lose_max_health", "full_heal",
-    "gold", "lose_gold", "max_mana", "draw",
-    "upgrade", "remove_card", "duplicate_card", "grant_relic",
+    "gold", "lose_gold", "lose_all_gold", "max_mana", "draw",
+    "upgrade", "remove_card", "remove_strike_defend",
+    "duplicate_card", "add_random_cards", "add_random_rare_card", "transform_card",
+    "grant_relic", "gain_potion", "weaken_next_battles",
 ]
 
 # 命格（命格共鸣按此过滤；空=通用）

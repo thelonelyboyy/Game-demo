@@ -1,0 +1,158 @@
+extends Node
+
+const GROWTH_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_rite_slash.tres"
+const DISCARD_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_repay.tres"
+const EXHAUST_CARD_PATH := "res://characters/demonic_cultivator/cards/engines/demon_blood_membrane.tres"
+const DISCOVER_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_forbidden_archive.tres"
+const DRAFT_POOL_PATH := "res://characters/demonic_cultivator/demonic_cultivator_draftable_cards.tres"
+const DEMONIC_CHARACTER_PATH := "res://characters/demonic_cultivator/demonic_cultivator.tres"
+const DISCOVERY_REQUEST_SCRIPT := preload("res://custom_resources/card_discovery_request.gd")
+const NEW_DEMONIC_CARD_IDS := [
+	"demon_blood_reversal",
+	"demon_blood_debt",
+	"demon_blood_forge_armor",
+	"demon_sha_blade",
+	"demon_seven_flame_cycle",
+	"demon_soul_lamp_renewal",
+	"demon_myriad_marks_return",
+]
+
+var failures := PackedStringArray()
+var resolved_card_count := -1
+
+
+func _ready() -> void:
+	call_deferred("_run_smoke")
+
+
+func _run_smoke() -> void:
+	_check_growth_card()
+	_check_lifecycle_trigger_cards()
+	_check_discover_card()
+	_check_discovery_request()
+	_check_card_reward_choices()
+	_check_demonic_pool_depth()
+	_finish()
+
+
+func _check_growth_card() -> void:
+	var card := (load(GROWTH_CARD_PATH) as Card).duplicate(true) as CultivationCard
+	_check(card != null and card.is_growth_card(), "growth card loads with growth tag")
+	if not card or card.configured_effects.size() < 2:
+		return
+
+	var self_damage = card.configured_effects[0]
+	var damage = card.configured_effects[1]
+	_check(self_damage.amount == 2 and damage.amount == 7, "growth card starts with expected values")
+	card.handle_lifecycle_trigger(Card.LifecycleTrigger.PLAYED, [], null)
+	_check(self_damage.amount == 2, "growth excludes self-damage cost")
+	_check(damage.amount == 9, "growth increases damage after play")
+	for i in range(4):
+		card.handle_lifecycle_trigger(Card.LifecycleTrigger.PLAYED, [], null)
+	_check(damage.amount == 13 and card.growth_accumulated == 6, "growth respects combat cap")
+
+
+func _check_lifecycle_trigger_cards() -> void:
+	var discard_card := load(DISCARD_CARD_PATH) as CultivationCard
+	_check(discard_card != null and discard_card.has_discard_trigger(), "discard trigger card has marker")
+	_check(discard_card != null and discard_card.discard_trigger_effects.size() == 1, "discard trigger card has configured effect")
+	if discard_card and not discard_card.discard_trigger_effects.is_empty():
+		_check(discard_card.discard_trigger_effects[0].amount == 4, "discard trigger grants expected block")
+
+	var exhaust_card := load(EXHAUST_CARD_PATH) as CultivationCard
+	_check(exhaust_card != null and exhaust_card.has_exhaust_trigger(), "exhaust trigger card has marker")
+	_check(exhaust_card != null and exhaust_card.exhaust_trigger_effects.size() == 1, "exhaust trigger card has configured effect")
+	if exhaust_card and not exhaust_card.exhaust_trigger_effects.is_empty():
+		_check(exhaust_card.exhaust_trigger_effects[0].amount == 1, "exhaust trigger grants expected mana")
+
+
+func _check_discover_card() -> void:
+	var card := (load(DISCOVER_CARD_PATH) as Card).duplicate(true) as CultivationCard
+	_check(card != null, "discover card loads")
+	if not card or card.configured_effects.is_empty():
+		return
+
+	var effect = card.configured_effects[0]
+	_check(effect.card_pool != null and effect.card_pool.cards.size() == 7, "discover uses fixed seven-card pool")
+	var choices: Array[Card] = effect._build_choices(null)
+	_check(choices.size() == 3, "discover presents configured choice count")
+	var ids := {}
+	for choice: Card in choices:
+		ids[choice.id] = true
+		_check(not choice.is_temporary_card(), "discovered cards participate in discard cycle")
+	_check(ids.size() == choices.size(), "discover choices are unique")
+
+	_check(card.can_upgrade(), "discover card can upgrade")
+	card.upgrade()
+	_check(effect.amount == 2, "discover upgrade increases pick count")
+
+	var draft_pool := load(DRAFT_POOL_PATH) as CardPile
+	var found := false
+	for draft_card: Card in draft_pool.cards:
+		if draft_card and draft_card.id == card.id:
+			found = true
+			break
+	_check(found, "discover card is in demonic draft pool")
+
+
+func _check_discovery_request() -> void:
+	var request = DISCOVERY_REQUEST_SCRIPT.new()
+	request.completed.connect(_on_request_completed)
+	var selected: Array[Card] = [load(DISCOVER_CARD_PATH) as Card]
+	request.resolve(selected)
+	request.resolve([])
+	_check(request.resolved and resolved_card_count == 1, "discovery request resolves exactly once")
+
+
+func _on_request_completed(selected_cards: Array[Card]) -> void:
+	resolved_card_count = selected_cards.size()
+
+
+func _check_card_reward_choices() -> void:
+	var character_resource := load(DEMONIC_CHARACTER_PATH) as CharacterStats
+	var reward := BattleReward.new()
+	reward.character_stats = character_resource.create_instance()
+	reward.run_stats = RunStats.new()
+	for i in range(40):
+		var choices := reward._generate_card_reward_choices()
+		var ids := {}
+		for card: Card in choices:
+			ids[card.id] = true
+		_check(choices.size() == reward.run_stats.card_rewards, "card reward returns configured choice count")
+		_check(ids.size() == choices.size(), "card reward choices never repeat an id")
+	reward.free()
+
+
+func _check_demonic_pool_depth() -> void:
+	var draft_pool := load(DRAFT_POOL_PATH) as CardPile
+	_check(draft_pool != null, "demonic draft pool loads for depth check")
+	if not draft_pool:
+		return
+	var unique_ids := {}
+	var found_new := {}
+	for card: Card in draft_pool.cards:
+		if not card:
+			continue
+		unique_ids[card.id] = true
+		if NEW_DEMONIC_CARD_IDS.has(card.id):
+			found_new[card.id] = true
+			var upgraded := card.duplicate(true) as Card
+			_check(upgraded.can_upgrade(), "%s can upgrade" % card.id)
+			_check(upgraded.upgrade(), "%s upgrade resolves" % card.id)
+	_check(unique_ids.size() == 75, "demonic draft pool contains seventy-five unique cards")
+	_check(found_new.size() == NEW_DEMONIC_CARD_IDS.size(), "all seven construction bridge cards are in draft pool")
+
+
+func _check(condition: bool, message: String) -> void:
+	if not condition:
+		failures.append(message)
+
+
+func _finish() -> void:
+	if failures.is_empty():
+		print("CARD_MECHANICS_SMOKE_OK")
+		get_tree().quit(0)
+	else:
+		for failure: String in failures:
+			push_error("CARD_MECHANICS_SMOKE_FAIL: %s" % failure)
+		get_tree().quit(1)

@@ -13,4 +13,5 @@ func set_status(new_status: Status) -> void:
 	
 	status = new_status
 	icon.texture = status.icon
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	label.text = status.get_tooltip()

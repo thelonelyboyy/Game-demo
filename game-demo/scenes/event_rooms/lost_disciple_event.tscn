@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "迷路弟子"
 event_body = "一个小宗弟子在雾里打转，快哭出来了。"
-choice_texts = PackedStringArray("指路：获得 35 灵石", "护送：回复 9 生命", "赶路要紧")
+choice_texts = PackedStringArray("指路：获得 40 灵石", "护送：回复 16 生命", "赶路要紧")
 choice_effects = PackedStringArray("gain_gold", "heal", "skip")
-choice_amounts = PackedInt32Array(35, 9, 0)
+choice_amounts = PackedInt32Array(40, 16, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

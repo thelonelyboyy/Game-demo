@@ -10,5 +10,5 @@ id = "bronze_puppet"
 display_name = "铜傀儡"
 description = "古宗门遗留的铜质傀儡，防御厚重。"
 ai = ExtResource("3_ai")
-max_health = 30
+max_health = 80
 art = ExtResource("2_art")

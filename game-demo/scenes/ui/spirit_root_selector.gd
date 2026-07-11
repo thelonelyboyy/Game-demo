@@ -14,6 +14,7 @@ var offered_roots: Array = []
 
 
 func _ready() -> void:
+	InkTheme.animate_screen_entrance(self, 0.4)
 	_polish_scene()
 	_roll_spirit_roots()
 	_setup_buttons()
@@ -39,10 +40,15 @@ func _setup_buttons() -> void:
 		child.queue_free()
 
 	for root in offered_roots:
-		buttons.add_child(_create_root_row(root))
+		var row := _create_root_row(root)
+		buttons.add_child(row)
+		InkTheme.wire_button_sfx(row)
+		InkTheme.animate_item_entrance(row, 0.12)
 
 
 func _on_root_selected(root: Card.Element) -> void:
+	# 定灵根的仪式感：与选人「开始修行」呼应的一记锣。
+	GameSfx.play(GameSfx.GONG, -4.0)
 	run_startup.type = RunStartup.Type.NEW_RUN
 	run_startup.selected_spirit_root = root
 	get_tree().change_scene_to_packed(RUN_SCENE)

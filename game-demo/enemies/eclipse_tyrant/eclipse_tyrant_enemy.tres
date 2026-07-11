@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/eclipse_tyrant.png" id="2_art"]
-[ext_resource type="PackedScene" path="res://enemies/toxic_ghost/toxic_ghost_ai.tscn" id="3_ai"]
+[ext_resource type="PackedScene" path="res://enemies/eclipse_tyrant/eclipse_tyrant_ai.tscn" id="3_ai"]
 
 [resource]
 script = ExtResource("1_stats")
@@ -10,5 +10,10 @@ id = "eclipse_tyrant"
 display_name = "蚀日妖皇"
 description = "吞过日冕碎片的妖皇，会用暗蚀拖入长线战。"
 ai = ExtResource("3_ai")
-max_health = 118
+phase_two_health_ratio = 0.60
+phase_two_name = "蚀日临界"
+phase_two_block = 25
+phase_two_damage_bonus = 0.30
+phase_two_sequence = Array[int]([2, 0, 2, 1])
+max_health = 290
 art = ExtResource("2_art")

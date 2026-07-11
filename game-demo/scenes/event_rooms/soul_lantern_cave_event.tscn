@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "魂灯洞窟"
 event_body = "万盏魂灯悬在洞顶，灯芯里传来似曾相识的呼唤。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("汲取魂火：失去 6 生命，随机突破一张牌", "收拢灯灰：获得 50 灵石", "吹灭灯火")
-choice_effects = PackedStringArray("damage:6|upgrade_random:0", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(0, 50, 0)
+choice_texts = PackedStringArray("汲取魂火：失去 10 生命，随机突破一张牌", "收拢灯灰：获得 60 灵石", "吹灭灯火")
+choice_effects = PackedStringArray("damage:10|upgrade_random:0", "gain_gold", "skip")
+choice_amounts = PackedInt32Array(0, 60, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

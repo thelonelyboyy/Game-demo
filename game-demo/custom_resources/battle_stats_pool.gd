@@ -4,12 +4,13 @@ extends Resource
 @export var pool: Array[BattleStats]
 
 var total_weights_by_tier := [0.0, 0.0, 0.0]
+var active_chapter := 0
 
 
 func _get_all_battles_for_tier(tier: int) -> Array[BattleStats]:
 	return pool.filter(
 		func(battle: BattleStats):
-			return battle.battle_tier == tier
+			return battle.battle_tier == tier and battle.is_available_in_chapter(active_chapter)
 	)
 
 
@@ -33,6 +34,7 @@ func get_random_battle_for_tier(tier: int) -> BattleStats:
 	return null
 
 
-func setup() -> void:
+func setup(chapter := 0) -> void:
+	active_chapter = chapter
 	for i in 3:
 		_setup_weight_for_tier(i)

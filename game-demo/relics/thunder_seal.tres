@@ -9,6 +9,7 @@ relic_name = "雷纹印"
 id = "thunder_seal"
 type = 0
 character_type = 0
+rarity = 2
 starter_relic = false
 icon = ExtResource("2")
 tooltip = "雷纹印\n每回合开始时，对所有敌人造成 3 点伤害。"

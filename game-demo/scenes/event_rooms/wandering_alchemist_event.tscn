@@ -13,8 +13,8 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "游方丹师"
 event_body = "丹师摆着三只玉瓶，笑说有缘者自取。"
-choice_texts = PackedStringArray("买回春丹：花 35 灵石，回复 12 生命", "试药：失去 5 生命，生命上限 +4", "谢绝")
-choice_effects = PackedStringArray("lose_gold:35|heal:12", "damage:5|max_hp:4", "skip")
+choice_texts = PackedStringArray("买回春丹：花 40 灵石，回复 22 生命", "试药：失去 8 生命，生命上限 +4", "谢绝")
+choice_effects = PackedStringArray("lose_gold:40|heal:22", "damage:8|max_hp:4", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

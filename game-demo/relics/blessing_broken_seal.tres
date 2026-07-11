@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://art/relics/icons/campfire_ember_seal.png" id="1_icon"]
+[ext_resource type="Script" path="res://relics/blessing_broken_seal.gd" id="2_script"]
+
+[resource]
+script = ExtResource("2_script")
+relic_name = "破劫之印"
+id = "blessing_broken_seal"
+type = 1
+character_type = 0
+starter_relic = false
+icon = ExtResource("1_icon")
+tooltip = "破劫之印
+接下来数场战斗，敌人以七成气血入场。用尽后碎裂。"
+battles_left = 3

@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "雷击木"
 event_body = "焦黑古树仍有电光在年轮中游走。"
-choice_texts = PackedStringArray("引雷淬体：失去 7 生命，生命上限 +5", "削下木心：获得 40 灵石", "远离雷光")
-choice_effects = PackedStringArray("damage:7|max_hp:5", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(0, 40, 0)
+choice_texts = PackedStringArray("引雷淬体：失去 11 生命，生命上限 +5", "削下木心：获得 50 灵石", "远离雷光")
+choice_effects = PackedStringArray("damage:11|max_hp:5", "gain_gold", "skip")
+choice_amounts = PackedInt32Array(0, 50, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

@@ -166,7 +166,10 @@ func _generate_card_reward_choices() -> Array[Card]:
 
 		picked_card.bind_spirit_root_owner(character_stats)
 		card_reward_array.append(picked_card)
-		available_cards.erase(picked_card)
+		available_cards = available_cards.filter(
+			func(candidate: Card):
+				return candidate and candidate.id != picked_card.id
+		)
 
 	return card_reward_array
 

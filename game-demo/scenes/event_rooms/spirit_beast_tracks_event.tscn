@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "灵兽足迹"
 event_body = "云雾里有一串发光的兽爪印，似乎通往一处隐秘巢穴。"
-choice_texts = PackedStringArray("追踪足迹：失去 6 生命，获得 45 灵石", "采集绒羽：回复 10 生命", "绕路离开")
-choice_effects = PackedStringArray("damage:6|gain_gold:45", "heal", "skip")
-choice_amounts = PackedInt32Array(0, 10, 0)
+choice_texts = PackedStringArray("追踪足迹：失去 10 生命，获得 55 灵石", "采集绒羽：回复 18 生命", "绕路离开")
+choice_effects = PackedStringArray("damage:10|gain_gold:55", "heal", "skip")
+choice_amounts = PackedInt32Array(0, 18, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

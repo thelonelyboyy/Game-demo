@@ -183,6 +183,7 @@ func modify_attack_damage(card: Card, target: Node, damage: int) -> int:
 func notify_soul_mark_detonated(_card: Card, enemy: Enemy, consumed: int, modifiers: ModifierHandler) -> void:
 	if not _is_demonic() or consumed <= 0:
 		return
+	Events.soul_mark_spent.emit(consumed, true)
 
 	var draw_count := _engine_value(DemonicEngine.SOUL_FLAME_CYCLE)
 	if draw_count > 0 and player_handler:
@@ -193,6 +194,7 @@ func notify_soul_mark_detonated(_card: Card, enemy: Enemy, consumed: int, modifi
 func notify_soul_mark_consumed(_card: Card, enemy: Enemy, consumed: int, modifiers: ModifierHandler) -> void:
 	if not _is_demonic() or consumed <= 0:
 		return
+	Events.soul_mark_spent.emit(consumed, false)
 	_apply_soul_echo(enemy, consumed, modifiers)
 
 
@@ -294,6 +296,10 @@ func _reset_blood_turn_state() -> void:
 	_blood_recompense_triggered = false
 	_bloodthirst_turn_bonus = 0
 	_set_bloodthirst_bonus(0)
+
+
+func get_self_damage_this_turn() -> int:
+	return _self_damage_this_turn
 
 
 func _deal_fixed_damage_to_all_enemies(amount: int) -> void:

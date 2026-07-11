@@ -10,9 +10,12 @@ const RELIC_UI = preload("res://scenes/relic_handler/relic_ui.tscn")
 @onready var price_label: Label = %PriceLabel
 @onready var buy_button: Button = %BuyButton
 
-# 法宝资源没有稀有度字段，统一用一个法宝价位带（比纯随机 100-300 收窄、更稳定）
-const RELIC_PRICE_MIN := 160
-const RELIC_PRICE_MAX := 240
+const RELIC_PRICE_RANGES := {
+	Relic.Rarity.COMMON: Vector2i(150, 190),
+	Relic.Rarity.UNCOMMON: Vector2i(210, 260),
+	Relic.Rarity.RARE: Vector2i(300, 380),
+	Relic.Rarity.BOSS: Vector2i(450, 520),
+}
 
 var gold_cost := 0
 
@@ -52,7 +55,8 @@ func set_relic(new_relic: Relic) -> void:
 		await ready
 
 	relic = new_relic
-	gold_cost = RNG.instance.randi_range(RELIC_PRICE_MIN, RELIC_PRICE_MAX)
+	var price_range := get_price_range(relic.rarity)
+	gold_cost = RNG.instance.randi_range(price_range.x, price_range.y)
 
 	for relic_ui: RelicUI in relic_container.get_children():
 		relic_ui.queue_free()
@@ -60,6 +64,10 @@ func set_relic(new_relic: Relic) -> void:
 	var new_relic_ui := RELIC_UI.instantiate() as RelicUI
 	relic_container.add_child(new_relic_ui)
 	new_relic_ui.relic = relic
+
+
+static func get_price_range(rarity: Relic.Rarity) -> Vector2i:
+	return RELIC_PRICE_RANGES.get(rarity, RELIC_PRICE_RANGES[Relic.Rarity.COMMON])
 
 
 func _on_buy_button_pressed() -> void:

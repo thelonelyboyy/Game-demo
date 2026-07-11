@@ -10,5 +10,5 @@ id = "shadow_reaper"
 display_name = "摄魂影"
 description = "从阴影里凝成的修罗影，擅长拖慢牌序。"
 ai = ExtResource("3_ai")
-max_health = 46
+max_health = 125
 art = ExtResource("2_art")

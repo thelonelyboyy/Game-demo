@@ -10,6 +10,7 @@ relic_name = "星斗盘"
 id = "star_compass"
 type = 1
 character_type = 0
+rarity = 3
 starter_relic = false
 icon = ExtResource("2")
 tooltip = "星斗盘\n战斗开始时，获得 1 层气脉。"

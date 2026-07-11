@@ -17,7 +17,7 @@ category = 0
 
 [sub_resource type="Resource" id="IntentBlock"]
 script = ExtResource("4")
-base_text = "6"
+base_text = "12"
 icon = ExtResource("6")
 category = 2
 
@@ -30,11 +30,11 @@ script = ExtResource("2")
 intent = SubResource("IntentAttack")
 sound = ExtResource("7")
 type = 1
-damage = 4
+damage = 9
 
 [node name="BlockAction" type="Node" parent="."]
 script = ExtResource("3")
 intent = SubResource("IntentBlock")
 sound = ExtResource("8")
 type = 1
-block = 6
+block = 12

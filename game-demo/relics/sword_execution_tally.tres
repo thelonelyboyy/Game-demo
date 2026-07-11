@@ -9,6 +9,7 @@ relic_name = "斩业筹"
 id = "sword_execution_tally"
 type = 4
 character_type = 2
+rarity = 1
 starter_relic = false
 icon = ExtResource("2_icon")
 tooltip = "剑修专属。每次击杀敌人，获得 1 点灵力。"

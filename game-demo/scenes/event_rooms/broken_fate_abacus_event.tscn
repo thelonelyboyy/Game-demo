@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "断命算盘"
 event_body = "玉珠自行拨响，一笔旧账从雾里翻到你的名字。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("拨乱命数：失去 30 灵石，生命上限 +4", "算尽破绽：随机突破一张牌", "不签账册")
-choice_effects = PackedStringArray("lose_gold:30|max_hp:4", "upgrade_random", "skip")
+choice_texts = PackedStringArray("拨乱命数：失去 35 灵石，生命上限 +4", "算尽破绽：随机突破一张牌", "不签账册")
+choice_effects = PackedStringArray("lose_gold:35|max_hp:4", "upgrade_random", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

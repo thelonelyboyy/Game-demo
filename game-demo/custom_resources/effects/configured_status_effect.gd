@@ -54,6 +54,8 @@ func _status_name() -> String:
 			return "铸剑"
 		"gold_body":
 			return "金身"
+		"sha_qi":
+			return "煞气"
 		"soul_mark":
 			return "魂印"
 		"spirit_beast":

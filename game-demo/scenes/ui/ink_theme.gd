@@ -227,11 +227,17 @@ static func _play_button_press() -> void:
 	GameSfx.play(GameSfx.UI_CLICK, -8.0)
 
 
+# 给自定义样式按钮（不走 apply_screen_button 的）单独挂 hover/点击音。
+static func wire_button_sfx(button: Button) -> void:
+	if not button or button.has_meta("ink_sfx_wired"):
+		return
+	button.set_meta("ink_sfx_wired", true)
+	button.mouse_entered.connect(_play_button_hover.bind(button))
+	button.pressed.connect(_play_button_press)
+
+
 static func apply_screen_button(button: Button, large := false) -> void:
-	if not button.has_meta("ink_sfx_wired"):
-		button.set_meta("ink_sfx_wired", true)
-		button.mouse_entered.connect(_play_button_hover.bind(button))
-		button.pressed.connect(_play_button_press)
+	wire_button_sfx(button)
 	button.add_theme_color_override("font_color", Color("f8e5c0"))
 	button.add_theme_color_override("font_hover_color", Color("fff4d8"))
 	button.add_theme_color_override("font_pressed_color", Color("d9a865"))

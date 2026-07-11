@@ -13,6 +13,7 @@ signal deck_reshuffled(card_count: int)
 signal card_played(card: Card)
 signal card_drawn(card: Card)
 signal card_extra_drawn(card: Card)
+signal card_discovery_requested(request)
 signal spirit_root_fire_choice_requested(choice)
 signal card_tooltip_requested(icon: Texture, text: String)
 signal tooltip_hide_requested
@@ -22,6 +23,9 @@ signal player_hand_drawn
 signal player_hand_discarded
 signal player_turn_started
 signal player_turn_ended
+signal hero_skill_requested(origin_global: Vector2)
+# 英雄技能成功施放后发出（battle_ui 据此禁用按钮到下回合）。
+signal hero_skill_used
 signal player_hit
 signal player_self_damaged(amount: int)
 signal player_died
@@ -33,8 +37,11 @@ signal attack_animation_finished
 signal flame_wheel_changed(colors: Array)
 # 煞气档位变化（0=无 1=≥3卡伤+1 2=≥6伤害×2 3=天魔降世×3），战斗 UI 播放阈值演出。
 signal sha_qi_tier_changed(tier: int, stacks: int)
+signal soul_mark_spent(consumed: int, detonated: bool)
 # 商店购卡等场合获得新卡，UI 播放"卡牌飞向总牌库"动画。
 signal card_acquired_animation_requested(card: Card, from_global_center: Vector2)
+# 随机效果结果播报（祝福/事件随机突破、移除、获得了哪张牌等），run 层居中 toast 显示。
+signal ui_notice_requested(text: String)
 
 # Enemy-related events
 signal enemy_action_completed(enemy: Enemy)

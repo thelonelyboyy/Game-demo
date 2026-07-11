@@ -9,6 +9,7 @@ enum ConditionType {ALWAYS, SELECTED_SPIRIT_ROOT, HAS_MECHANIC_TAG, CARD_TYPE, P
 @export_group("Value")
 @export var amount := 0
 @export var affected_by_spirit_root := true
+@export var affected_by_card_growth := true
 
 @export_group("Condition")
 @export var require_condition := false
@@ -46,6 +47,15 @@ func get_primary_value(card: CultivationCard) -> int:
 func upgrade_values() -> void:
 	amount = _upgrade_number(amount)
 	bonus_amount = _upgrade_number(bonus_amount)
+
+
+func grow_values(growth_amount: int) -> void:
+	if not affected_by_card_growth or growth_amount <= 0:
+		return
+	if amount > 0:
+		amount += growth_amount
+	if bonus_amount > 0:
+		bonus_amount += growth_amount
 
 
 func get_modified_amount(card: CultivationCard, _player_modifiers: ModifierHandler = null, _enemy_modifiers: ModifierHandler = null) -> int:

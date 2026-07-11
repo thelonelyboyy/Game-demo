@@ -1,0 +1,54 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
+[ext_resource type="Script" path="res://enemies/shared/buff_allies_action.gd" id="2"]
+[ext_resource type="Script" path="res://enemies/crab/crab_attack_action.gd" id="3"]
+[ext_resource type="Script" path="res://enemies/bat/bat_attack_action.gd" id="4"]
+[ext_resource type="Script" path="res://custom_resources/intent.gd" id="5"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/toxic_ghost_muscle_buff.png" id="6"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/bat_attack.png" id="7"]
+[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="8"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="9"]
+
+[sub_resource type="Resource" id="IntentHowl"]
+script = ExtResource("5")
+base_text = "+2"
+icon = ExtResource("6")
+category = 4
+
+[sub_resource type="Resource" id="IntentPounce"]
+script = ExtResource("5")
+base_text = "%s"
+icon = ExtResource("7")
+category = 0
+
+[sub_resource type="Resource" id="IntentRend"]
+script = ExtResource("5")
+base_text = "2x%s"
+icon = ExtResource("7")
+category = 1
+
+[node name="BloodMoonAlphaAI" type="Node"]
+script = ExtResource("1")
+fixed_sequence = Array[int]([0, 1, 2])
+
+[node name="PackHowlAction" type="Node" parent="."]
+script = ExtResource("2")
+intent = SubResource("IntentHowl")
+sound = ExtResource("8")
+type = 1
+stacks = 2
+
+[node name="PounceAction" type="Node" parent="."]
+script = ExtResource("3")
+intent = SubResource("IntentPounce")
+sound = ExtResource("9")
+type = 1
+damage = 12
+
+[node name="RendAction" type="Node" parent="."]
+script = ExtResource("4")
+intent = SubResource("IntentRend")
+sound = ExtResource("9")
+type = 1
+damage = 6

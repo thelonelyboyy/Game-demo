@@ -10,6 +10,7 @@ relic_name = "玄铁甲"
 id = "armor"
 type = 2
 character_type = 1
+rarity = 1
 starter_relic = false
 icon = ExtResource("1_af34x")
 tooltip = "[color=\"ffdf00\"]玄铁甲[/color]

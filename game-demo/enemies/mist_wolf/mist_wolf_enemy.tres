@@ -10,5 +10,5 @@ id = "mist_wolf"
 display_name = "雾隐狼"
 description = "藏在云海边缘的灵狼，习惯用连扑试探修士破绽。"
 ai = ExtResource("3_ai")
-max_health = 14
+max_health = 38
 art = ExtResource("2_art")

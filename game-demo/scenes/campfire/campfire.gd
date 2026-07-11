@@ -4,6 +4,7 @@ extends Control
 const CARD_UPGRADE_SCENE := preload("res://scenes/card_upgrade/card_upgrade.tscn")
 
 @export var char_stats: CharacterStats
+@export var run_stats: RunStats
 
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var ui_layer: CanvasLayer = $UILayer
@@ -23,7 +24,11 @@ func _ready() -> void:
 
 func _on_rest_button_pressed() -> void:
 	_set_action_buttons_disabled(true)
-	var heal_amount := ceili(char_stats.max_health * 0.3)
+	var heal_amount := (
+		run_stats.get_campfire_heal_amount(char_stats.max_health)
+		if run_stats
+		else ceili(char_stats.max_health * 0.3)
+	)
 	var initial_health := char_stats.health
 	char_stats.heal(heal_amount)
 	GameSfx.play(GameSfx.HEAL, -2.0)

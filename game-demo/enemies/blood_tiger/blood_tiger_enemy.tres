@@ -10,5 +10,5 @@ id = "blood_tiger"
 display_name = "血纹虎"
 description = "背生血纹的山君，越战越凶。"
 ai = ExtResource("3_ai")
-max_health = 48
+max_health = 130
 art = ExtResource("2_art")

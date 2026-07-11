@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/enemies_redesign/shadow_reaper.png" id="2"]
+[ext_resource type="PackedScene" path="res://enemies/eclipse_priest/eclipse_priest_ai.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = "eclipse_priest"
+display_name = "蚀魂祭司"
+description = "以蚀痕与毒念搅乱牌序，并用暗幕庇护同伴。"
+ai = ExtResource("3")
+max_health = 132
+art = ExtResource("2")

@@ -17,5 +17,6 @@ func execute(targets: Array[Node]) -> void:
 	RNG.array_shuffle(hand_randomized)
 	var cards := hand_randomized.slice(0, amount)
 	
-	for card in cards:
-		card.queue_free()
+	for card_ui in cards:
+		if card_ui is CardUI:
+			player_handler.discard_card_from_hand(card_ui, false)

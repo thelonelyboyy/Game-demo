@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BattleStatsPool" load_steps=24 format=3 uid="uid://by8ka073e8sah"]
+[gd_resource type="Resource" script_class="BattleStatsPool" load_steps=45 format=3 uid="uid://by8ka073e8sah"]
 
 [ext_resource type="Script" path="res://custom_resources/battle_stats_pool.gd" id="1_pool"]
 [ext_resource type="Script" path="res://custom_resources/battle_stats.gd" id="2_stats"]
@@ -23,7 +23,28 @@
 [ext_resource type="Resource" path="res://battles/demo_b_sky_guardian.tres" id="battle_19"]
 [ext_resource type="Resource" path="res://battles/demo_b_sword_soul.tres" id="battle_20"]
 [ext_resource type="Resource" path="res://battles/demo_b_eclipse_tyrant.tres" id="battle_21"]
+[ext_resource type="Resource" path="res://battles/demo_n_moon_wolf_pack.tres" id="battle_22"]
+[ext_resource type="Resource" path="res://battles/demo_n_ash_wolf.tres" id="battle_23"]
+[ext_resource type="Resource" path="res://battles/demo_n_puppet_soldier.tres" id="battle_24"]
+[ext_resource type="Resource" path="res://battles/demo_n_lantern_moth.tres" id="battle_25"]
+[ext_resource type="Resource" path="res://battles/demo_n_serpent_spider.tres" id="battle_26"]
+[ext_resource type="Resource" path="res://battles/demo_n_bronze_lantern.tres" id="battle_27"]
+[ext_resource type="Resource" path="res://battles/demo_n_stone_eagle.tres" id="battle_28"]
+[ext_resource type="Resource" path="res://battles/demo_n_cursed_vanguard.tres" id="battle_29"]
+[ext_resource type="Resource" path="res://battles/demo_e_blood_moon_hunt.tres" id="battle_30"]
+[ext_resource type="Resource" path="res://battles/demo_e_bronze_formation.tres" id="battle_31"]
+[ext_resource type="Resource" path="res://battles/demo_e_eclipse_ritual.tres" id="battle_32"]
+[ext_resource type="Resource" path="res://battles/demo_n_wolf_spider.tres" id="battle_33"]
+[ext_resource type="Resource" path="res://battles/demo_n_ash_hawk.tres" id="battle_34"]
+[ext_resource type="Resource" path="res://battles/demo_n_paper_lantern.tres" id="battle_35"]
+[ext_resource type="Resource" path="res://battles/demo_n_puppet_moth.tres" id="battle_36"]
+[ext_resource type="Resource" path="res://battles/demo_n_serpent_goblin.tres" id="battle_37"]
+[ext_resource type="Resource" path="res://battles/demo_n_eagle_spider_pack.tres" id="battle_38"]
+[ext_resource type="Resource" path="res://battles/demo_b_blood_moon_demon_king.tres" id="battle_39"]
+[ext_resource type="Resource" path="res://battles/demo_b_bronze_corpse_king.tres" id="battle_40"]
+[ext_resource type="Resource" path="res://battles/demo_b_venom_broodmother.tres" id="battle_41"]
+[ext_resource type="Resource" path="res://battles/demo_b_underworld_judge.tres" id="battle_42"]
 
 [resource]
 script = ExtResource("1_pool")
-pool = Array[ExtResource("2_stats")]([ExtResource("battle_1"), ExtResource("battle_2"), ExtResource("battle_3"), ExtResource("battle_4"), ExtResource("battle_5"), ExtResource("battle_6"), ExtResource("battle_7"), ExtResource("battle_8"), ExtResource("battle_9"), ExtResource("battle_10"), ExtResource("battle_11"), ExtResource("battle_12"), ExtResource("battle_13"), ExtResource("battle_14"), ExtResource("battle_15"), ExtResource("battle_16"), ExtResource("battle_17"), ExtResource("battle_18"), ExtResource("battle_19"), ExtResource("battle_20"), ExtResource("battle_21")])
+pool = Array[ExtResource("2_stats")]([ExtResource("battle_1"), ExtResource("battle_2"), ExtResource("battle_3"), ExtResource("battle_4"), ExtResource("battle_5"), ExtResource("battle_6"), ExtResource("battle_7"), ExtResource("battle_8"), ExtResource("battle_9"), ExtResource("battle_10"), ExtResource("battle_11"), ExtResource("battle_12"), ExtResource("battle_13"), ExtResource("battle_14"), ExtResource("battle_15"), ExtResource("battle_16"), ExtResource("battle_17"), ExtResource("battle_18"), ExtResource("battle_19"), ExtResource("battle_20"), ExtResource("battle_21"), ExtResource("battle_22"), ExtResource("battle_23"), ExtResource("battle_24"), ExtResource("battle_25"), ExtResource("battle_26"), ExtResource("battle_27"), ExtResource("battle_28"), ExtResource("battle_29"), ExtResource("battle_30"), ExtResource("battle_31"), ExtResource("battle_32"), ExtResource("battle_33"), ExtResource("battle_34"), ExtResource("battle_35"), ExtResource("battle_36"), ExtResource("battle_37"), ExtResource("battle_38"), ExtResource("battle_39"), ExtResource("battle_40"), ExtResource("battle_41"), ExtResource("battle_42")])

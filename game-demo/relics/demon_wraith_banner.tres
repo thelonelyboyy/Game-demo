@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SoulMarkSpentRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/soul_mark_spent_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/pack_banner.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "万鬼幡"
+id = "demon_wraith_banner"
+type = 4
+character_type = 3
+rarity = 3
+icon = ExtResource("2")
+tooltip = "魔修专属。每回合第一次引爆或消耗魂印时，每消耗 1 层对所有敌人造成 1 点伤害。"
+reward_mode = 2
+amount = 1
+scale_by_consumed = true
+once_per_turn = true

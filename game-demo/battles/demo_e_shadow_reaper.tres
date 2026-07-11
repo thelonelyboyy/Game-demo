@@ -6,9 +6,11 @@
 [resource]
 script = ExtResource("1_stats")
 battle_tier = 1
+chapter_min = 3
+chapter_max = 3
 weight = 1.00
 gold_reward_min = 110
 gold_reward_max = 140
 enemy_health_multiplier = 1.00
-enemy_damage_multiplier = 1.10
+enemy_damage_multiplier = 1.30
 enemies = ExtResource("2_scene")

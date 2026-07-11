@@ -30,6 +30,7 @@ var target_highlight_lines: Array[Line2D] = []
 var sprite_visible_size := Vector2.ZERO
 var _highlight_tween: Tween
 var _dying := false
+var _phase_two_triggered := false
 # 战斗信息卡尺寸（画布像素）。battle_ui 把本节点对齐到信息卡时写入，
 # 之后碰撞体/选中框/飘字/特效全部以信息卡为基准。
 var aligned_feedback_extents := Vector2.ZERO
@@ -141,9 +142,9 @@ func _get_target_art_max_size() -> float:
 		return DEFAULT_ART_MAX_SIZE
 
 	match stats.id:
-		"bone_dragon", "black_lotus_matriarch", "sky_palace_guardian", "abyssal_sword_soul", "eclipse_tyrant":
+		"bone_dragon", "black_lotus_matriarch", "sky_palace_guardian", "abyssal_sword_soul", "eclipse_tyrant", "blood_moon_demon_king", "bronze_corpse_king", "venom_broodmother", "underworld_judge":
 			return BOSS_ART_MAX_SIZE
-		"bull_demon", "iron_golem", "blood_tiger", "thunder_roc", "shadow_reaper", "jade_wyrm":
+		"bull_demon", "iron_golem", "blood_tiger", "thunder_roc", "shadow_reaper", "jade_wyrm", "blood_moon_alpha", "bronze_overseer", "eclipse_priest":
 			return ELITE_ART_MAX_SIZE
 		_:
 			return DEFAULT_ART_MAX_SIZE
@@ -240,9 +241,37 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 	tween.tween_callback(Shaker.shake.bind(self, 16, 0.15))
 	tween.tween_callback(_spawn_damage_feedback.bind(modified_damage))
 	tween.tween_callback(stats.take_damage.bind(modified_damage))
+	tween.tween_callback(_try_enter_phase_two)
 	tween.tween_interval(0.17)
 
 	tween.finished.connect(_on_damage_tween_finished)
+
+
+func _try_enter_phase_two() -> void:
+	if _phase_two_triggered or not stats or stats.health <= 0:
+		return
+	if stats.phase_two_health_ratio <= 0.0:
+		return
+	if float(stats.health) / float(maxi(stats.max_health, 1)) > stats.phase_two_health_ratio:
+		return
+
+	_phase_two_triggered = true
+	if stats.phase_two_block > 0:
+		stats.block += stats.phase_two_block
+	if stats.phase_two_damage_bonus > 0.0:
+		var damage_modifier := modifier_handler.get_modifier(Modifier.Type.DMG_DEALT)
+		if damage_modifier:
+			var value := ModifierValue.create_new_modifier("boss_phase_two", ModifierValue.Type.PERCENT_BASED)
+			value.percent_value = stats.phase_two_damage_bonus
+			damage_modifier.add_new_value(value)
+	if enemy_action_picker and not stats.phase_two_sequence.is_empty():
+		enemy_action_picker.enter_phase_sequence(stats.phase_two_sequence)
+		current_action = enemy_action_picker.get_action()
+
+	GameSfx.play(GameSfx.POWER_UP, -1.0)
+	HitEffect.spawn(self, _feedback_radius() * 1.25, Color(1.0, 0.36, 0.25, 0.96))
+	var phase_name := stats.phase_two_name if not stats.phase_two_name.is_empty() else "第二阶段"
+	Events.ui_notice_requested.emit("%s · %s" % [stats.display_name, phase_name])
 
 
 func _on_damage_tween_finished() -> void:

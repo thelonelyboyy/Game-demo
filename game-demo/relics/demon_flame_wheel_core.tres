@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardPlayDrawRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/card_play_draw_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/fire_spark_pearl.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "焰轮心核"
+id = "demon_flame_wheel_core"
+type = 4
+character_type = 3
+rarity = 2
+icon = ExtResource("2")
+tooltip = "魔修专属。每回合第一次打出魔焰牌时，抽 1 张牌。"
+match_id_prefix = "demon_flame_"
+draw_amount = 1
+once_per_turn = true

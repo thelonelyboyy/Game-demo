@@ -13,8 +13,8 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "魔念低语"
 event_body = "耳边的低语许诺力量，也索要代价。"
-choice_texts = PackedStringArray("接受：生命上限 +6，失去 8 生命", "以剑斩念：随机突破一张牌", "静心离开")
-choice_effects = PackedStringArray("max_hp:6|damage:8", "upgrade_random", "skip")
+choice_texts = PackedStringArray("接受：生命上限 +6，失去 13 生命", "以剑斩念：随机突破一张牌", "静心离开")
+choice_effects = PackedStringArray("max_hp:6|damage:13", "upgrade_random", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

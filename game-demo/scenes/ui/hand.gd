@@ -9,7 +9,8 @@ const SIDE_SAFE_AREA := 720.0
 const FAN_ROTATION := 7.0
 const FAN_DROP := 38.0
 const CENTER_LIFT := 62.0
-const HAND_Y_OFFSET := 50.0
+# 手牌下沉量：过大时卡底描述会被屏幕边缘裁切。
+const HAND_Y_OFFSET := 26.0
 const HOVER_SCALE := 1.38
 const HOVER_LIFT := 54.0
 const HOVER_Z_INDEX := 1000
@@ -35,7 +36,7 @@ func _ready() -> void:
 	resized.connect(_layout_cards)
 
 
-func add_card(card: Card) -> void:
+func add_card(card: Card, use_draw_origin := true, origin_global := Vector2.ZERO) -> void:
 	var new_card_ui := CARD_UI_SCENE.instantiate() as CardUI
 	add_child(new_card_ui)
 	_prepare_card(new_card_ui)
@@ -45,8 +46,9 @@ func add_card(card: Card) -> void:
 	new_card_ui.char_stats = char_stats
 	new_card_ui.player_modifiers = player.modifier_handler
 
-	if draw_origin_global != Vector2.ZERO:
-		new_card_ui.position = draw_origin_global - global_position - CARD_SIZE * 0.5
+	var spawn_origin := draw_origin_global if use_draw_origin else origin_global
+	if spawn_origin != Vector2.ZERO:
+		new_card_ui.position = spawn_origin - global_position - CARD_SIZE * 0.5
 		new_card_ui.scale = Vector2.ONE * 0.3
 		new_card_ui.rotation_degrees = -14.0
 		new_card_ui.modulate = Color(1, 1, 1, 0.0)
@@ -56,10 +58,10 @@ func add_card(card: Card) -> void:
 	_layout_cards()
 
 
-func discard_card(card: CardUI) -> void:
+func discard_card(card: CardUI, play_discard_animation := true) -> void:
 	if focused_card == card:
 		focused_card = null
-	if card.card:
+	if play_discard_animation and card.card:
 		Events.card_discarded.emit(card.card, card.get_global_rect().get_center())
 	card.queue_free()
 	_layout_cards.call_deferred()

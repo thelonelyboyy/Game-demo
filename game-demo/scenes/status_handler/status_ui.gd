@@ -14,6 +14,7 @@ func set_status(new_status: Status) -> void:
 	
 	status = new_status
 	icon.texture = status.icon
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	tooltip_text = _format_tooltip()
 	duration.visible = status.stack_type == Status.StackType.DURATION
 	stacks.visible = status.stack_type == Status.StackType.INTENSITY

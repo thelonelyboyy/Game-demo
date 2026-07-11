@@ -10,5 +10,5 @@ id = "ash_imp"
 display_name = "劫灰小鬼"
 description = "从炉灰里爬出的劫火小鬼，会在攻击间隙积攒护体灰烬。"
 ai = ExtResource("3_ai")
-max_health = 18
+max_health = 48
 art = ExtResource("2_art")

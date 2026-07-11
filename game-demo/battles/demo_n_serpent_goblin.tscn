@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemy/enemy.tscn" id="1"]
+[ext_resource type="Resource" path="res://enemies/river_serpent/river_serpent_enemy.tres" id="2"]
+[ext_resource type="Resource" path="res://enemies/stone_goblin/stone_goblin_enemy.tres" id="3"]
+
+[node name="Enemies" type="Node2D"]
+
+[node name="Enemy1" parent="." instance=ExtResource("1")]
+position = Vector2(250, 124)
+stats = ExtResource("2")
+
+[node name="Enemy2" parent="." instance=ExtResource("1")]
+position = Vector2(316, 120)
+stats = ExtResource("3")

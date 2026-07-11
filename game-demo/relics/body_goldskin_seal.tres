@@ -10,6 +10,7 @@ relic_name = "金皮印"
 id = "body_goldskin_seal"
 type = 1
 character_type = 1
+rarity = 1
 icon = ExtResource("2")
 tooltip = "体修专属。战斗开始时，获得 1 层金身。"
 status = ExtResource("3")

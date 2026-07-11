@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "白骨桥"
 event_body = "桥下云海翻涌，桥面由巨兽白骨搭成。"
-choice_texts = PackedStringArray("快步通过：失去 4 生命", "拆一截骨材：获得 50 灵石，失去 8 生命", "绕远路")
-choice_effects = PackedStringArray("damage", "gain_gold:50|damage:8", "skip")
-choice_amounts = PackedInt32Array(4, 0, 0)
+choice_texts = PackedStringArray("快步通过：失去 6 生命", "拆一截骨材：获得 60 灵石，失去 13 生命", "绕远路")
+choice_effects = PackedStringArray("damage", "gain_gold:60|damage:13", "skip")
+choice_amounts = PackedInt32Array(6, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

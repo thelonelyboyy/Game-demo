@@ -1,0 +1,58 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
+[ext_resource type="Script" path="res://enemies/shared/add_card_to_discard_action.gd" id="2"]
+[ext_resource type="Script" path="res://enemies/toxic_ghost/toxic_ghost_attack_action.gd" id="3"]
+[ext_resource type="Script" path="res://enemies/shared/block_allies_action.gd" id="4"]
+[ext_resource type="Script" path="res://custom_resources/intent.gd" id="5"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/toxic_ghost_muscle_buff.png" id="6"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/attack_negative.png" id="7"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/toxic_ghost_block.png" id="8"]
+[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="9"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="10"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="11"]
+[ext_resource type="Resource" path="res://common_cards/status/eclipse_scar.tres" id="12"]
+
+[sub_resource type="Resource" id="IntentScar"]
+script = ExtResource("5")
+base_text = ""
+icon = ExtResource("6")
+category = 5
+
+[sub_resource type="Resource" id="IntentDrain"]
+script = ExtResource("5")
+base_text = "%s"
+icon = ExtResource("7")
+category = 0
+
+[sub_resource type="Resource" id="IntentVeil"]
+script = ExtResource("5")
+base_text = "10"
+icon = ExtResource("8")
+category = 2
+
+[node name="EclipsePriestAI" type="Node"]
+script = ExtResource("1")
+fixed_sequence = Array[int]([0, 1, 2, 1])
+
+[node name="EclipseScarAction" type="Node" parent="."]
+script = ExtResource("2")
+intent = SubResource("IntentScar")
+sound = ExtResource("9")
+type = 1
+card_to_add = ExtResource("12")
+copies = 1
+
+[node name="SoulDrainAction" type="Node" parent="."]
+script = ExtResource("3")
+intent = SubResource("IntentDrain")
+sound = ExtResource("10")
+type = 1
+damage = 11
+
+[node name="EclipseVeilAction" type="Node" parent="."]
+script = ExtResource("4")
+intent = SubResource("IntentVeil")
+sound = ExtResource("11")
+type = 1
+block = 10

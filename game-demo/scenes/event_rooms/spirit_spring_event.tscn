@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "灵泉"
 event_body = "岩缝间涌出清泉，灵气温润。"
-choice_texts = PackedStringArray("饮泉：回复 10 生命", "炼体：失去 4 生命，生命上限 +3", "装满水囊：获得 25 灵石")
-choice_effects = PackedStringArray("heal", "damage:4|max_hp:3", "gain_gold")
-choice_amounts = PackedInt32Array(10, 0, 25)
+choice_texts = PackedStringArray("饮泉：回复 18 生命", "炼体：失去 6 生命，生命上限 +3", "装满水囊：获得 30 灵石")
+choice_effects = PackedStringArray("heal", "damage:6|max_hp:3", "gain_gold")
+choice_amounts = PackedInt32Array(18, 0, 30)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

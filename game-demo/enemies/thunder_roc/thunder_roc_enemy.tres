@@ -10,5 +10,5 @@ id = "thunder_roc"
 display_name = "劫雷鹏"
 description = "沐浴雷劫的巨鹏，会用高速连击撕开护体。"
 ai = ExtResource("3_ai")
-max_health = 50
+max_health = 135
 art = ExtResource("2_art")

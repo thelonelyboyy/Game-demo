@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/status_sword_intent.png" id="2"]
+[ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_consume_status_to_damage_effect.gd" id="4"]
+
+[sub_resource type="Resource" id="Damage"]
+script = ExtResource("4")
+affected_by_spirit_root = false
+damage_per_stack = 5
+consume_amount = 2
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("Damage")])
+id = "demon_sha_blade"
+target = 1
+upgrade_type = 1
+element = 4
+profession = 3
+mechanic_tags = PackedStringArray("煞气")
+display_name = "煞刃"
+icon = ExtResource("2")
+sound = ExtResource("3")

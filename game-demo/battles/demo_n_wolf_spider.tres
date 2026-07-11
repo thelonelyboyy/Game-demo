@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BattleStats" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/battle_stats.gd" id="1"]
+[ext_resource type="PackedScene" path="res://battles/demo_n_wolf_spider.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+battle_tier = 0
+chapter_min = 1
+chapter_max = 1
+weight = 0.90
+gold_reward_min = 50
+gold_reward_max = 64
+enemy_health_multiplier = 1.00
+enemy_damage_multiplier = 1.00
+enemies = ExtResource("2")

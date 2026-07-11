@@ -16,12 +16,26 @@ const EFFECT_ICONS := {
 	"upgrade": preload("res://art/ui/icons/deck.png"),
 	"remove_card": preload("res://art/ui/icons/deck.png"),
 	"duplicate_card": preload("res://art/ui/icons/deck.png"),
+	"rare_card": preload("res://art/ui/icons/deck.png"),
 	"draw": preload("res://art/ui/icons/draw.png"),
 	"max_mana": preload("res://art/map/nodes/map_node_blessing.png"),
 	"relic": preload("res://art/map/nodes/map_node_blessing.png"),
+	"seal": preload("res://art/relics/icons/campfire_ember_seal.png"),
+	"potion": preload("res://art/potions/icons/healing_pill.png"),
+}
+
+# 来源徽记颜色：一眼区分每个选项的"性格"。
+const SOURCE_COLORS := {
+	"灵脉余泽": Color("7cc47a"),
+	"补天盟密阵": Color("6fb2d8"),
+	"残仙遗蜕": Color("e06a5a"),
+	"照命石审判": Color("f2c94f"),
+	"命格共鸣": Color("b88ad8"),
 }
 
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
+const BROKEN_SEAL_RELIC := preload("res://relics/blessing_broken_seal.tres")
+const CHOICE_COUNT := 4
 
 @export var character_stats: CharacterStats
 @export var run_stats: RunStats
@@ -131,22 +145,24 @@ func _build_ui() -> void:
 	list.name = "Choices"
 	list.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	list.offset_left = -470
-	list.offset_top = 718
+	list.offset_top = 712
 	list.offset_right = 470
-	list.offset_bottom = 980
-	list.add_theme_constant_override("separation", 12)
+	list.offset_bottom = 1044
+	list.add_theme_constant_override("separation", 10)
 	add_child(list)
 
-	for i in 3:
+	for i in CHOICE_COUNT:
 		var row := _create_choice_row(i)
 		list.add_child(row["button"])
+		InkTheme.wire_button_sfx(row["button"])
+		InkTheme.animate_item_entrance(row["button"], 0.1)
 		choice_buttons.append(row["button"])
 		choice_rows.append(row)
 
 
 func _create_choice_row(index: int) -> Dictionary:
 	var button := Button.new()
-	button.custom_minimum_size = Vector2(940, 76)
+	button.custom_minimum_size = Vector2(940, 72)
 	button.focus_mode = Control.FOCUS_NONE
 	button.text = ""
 	button.pressed.connect(_on_choice_pressed.bind(index))
@@ -175,6 +191,20 @@ func _create_choice_row(index: int) -> Dictionary:
 	text_box.add_theme_constant_override("separation", 2)
 	content.add_child(text_box)
 
+	var name_row := HBoxContainer.new()
+	name_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_row.add_theme_constant_override("separation", 10)
+	text_box.add_child(name_row)
+
+	# 来源徽记：标明这个选项来自哪路"先古回响"。
+	var tag_label := Label.new()
+	tag_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tag_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.78))
+	tag_label.add_theme_constant_override("shadow_offset_x", 2)
+	tag_label.add_theme_constant_override("shadow_offset_y", 2)
+	tag_label.add_theme_font_size_override("font_size", 18)
+	name_row.add_child(tag_label)
+
 	var name_label := Label.new()
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	name_label.add_theme_color_override("font_color", Color("f2c94f"))
@@ -182,7 +212,7 @@ func _create_choice_row(index: int) -> Dictionary:
 	name_label.add_theme_constant_override("shadow_offset_x", 2)
 	name_label.add_theme_constant_override("shadow_offset_y", 2)
 	name_label.add_theme_font_size_override("font_size", 24)
-	text_box.add_child(name_label)
+	name_row.add_child(name_label)
 
 	var description_label := Label.new()
 	description_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -197,32 +227,43 @@ func _create_choice_row(index: int) -> Dictionary:
 	return {
 		"button": button,
 		"icon": icon,
+		"tag": tag_label,
 		"name": name_label,
 		"description": description_label,
 	}
 
 
+# 杀戮尖塔 Neow 式选择：不再"抽一个来源出三个同质选项"，
+# 而是打乱来源、每个来源各出一条——稳妥/改牌/以劫换福/豪赌四种性格同台，必有取舍。
 func _roll_blessings() -> void:
 	_load_sources()
 	if sources_data.is_empty():
 		return
-	source = RNG.array_pick_random(sources_data) as Dictionary
 
-	# 按角色命格过滤（仅命格共鸣带 class 标签；其余来源全部放行）。
 	var cls := _character_class()
-	var blessing_pool: Array = []
-	for b in (source.get("blessings", []) as Array):
-		var b_class: String = (b as Dictionary).get("class", "")
-		if b_class.is_empty() or b_class == cls:
-			blessing_pool.append(b)
+	var shuffled_sources: Array = sources_data.duplicate()
+	RNG.array_shuffle(shuffled_sources)
 
-	RNG.array_shuffle(blessing_pool)
-	choices = blessing_pool.slice(0, mini(3, blessing_pool.size()))
+	choices = []
+	for src in shuffled_sources:
+		if choices.size() >= CHOICE_COUNT:
+			break
+		var pool: Array = []
+		for b in ((src as Dictionary).get("blessings", []) as Array):
+			var b_class: String = (b as Dictionary).get("class", "")
+			if b_class.is_empty() or b_class == cls:
+				pool.append(b)
+		if pool.is_empty():
+			continue
+		choices.append({
+			"blessing": RNG.array_pick_random(pool),
+			"source_name": (src as Dictionary).get("name", ""),
+		})
 
 	var title := $Title as Label
 	var description := $Description as Label
-	title.text = source.get("name", "劫中遗赠")
-	description.text = "第 %s 章之前，%s" % [chapter, source.get("description", "")]
+	title.text = "劫中遗赠"
+	description.text = "第 %s 章之前，数道先古回响同时低语，只可应其一。" % chapter
 
 	for i in choice_rows.size():
 		var row := choice_rows[i]
@@ -231,9 +272,14 @@ func _roll_blessings() -> void:
 			button.hide()
 			continue
 
-		var blessing := choices[i] as Dictionary
+		var entry := choices[i] as Dictionary
+		var blessing := entry["blessing"] as Dictionary
+		var source_name := entry["source_name"] as String
 		var icon_key := blessing.get("icon", "max_mana") as String
 		(row["icon"] as TextureRect).texture = EFFECT_ICONS.get(icon_key, EFFECT_ICONS["max_mana"])
+		var tag := row["tag"] as Label
+		tag.text = "「%s」" % source_name
+		tag.add_theme_color_override("font_color", SOURCE_COLORS.get(source_name, Color("d4c2a0")))
 		(row["name"] as Label).text = blessing.get("name", "未知祝福")
 		(row["description"] as Label).text = blessing.get("description", "")
 		button.show()
@@ -243,7 +289,8 @@ func _on_choice_pressed(index: int) -> void:
 	if index < 0 or index >= choices.size():
 		return
 
-	_apply_blessing(choices[index])
+	GameSfx.play(GameSfx.GONG, -6.0)
+	_apply_blessing((choices[index] as Dictionary)["blessing"])
 	Events.blessing_exited.emit()
 	queue_free()
 
@@ -277,10 +324,26 @@ func _apply_effect(type: String, amount: int) -> void:
 			_upgrade_random_cards(maxi(amount, 1))
 		"remove_card":
 			_remove_random_cards(maxi(amount, 1))
+		"remove_strike_defend":
+			_remove_basic_cards(maxi(amount, 1))
 		"duplicate_card":
 			_duplicate_random_cards(maxi(amount, 1))
+		"add_random_cards":
+			_add_random_draftable_cards(maxi(amount, 1), false)
+		"add_random_rare_card":
+			_add_random_draftable_cards(maxi(amount, 1), true)
+		"transform_card":
+			# 蜕变：移除 N 张打击/防御，换 N 张随机职业术法。
+			_remove_basic_cards(maxi(amount, 1))
+			_add_random_draftable_cards(maxi(amount, 1), false)
 		"grant_relic":
 			_grant_relics(maxi(amount, 1))
+		"gain_potion":
+			_grant_random_potions(maxi(amount, 1))
+		"lose_all_gold":
+			run_stats.gold = 0
+		"weaken_next_battles":
+			_grant_broken_seal(maxi(amount, 1))
 
 
 func _character_class() -> String:
@@ -303,6 +366,7 @@ func _character_class() -> String:
 func _upgrade_random_cards(count: int) -> void:
 	if not character_stats or not character_stats.deck:
 		return
+	var picked_names: Array[String] = []
 	for _i in count:
 		var candidates: Array[Card] = []
 		for card: Card in character_stats.deck.cards:
@@ -311,37 +375,130 @@ func _upgrade_random_cards(count: int) -> void:
 		var picked := RNG.array_pick_random(candidates) as Card
 		if picked:
 			picked.upgrade()
+			picked_names.append(picked.get_display_name())
+	_notify("突破", picked_names)
 
 
 func _remove_random_cards(count: int) -> void:
 	if not character_stats or not character_stats.deck:
 		return
+	var picked_names: Array[String] = []
 	for _i in count:
 		if character_stats.deck.cards.size() <= 1:
-			return
+			break
 		var picked := RNG.array_pick_random(character_stats.deck.cards) as Card
 		if picked:
 			character_stats.deck.remove_card(picked)
+			picked_names.append(picked.get_display_name())
+	_notify("移除", picked_names)
 
 
 func _duplicate_random_cards(count: int) -> void:
 	if not character_stats or not character_stats.deck:
 		return
+	var picked_names: Array[String] = []
 	for _i in count:
 		if character_stats.deck.cards.is_empty():
-			return
+			break
 		var picked := RNG.array_pick_random(character_stats.deck.cards) as Card
 		if picked:
 			character_stats.deck.add_card(picked.duplicate(true))
+			picked_names.append(picked.get_display_name())
+	_notify("复制", picked_names)
 
 
 func _grant_relics(count: int) -> void:
 	if not relic_handler:
 		return
+	var picked_names: Array[String] = []
 	for _i in count:
-		var relic := RELIC_REWARD_POOL.get_random_available(character_stats, relic_handler)
+		var relic := RELIC_REWARD_POOL.get_random_available(
+			character_stats,
+			relic_handler,
+			chapter,
+			RelicRewardPool.RewardContext.STANDARD
+		)
 		if relic:
 			relic_handler.add_relic(relic)
+			picked_names.append(relic.relic_name)
+	_notify("获得法宝", picked_names)
+
+
+# 随机结果播报：让玩家看见"到底随机到了哪张"。
+func _notify(prefix: String, names: Array[String]) -> void:
+	if names.is_empty():
+		return
+	var joined := ""
+	for n in names:
+		joined += "「%s」" % n
+	Events.ui_notice_requested.emit("%s：%s" % [prefix, joined])
+
+
+# 移除打击/防御类起手牌（id 含 strike/defend，兼容魔修的 demon_strike 等专属版本）。
+# 比"随机移除任意牌"安全——不会吃掉玩家的好牌。
+func _remove_basic_cards(count: int) -> void:
+	if not character_stats or not character_stats.deck:
+		return
+	var picked_names: Array[String] = []
+	for _i in count:
+		if character_stats.deck.cards.size() <= 1:
+			break
+		var candidates: Array[Card] = []
+		for card: Card in character_stats.deck.cards:
+			if card and (card.id.contains("strike") or card.id.contains("defend")):
+				candidates.append(card)
+		var picked := RNG.array_pick_random(candidates) as Card
+		if picked:
+			character_stats.deck.remove_card(picked)
+			picked_names.append(picked.get_display_name())
+	_notify("移除", picked_names)
+
+
+# 从职业可抽卡池发随机卡；rare_only 时只发金卡（无金卡则退回全池）。
+func _add_random_draftable_cards(count: int, rare_only: bool) -> void:
+	if not character_stats or not character_stats.deck or not character_stats.draftable_cards:
+		return
+	var pool: Array[Card] = character_stats.draftable_cards.cards
+	if pool.is_empty():
+		return
+	var picked_names: Array[String] = []
+	for _i in count:
+		var candidates: Array[Card] = []
+		for card: Card in pool:
+			if card and (not rare_only or card.rarity == Card.Rarity.RARE):
+				candidates.append(card)
+		if candidates.is_empty():
+			candidates = pool.duplicate()
+		var picked := RNG.array_pick_random(candidates) as Card
+		if picked:
+			character_stats.deck.add_card(picked.duplicate(true))
+			picked_names.append(picked.get_display_name())
+	_notify("获得卡牌", picked_names)
+
+
+# 借用 run 的丹药奖池发放（blessing 是 run 的子场景，经组拿 run 节点）。
+func _grant_random_potions(count: int) -> void:
+	var run: Node = get_tree().get_first_node_in_group("run")
+	if not run or not ("potion_handler" in run) or not run.potion_handler:
+		return
+	var picked_names: Array[String] = []
+	for _i in count:
+		if run.potion_handler.is_full():
+			break
+		var potion: Potion = run._random_reward_potion()
+		if potion:
+			run.potion_handler.add_potion(potion)
+			picked_names.append(potion.potion_name)
+	_notify("获得丹药", picked_names)
+
+
+# 破劫之印：接下来 N 场战斗敌人以七成气血入场（消耗性法宝，用尽自碎）。
+func _grant_broken_seal(battle_count: int) -> void:
+	if not relic_handler:
+		return
+	var seal := BROKEN_SEAL_RELIC.duplicate(true) as Relic
+	seal.set("battles_left", battle_count)
+	relic_handler.add_relic(seal)
 
 
 func _apply_choice_button_style(button: Button) -> void:

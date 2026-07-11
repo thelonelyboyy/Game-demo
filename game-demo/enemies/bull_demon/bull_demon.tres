@@ -10,5 +10,5 @@ id = "bull_demon"
 display_name = "牛魔"
 description = "镇守险途的赤角牛魔，肉身沉重如山，善以蛮力冲撞并凝聚妖甲。"
 ai = ExtResource("3_ai")
-max_health = 35
+max_health = 105
 art = ExtResource("2_art")

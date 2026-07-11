@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/enemies_redesign/jade_spider.png" id="2"]
+[ext_resource type="PackedScene" path="res://enemies/venom_broodmother/venom_broodmother_ai.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = "venom_broodmother"
+display_name = "万蛊母皇"
+description = "将浊卵混入牌序，拖得越久越难抽到真正的术法。"
+ai = ExtResource("3")
+phase_two_health_ratio = 0.55
+phase_two_name = "万蛊孵化"
+phase_two_block = 22
+phase_two_damage_bonus = 0.25
+phase_two_sequence = Array[int]([1, 0, 1, 2])
+max_health = 245
+art = ExtResource("2")

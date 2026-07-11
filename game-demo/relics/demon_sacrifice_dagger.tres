@@ -9,6 +9,7 @@ relic_name = "祭血匕"
 id = "demon_sacrifice_dagger"
 type = 4
 character_type = 3
+rarity = 1
 icon = ExtResource("2")
 tooltip = "魔修专属。打出魔修牌时，对所有敌人造成 1 点伤害。"
 match_profession = 3

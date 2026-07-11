@@ -9,6 +9,7 @@ relic_name = "髓鼓"
 id = "body_marrow_drum"
 type = 4
 character_type = 1
+rarity = 1
 icon = ExtResource("2")
 tooltip = "体修专属。每回合第一次受到伤害后，获得 7 点护体。"
 block_amount = 7

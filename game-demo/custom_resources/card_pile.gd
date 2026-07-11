@@ -43,6 +43,18 @@ func shuffle() -> void:
 	RNG.array_shuffle(cards)
 
 
+func move_innate_cards_to_top() -> void:
+	var innate_cards: Array[Card] = []
+	var other_cards: Array[Card] = []
+	for card: Card in cards:
+		if card and card.is_innate_card():
+			innate_cards.append(card)
+		else:
+			other_cards.append(card)
+	cards = innate_cards + other_cards
+	card_pile_size_changed.emit(cards.size())
+
+
 func clear() -> void:
 	cards.clear()
 	card_pile_size_changed.emit(cards.size())

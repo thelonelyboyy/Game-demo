@@ -108,11 +108,13 @@ func _apply_single_effect(effect: String, amount: int) -> void:
 				var card := RNG.array_pick_random(candidates) as Card
 				if card:
 					card.upgrade()
+					Events.ui_notice_requested.emit("突破：「%s」" % card.get_display_name())
 		"remove_random":
 			if character_stats and character_stats.deck and character_stats.deck.cards.size() > 1:
 				var card := RNG.array_pick_random(character_stats.deck.cards) as Card
 				if card:
 					character_stats.deck.remove_card(card)
+					Events.ui_notice_requested.emit("移除：「%s」" % card.get_display_name())
 		_:
 			pass
 

@@ -10,5 +10,5 @@ id = "dark_eagle"
 display_name = "幽暗鹰"
 description = "盘旋在阴云中的幽羽妖禽，擅长以暗影羽刃与护体妖风拖慢战局。"
 ai = ExtResource("1_x0e6g")
-max_health = 25
+max_health = 68
 art = ExtResource("1_cepjj")

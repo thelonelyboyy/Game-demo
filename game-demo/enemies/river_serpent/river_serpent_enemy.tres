@@ -10,5 +10,5 @@ id = "river_serpent"
 display_name = "寒潭蛇"
 description = "蛰伏在灵潭里的长蛇，攻守转换狡猾。"
 ai = ExtResource("3_ai")
-max_health = 26
+max_health = 70
 art = ExtResource("2_art")

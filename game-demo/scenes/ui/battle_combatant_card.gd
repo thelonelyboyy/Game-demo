@@ -10,6 +10,10 @@ const PAPER_SOLDIER_CARD := preload("res://art/ui/battle_cards/paper_soldier_car
 const MIST_WOLF_CARD := preload("res://art/ui/battle_cards/mist_wolf_card.png")
 const BULL_DEMON_CARD := preload("res://art/ui/battle_cards/bull_demon_card.png")
 const ABYSSAL_SWORD_SOUL_CARD := preload("res://art/ui/battle_cards/abyssal_sword_soul_card.png")
+const SHA_QI_STATUS := preload("res://statuses/sha_qi.tres")
+const STATUS_ROW_HEIGHT := 44.0
+const STATUS_ICON_SIZE := 32.0
+const STATUS_CHIP_HEIGHT := 38.0
 
 var kind := Kind.PLAYER
 var combatant: Node
@@ -120,7 +124,7 @@ func _build() -> void:
 	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_frame.add_child(_portrait)
 
 	_name_label = _make_label("Name", 22, Color("f4deb0"))
@@ -150,15 +154,16 @@ func _build() -> void:
 
 	_status_row = HBoxContainer.new()
 	_status_row.name = "StatusRow"
-	_status_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_status_row.mouse_filter = Control.MOUSE_FILTER_PASS
 	_status_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_status_row.add_theme_constant_override("separation", 8)
+	_status_row.add_theme_constant_override("separation", 10)
 	_frame.add_child(_status_row)
 
 	_sha_badge = Panel.new()
 	_sha_badge.name = "ShaQiBadge"
-	_sha_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_sha_badge.mouse_filter = Control.MOUSE_FILTER_STOP
 	_sha_badge.z_index = 22
+	_sha_badge.tooltip_text = _format_status_tooltip(SHA_QI_STATUS)
 	_sha_badge.hide()
 	add_child(_sha_badge)
 
@@ -180,21 +185,26 @@ func _layout() -> void:
 	var frame_h := maxf(80.0, h - intent_top_height)
 	var pad := 12.0
 	var bar_w := 18.0
+	var bar_top := 48.0
+	var status_y := frame_h - STATUS_ROW_HEIGHT - 8.0
+	var bar_h := maxf(84.0, status_y - bar_top - 28.0)
 
 	_set_rect(_frame, Vector2(0, intent_top_height), Vector2(w, frame_h))
-	_set_rect(_portrait, Vector2(44, 48), Vector2(w - 88, frame_h - 104))
+	# 立绘尽量占满卡窗（左右只留条宽），削弱"黑盒"感。
+	_set_rect(_portrait, Vector2(pad + bar_w + 4.0, 46), Vector2(w - (pad + bar_w + 4.0) * 2.0, maxf(96.0, status_y - 56.0)))
 	_set_rect(_name_label, Vector2(42, 10), Vector2(w - 84, 34))
-	_set_rect(_health_fill.get_parent() as Control, Vector2(pad, 48), Vector2(bar_w, frame_h - 96))
-	_set_rect(_block_fill.get_parent() as Control, Vector2(w - pad - bar_w, 48), Vector2(bar_w, frame_h - 96))
-	_set_rect(_status_row, Vector2(44, frame_h - 43), Vector2(w - 88, 32))
-	_layout_vertical_bar_label(_health_label, _health_fill.get_parent() as Control)
-	_layout_vertical_bar_label(_block_label, _block_fill.get_parent() as Control)
+	_set_rect(_health_fill.get_parent() as Control, Vector2(pad, bar_top), Vector2(bar_w, bar_h))
+	_set_rect(_block_fill.get_parent() as Control, Vector2(w - pad - bar_w, bar_top), Vector2(bar_w, bar_h))
+	_set_rect(_status_row, Vector2(40, status_y), Vector2(w - 80, STATUS_ROW_HEIGHT))
+	_layout_vertical_bar_label(_health_label, _health_fill.get_parent() as Control, false)
+	_layout_vertical_bar_label(_block_label, _block_fill.get_parent() as Control, true)
 
 	if kind == Kind.ENEMY:
+		_intent_badge.show()
 		_set_rect(_intent_badge, Vector2(w * 0.5 - 112.0, 0.0), Vector2(224.0, 42.0))
+		_layout_intent_badge()
 	else:
-		_set_rect(_intent_badge, Vector2(w * 0.5 - 78.0, h - 42.0), Vector2(156.0, 34.0))
-	_layout_intent_badge()
+		_intent_badge.hide()
 
 	if _sha_badge:
 		# 煞气徽章悬在玩家卡顶部上方，常驻可读。
@@ -236,6 +246,7 @@ func _refresh_sha_badge() -> void:
 
 	_sha_badge.show()
 	_sha_label.text = "煞气 %d" % stacks
+	_sha_badge.tooltip_text = _format_status_tooltip(SHA_QI_STATUS, stacks)
 
 	var tier := 0
 	if stacks >= 10:
@@ -339,10 +350,12 @@ func _punch_label(label: Label) -> void:
 
 func _refresh_intent() -> void:
 	if kind == Kind.PLAYER:
-		_intent_icon.texture = ICON_SHIELD
-		_intent_label.text = "护体 %s" % stats.block
+		_intent_badge.hide()
+		_intent_icon.texture = null
+		_intent_label.text = ""
 		return
 
+	_intent_badge.show()
 	var enemy := combatant as Enemy
 	if not enemy or not enemy.current_action or not enemy.current_action.intent:
 		_intent_icon.texture = null
@@ -413,27 +426,51 @@ func _status_value(status: Status) -> int:
 
 
 func _make_status_chip(status: Status, is_new := false, stacks_changed := false) -> Control:
-	var chip := HBoxContainer.new()
-	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.alignment = BoxContainer.ALIGNMENT_CENTER
-	chip.add_theme_constant_override("separation", 2)
+	var chip := PanelContainer.new()
+	chip.mouse_filter = Control.MOUSE_FILTER_STOP
+	chip.custom_minimum_size = Vector2(50.0, STATUS_CHIP_HEIGHT)
+	chip.tooltip_text = _format_status_tooltip(status)
+	chip.add_theme_stylebox_override("panel", InkTheme.make_style(
+		Color(0.018, 0.014, 0.018, 0.82),
+		Color(0.68, 0.52, 0.25, 0.78),
+		1,
+		6,
+		Color(0, 0, 0, 0.42),
+		8
+	))
+
+	var margin := MarginContainer.new()
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_theme_constant_override("margin_left", 5)
+	margin.add_theme_constant_override("margin_top", 3)
+	margin.add_theme_constant_override("margin_right", 5)
+	margin.add_theme_constant_override("margin_bottom", 3)
+	chip.add_child(margin)
+
+	var content := HBoxContainer.new()
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.alignment = BoxContainer.ALIGNMENT_CENTER
+	content.add_theme_constant_override("separation", 3)
+	margin.add_child(content)
 
 	var icon := TextureRect.new()
-	icon.custom_minimum_size = Vector2(20, 20)
+	icon.custom_minimum_size = Vector2(STATUS_ICON_SIZE, STATUS_ICON_SIZE)
 	icon.texture = status.icon
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.add_child(icon)
+	content.add_child(icon)
 
-	var label := _make_label("Value", 15, Color("ecdfbf"))
-	label.custom_minimum_size = Vector2(16, 20)
+	var label := _make_label("Value", 18, Color("fff1c9"))
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.custom_minimum_size = Vector2(20, STATUS_ICON_SIZE)
 	label.text = str(_status_value(status))
-	chip.add_child(label)
+	content.add_child(label)
 
 	if is_new:
 		# 新词条：图标从小弹出 + 整体淡入。
-		icon.pivot_offset = Vector2(10, 10)
+		icon.pivot_offset = Vector2.ONE * (STATUS_ICON_SIZE * 0.5)
 		icon.scale = Vector2.ONE * 0.2
 		chip.modulate = Color(1, 1, 1, 0.0)
 		var tween := chip.create_tween().set_parallel(true)
@@ -442,7 +479,7 @@ func _make_status_chip(status: Status, is_new := false, stacks_changed := false)
 		tween.tween_property(chip, "modulate:a", 1.0, 0.22)
 	elif stacks_changed:
 		# 层数变化：数字 punch。
-		label.pivot_offset = Vector2(8, 10)
+		label.pivot_offset = Vector2(10, STATUS_ICON_SIZE * 0.5)
 		label.scale = Vector2.ONE * 1.5
 		var tween := label.create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		tween.tween_property(label, "scale", Vector2.ONE, 0.32)
@@ -504,8 +541,7 @@ func _make_vertical_bar(node_name: String, back_color: Color, fill_color: Color)
 	fill.color = fill_color
 	panel.add_child(fill)
 
-	var label := _make_label("Label", 13, Color("fff2d0"))
-	label.rotation_degrees = -90.0
+	var label := _make_label("Label", 16, Color("fff2d0"))
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -513,13 +549,34 @@ func _make_vertical_bar(node_name: String, back_color: Color, fill_color: Color)
 	return panel
 
 
-func _layout_vertical_bar_label(label: Label, bar: Control) -> void:
+# 数字横排在条底：血条向卡内右伸、护体条向卡内左伸——
+# 向卡外伸会被 frame 的 clip_contents 裁掉（此前"100/100"显示成"00/100"的根因）。
+func _layout_vertical_bar_label(label: Label, bar: Control, align_right := false) -> void:
 	if not label or not bar:
 		return
 
-	label.rotation_degrees = -90.0
-	label.position = Vector2(1.0, maxf(1.0, bar.size.y - 2.0))
-	label.size = Vector2(maxf(1.0, bar.size.y - 4.0), maxf(1.0, bar.size.x - 2.0))
+	label.rotation_degrees = 0.0
+	label.size = Vector2(92.0, 24.0)
+	if align_right:
+		label.position = Vector2(bar.size.x - 2.0 - 92.0, bar.size.y + 3.0)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	else:
+		label.position = Vector2(2.0, bar.size.y + 3.0)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+
+
+func _format_status_tooltip(status: Status, override_value := -1) -> String:
+	if not status:
+		return ""
+	var text := status.get_tooltip()
+	if text.is_empty():
+		return ""
+	if text.contains("%s"):
+		var value := override_value
+		if value < 0:
+			value = status.stacks if status.stack_type == Status.StackType.INTENSITY else status.duration
+		text = text.replace("%s", str(value))
+	return text.replace("%%", "%")
 
 
 func _layout_intent_badge() -> void:

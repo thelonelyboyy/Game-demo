@@ -17,6 +17,7 @@ const DISCARD_PILE_ICON := preload("res://art/ui/icons/discard.png")
 const DRAW_PILE_WIDGET := preload("res://art/ui/battle_widgets/battle_draw_pile.png")
 const DISCARD_PILE_WIDGET := preload("res://art/ui/battle_widgets/battle_discard_pile.png")
 const CARD_VISUALS_SCENE := preload("res://scenes/ui/card_visuals.tscn")
+const CARD_MENU_UI_SCENE := preload("res://scenes/ui/card_menu_ui.tscn")
 const PHASE_B_GUIDES_VISIBLE := false
 const PLAYED_CARD_PREVIEW_SIZE := Vector2(224.0, 322.0)
 const PLAYED_CARD_PREVIEW_SCALE := 1.45
@@ -28,7 +29,7 @@ const PHASE_BANNER_COLOR_PLAYER := Color("f2c94f")
 const PHASE_BANNER_COLOR_ENEMY := Color("e0503c")
 const BOSS_BANNER_COLOR := Color("b04ae0")
 # 与 enemy.gd _get_target_art_max_size 的 Boss 名单保持一致。
-const BOSS_IDS := ["bone_dragon", "black_lotus_matriarch", "sky_palace_guardian", "abyssal_sword_soul", "eclipse_tyrant"]
+const BOSS_IDS := ["bone_dragon", "black_lotus_matriarch", "sky_palace_guardian", "abyssal_sword_soul", "eclipse_tyrant", "blood_moon_demon_king", "bronze_corpse_king", "venom_broodmother", "underworld_judge"]
 
 var _turn_count := 0
 var _turn_label: Label
@@ -45,6 +46,15 @@ var _player_card: BattleCombatantCard
 var _enemy_cards: Array[BattleCombatantCard] = []
 var _tracked_player: Player
 var _tracked_enemies: Array[Enemy] = []
+var _discover_overlay: ColorRect
+var _discover_request
+var _discover_selected: Array[Card] = []
+var _discover_cards_box: HBoxContainer
+var _discover_confirm_button: Button
+var _discover_count_label: Label
+var hero_skill_button: Button
+# 英雄技能每回合限一次：施放后按钮禁用到下回合开始。
+var _hero_skill_used_this_turn := false
 
 func _ready() -> void:
 	layer = 4
@@ -56,10 +66,14 @@ func _ready() -> void:
 	Events.sha_qi_tier_changed.connect(_on_sha_qi_tier_changed)
 	Events.card_drawn.connect(_on_card_drawn_sfx)
 	Events.card_played.connect(_on_card_played_sfx)
+	Events.card_discovery_requested.connect(_on_card_discovery_requested)
 	Events.player_turn_started.connect(_on_player_turn_started)
 	Events.player_turn_ended.connect(_on_player_turn_ended_for_banner)
 	Events.player_hand_drawn.connect(_on_player_hand_drawn)
+	Events.hero_skill_used.connect(_on_hero_skill_used)
 	end_turn_button.pressed.connect(_on_end_turn_button_pressed)
+	if hero_skill_button:
+		hero_skill_button.pressed.connect(_on_hero_skill_button_pressed)
 	draw_pile_button.pressed.connect(draw_pile_view.show_current_view.bind("抽牌堆", true))
 	discard_pile_button.pressed.connect(discard_pile_view.show_current_view.bind("弃牌堆"))
 	_layout_battle_controls()
@@ -148,24 +162,38 @@ func _show_boss_banner_now(boss_name: String) -> void:
 
 
 func _set_char_stats(value: CharacterStats) -> void:
+	if char_stats and char_stats.stats_changed.is_connected(_update_hero_skill_button_state):
+		char_stats.stats_changed.disconnect(_update_hero_skill_button_state)
 	char_stats = value
 	mana_ui.char_stats = char_stats
 	hand.char_stats = char_stats
+	if char_stats and not char_stats.stats_changed.is_connected(_update_hero_skill_button_state):
+		char_stats.stats_changed.connect(_update_hero_skill_button_state)
+	_sync_hero_skill_visibility()
 
 
 func _on_player_hand_drawn() -> void:
 	end_turn_button.disabled = false
+	_update_hero_skill_button_state()
 
 
 func _on_player_turn_started() -> void:
 	_turn_count += 1
+	_hero_skill_used_this_turn = false
 	if _turn_label:
 		_turn_label.text = "回合 %s" % _turn_count
 	_pulse_turn_badge()
 	_show_phase_banner("我方回合", PHASE_BANNER_COLOR_PLAYER)
 
 
+func _on_hero_skill_used() -> void:
+	_hero_skill_used_this_turn = true
+	_update_hero_skill_button_state()
+
+
 func _on_player_turn_ended_for_banner() -> void:
+	if hero_skill_button:
+		hero_skill_button.disabled = true
 	_show_phase_banner("敌方回合", PHASE_BANNER_COLOR_ENEMY)
 
 
@@ -257,8 +285,19 @@ func _show_phase_banner(text: String, accent: Color, hold := 0.80, font_size := 
 
 func _on_end_turn_button_pressed() -> void:
 	end_turn_button.disabled = true
+	if hero_skill_button:
+		hero_skill_button.disabled = true
 	GameSfx.play(GameSfx.END_TURN, -6.0)
 	Events.player_turn_ended.emit()
+
+
+func _on_hero_skill_button_pressed() -> void:
+	if not hero_skill_button or hero_skill_button.disabled:
+		return
+
+	Events.hero_skill_requested.emit(hero_skill_button.get_global_rect().get_center())
+	_pulse_hero_skill_button()
+	_update_hero_skill_button_state.call_deferred()
 
 
 func _on_card_drawn_sfx(_card: Card) -> void:
@@ -267,6 +306,175 @@ func _on_card_drawn_sfx(_card: Card) -> void:
 
 func _on_card_played_sfx(_card: Card) -> void:
 	GameSfx.play(GameSfx.PLAY_CARD, -2.0)
+
+
+func _on_card_discovery_requested(request) -> void:
+	if not request or request.choices.is_empty():
+		if request:
+			request.resolve([])
+		return
+
+	if _discover_overlay:
+		_finish_discovery([])
+
+	_discover_request = request
+	_discover_selected.clear()
+	_show_discovery_overlay()
+
+
+func _show_discovery_overlay() -> void:
+	if hand:
+		hand.disable_hand()
+	end_turn_button.disabled = true
+	if hero_skill_button:
+		hero_skill_button.disabled = true
+
+	_discover_overlay = ColorRect.new()
+	_discover_overlay.name = "DiscoveryOverlay"
+	_discover_overlay.color = Color(0.012, 0.008, 0.014, 0.86)
+	_discover_overlay.z_index = 3200
+	_discover_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_discover_overlay)
+
+	var panel := PanelContainer.new()
+	panel.name = "DiscoveryPanel"
+	panel.anchor_left = 0.5
+	panel.anchor_top = 0.5
+	panel.anchor_right = 0.5
+	panel.anchor_bottom = 0.5
+	panel.offset_left = -560.0
+	panel.offset_top = -285.0
+	panel.offset_right = 560.0
+	panel.offset_bottom = 285.0
+	panel.add_theme_stylebox_override("panel", InkTheme.make_style(
+		Color(0.030, 0.020, 0.032, 0.96),
+		Color(0.72, 0.47, 0.22, 0.92),
+		2,
+		8,
+		Color(0.95, 0.48, 0.12, 0.22),
+		20
+	))
+	_discover_overlay.add_child(panel)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 34)
+	margin.add_theme_constant_override("margin_top", 26)
+	margin.add_theme_constant_override("margin_right", 34)
+	margin.add_theme_constant_override("margin_bottom", 24)
+	panel.add_child(margin)
+
+	var layout := VBoxContainer.new()
+	layout.alignment = BoxContainer.ALIGNMENT_CENTER
+	layout.add_theme_constant_override("separation", 14)
+	margin.add_child(layout)
+
+	var title := Label.new()
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.text = _discover_request.title if not _discover_request.title.is_empty() else "发现"
+	title.add_theme_font_size_override("font_size", 34)
+	title.add_theme_color_override("font_color", Color("ffe2a6"))
+	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.9))
+	title.add_theme_constant_override("shadow_offset_x", 2)
+	title.add_theme_constant_override("shadow_offset_y", 2)
+	layout.add_child(title)
+
+	_discover_count_label = Label.new()
+	_discover_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_discover_count_label.add_theme_font_size_override("font_size", 19)
+	_discover_count_label.add_theme_color_override("font_color", Color("d8c29a"))
+	layout.add_child(_discover_count_label)
+
+	if not _discover_request.prompt.is_empty():
+		var prompt_label := Label.new()
+		prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		prompt_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		prompt_label.text = _discover_request.prompt
+		prompt_label.add_theme_font_size_override("font_size", 18)
+		prompt_label.add_theme_color_override("font_color", Color("cdbf92"))
+		layout.add_child(prompt_label)
+
+	_discover_cards_box = HBoxContainer.new()
+	_discover_cards_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	_discover_cards_box.add_theme_constant_override("separation", 22)
+	layout.add_child(_discover_cards_box)
+
+	for card: Card in _discover_request.choices:
+		var menu := CARD_MENU_UI_SCENE.instantiate() as CardMenuUI
+		menu.set_visual_size(Vector2(214, 307))
+		menu.card = card
+		menu.tooltip_requested.connect(_on_discover_card_clicked.bind(menu))
+		_discover_cards_box.add_child(menu)
+
+	var buttons := HBoxContainer.new()
+	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	buttons.add_theme_constant_override("separation", 16)
+	layout.add_child(buttons)
+
+	_discover_confirm_button = Button.new()
+	_discover_confirm_button.text = "确认"
+	_discover_confirm_button.custom_minimum_size = Vector2(156, 48)
+	InkTheme.apply_screen_button(_discover_confirm_button)
+	_discover_confirm_button.pressed.connect(_finish_discovery.bind(_discover_selected))
+	buttons.add_child(_discover_confirm_button)
+
+	if _discover_request.allow_skip:
+		var skip_button := Button.new()
+		skip_button.text = "跳过"
+		skip_button.custom_minimum_size = Vector2(146, 48)
+		InkTheme.apply_secondary_button(skip_button)
+		skip_button.pressed.connect(_finish_discovery.bind([]))
+		buttons.add_child(skip_button)
+
+	_refresh_discovery_selection()
+
+
+func _on_discover_card_clicked(card: Card, menu: CardMenuUI) -> void:
+	if not _discover_request or not card:
+		return
+	if _discover_selected.has(card):
+		_discover_selected.erase(card)
+	elif _discover_selected.size() < _discover_request.picks:
+		_discover_selected.append(card)
+	GameSfx.play(GameSfx.UI_CLICK, -8.0)
+	_refresh_discovery_selection()
+
+
+func _refresh_discovery_selection() -> void:
+	if not _discover_request:
+		return
+	if _discover_count_label:
+		_discover_count_label.text = "选择 %s / %s 张加入手牌" % [_discover_selected.size(), _discover_request.picks]
+	if _discover_confirm_button:
+		_discover_confirm_button.disabled = _discover_selected.size() != _discover_request.picks
+	if _discover_cards_box:
+		for child in _discover_cards_box.get_children():
+			var menu := child as CardMenuUI
+			if not menu:
+				continue
+			var selected := _discover_selected.has(menu.card)
+			menu.modulate = Color(1.18, 1.08, 0.82, 1.0) if selected else Color.WHITE
+			menu.z_index = 20 if selected else 0
+
+
+func _finish_discovery(selected_cards: Array[Card]) -> void:
+	var request = _discover_request
+	var selected_copy := selected_cards.duplicate()
+	_discover_request = null
+	if _discover_overlay:
+		_discover_overlay.queue_free()
+		_discover_overlay = null
+	_discover_cards_box = null
+	_discover_confirm_button = null
+	_discover_count_label = null
+	_discover_selected.clear()
+
+	if request and not request.resolved:
+		request.resolve(selected_copy)
+
+	if hand:
+		hand.enable_hand()
+	end_turn_button.disabled = false
+	_update_hero_skill_button_state()
 
 
 func _on_card_play_preview_requested(card: Card, start_global_center: Vector2) -> void:
@@ -437,8 +645,28 @@ func _polish_ui() -> void:
 	end_turn_button.text = "结束回合"
 	end_turn_button.custom_minimum_size = Vector2(316, 104)
 	InkTheme.apply_battle_blue_button(end_turn_button, true)
+	_add_hero_skill_button()
 	_polish_pile_button(draw_pile_button, "抽牌堆", false)
 	_polish_pile_button(discard_pile_button, "弃牌堆", true)
+
+
+func _add_hero_skill_button() -> void:
+	if hero_skill_button:
+		return
+
+	hero_skill_button = Button.new()
+	hero_skill_button.name = "HeroSkillButton"
+	hero_skill_button.text = "魔焰焚心"
+	hero_skill_button.tooltip_text = "魔焰焚心：受到 2 点伤害，生成 1 张临时随机魔修卡（不含攻击与基础防御）。临时牌离开手牌后移除。每回合限用一次。"
+	hero_skill_button.custom_minimum_size = Vector2(156, 76)
+	hero_skill_button.focus_mode = Control.FOCUS_NONE
+	hero_skill_button.disabled = true
+	hero_skill_button.hide()
+	# 边框与「结束回合」同款；代价说明只在悬停 tooltip 里。
+	InkTheme.apply_battle_blue_button(hero_skill_button, false)
+	hero_skill_button.add_theme_font_size_override("font_size", 23)
+	InkTheme.wire_button_sfx(hero_skill_button)
+	add_child(hero_skill_button)
 
 
 func _add_combatant_layer() -> void:
@@ -490,7 +718,7 @@ func _rebuild_combatant_cards() -> void:
 	_enemy_cards.clear()
 
 	if _tracked_player:
-		_player_card = _create_combatant_card("PlayerCard", Vector2(318, 306))
+		_player_card = _create_combatant_card("PlayerCard", Vector2(318, 236))
 		_player_card.bind_player(_tracked_player)
 
 	for enemy in _tracked_enemies:
@@ -705,6 +933,9 @@ func _layout_battle_controls() -> void:
 	_place_bottom_left(draw_pile_button, Vector2(48, 40), Vector2(104, 156), scale_factor)
 	_place_bottom_left(discard_pile_button, Vector2(162, 40), Vector2(104, 156), scale_factor)
 	_place_bottom_right(end_turn_button, Vector2(264, 366), Vector2(316, 104), scale_factor)
+	if hero_skill_button:
+		# 技能行贴在角色牌正下方：魔焰焚心在左，右侧留白给未来第二技能。
+		_place_bottom_right(hero_skill_button, Vector2(232, 40), Vector2(156, 76), scale_factor)
 	_place_bottom_right(mana_ui, Vector2(56, 362), Vector2(116, 116), scale_factor)
 
 	hand.offset_top = -322.0 * scale_factor
@@ -725,6 +956,9 @@ func _layout_battle_controls() -> void:
 			_turn_label.add_theme_font_size_override("font_size", roundi(35.0 * scale_factor))
 
 	end_turn_button.add_theme_font_size_override("font_size", roundi(36.0 * scale_factor))
+	if hero_skill_button:
+		hero_skill_button.add_theme_font_size_override("font_size", roundi(28.0 * scale_factor))
+		_update_hero_skill_button_state()
 	_update_hand_draw_origin.call_deferred()
 
 
@@ -738,12 +972,13 @@ func _process(delta: float) -> void:
 	_breath_check_elapsed += delta
 	if _breath_check_elapsed >= 0.2:
 		_breath_check_elapsed = 0.0
+		_update_hero_skill_button_state()
 		_update_end_turn_breath()
 
 
 # 无牌可打（费用不够或手牌空）时结束回合按钮呼吸发亮，提示玩家该收手了。
 func _update_end_turn_breath() -> void:
-	var should_breathe := not end_turn_button.disabled and not _hand_has_playable_card()
+	var should_breathe := not end_turn_button.disabled and not _hand_has_playable_card() and not _hero_skill_available()
 	var breathing := _end_turn_breath_tween and _end_turn_breath_tween.is_running()
 
 	if should_breathe and not breathing:
@@ -765,6 +1000,66 @@ func _hand_has_playable_card() -> bool:
 		if card_ui and card_ui.playable:
 			return true
 	return false
+
+
+func _hero_skill_available() -> bool:
+	return (
+		hero_skill_button
+		and hero_skill_button.visible
+		and not hero_skill_button.disabled
+	)
+
+
+func _sync_hero_skill_visibility() -> void:
+	if not hero_skill_button:
+		return
+
+	var should_show := _is_demonic_character()
+	hero_skill_button.visible = should_show
+	if not should_show:
+		hero_skill_button.disabled = true
+	else:
+		_update_hero_skill_button_state()
+
+
+func _update_hero_skill_button_state() -> void:
+	if not hero_skill_button:
+		return
+
+	if not _is_demonic_character():
+		hero_skill_button.hide()
+		hero_skill_button.disabled = true
+		return
+
+	hero_skill_button.show()
+	hero_skill_button.disabled = (
+		end_turn_button.disabled
+		or _hero_skill_used_this_turn
+		or not char_stats
+		or char_stats.health <= 0
+	)
+
+
+func _pulse_hero_skill_button() -> void:
+	if not hero_skill_button:
+		return
+	hero_skill_button.pivot_offset = hero_skill_button.size * 0.5
+	hero_skill_button.scale = Vector2.ONE * 1.08
+	var tween := hero_skill_button.create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(hero_skill_button, "scale", Vector2.ONE, 0.36)
+
+
+func _is_demonic_character() -> bool:
+	if not char_stats:
+		return false
+	if char_stats.character_name == "魔修" or char_stats.battle_anim_id == "demonic_cultivator":
+		return true
+	var paths := [
+		char_stats.resource_path,
+		char_stats.starting_deck.resource_path if char_stats.starting_deck else "",
+		char_stats.draftable_cards.resource_path if char_stats.draftable_cards else "",
+	]
+	return ("%s %s %s" % [paths[0], paths[1], paths[2]]).contains("demonic_cultivator")
 
 
 func _layout_combatant_cards(viewport_size: Vector2, scale_factor: float) -> void:
@@ -801,7 +1096,7 @@ func _layout_combatant_cards(viewport_size: Vector2, scale_factor: float) -> voi
 			)
 
 	if _player_card:
-		_place_bottom_right(_player_card, Vector2(70, 56), Vector2(318, 306), scale_factor)
+		_place_bottom_right(_player_card, Vector2(70, 124), Vector2(318, 236), scale_factor)
 
 	# 世界立绘已隐藏、战斗单位只显示为信息卡，但瞄准/选中框/飘字仍挂在世界节点上。
 	# 把世界节点对齐到各自信息卡中心，否则选中框和卡的位置对不上（敌人越多偏得越远）。
@@ -904,7 +1199,7 @@ func _layout_phase_b_guides(viewport_size: Vector2, scale_factor: float) -> void
 	if enemy_card:
 		_place_center_top(enemy_card, viewport_size, Vector2(332, 338), 88.0, scale_factor)
 	if player_card:
-		_place_bottom_right(player_card, Vector2(70, 56), Vector2(318, 306), scale_factor)
+		_place_bottom_right(player_card, Vector2(70, 124), Vector2(318, 236), scale_factor)
 	if left_dock:
 		_place_bottom_left(left_dock, Vector2(28, 42), Vector2(358, 486), scale_factor)
 
@@ -933,6 +1228,8 @@ func _place_absolute(control: Control, position: Vector2, rect_size: Vector2) ->
 
 
 func _exit_tree() -> void:
+	if char_stats and char_stats.stats_changed.is_connected(_update_hero_skill_button_state):
+		char_stats.stats_changed.disconnect(_update_hero_skill_button_state)
 	if get_viewport().size_changed.is_connected(_layout_battle_controls):
 		get_viewport().size_changed.disconnect(_layout_battle_controls)
 	if Events.card_play_preview_requested.is_connected(_on_card_play_preview_requested):
@@ -947,7 +1244,11 @@ func _exit_tree() -> void:
 		Events.card_drawn.disconnect(_on_card_drawn_sfx)
 	if Events.card_played.is_connected(_on_card_played_sfx):
 		Events.card_played.disconnect(_on_card_played_sfx)
+	if Events.card_discovery_requested.is_connected(_on_card_discovery_requested):
+		Events.card_discovery_requested.disconnect(_on_card_discovery_requested)
 	if Events.player_turn_started.is_connected(_on_player_turn_started):
 		Events.player_turn_started.disconnect(_on_player_turn_started)
 	if Events.player_turn_ended.is_connected(_on_player_turn_ended_for_banner):
 		Events.player_turn_ended.disconnect(_on_player_turn_ended_for_banner)
+	if Events.hero_skill_used.is_connected(_on_hero_skill_used):
+		Events.hero_skill_used.disconnect(_on_hero_skill_used)

@@ -10,5 +10,5 @@ id = "paper_soldier"
 display_name = "符纸兵"
 description = "被残缺符箓驱使的纸甲兵，动作僵硬但数量烦人。"
 ai = ExtResource("3_ai")
-max_health = 16
+max_health = 44
 art = ExtResource("2_art")

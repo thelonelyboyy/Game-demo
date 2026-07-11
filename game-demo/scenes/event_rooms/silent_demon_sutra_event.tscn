@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "无声魔经"
 event_body = "经卷自行翻页，没有声音，却有字句落进识海。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("默诵禁章：失去 10 生命，随机突破一张牌", "撕下残页：获得 45 灵石", "合上经卷")
-choice_effects = PackedStringArray("damage:10|upgrade_random:0", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(0, 45, 0)
+choice_texts = PackedStringArray("默诵禁章：失去 16 生命，随机突破一张牌", "撕下残页：获得 55 灵石", "合上经卷")
+choice_effects = PackedStringArray("damage:16|upgrade_random:0", "gain_gold", "skip")
+choice_amounts = PackedInt32Array(0, 55, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

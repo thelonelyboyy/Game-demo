@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/enemies_redesign/iron_golem.png" id="2"]
+[ext_resource type="PackedScene" path="res://enemies/bronze_corpse_king/bronze_corpse_king_ai.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = "bronze_corpse_king"
+display_name = "铜甲尸王"
+description = "尸气盘踞玄铁甲胄，反复结甲后蓄势镇杀。"
+ai = ExtResource("3")
+phase_two_health_ratio = 0.50
+phase_two_name = "尸火熔甲"
+phase_two_block = 28
+phase_two_damage_bonus = 0.20
+phase_two_sequence = Array[int]([2, 0, 2, 1])
+max_health = 210
+art = ExtResource("2")

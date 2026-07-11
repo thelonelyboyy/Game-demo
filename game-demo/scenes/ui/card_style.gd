@@ -7,6 +7,8 @@ const TYPE_MIND := "心法"
 const TYPE_SECRET := "秘术"
 const TYPE_ALCHEMY := "丹道"
 const TYPE_ARRAY := "剑阵"
+const TYPE_STATUS := "状态"
+const TYPE_CURSE := "诅咒"
 const TYPE_DEFAULT := "术法"
 
 const FRAME_ROOT := "res://art/ui/cards/generated/"
@@ -48,6 +50,18 @@ const TYPE_COLORS := {
 		"highlight": Color("ff8a6a"),
 		"frame": FRAME_ROOT + "card_frame_array.png",
 	},
+	TYPE_STATUS: {
+		"main": Color("59606a"),
+		"dark": Color("141820"),
+		"highlight": Color("b8c1d6"),
+		"frame": FRAME_ROOT + "card_frame_default.png",
+	},
+	TYPE_CURSE: {
+		"main": Color("4b284d"),
+		"dark": Color("170b18"),
+		"highlight": Color("d19ae0"),
+		"frame": FRAME_ROOT + "card_frame_secret.png",
+	},
 	TYPE_DEFAULT: {
 		"main": Color("b89c62"),
 		"dark": Color("1d1a14"),
@@ -64,10 +78,23 @@ const KEYWORDS := [
 	"护体",
 	"生命",
 	"破绽",
+	"煞气",
 	"邪祟",
 	"中毒",
 	"攻击",
 	"防御",
+	"临时",
+	"消耗",
+	"保留",
+	"固有",
+	"虚无",
+	"不可打出",
+	"状态",
+	"诅咒",
+	"弃牌触发",
+	"消耗触发",
+	"成长",
+	"发现",
 	"格挡",
 	"抽",
 	"火",
@@ -77,10 +104,19 @@ const KEYWORDS := [
 	"土",
 ]
 
+const STATUS_TERM_HINTS := {
+	"煞气": "魔修战斗资源。达到3/6/10档时强化伤害并带来风险，战斗结束清空。",
+}
+
 
 func get_card_type(card: Card) -> String:
 	if not card:
 		return TYPE_DEFAULT
+
+	if card.is_curse_card():
+		return TYPE_CURSE
+	if card.is_status_card():
+		return TYPE_STATUS
 
 	var marker: String = _card_marker(card)
 	if (
@@ -187,7 +223,12 @@ func _highlight_numbers_and_keywords(value: String) -> String:
 	number_regex.compile("([0-9]+)")
 	text = number_regex.sub(text, "[color=#f0c85b]$1[/color]", true)
 
+	for term: String in STATUS_TERM_HINTS:
+		text = text.replace(term, "[hint=%s][color=#e6a84f]%s[/color][/hint]" % [STATUS_TERM_HINTS[term], term])
+
 	for keyword: String in KEYWORDS:
+		if STATUS_TERM_HINTS.has(keyword):
+			continue
 		text = text.replace(keyword, "[color=#e6a84f]%s[/color]" % keyword)
 	return text
 

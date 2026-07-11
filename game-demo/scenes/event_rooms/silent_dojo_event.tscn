@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "无声道场"
 event_body = "空旷道场里摆着蒲团，似乎仍有人讲法。"
-choice_texts = PackedStringArray("坐下听法：随机突破一张牌", "调息：回复 12 生命", "继续赶路")
+choice_texts = PackedStringArray("坐下听法：随机突破一张牌", "调息：回复 22 生命", "继续赶路")
 choice_effects = PackedStringArray("upgrade_random", "heal", "skip")
-choice_amounts = PackedInt32Array(0, 12, 0)
+choice_amounts = PackedInt32Array(0, 22, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

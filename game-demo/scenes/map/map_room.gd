@@ -27,11 +27,20 @@ const ICONS := {
 var available := false : set = set_available
 var focused := false : set = set_focused
 var room: Room : set = set_room
+var _hover_tween: Tween
+var _boss_pulse := 0.0
 
 
 func _ready() -> void:
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+	set_process(false)
+
+
+# 仅 Boss 节点开启 _process：红光缓慢脉冲，隔着半张地图也能感到威慑。
+func _process(delta: float) -> void:
+	_boss_pulse += delta
+	queue_redraw()
 
 
 func set_available(new_value: bool) -> void:
@@ -56,6 +65,7 @@ func set_room(new_data: Room) -> void:
 	line_2d.rotation_degrees = randi_range(0, 360)
 	_apply_room_icon()
 	line_2d.hide()
+	set_process(room.type == Room.Type.BOSS)
 	_refresh_visual_state()
 	queue_redraw()
 
@@ -68,7 +78,7 @@ func show_selected() -> void:
 func _apply_room_icon() -> void:
 	var texture := ICONS.get(room.type, ICONS[Room.Type.NOT_ASSIGNED]) as Texture2D
 	sprite_2d.texture = texture
-	sprite_2d.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	sprite_2d.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	sprite_2d.show()
 
 	var target_size := LARGE_TEXTURE_SIZE if _is_large_room() else NORMAL_TEXTURE_SIZE
@@ -91,6 +101,11 @@ func _refresh_visual_state() -> void:
 func _draw() -> void:
 	if not room:
 		return
+
+	if room.type == Room.Type.BOSS:
+		var pulse := 0.5 + 0.5 * sin(_boss_pulse * 2.2)
+		draw_circle(Vector2.ZERO, 27.0 + pulse * 3.0, Color(0.80, 0.16, 0.12, 0.08 + 0.08 * pulse))
+		draw_arc(Vector2.ZERO, 24.5 + pulse * 2.0, 0.0, TAU, 72, Color(1.0, 0.34, 0.24, 0.26 + 0.24 * pulse), 1.8, true)
 
 	if available:
 		draw_circle(Vector2.ZERO, 22.5, Color(0.74, 0.94, 1.0, 0.20))
@@ -129,11 +144,24 @@ func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> voi
 func _on_mouse_entered() -> void:
 	if room:
 		hovered.emit(self)
+		if available:
+			GameSfx.play(GameSfx.UI_HOVER, -16.0)
+			_animate_hover(1.18)
 
 
 func _on_mouse_exited() -> void:
 	if room:
 		hover_cleared.emit(self)
+		_animate_hover(1.0)
+
+
+func _animate_hover(target: float) -> void:
+	if _hover_tween and _hover_tween.is_running():
+		_hover_tween.kill()
+	_hover_tween = create_tween() \
+			.set_trans(Tween.TRANS_BACK if target > 1.0 else Tween.TRANS_CUBIC) \
+			.set_ease(Tween.EASE_OUT)
+	_hover_tween.tween_property(self, "scale", Vector2.ONE * target, 0.18)
 
 
 # Called by the AnimationPlayer when the select animation finishes.

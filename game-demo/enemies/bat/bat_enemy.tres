@@ -10,5 +10,5 @@ id = "silver_moon_wolf"
 display_name = "银月狼"
 description = "受月华侵染的山林妖狼，行动迅捷，常以冷冽爪风试探修士破绽。"
 ai = ExtResource("1_oeu8d")
-max_health = 8
+max_health = 20
 art = ExtResource("1_xdrl7")

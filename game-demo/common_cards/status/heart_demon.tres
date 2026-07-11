@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/forbidden_mantra.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+effect_text = "心念反噬，抽到时占据一张手牌。"
+id = "heart_demon"
+type = 1
+cost = 0
+target = 0
+mechanic_tags = PackedStringArray("诅咒", "不可打出")
+display_name = "心魔"
+icon = ExtResource("2")

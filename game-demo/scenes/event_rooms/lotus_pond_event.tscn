@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "净莲池"
 event_body = "白莲开在污泥中，香气清冷。"
-choice_texts = PackedStringArray("采莲：回复 13 生命", "挖莲藕：获得 35 灵石", "不扰清净")
+choice_texts = PackedStringArray("采莲：回复 23 生命", "挖莲藕：获得 40 灵石", "不扰清净")
 choice_effects = PackedStringArray("heal", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(13, 35, 0)
+choice_amounts = PackedInt32Array(23, 40, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

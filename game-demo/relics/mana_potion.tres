@@ -9,6 +9,7 @@ relic_name = "聚灵瓶"
 id = "mana_potion"
 type = 1
 character_type = 0
+rarity = 1
 starter_relic = false
 icon = ExtResource("1_di0fn")
 tooltip = "[color=\"ffdf00\"]聚灵瓶[/color]

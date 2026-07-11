@@ -9,6 +9,7 @@ relic_name = "余烬印"
 id = "campfire_ember_seal"
 type = 4
 character_type = 0
+rarity = 1
 starter_relic = false
 icon = ExtResource("2_icon")
 tooltip = "每次在篝火休息或突破后，获得 2 点最大生命。"

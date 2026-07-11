@@ -6,7 +6,7 @@
 			"blessings": [
 				{
 					"name": "灵脉滋养",
-					"description": "最大生命 +10，并回复 10 点生命。",
+					"description": "最大生命 +10。",
 					"icon": "max_health",
 					"effects": [
 						{
@@ -28,115 +28,38 @@
 				},
 				{
 					"name": "拾遗聚财",
-					"description": "获得 90 灵石。",
+					"description": "获得 100 灵石。",
 					"icon": "gold",
 					"effects": [
 						{
 							"type": "gold",
-							"amount": 90
+							"amount": 100
 						}
 					]
 				},
 				{
-					"name": "气海拓宽",
-					"description": "最大法力 +1。",
-					"icon": "max_mana",
+					"name": "丹炉馈赠",
+					"description": "获得 2 个随机符箓丹药。",
+					"icon": "potion",
 					"effects": [
 						{
-							"type": "max_mana",
-							"amount": 1
-						}
-					]
-				},
-				{
-					"name": "灵光启智",
-					"description": "每回合抽牌数 +1。",
-					"icon": "draw",
-					"effects": [
-						{
-							"type": "draw",
-							"amount": 1
-						}
-					]
-				},
-				{
-					"name": "旧术点化",
-					"description": "随机突破一张可突破卡牌。",
-					"icon": "upgrade",
-					"effects": [
-						{
-							"type": "upgrade",
-							"amount": 1
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "残仙遗蜕",
-			"description": "飞升失败者的残魂附蜕，予你力量，也予你劫。",
-			"blessings": [
-				{
-					"name": "残魂灌体",
-					"description": "最大法力 +1；但最大生命 -10。",
-					"icon": "max_mana",
-					"effects": [
-						{
-							"type": "max_mana",
-							"amount": 1
-						},
-						{
-							"type": "lose_max_health",
-							"amount": 10
-						}
-					]
-				},
-				{
-					"name": "枯荣逆转",
-					"description": "最大生命 +18 并回满；但失去 80 灵石。",
-					"icon": "max_health",
-					"effects": [
-						{
-							"type": "max_health",
-							"amount": 18
-						},
-						{
-							"type": "full_heal",
-							"amount": 0
-						},
-						{
-							"type": "lose_gold",
-							"amount": 80
-						}
-					]
-				},
-				{
-					"name": "嗜血淬炼",
-					"description": "随机突破 2 张牌；但最大生命 -8。",
-					"icon": "upgrade",
-					"effects": [
-						{
-							"type": "upgrade",
+							"type": "gain_potion",
 							"amount": 2
-						},
-						{
-							"type": "lose_max_health",
-							"amount": 8
 						}
 					]
 				},
 				{
-					"name": "鬻命求财",
-					"description": "获得 160 灵石；但最大生命 -14。",
-					"icon": "gold",
+					"name": "行脚盘缠",
+					"description": "获得 60 灵石与 1 个随机符箓丹药。",
+					"icon": "potion",
 					"effects": [
 						{
 							"type": "gold",
-							"amount": 160
+							"amount": 60
 						},
 						{
-							"type": "lose_max_health",
-							"amount": 14
+							"type": "gain_potion",
+							"amount": 1
 						}
 					]
 				}
@@ -148,29 +71,18 @@
 			"blessings": [
 				{
 					"name": "炼魂阵·焚",
-					"description": "移除牌组中随机 1 张牌。",
+					"description": "移除两张打击或防御。",
 					"icon": "remove_card",
 					"effects": [
 						{
-							"type": "remove_card",
-							"amount": 1
+							"type": "remove_strike_defend",
+							"amount": 2
 						}
 					]
 				},
 				{
-					"name": "复刻阵·衍",
-					"description": "复制牌组中随机 1 张牌。",
-					"icon": "duplicate_card",
-					"effects": [
-						{
-							"type": "duplicate_card",
-							"amount": 1
-						}
-					]
-				},
-				{
-					"name": "淬炼大阵",
-					"description": "随机突破 2 张牌。",
+					"name": "淬炼阵·升",
+					"description": "随机突破两张卡牌。",
 					"icon": "upgrade",
 					"effects": [
 						{
@@ -180,59 +92,51 @@
 					]
 				},
 				{
-					"name": "拆解重组",
-					"description": "移除随机 1 张牌，并获得 70 灵石。",
-					"icon": "remove_card",
+					"name": "衍法阵·启",
+					"description": "获得两张随机职业术法。",
+					"icon": "duplicate_card",
 					"effects": [
 						{
-							"type": "remove_card",
-							"amount": 1
-						},
+							"type": "add_random_cards",
+							"amount": 2
+						}
+					]
+				},
+				{
+					"name": "夺天阵·稀",
+					"description": "获得一张随机金卡术法。",
+					"icon": "rare_card",
+					"effects": [
 						{
-							"type": "gold",
-							"amount": 70
+							"type": "add_random_rare_card",
+							"amount": 1
+						}
+					]
+				},
+				{
+					"name": "蜕形阵·换",
+					"description": "两张打击或防御蜕变为随机职业术法。",
+					"icon": "duplicate_card",
+					"effects": [
+						{
+							"type": "transform_card",
+							"amount": 2
 						}
 					]
 				}
 			]
 		},
 		{
-			"name": "照命石审判",
-			"description": "照命石映出你的命格，或赐法宝，或索取代价。",
+			"name": "残仙遗蜕",
+			"description": "飞升失败者的残魂附蜕，予你力量，也予你劫。",
 			"blessings": [
 				{
-					"name": "命石垂赐",
-					"description": "获得 1 件随机法宝。",
-					"icon": "relic",
+					"name": "残魂灌体",
+					"description": "最大法力 +1；但最大生命 -12。",
+					"icon": "max_mana",
 					"effects": [
 						{
-							"type": "grant_relic",
-							"amount": 1
-						}
-					]
-				},
-				{
-					"name": "富贵险中",
-					"description": "获得 180 灵石；但最大生命 -10。",
-					"icon": "gold",
-					"effects": [
-						{
-							"type": "gold",
-							"amount": 180
-						},
-						{
-							"type": "lose_max_health",
-							"amount": 10
-						}
-					]
-				},
-				{
-					"name": "舍身得宝",
-					"description": "获得 1 件随机法宝；但最大生命 -12。",
-					"icon": "relic",
-					"effects": [
-						{
-							"type": "grant_relic",
+							"type": "max_mana",
 							"amount": 1
 						},
 						{
@@ -242,17 +146,139 @@
 					]
 				},
 				{
-					"name": "照命满血",
-					"description": "回复至满生命，并获得 50 灵石。",
-					"icon": "full_heal",
+					"name": "嗜血淬炼",
+					"description": "随机突破三张卡牌；但最大生命 -30。",
+					"icon": "upgrade",
 					"effects": [
 						{
-							"type": "full_heal",
+							"type": "upgrade",
+							"amount": 3
+						},
+						{
+							"type": "lose_max_health",
+							"amount": 30
+						}
+					]
+				},
+				{
+					"name": "鬻命求财",
+					"description": "获得 170 灵石；但最大生命 -12。",
+					"icon": "gold",
+					"effects": [
+						{
+							"type": "gold",
+							"amount": 170
+						},
+						{
+							"type": "lose_max_health",
+							"amount": 12
+						}
+					]
+				},
+				{
+					"name": "蜕骨夺珍",
+					"description": "获得两张随机金卡术法；但最大生命 -14。",
+					"icon": "rare_card",
+					"effects": [
+						{
+							"type": "add_random_rare_card",
+							"amount": 2
+						},
+						{
+							"type": "lose_max_health",
+							"amount": 14
+						}
+					]
+				},
+				{
+					"name": "燃脉借力",
+					"description": "每回合抽牌数 +1；但最大生命 -20。",
+					"icon": "draw",
+					"effects": [
+						{
+							"type": "draw",
+							"amount": 1
+						},
+						{
+							"type": "lose_max_health",
+							"amount": 20
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "照命石审判",
+			"description": "照命石映出你的命格，或赐机缘，或索代价。",
+			"blessings": [
+				{
+					"name": "命石垂赐",
+					"description": "获得一件随机法宝。",
+					"icon": "relic",
+					"effects": [
+						{
+							"type": "grant_relic",
+							"amount": 1
+						}
+					]
+				},
+				{
+					"name": "破劫之印",
+					"description": "接下来 3 场战斗，敌人以七成气血入场。",
+					"icon": "seal",
+					"effects": [
+						{
+							"type": "weaken_next_battles",
+							"amount": 3
+						}
+					]
+				},
+				{
+					"name": "孤注一掷",
+					"description": "散尽全部灵石，换一件法宝与一张金卡术法。",
+					"icon": "relic",
+					"effects": [
+						{
+							"type": "lose_all_gold",
 							"amount": 0
 						},
 						{
+							"type": "grant_relic",
+							"amount": 1
+						},
+						{
+							"type": "add_random_rare_card",
+							"amount": 1
+						}
+					]
+				},
+				{
+					"name": "舍身得宝",
+					"description": "获得两件随机法宝；但最大生命 -16。",
+					"icon": "relic",
+					"effects": [
+						{
+							"type": "grant_relic",
+							"amount": 2
+						},
+						{
+							"type": "lose_max_health",
+							"amount": 16
+						}
+					]
+				},
+				{
+					"name": "富贵险中",
+					"description": "获得 250 灵石；但最大生命 -20。",
+					"icon": "gold",
+					"effects": [
+						{
 							"type": "gold",
-							"amount": 50
+							"amount": 250
+						},
+						{
+							"type": "lose_max_health",
+							"amount": 20
 						}
 					]
 				}
@@ -264,7 +290,7 @@
 			"blessings": [
 				{
 					"name": "魂祭·以命",
-					"description": "最大法力 +1；但最大生命 -8。",
+					"description": "最大法力 +1；但最大生命 -18。",
 					"icon": "max_mana",
 					"class": "demonic",
 					"effects": [
@@ -279,14 +305,18 @@
 					]
 				},
 				{
-					"name": "煞海之躯",
-					"description": "最大生命 +24 并回复同等生命。",
+					"name": "血劫同源",
+					"description": "最大生命 +15，并获得 1 个随机符箓丹药。",
 					"icon": "max_health",
 					"class": "demonic",
 					"effects": [
 						{
 							"type": "max_health",
-							"amount": 24
+							"amount": 15
+						},
+						{
+							"type": "gain_potion",
+							"amount": 1
 						}
 					]
 				},
@@ -303,20 +333,8 @@
 					]
 				},
 				{
-					"name": "千锤百炼",
-					"description": "随机突破 2 张牌。",
-					"icon": "upgrade",
-					"class": "sword",
-					"effects": [
-						{
-							"type": "upgrade",
-							"amount": 2
-						}
-					]
-				},
-				{
 					"name": "金身不坏",
-					"description": "最大生命 +30 并回复同等生命。",
+					"description": "最大生命 +30。",
 					"icon": "max_health",
 					"class": "body",
 					"effects": [
@@ -335,17 +353,6 @@
 						{
 							"type": "gold",
 							"amount": 120
-						}
-					]
-				},
-				{
-					"name": "命途加身",
-					"description": "最大生命 +12 并回复同等生命。",
-					"icon": "max_health",
-					"effects": [
-						{
-							"type": "max_health",
-							"amount": 12
 						}
 					]
 				}

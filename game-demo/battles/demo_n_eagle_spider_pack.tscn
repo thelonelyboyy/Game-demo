@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemy/enemy.tscn" id="1"]
+[ext_resource type="Resource" path="res://enemies/crab/crab_enemy.tres" id="2"]
+[ext_resource type="Resource" path="res://enemies/jade_spider/jade_spider_enemy.tres" id="3"]
+[ext_resource type="Resource" path="res://enemies/bat/bat_enemy.tres" id="4"]
+
+[node name="Enemies" type="Node2D"]
+
+[node name="Enemy1" parent="." instance=ExtResource("1")]
+position = Vector2(224, 122)
+stats = ExtResource("2")
+
+[node name="Enemy2" parent="." instance=ExtResource("1")]
+position = Vector2(280, 126)
+stats = ExtResource("3")
+
+[node name="Enemy3" parent="." instance=ExtResource("1")]
+position = Vector2(336, 120)
+stats = ExtResource("4")

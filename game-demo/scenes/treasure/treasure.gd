@@ -33,10 +33,12 @@ func generate_relic() -> void:
 	generate_relic_choices(1)
 
 
-func generate_relic_choices(count := 2) -> void:
+func generate_relic_choices(count := 2, chapter := 1) -> void:
 	found_relics.clear()
 	if relic_reward_pool:
-		found_relics = relic_reward_pool.get_random_available_choices(char_stats, relic_handler, count)
+		found_relics = relic_reward_pool.get_random_available_choices(
+			char_stats, relic_handler, count, chapter, RelicRewardPool.RewardContext.TREASURE
+		)
 		found_relic = found_relics[0] if not found_relics.is_empty() else null
 		return
 

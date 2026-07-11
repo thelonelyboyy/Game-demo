@@ -177,8 +177,25 @@ func _check_boss_room_resolution(run: Run, room: Room) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var current_view := _current_view_child(run)
-	_check(run.current_chapter == 2 or current_view is WinScreen, "boss victory advances chapter or shows win screen")
-	_check(run.map.visible or current_view is WinScreen, "boss victory leaves battle cleanly")
+	if current_view is BattleReward:
+		var reward := current_view as BattleReward
+		_check(run.pending_chapter_advance, "boss victory marks pending chapter advance")
+		_check(reward.rewards.get_child_count() >= 3, "boss reward offers gold, card and relic choice")
+		var relic_choice: RewardButton
+		for child in reward.rewards.get_children():
+			if child is RewardButton and child.has_meta("relic_choice"):
+				relic_choice = child
+				break
+		_check(relic_choice != null, "boss reward includes mandatory relic choice")
+		if relic_choice:
+			relic_choice.pressed.emit()
+			await get_tree().process_frame
+		reward.back_button.pressed.emit()
+		await get_tree().process_frame
+		await get_tree().process_frame
+		current_view = _current_view_child(run)
+	_check(run.current_chapter == 2 or current_view is WinScreen, "boss reward exit advances chapter or shows win screen")
+	_check(run.map.visible or current_view is WinScreen, "boss reward flow leaves battle cleanly")
 	get_tree().paused = false
 
 

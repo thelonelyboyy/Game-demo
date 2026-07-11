@@ -2,7 +2,7 @@ extends EnemyAction
 
 const TOXIN = preload("res://common_cards/toxin.tres")
 
-@export var damage := 8
+@export var damage := 13
 
 
 func perform_action() -> void:

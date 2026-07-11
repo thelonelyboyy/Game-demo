@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SelfDamageRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/self_damage_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/spirit_spring_gourd.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "赤髓葫"
+id = "demon_crimson_gourd"
+type = 4
+character_type = 3
+rarity = 1
+icon = ExtResource("2")
+tooltip = "魔修专属。每回合第一次因自己的卡牌失去生命后，抽 1 张牌。"
+reward_mode = 2
+amount = 1
+minimum_damage = 1
+once_per_turn = true

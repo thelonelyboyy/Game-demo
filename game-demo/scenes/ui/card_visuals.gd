@@ -32,7 +32,8 @@ var style_helper: CardStyle = CARD_STYLE.new()
 
 func _ready() -> void:
 	ignore_mouse_input(self)
-	frame_texture.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	description.mouse_filter = Control.MOUSE_FILTER_PASS
+	frame_texture.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 
 
 func set_card(value: Card) -> void:
@@ -44,13 +45,13 @@ func set_card(value: Card) -> void:
 		_clear_card()
 		return
 
-	cost.text = card.get_cost_text()
+	cost.text = "禁" if card.blocks_manual_play() else card.get_cost_text()
 	card_name.text = card.get_display_name()
 	card_name.add_theme_font_size_override("font_size", _get_title_font_size(card_name.text))
 	description.text = "[center]%s[/center]" % style_helper.format_card_text(card, card.get_default_tooltip())
 	description.add_theme_font_size_override("normal_font_size", _get_description_font_size(description.text))
 	icon.texture = card.icon
-	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	rarity.modulate = Card.RARITY_COLORS[card.rarity]
 	rarity.tooltip_text = _get_rarity_name(card.rarity)
@@ -137,8 +138,8 @@ func _apply_empty_style() -> void:
 		Color(0, 0, 0, 0),
 		0,
 		12,
-		Color(0, 0, 0, 0.48),
-		14
+		Color(0, 0, 0, 0),
+		0
 	))
 
 
@@ -154,32 +155,24 @@ func _apply_card_style(card_to_style: Card, state: int = VisualState.NORMAL) -> 
 		frame_texture.texture = frame
 
 	var frame_modulate := Color.WHITE
-	var shadow_color := Color(0, 0, 0, 0.58)
-	var shadow_size := 12
+	var shadow_color := Color(0, 0, 0, 0)
+	var shadow_size := 0
 	var icon_alpha := 1.0
 
 	if card_to_style.rarity == Card.Rarity.RARE:
 		frame_modulate = Color(1.08, 1.04, 0.94, 1.0)
 	elif card_to_style.rarity == Card.Rarity.MYTHIC:
 		frame_modulate = Color(1.10, 0.96, 0.84, 1.0)
-		shadow_color = Color(0.82, 0.34, 0.10, 0.34)
 
 	if state == VisualState.HOVER:
 		frame_modulate = frame_modulate * Color(1.16, 1.12, 1.08, 1.0)
-		shadow_color = Color(highlight.r, highlight.g, highlight.b, 0.40)
-		shadow_size = 22
 	elif state == VisualState.DRAG:
 		frame_modulate = frame_modulate * Color(1.20, 1.16, 1.10, 1.0)
-		shadow_color = Color(highlight.r, highlight.g, highlight.b, 0.52)
-		shadow_size = 28
 	elif playable_glow:
-		shadow_color = Color(bright_gold.r, bright_gold.g, bright_gold.b, 0.20)
-		shadow_size = 14
+		frame_modulate = frame_modulate * Color(1.08, 1.05, 1.0, 1.0)
 
 	if disabled_visual:
 		frame_modulate = Color(0.48, 0.48, 0.48, 0.72)
-		shadow_color = Color(0, 0, 0, 0.36)
-		shadow_size = 8
 		icon_alpha = 0.68
 
 	frame_texture.modulate = frame_modulate

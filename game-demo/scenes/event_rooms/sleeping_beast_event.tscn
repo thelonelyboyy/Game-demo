@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "沉睡灵兽"
 event_body = "巨兽伏在路旁，呼吸间吐出青色灵雾。"
-choice_texts = PackedStringArray("汲取灵雾：回复 11 生命", "偷取鳞片：获得 80 灵石，失去 10 生命", "安静离开")
-choice_effects = PackedStringArray("heal", "gain_gold:80|damage:10", "skip")
-choice_amounts = PackedInt32Array(11, 0, 0)
+choice_texts = PackedStringArray("汲取灵雾：回复 20 生命", "偷取鳞片：获得 95 灵石，失去 16 生命", "安静离开")
+choice_effects = PackedStringArray("heal", "gain_gold:95|damage:16", "skip")
+choice_amounts = PackedInt32Array(20, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

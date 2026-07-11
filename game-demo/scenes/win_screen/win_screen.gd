@@ -24,6 +24,14 @@ func set_character(new_character: CharacterStats) -> void:
 	character_portrait.texture = character.portrait
 
 
+func set_completion(new_character: CharacterStats, difficulty_level: int, unlocked_level := -1) -> void:
+	set_character(new_character)
+	if difficulty_level > 0:
+		message.text += "\n已克服心魔 %s" % difficulty_level
+	if unlocked_level > difficulty_level:
+		message.text += "\n新难度「心魔 %s」已解锁" % unlocked_level
+
+
 func _on_main_menu_button_pressed() -> void:
 	get_tree().change_scene_to_file(MAIN_MENU_PATH)
 

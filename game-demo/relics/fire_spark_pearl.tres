@@ -9,6 +9,7 @@ relic_name = "火魄珠"
 id = "fire_spark_pearl"
 type = 4
 character_type = 0
+rarity = 1
 starter_relic = false
 icon = ExtResource("2")
 tooltip = "火魄珠\n打出火属性牌时，对所有敌人造成 2 点伤害。"

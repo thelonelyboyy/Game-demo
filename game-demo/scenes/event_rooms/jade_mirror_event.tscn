@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "照心玉镜"
 event_body = "镜中映出的不是你，而是一手未出的牌。"
-choice_texts = PackedStringArray("照见破绽：随机突破一张牌", "打碎玉镜：获得 60 灵石", "遮住镜面")
+choice_texts = PackedStringArray("照见破绽：随机突破一张牌", "打碎玉镜：获得 70 灵石", "遮住镜面")
 choice_effects = PackedStringArray("upgrade_random", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(0, 60, 0)
+choice_amounts = PackedInt32Array(0, 70, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

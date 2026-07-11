@@ -1,0 +1,6 @@
+Godot Engine v4.5.2.stable.mono.official.6ce3de25a - https://godotengine.org
+
+SCRIPT ERROR: Parse Error: Invalid argument for "apply_effects()" function: argument 1 should be "Array[Node]" but is "Array[Enemy]".
+   at: GDScript::reload (res://test_data/demonic_card_suite_smoke.gd:102)
+ERROR: Failed to load script "res://test_data/demonic_card_suite_smoke.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:3041)

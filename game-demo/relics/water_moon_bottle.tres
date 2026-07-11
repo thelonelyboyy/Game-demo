@@ -9,6 +9,7 @@ relic_name = "水月瓶"
 id = "water_moon_bottle"
 type = 4
 character_type = 0
+rarity = 2
 starter_relic = false
 icon = ExtResource("2")
 tooltip = "水月瓶\n每回合第一次打出水属性牌时，抽 1 张牌。"

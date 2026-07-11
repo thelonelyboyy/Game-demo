@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "锈蚀丹炉"
 event_body = "丹炉盖缝里飘出一缕药香。"
-choice_texts = PackedStringArray("开炉：获得 65 灵石", "吞服残丹：回复 14 生命", "不碰古物")
+choice_texts = PackedStringArray("开炉：获得 80 灵石", "吞服残丹：回复 25 生命", "不碰古物")
 choice_effects = PackedStringArray("gain_gold", "heal", "skip")
-choice_amounts = PackedInt32Array(65, 14, 0)
+choice_amounts = PackedInt32Array(80, 25, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

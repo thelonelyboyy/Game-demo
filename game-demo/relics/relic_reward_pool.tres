@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RelicRewardPool" load_steps=42 format=3]
+[gd_resource type="Resource" script_class="RelicRewardPool" load_steps=48 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/relic_reward_pool.gd" id="1_pool"]
 [ext_resource type="Script" path="res://custom_resources/relic.gd" id="2_relic"]
@@ -41,7 +41,13 @@
 [ext_resource type="Resource" path="res://relics/wind_sword_tassel.tres" id="relic_37"]
 [ext_resource type="Resource" path="res://relics/wood_earth_seed.tres" id="relic_38"]
 [ext_resource type="Resource" path="res://relics/wooden_sword.tres" id="relic_39"]
+[ext_resource type="Resource" path="res://relics/demon_blood_crucible.tres" id="relic_40"]
+[ext_resource type="Resource" path="res://relics/demon_crimson_gourd.tres" id="relic_41"]
+[ext_resource type="Resource" path="res://relics/demon_soul_bell.tres" id="relic_42"]
+[ext_resource type="Resource" path="res://relics/demon_wraith_banner.tres" id="relic_43"]
+[ext_resource type="Resource" path="res://relics/demon_sha_urn.tres" id="relic_44"]
+[ext_resource type="Resource" path="res://relics/demon_flame_wheel_core.tres" id="relic_45"]
 
 [resource]
 script = ExtResource("1_pool")
-relics = Array[Resource("res://custom_resources/relic.gd")]([ExtResource("relic_1"), ExtResource("relic_2"), ExtResource("relic_3"), ExtResource("relic_4"), ExtResource("relic_5"), ExtResource("relic_6"), ExtResource("relic_7"), ExtResource("relic_8"), ExtResource("relic_9"), ExtResource("relic_10"), ExtResource("relic_11"), ExtResource("relic_12"), ExtResource("relic_13"), ExtResource("relic_14"), ExtResource("relic_15"), ExtResource("relic_16"), ExtResource("relic_17"), ExtResource("relic_18"), ExtResource("relic_19"), ExtResource("relic_20"), ExtResource("relic_21"), ExtResource("relic_22"), ExtResource("relic_23"), ExtResource("relic_24"), ExtResource("relic_25"), ExtResource("relic_26"), ExtResource("relic_27"), ExtResource("relic_28"), ExtResource("relic_29"), ExtResource("relic_30"), ExtResource("relic_31"), ExtResource("relic_32"), ExtResource("relic_33"), ExtResource("relic_34"), ExtResource("relic_35"), ExtResource("relic_36"), ExtResource("relic_37"), ExtResource("relic_38"), ExtResource("relic_39")])
+relics = Array[Resource("res://custom_resources/relic.gd")]([ExtResource("relic_1"), ExtResource("relic_2"), ExtResource("relic_3"), ExtResource("relic_4"), ExtResource("relic_5"), ExtResource("relic_6"), ExtResource("relic_7"), ExtResource("relic_8"), ExtResource("relic_9"), ExtResource("relic_10"), ExtResource("relic_11"), ExtResource("relic_12"), ExtResource("relic_13"), ExtResource("relic_14"), ExtResource("relic_15"), ExtResource("relic_16"), ExtResource("relic_17"), ExtResource("relic_18"), ExtResource("relic_19"), ExtResource("relic_20"), ExtResource("relic_21"), ExtResource("relic_22"), ExtResource("relic_23"), ExtResource("relic_24"), ExtResource("relic_25"), ExtResource("relic_26"), ExtResource("relic_27"), ExtResource("relic_28"), ExtResource("relic_29"), ExtResource("relic_30"), ExtResource("relic_31"), ExtResource("relic_32"), ExtResource("relic_33"), ExtResource("relic_34"), ExtResource("relic_35"), ExtResource("relic_36"), ExtResource("relic_37"), ExtResource("relic_38"), ExtResource("relic_39"), ExtResource("relic_40"), ExtResource("relic_41"), ExtResource("relic_42"), ExtResource("relic_43"), ExtResource("relic_44"), ExtResource("relic_45")])

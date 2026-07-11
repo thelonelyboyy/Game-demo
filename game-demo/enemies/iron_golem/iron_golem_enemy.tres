@@ -10,5 +10,5 @@ id = "iron_golem"
 display_name = "玄铁傀"
 description = "由玄铁和残魂铸成的精英守卫，护甲层层叠起。"
 ai = ExtResource("3_ai")
-max_health = 54
+max_health = 145
 art = ExtResource("2_art")

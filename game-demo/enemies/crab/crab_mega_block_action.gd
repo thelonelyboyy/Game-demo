@@ -1,6 +1,6 @@
 extends EnemyAction
 
-@export var block := 15
+@export var block := 26
 @export var hp_threshold := 6
 
 var already_used := false

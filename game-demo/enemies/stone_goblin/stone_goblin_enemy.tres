@@ -10,5 +10,5 @@ id = "stone_goblin"
 display_name = "山魈石怪"
 description = "披着碎岩的山魈，力道不大但很耐打。"
 ai = ExtResource("3_ai")
-max_health = 28
+max_health = 75
 art = ExtResource("2_art")

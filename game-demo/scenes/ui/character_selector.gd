@@ -25,7 +25,8 @@ const BACK_BUTTON_NORMAL := preload("res://assets/ui/generated/buttons/character
 const BACK_BUTTON_HOVER := preload("res://assets/ui/generated/buttons/character_select_back_button_hover_9slice.png")
 const BACK_BUTTON_PRESSED := preload("res://assets/ui/generated/buttons/character_select_back_button_pressed_9slice.png")
 
-const STARTING_GOLD := 99
+# 与 run_stats.gd 的实际初始灵石保持一致（此前显示 99、实际 70，不一致）。
+const STARTING_GOLD := 70
 const ANIMATED_BACKGROUND_FPS := 18.0
 const REFERENCE_SIZE := Vector2(1672.0, 941.0)
 const INFO_PANEL_POS := Vector2(48.0, 82.0)
@@ -89,14 +90,32 @@ var _stats_frame: PanelContainer
 var _relic_frame: PanelContainer
 var _class_badge: Control
 var _class_badge_glyph: Label
+var _info_swap_tween: Tween
+var _last_punched_index := -1
+var _difficulty_selector: OptionButton
+var _difficulty_profile: DifficultyProfile
 
 
 func _ready() -> void:
+	InkTheme.animate_screen_entrance(self, 0.4)
 	_build_character_entries()
 	_polish_scene()
+	_setup_difficulty_selector()
+	_wire_button_sounds()
 	get_viewport().size_changed.connect(_layout_scene)
 	set_current_character(_default_character())
 	_layout_scene()
+
+
+func _wire_button_sounds() -> void:
+	InkTheme.wire_button_sfx(start_button)
+	InkTheme.wire_button_sfx(back_button)
+	if _difficulty_selector:
+		InkTheme.wire_button_sfx(_difficulty_selector)
+	for entry in character_entries:
+		var button := entry.get("button") as Button
+		if button:
+			InkTheme.wire_button_sfx(button)
 
 
 func set_current_character(new_character: CharacterStats) -> void:
@@ -122,14 +141,57 @@ func set_current_character(new_character: CharacterStats) -> void:
 		relic_name.text = entry.relic_name
 		relic_description.text = entry.relic_description
 
+	_animate_info_swap()
 	_update_character_buttons()
+
+
+# 切换角色时信息面板淡入，信息更替不再硬切。
+func _animate_info_swap() -> void:
+	if not info_panel:
+		return
+	if _info_swap_tween and _info_swap_tween.is_running():
+		_info_swap_tween.kill()
+	info_panel.modulate = Color(1, 1, 1, 0.0)
+	_info_swap_tween = info_panel.create_tween()
+	_info_swap_tween.tween_property(info_panel, "modulate:a", 1.0, 0.24) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
 func _on_start_button_pressed() -> void:
 	print("Start new Run with %s" % current_character.character_name)
+	# 踏上旅途的仪式感：一记锣。
+	GameSfx.play(GameSfx.GONG, -4.0)
 	run_startup.type = RunStartup.Type.NEW_RUN
 	run_startup.picked_character = current_character
+	run_startup.difficulty_level = _difficulty_profile.selected_level if _difficulty_profile else 0
 	get_tree().change_scene_to_packed(SPIRIT_ROOT_SELECTOR_SCENE)
+
+
+func _setup_difficulty_selector() -> void:
+	_difficulty_profile = DifficultyProfile.load_data()
+	_difficulty_selector = OptionButton.new()
+	_difficulty_selector.name = "DifficultySelector"
+	_difficulty_selector.focus_mode = Control.FOCUS_ALL
+	_difficulty_selector.tooltip_text = "通关当前最高心魔难度可解锁下一阶。"
+	add_child(_difficulty_selector)
+	for level in _difficulty_profile.unlocked_level + 1:
+		var label := "难度 · 凡境" if level == 0 else "难度 · 心魔 %s" % level
+		_difficulty_selector.add_item(label, level)
+		_difficulty_selector.set_item_tooltip(level, RunStats.get_difficulty_rule(level))
+	_difficulty_selector.select(_difficulty_profile.selected_level)
+	_difficulty_selector.item_selected.connect(_on_difficulty_selected)
+	InkTheme.apply_screen_button(_difficulty_selector)
+	_difficulty_selector.add_theme_font_size_override("font_size", 22)
+
+
+func _on_difficulty_selected(index: int) -> void:
+	if not _difficulty_profile or not _difficulty_selector:
+		return
+	var level := _difficulty_selector.get_item_id(index)
+	_difficulty_profile.select_level(level)
+	var error := _difficulty_profile.save_data()
+	if error != OK:
+		push_warning("无法保存心魔难度选择：%s" % error)
 
 
 func _on_back_button_pressed() -> void:
@@ -283,7 +345,7 @@ func _polish_scene() -> void:
 		var icon := button.get_node_or_null("Icon") as TextureRect
 		if icon:
 			icon.texture = entry.stats.portrait
-			icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+			icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var label := button.get_node_or_null("Name") as Label
 		if label:
@@ -528,6 +590,8 @@ func _layout_scene() -> void:
 	_place_reference_rect(character_buttons, CARD_ROW_POS, CARD_ROW_SIZE, origin, _ui_scale)
 	_place_reference_rect(back_button, BACK_BUTTON_POS, Vector2(260.0, 74.0), origin, _ui_scale)
 	_place_reference_rect(start_button, START_BUTTON_POS, Vector2(320.0, 104.0), origin, _ui_scale)
+	if _difficulty_selector:
+		_place_reference_rect(_difficulty_selector, START_BUTTON_POS - Vector2(0.0, 72.0), Vector2(320.0, 58.0), origin, _ui_scale)
 
 	character_text.add_theme_constant_override("separation", roundi(13.0 * _ui_scale))
 	character_buttons.add_theme_constant_override("separation", roundi(22.0 * _ui_scale))
@@ -704,6 +768,14 @@ func _update_character_buttons() -> void:
 			label.add_theme_color_override("font_color", Color("ffe7ad") if selected else Color("d4c2a0"))
 			if not enabled and not selected:
 				label.add_theme_color_override("font_color", Color(0.58, 0.54, 0.47, 0.78))
+
+		# 新选中的角色卡 punch 一下（布局刷新重进本函数时不重复弹）。
+		if selected and index != _last_punched_index:
+			_last_punched_index = index
+			button.pivot_offset = button.size * 0.5
+			button.scale = Vector2.ONE * 1.08
+			var tween := button.create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			tween.tween_property(button, "scale", Vector2.ONE, 0.3)
 
 	_refresh_character_card_metrics()
 

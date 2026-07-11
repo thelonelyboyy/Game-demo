@@ -1,0 +1,55 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
+[ext_resource type="Script" path="res://enemies/toxic_ghost/toxic_ghost_muscle_buff_action.gd" id="2"]
+[ext_resource type="Script" path="res://enemies/bat/bat_attack_action.gd" id="3"]
+[ext_resource type="Script" path="res://enemies/crab/crab_attack_action.gd" id="4"]
+[ext_resource type="Script" path="res://custom_resources/intent.gd" id="5"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/toxic_ghost_muscle_buff.png" id="6"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/bat_attack.png" id="7"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_attack.png" id="8"]
+[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="9"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="10"]
+
+[sub_resource type="Resource" id="IntentHowl"]
+script = ExtResource("5")
+base_text = "+3"
+icon = ExtResource("6")
+category = 4
+
+[sub_resource type="Resource" id="IntentRend"]
+script = ExtResource("5")
+base_text = "2x%s"
+icon = ExtResource("7")
+category = 1
+
+[sub_resource type="Resource" id="IntentHunt"]
+script = ExtResource("5")
+base_text = "%s"
+icon = ExtResource("8")
+category = 0
+
+[node name="BloodMoonDemonKingAI" type="Node"]
+script = ExtResource("1")
+fixed_sequence = Array[int]([0, 1, 2, 1])
+
+[node name="BloodHowlAction" type="Node" parent="."]
+script = ExtResource("2")
+intent = SubResource("IntentHowl")
+sound = ExtResource("9")
+type = 1
+stacks_per_action = 3
+
+[node name="MoonRendAction" type="Node" parent="."]
+script = ExtResource("3")
+intent = SubResource("IntentRend")
+sound = ExtResource("10")
+type = 1
+damage = 7
+
+[node name="BloodHuntAction" type="Node" parent="."]
+script = ExtResource("4")
+intent = SubResource("IntentHunt")
+sound = ExtResource("10")
+type = 1
+damage = 16

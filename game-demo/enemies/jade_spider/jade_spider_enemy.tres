@@ -10,5 +10,5 @@ id = "jade_spider"
 display_name = "碧玉蛛"
 description = "足肢如玉的毒蛛，吐出的灵丝会扰乱手牌节奏。"
 ai = ExtResource("3_ai")
-max_health = 20
+max_health = 54
 art = ExtResource("2_art")

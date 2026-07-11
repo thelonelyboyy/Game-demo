@@ -11,7 +11,7 @@
 
 [sub_resource type="Resource" id="IntentGuard"]
 script = ExtResource("4")
-base_text = "8"
+base_text = "18"
 icon = ExtResource("5")
 category = 2
 
@@ -36,18 +36,18 @@ script = ExtResource("2")
 intent = SubResource("IntentGuard")
 sound = ExtResource("7")
 type = 1
-block = 8
+block = 18
 
 [node name="SmashAction" type="Node" parent="."]
 script = ExtResource("3")
 intent = SubResource("IntentSmash")
 sound = ExtResource("8")
 type = 1
-damage = 10
+damage = 20
 
 [node name="GoreAction" type="Node" parent="."]
 script = ExtResource("3")
 intent = SubResource("IntentGore")
 sound = ExtResource("8")
 type = 1
-damage = 6
+damage = 13

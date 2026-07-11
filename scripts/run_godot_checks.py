@@ -18,12 +18,19 @@ CHECKS = [
     {"name": "main", "args": [], "quit": True},
     {"name": "character-selector", "args": ["res://scenes/ui/character_selector.tscn"], "quit": True},
     {"name": "codex", "args": ["res://test_data/codex_smoke.tscn"], "quit": False, "required_marker": "CODEX_SMOKE_OK"},
+    {"name": "card-mechanics", "args": ["res://test_data/card_mechanics_smoke.tscn"], "quit": False, "required_marker": "CARD_MECHANICS_SMOKE_OK"},
+    {"name": "content-progression", "args": ["res://test_data/content_progression_smoke.tscn"], "quit": False, "required_marker": "CONTENT_PROGRESSION_SMOKE_OK"},
     {"name": "battle", "args": ["res://scenes/battle/battle.tscn"], "quit": True},
     {"name": "map", "args": ["res://scenes/map/map.tscn"], "quit": True},
     {"name": "run-flow", "args": ["res://test_data/run_flow_smoke.tscn"], "quit": False, "required_marker": "RUN_FLOW_SMOKE_OK"},
     {"name": "boss-battle", "args": ["res://test_data/boss_battle_smoke.tscn"], "quit": False, "required_marker": "BOSS_BATTLE_SMOKE_OK"},
+    {"name": "elite-tactics", "args": ["res://test_data/elite_tactics_smoke.tscn"], "quit": False, "required_marker": "ELITE_TACTICS_SMOKE_OK"},
+    {"name": "difficulty", "args": ["res://test_data/difficulty_smoke.tscn"], "quit": False, "required_marker": "DIFFICULTY_SMOKE_OK"},
+    {"name": "demonic-card-suite", "args": ["res://test_data/demonic_card_suite_smoke.tscn"], "quit": False, "required_marker": "DEMONIC_CARD_SUITE_SMOKE_OK"},
+    {"name": "demonic-relic", "args": ["res://test_data/demonic_relic_smoke.tscn"], "quit": False, "required_marker": "DEMONIC_RELIC_SMOKE_OK"},
+    {"name": "relic-economy", "args": ["res://test_data/relic_economy_smoke.tscn"], "quit": False, "required_marker": "RELIC_ECONOMY_SMOKE_OK"},
 ]
-CHECK_TIMEOUT_SECONDS = 60
+CHECK_TIMEOUT_SECONDS = 90
 
 IGNORED_ERROR_FRAGMENTS = [
     "ObjectDB instances leaked at exit",

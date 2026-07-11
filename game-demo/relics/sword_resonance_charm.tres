@@ -9,6 +9,7 @@ relic_name = "剑鸣玉坠"
 id = "sword_resonance_charm"
 type = 4
 character_type = 2
+rarity = 1
 icon = ExtResource("2")
 tooltip = "剑修专属。每回合第一次打出剑修牌时，对随机敌人造成 3 点伤害。"
 match_profession = 2

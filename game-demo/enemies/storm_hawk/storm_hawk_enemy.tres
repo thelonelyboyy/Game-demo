@@ -10,5 +10,5 @@ id = "storm_hawk"
 display_name = "雷羽鹰"
 description = "盘旋在云桥上的雷羽妖禽，俯冲速度极快。"
 ai = ExtResource("3_ai")
-max_health = 22
+max_health = 60
 art = ExtResource("2_art")

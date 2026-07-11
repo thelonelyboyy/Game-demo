@@ -20,7 +20,7 @@ func _ready() -> void:
 	add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	frame.texture = BATTLE_ENERGY_ORB
 	frame.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	frame.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	frame.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_ensure_fill()
 	queue_redraw()
 

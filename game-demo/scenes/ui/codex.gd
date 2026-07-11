@@ -105,8 +105,12 @@ var all_potions: Array = []
 var display_font: SystemFont
 
 
+var _detail_swap_tween: Tween
+
+
 func _ready() -> void:
 	InkTheme.animate_screen_entrance(self)
+	InkTheme.wire_button_sfx(back_button)
 	back_button.pressed.connect(_on_back_pressed)
 	directory.item_selected.connect(_on_directory_item_selected)
 	get_viewport().size_changed.connect(_apply_layout)
@@ -472,7 +476,7 @@ func _show_overview_preview() -> void:
 	rect.custom_minimum_size = Vector2(430.0, 285.0) * scale
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	rect.modulate = Color(0.78, 0.66, 0.50, 0.96)
 	preview_slot.add_child(rect)
 
@@ -784,6 +788,10 @@ func _on_directory_item_selected() -> void:
 	if not data is Dictionary:
 		return
 
+	# 翻页感：条目切换时详情面板淡入 + 翻书音。
+	GameSfx.play(GameSfx.BOOK, -8.0)
+	_animate_detail_swap()
+
 	match data.get("kind", EntryKind.SUMMARY):
 		EntryKind.CARD:
 			_show_card_detail(data.resource as Card)
@@ -797,6 +805,17 @@ func _on_directory_item_selected() -> void:
 			_show_potion_detail(data.resource as Potion)
 		_:
 			_show_summary(str(data.get("title", "图鉴")), str(data.get("text", "")))
+
+
+func _animate_detail_swap() -> void:
+	if not detail_vbox:
+		return
+	if _detail_swap_tween and _detail_swap_tween.is_running():
+		_detail_swap_tween.kill()
+	detail_vbox.modulate = Color(1, 1, 1, 0.0)
+	_detail_swap_tween = detail_vbox.create_tween()
+	_detail_swap_tween.tween_property(detail_vbox, "modulate:a", 1.0, 0.18) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
 func _show_summary(summary_title: String, body_text: String) -> void:
@@ -829,10 +848,10 @@ func _show_card_detail(card: Card) -> void:
 	detail_icon.show()
 	detail_icon.texture = card.icon
 	detail_title.text = card.get_display_name()
-	detail_meta.text = "卡牌 / %s / %s / %s费 / %s" % [
+	detail_meta.text = "卡牌 / %s / %s / %s / %s" % [
 		_card_profession_label(card),
-		_card_type_name(card.type),
-		card.get_cost_text(),
+		_card_display_type_name(card),
+		_card_cost_label(card),
 		_card_rarity_name(card.rarity),
 	]
 	detail_text.text = _format_card_detail(card)
@@ -926,7 +945,7 @@ func _show_texture_preview(texture: Texture, minimum_size: Vector2) -> void:
 	rect.custom_minimum_size = minimum_size
 	rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	rect.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	preview_slot.add_child(rect)
 
 
@@ -1004,6 +1023,12 @@ func _describe_potion_effect(effect: Resource) -> String:
 		return "抽 %s 张牌" % (effect as ConfiguredDrawEffect).amount
 	if effect is ConfiguredManaEffect:
 		return "获得 %s 点灵气" % (effect as ConfiguredManaEffect).amount
+	if _is_discover_effect(effect):
+		var discover = effect
+		return "发现：展示 %s 张，选择 %s 张加入手牌" % [
+			discover.choices_to_show,
+			maxi(1, discover.amount),
+		]
 	if effect is ConfiguredStatusEffect:
 		var st := effect as ConfiguredStatusEffect
 		var status_name := _status_display_name(st.status) if st.status else "状态"
@@ -1024,17 +1049,48 @@ func _effect_scope_suffix(target_mode: int) -> String:
 			return ""
 
 
+func _is_discover_effect(effect: Resource) -> bool:
+	return (
+		effect
+		and effect.get_script()
+		and str(effect.get_script().resource_path).ends_with("configured_discover_effect.gd")
+	)
+
+
 func _format_card_detail(card: Card) -> String:
 	var lines := PackedStringArray()
 	lines.append("[b]基础信息[/b]")
 	lines.append("职业：%s" % _card_profession_label(card))
-	lines.append("类型：%s" % _card_type_name(card.type))
+	lines.append("类型：%s" % _card_display_type_name(card))
 	lines.append("稀有度：%s" % _card_rarity_name(card.rarity))
 	lines.append("目标：%s" % _card_target_name(card.target))
 	lines.append("元素：%s" % _card_element_name(card.element))
-	lines.append("费用：%s" % card.get_cost_text())
-	if card.exhausts:
-		lines.append("特性：消耗")
+	lines.append("费用：%s" % ("不可打出" if card.blocks_manual_play() else card.get_cost_text()))
+	var traits := PackedStringArray()
+	if card.is_status_card():
+		traits.append("状态牌")
+	if card.is_curse_card():
+		traits.append("诅咒牌")
+	if card.is_retained_card():
+		traits.append("保留")
+	if card.is_innate_card():
+		traits.append("固有")
+	if card.is_temporary_card():
+		traits.append("临时")
+	if card.is_consumable_card():
+		traits.append("消耗")
+	if card.is_ethereal_card():
+		traits.append("虚无")
+	if card.is_unplayable_card():
+		traits.append("不可打出")
+	if card.has_discard_trigger():
+		traits.append("弃牌触发")
+	if card.has_exhaust_trigger():
+		traits.append("消耗触发")
+	if card.is_growth_card():
+		traits.append("成长")
+	if not traits.is_empty():
+		lines.append("特性：%s" % "、".join(traits))
 	if card.mechanic_tags.size() > 0:
 		lines.append("标签：%s" % "、".join(card.mechanic_tags))
 	lines.append("")
@@ -1105,6 +1161,20 @@ func _card_profession_label(card: Card) -> String:
 			return "驭兽"
 		_:
 			return "通用"
+
+
+func _card_display_type_name(card: Card) -> String:
+	if card.is_curse_card():
+		return "诅咒牌"
+	if card.is_status_card():
+		return "状态牌"
+	return _card_type_name(card.type)
+
+
+func _card_cost_label(card: Card) -> String:
+	if card.blocks_manual_play():
+		return "不可打出"
+	return "%s费" % card.get_cost_text()
 
 
 func _card_type_name(type: Card.Type) -> String:

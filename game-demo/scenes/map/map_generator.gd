@@ -5,17 +5,23 @@ enum MapMode {TEST_LINEAR, ROGUELIKE, TEST_ELITE_LINEAR}
 
 const X_DIST := 45
 const Y_DIST := 40
+const FIRST_SECOND_FLOOR_EXTRA_Y_GAP := 10
 const PLACEMENT_RANDOMNESS := 4
-const FLOORS := 15
+# ROGUELIKE 地图生成层数不含额外插入的起始赐福层；插入后总可见节点层为 20。
+const FLOORS := 19
 const TEST_FLOORS := 7
 const TEST_ELITE_FLOORS := 8
 const MAP_WIDTH := 7
-const PATHS := 6
-const MONSTER_ROOM_WEIGHT := 12.0
+const PATHS := 4
+const FIRST_ROW_MONSTER_CAP := 1
+const MONSTER_ROOM_WEIGHT := 7.0
 const ELITE_ROOM_WEIGHT := 2.4
-const EVENT_ROOM_WEIGHT := 5.0
-const SHOP_ROOM_WEIGHT := 2.5
-const CAMPFIRE_ROOM_WEIGHT := 4.0
+const EVENT_ROOM_WEIGHT := 7.0
+const SHOP_ROOM_WEIGHT := 4.0
+const CAMPFIRE_ROOM_WEIGHT := 4.5
+const EARLY_MONSTER_ROOM_WEIGHT := 4.0
+const EARLY_EVENT_ROOM_WEIGHT := 8.5
+const EARLY_SHOP_ROOM_WEIGHT := 5.0
 const ELITE_HEALTH_MULTIPLIER := 1.45
 const ELITE_DAMAGE_MULTIPLIER := 1.25
 const ELITE_GOLD_MULTIPLIER := 1.55
@@ -46,10 +52,21 @@ var random_room_type_weights = {
 var random_room_type_total_weight := 0
 var map_data: Array[Array]
 var current_chapter := 1
+var difficulty_stats: RunStats
+
+
+static func get_row_y(row: int) -> float:
+	if row <= 0:
+		return 0.0
+	return -float(row * Y_DIST + FIRST_SECOND_FLOOR_EXTRA_Y_GAP)
+
+
+static func get_floor_span(floor_slots: int) -> float:
+	return -get_row_y(maxi(floor_slots - 1, 0))
 
 
 func generate_map() -> Array[Array]:
-	battle_stats_pool.setup()
+	battle_stats_pool.setup(current_chapter)
 
 	if map_mode == MapMode.TEST_LINEAR:
 		return _generate_test_linear_map()
@@ -89,7 +106,7 @@ func _generate_test_linear_map() -> Array[Array]:
 	for i in TEST_FLOORS:
 		var room := map_data[i][middle] as Room
 		room.type = room_types[i]
-		room.position = Vector2(middle * X_DIST, i * -Y_DIST)
+		room.position = Vector2(middle * X_DIST, get_row_y(i))
 
 		if room.type == Room.Type.MONSTER:
 			room.battle_stats = TEST_FIXED_MONSTER_BATTLE
@@ -122,7 +139,7 @@ func _generate_test_elite_linear_map() -> Array[Array]:
 	for i in TEST_ELITE_FLOORS:
 		var room := map_data[i][middle] as Room
 		room.type = room_types[i]
-		room.position = Vector2(middle * X_DIST, i * -Y_DIST)
+		room.position = Vector2(middle * X_DIST, get_row_y(i))
 
 		if room.type == Room.Type.MONSTER:
 			room.battle_stats = TEST_FIXED_MONSTER_BATTLE
@@ -149,14 +166,14 @@ func _generate_initial_grid(floors: int, randomize_position := true) -> Array[Ar
 		for j in MAP_WIDTH:
 			var current_room := Room.new()
 			var offset := Vector2(randf(), randf()) * PLACEMENT_RANDOMNESS if randomize_position else Vector2.ZERO
-			current_room.position = Vector2(j * X_DIST, i * -Y_DIST) + offset
+			current_room.position = Vector2(j * X_DIST, get_row_y(i)) + offset
 			current_room.row = i
 			current_room.column = j
 			current_room.next_rooms = []
 			
 			# Boss room has a non-random Y
 			if i == floors - 1:
-				current_room.position.y = (i + 1) * -Y_DIST
+				current_room.position.y = get_row_y(i + 1)
 			
 			adjacent_rooms.append(current_room)
 			
@@ -224,10 +241,11 @@ func _would_cross_existing_path(i: int, j: int, room: Room) -> bool:
 
 func _setup_boss_room() -> void:
 	var middle := floori(MAP_WIDTH * 0.5)
-	var boss_room := map_data[FLOORS - 1][middle] as Room
+	var boss_row := map_data.size() - 1
+	var boss_room := map_data[boss_row][middle] as Room
 	
 	for j in MAP_WIDTH:
-		var current_room = map_data[FLOORS - 2][j] as Room
+		var current_room = map_data[boss_row - 1][j] as Room
 		if current_room.next_rooms:
 			current_room.next_rooms = [] as Array[Room]
 			current_room.next_rooms.append(boss_room)
@@ -247,21 +265,21 @@ func _setup_random_room_weights() -> void:
 
 
 func _setup_room_types() -> void:
-	# first floor is always a battle
-	for room: Room in map_data[0]:
-		if room.next_rooms.size() > 0:
-				room.type = Room.Type.MONSTER
-				room.battle_stats = _battle_for_room(0)
+	var boss_row := map_data.size() - 1
+	var treasure_row := clampi(roundi(float(boss_row) * 0.58), 2, boss_row - 2)
+	var campfire_row := boss_row - 1
 
-	# 9th floor is always a treasure
-	for room: Room in map_data[8]:
+	_setup_first_floor_types()
+
+	# 中段固定一个宝箱，随总层数计算，避免缩短地图后索引失效。
+	for room: Room in map_data[treasure_row]:
 		if room.next_rooms.size() > 0:
-				room.type = Room.Type.TREASURE
+				_apply_room_type(room, Room.Type.TREASURE)
 				
-	# last floor before the boss is always a campfire
-	for room: Room in map_data[13]:
+	# Boss 前一层固定为篝火。
+	for room: Room in map_data[campfire_row]:
 		if room.next_rooms.size() > 0:
-				room.type = Room.Type.CAMPFIRE
+				_apply_room_type(room, Room.Type.CAMPFIRE)
 	
 	# rest of rooms
 	for current_floor in map_data:
@@ -271,18 +289,49 @@ func _setup_room_types() -> void:
 					_set_room_randomly(next_room)
 
 
+func _setup_first_floor_types() -> void:
+	var active_rooms: Array[Room] = []
+	for room: Room in map_data[0]:
+		if room.next_rooms.size() > 0:
+			active_rooms.append(room)
+
+	if active_rooms.is_empty():
+		return
+
+	RNG.array_shuffle(active_rooms)
+	for index in active_rooms.size():
+		var room := active_rooms[index]
+		if index < FIRST_ROW_MONSTER_CAP:
+			_apply_room_type(room, Room.Type.MONSTER)
+		else:
+			_apply_room_type(room, _get_first_floor_support_type(index))
+
+
+func _get_first_floor_support_type(index: int) -> Room.Type:
+	var support_types := [
+		Room.Type.EVENT,
+		Room.Type.SHOP,
+		Room.Type.EVENT,
+		Room.Type.EVENT,
+	]
+	return support_types[index % support_types.size()]
+
+
 func _set_room_randomly(room_to_set: Room) -> void:
 	var campfire_below_4 := true
 	var consecutive_campfire := true
 	var consecutive_shop := true
 	var consecutive_elite := true
 	var elite_too_early_or_late := true
-	var campfire_on_13 := true
+	var campfire_too_late := true
+	var boss_row := map_data.size() - 1
+	var latest_elite_row := maxi(4, boss_row - 3)
+	var forced_campfire_row := boss_row - 1
 	
 	var type_candidate: Room.Type
 	
-	while campfire_below_4 or consecutive_campfire or consecutive_shop or consecutive_elite or elite_too_early_or_late or campfire_on_13:
-		type_candidate = _get_random_room_type_by_weight()
+	while campfire_below_4 or consecutive_campfire or consecutive_shop or consecutive_elite or elite_too_early_or_late or campfire_too_late:
+		type_candidate = _get_random_room_type_by_weight(room_to_set.row)
 		
 		var is_campfire := type_candidate == Room.Type.CAMPFIRE
 		var has_campfire_parent := _room_has_parent_of_type(room_to_set, Room.Type.CAMPFIRE)
@@ -295,17 +344,20 @@ func _set_room_randomly(room_to_set: Room) -> void:
 		consecutive_campfire = is_campfire and has_campfire_parent
 		consecutive_shop = is_shop and has_shop_parent
 		consecutive_elite = is_elite and has_elite_parent
-		elite_too_early_or_late = is_elite and (room_to_set.row < 3 or room_to_set.row > 11)
-		campfire_on_13 = is_campfire and room_to_set.row == 12
+		elite_too_early_or_late = is_elite and (room_to_set.row < 3 or room_to_set.row > latest_elite_row)
+		campfire_too_late = is_campfire and room_to_set.row >= forced_campfire_row - 1
 		
+	_apply_room_type(room_to_set, type_candidate)
+
+
+func _apply_room_type(room_to_set: Room, type_candidate: Room.Type) -> void:
 	room_to_set.type = type_candidate
 
 	if type_candidate == Room.Type.ELITE:
 		_setup_elite_battle(room_to_set)
 	elif type_candidate == Room.Type.MONSTER:
 		room_to_set.battle_stats = _battle_for_room(0)
-	
-	if type_candidate == Room.Type.EVENT:
+	elif type_candidate == Room.Type.EVENT:
 		room_to_set.event_scene = event_room_pool.get_random()
 
 
@@ -315,8 +367,9 @@ func _prepend_blessing_room() -> void:
 
 	for row: Array in map_data:
 		for room: Room in row:
+			var row_offset := room.position.y - get_row_y(room.row)
 			room.row += 1
-			room.position.y -= Y_DIST
+			room.position.y = get_row_y(room.row) + row_offset
 
 	var middle := floori(MAP_WIDTH * 0.5)
 	var blessing_row: Array[Room] = []
@@ -349,9 +402,18 @@ func _setup_elite_battle(room: Room) -> void:
 
 	room.battle_stats = battle_stats.duplicate() as BattleStats
 	# 精英在精英倍率的基础上再叠加章节倍率
-	room.battle_stats.enemy_health_multiplier = ELITE_HEALTH_MULTIPLIER * _chapter_value(CHAPTER_HEALTH_MULTIPLIERS)
-	room.battle_stats.enemy_damage_multiplier = ELITE_DAMAGE_MULTIPLIER * _chapter_value(CHAPTER_DAMAGE_MULTIPLIERS)
+	room.battle_stats.enemy_health_multiplier = (
+		ELITE_HEALTH_MULTIPLIER
+		* _chapter_value(CHAPTER_HEALTH_MULTIPLIERS)
+		* _difficulty_health_multiplier(1)
+	)
+	room.battle_stats.enemy_damage_multiplier = (
+		ELITE_DAMAGE_MULTIPLIER
+		* _chapter_value(CHAPTER_DAMAGE_MULTIPLIERS)
+		* _difficulty_damage_multiplier(1)
+	)
 	var gold_multiplier := ELITE_GOLD_MULTIPLIER * _chapter_value(CHAPTER_GOLD_MULTIPLIERS)
+	gold_multiplier *= _difficulty_gold_multiplier()
 	room.battle_stats.gold_reward_min = ceili(room.battle_stats.gold_reward_min * gold_multiplier)
 	room.battle_stats.gold_reward_max = ceili(room.battle_stats.gold_reward_max * gold_multiplier)
 
@@ -361,15 +423,18 @@ func _battle_for_room(tier: int) -> BattleStats:
 	if not base:
 		return null
 	# 复制一份再缩放，避免改动共享的战斗池资源
-	return _apply_chapter_scaling(base.duplicate() as BattleStats)
+	return _apply_chapter_scaling(base.duplicate() as BattleStats, tier)
 
 
-func _apply_chapter_scaling(battle_stats: BattleStats) -> BattleStats:
+func _apply_chapter_scaling(battle_stats: BattleStats, tier := 0) -> BattleStats:
 	if not battle_stats:
 		return null
 	battle_stats.enemy_health_multiplier *= _chapter_value(CHAPTER_HEALTH_MULTIPLIERS)
 	battle_stats.enemy_damage_multiplier *= _chapter_value(CHAPTER_DAMAGE_MULTIPLIERS)
+	battle_stats.enemy_health_multiplier *= _difficulty_health_multiplier(tier)
+	battle_stats.enemy_damage_multiplier *= _difficulty_damage_multiplier(tier)
 	var gold_multiplier := _chapter_value(CHAPTER_GOLD_MULTIPLIERS)
+	gold_multiplier *= _difficulty_gold_multiplier()
 	battle_stats.gold_reward_min = ceili(battle_stats.gold_reward_min * gold_multiplier)
 	battle_stats.gold_reward_max = ceili(battle_stats.gold_reward_max * gold_multiplier)
 	return battle_stats
@@ -380,12 +445,29 @@ func _chapter_value(multipliers: Array) -> float:
 	return multipliers[index]
 
 
+func _difficulty_health_multiplier(tier: int) -> float:
+	if not difficulty_stats:
+		return 1.0
+	return difficulty_stats.get_enemy_health_multiplier(tier)
+
+
+func _difficulty_damage_multiplier(tier: int) -> float:
+	if not difficulty_stats:
+		return 1.0
+	return difficulty_stats.get_enemy_damage_multiplier(tier)
+
+
+func _difficulty_gold_multiplier() -> float:
+	return difficulty_stats.gold_reward_multiplier if difficulty_stats else 1.0
+
+
 func _ensure_elite_room_exists() -> void:
 	if _has_room_type(Room.Type.ELITE):
 		return
 
 	var candidates: Array[Room] = []
-	for row_index in range(3, 12):
+	var boss_row := map_data.size() - 1
+	for row_index in range(3, maxi(4, boss_row - 2)):
 		for room: Room in map_data[row_index]:
 			if room.next_rooms.is_empty():
 				continue
@@ -397,8 +479,7 @@ func _ensure_elite_room_exists() -> void:
 		return
 
 	var elite_room := RNG.array_pick_random(candidates) as Room
-	elite_room.type = Room.Type.ELITE
-	_setup_elite_battle(elite_room)
+	_apply_room_type(elite_room, Room.Type.ELITE)
 
 
 func _has_room_type(type: Room.Type) -> bool:
@@ -435,7 +516,10 @@ func _room_has_parent_of_type(room: Room, type: Room.Type) -> bool:
 	return false
 
 
-func _get_random_room_type_by_weight() -> Room.Type:
+func _get_random_room_type_by_weight(row := -1) -> Room.Type:
+	if row >= 1 and row <= 2:
+		return _get_early_room_type_by_weight()
+
 	var roll := randf_range(0.0, random_room_type_total_weight)
 	
 	for type: Room.Type in random_room_type_weights:
@@ -443,3 +527,14 @@ func _get_random_room_type_by_weight() -> Room.Type:
 			return type
 	
 	return Room.Type.MONSTER
+
+
+func _get_early_room_type_by_weight() -> Room.Type:
+	var total := EARLY_MONSTER_ROOM_WEIGHT + EARLY_SHOP_ROOM_WEIGHT + EARLY_EVENT_ROOM_WEIGHT
+	var roll := randf_range(0.0, total)
+	if roll < EARLY_MONSTER_ROOM_WEIGHT:
+		return Room.Type.MONSTER
+	roll -= EARLY_MONSTER_ROOM_WEIGHT
+	if roll < EARLY_SHOP_ROOM_WEIGHT:
+		return Room.Type.SHOP
+	return Room.Type.EVENT

@@ -10,6 +10,7 @@ relic_name = "雷火坛"
 id = "explosive_barrel"
 type = 0
 character_type = 0
+rarity = 3
 starter_relic = false
 icon = ExtResource("1_813wr")
 tooltip = "[color=\"ffdf00\"]雷火坛[/color]

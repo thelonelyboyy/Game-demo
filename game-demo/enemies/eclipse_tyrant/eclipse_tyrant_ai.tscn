@@ -1,0 +1,55 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
+[ext_resource type="Script" path="res://enemies/crab/crab_attack_action.gd" id="2"]
+[ext_resource type="Script" path="res://custom_resources/intent.gd" id="5"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_attack.png" id="6"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/toxic_ghost_muscle_buff.png" id="7"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="9"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="10"]
+[ext_resource type="Script" path="res://enemies/shared/block_and_add_card_action.gd" id="11"]
+[ext_resource type="Resource" path="res://common_cards/status/eclipse_scar.tres" id="12"]
+
+[sub_resource type="Resource" id="IntentClaw"]
+script = ExtResource("5")
+base_text = "%s"
+icon = ExtResource("6")
+category = 0
+
+[sub_resource type="Resource" id="IntentGather"]
+script = ExtResource("5")
+base_text = ""
+icon = ExtResource("7")
+category = 6
+
+[sub_resource type="Resource" id="IntentEclipseBite"]
+script = ExtResource("5")
+base_text = "%s"
+icon = ExtResource("6")
+category = 0
+
+[node name="EclipseTyrantAI" type="Node"]
+script = ExtResource("1")
+fixed_sequence = Array[int]([0, 1, 2])
+
+[node name="ClawAction" type="Node" parent="."]
+script = ExtResource("2")
+intent = SubResource("IntentClaw")
+sound = ExtResource("9")
+type = 1
+damage = 14
+
+[node name="GatherAction" type="Node" parent="."]
+script = ExtResource("11")
+intent = SubResource("IntentGather")
+sound = ExtResource("10")
+type = 1
+block = 15
+card_to_add = ExtResource("12")
+
+[node name="EclipseBiteAction" type="Node" parent="."]
+script = ExtResource("2")
+intent = SubResource("IntentEclipseBite")
+sound = ExtResource("9")
+type = 1
+damage = 34

@@ -74,6 +74,7 @@ var potion_bar_panel: PanelContainer
 var legacy_choice_layer: CanvasLayer
 var debug_console
 var current_chapter := 1
+var pending_chapter_advance := false
 
 
 func _ready() -> void:
@@ -95,12 +96,16 @@ func _ready() -> void:
 
 func _start_run() -> void:
 	stats = RunStats.new()
+	stats.configure_difficulty(run_startup.difficulty_level)
 	current_chapter = 1
+	stats.apply_chapter_card_weights(current_chapter)
+	character.health = stats.get_starting_health(character.max_health)
 	
 	_setup_event_connections()
 	_setup_top_bar()
 	_setup_debug_console()
 
+	_configure_map_difficulty()
 	map.generate_new_map(current_chapter)
 	map.unlock_floor(0)
 
@@ -418,8 +423,12 @@ func _load_run() -> void:
 
 	RNG.set_from_save_data(save_data.rng_seed, save_data.rng_state)
 	stats = save_data.run_stats
+	if not stats:
+		stats = RunStats.new()
+	stats.refresh_difficulty_modifiers(false)
 	character = save_data.char_stats
 	current_chapter = maxi(save_data.current_chapter, 1)
+	stats.apply_chapter_card_weights(current_chapter)
 	if save_data.spirit_root != Card.Element.NONE:
 		character.spirit_root = save_data.spirit_root
 	character.deck = save_data.current_deck
@@ -431,6 +440,7 @@ func _load_run() -> void:
 	_setup_debug_console()
 	_setup_event_connections()
 	
+	_configure_map_difficulty()
 	map.load_map(save_data.map_data, save_data.floors_climbed, save_data.last_room)
 	if save_data.last_room and not save_data.was_on_map:
 		_on_map_exited(save_data.last_room)
@@ -465,7 +475,7 @@ func _show_map() -> void:
 func _setup_event_connections() -> void:
 	potion_handler.character_stats = character
 	Events.battle_won.connect(_on_battle_won)
-	Events.battle_reward_exited.connect(_show_map)
+	Events.battle_reward_exited.connect(_on_battle_reward_exited)
 	Events.campfire_exited.connect(_show_map)
 	Events.map_exited.connect(_on_map_exited)
 	Events.shop_exited.connect(_show_map)
@@ -474,6 +484,8 @@ func _setup_event_connections() -> void:
 	Events.blessing_exited.connect(_show_map)
 	if not Events.card_acquired_animation_requested.is_connected(_on_card_acquired_animation):
 		Events.card_acquired_animation_requested.connect(_on_card_acquired_animation)
+	if not Events.ui_notice_requested.is_connected(_on_ui_notice_requested):
+		Events.ui_notice_requested.connect(_on_ui_notice_requested)
 	
 	battle_button.pressed.connect(_change_view.bind(BATTLE_SCENE))
 	campfire_button.pressed.connect(_change_view.bind(CAMPFIRE_SCENE))
@@ -481,6 +493,75 @@ func _setup_event_connections() -> void:
 	rewards_button.pressed.connect(_change_view.bind(BATTLE_REWARD_SCENE))
 	shop_button.pressed.connect(_change_view.bind(SHOP_SCENE))
 	treasure_button.pressed.connect(_change_view.bind(TREASURE_SCENE))
+
+
+var _notice_layer: CanvasLayer
+var _notice_box: VBoxContainer
+
+
+# 随机效果结果播报：居中 toast 逐条堆叠、各自淡入停留后消失。
+# 祝福/事件的"随机突破了哪张牌"等结果经 Events.ui_notice_requested 汇到这里。
+func _on_ui_notice_requested(text: String) -> void:
+	if text.is_empty() or not is_inside_tree():
+		return
+	_ensure_notice_layer()
+
+	var panel := PanelContainer.new()
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style := InkTheme.make_style(
+		Color(0.035, 0.024, 0.020, 0.90),
+		Color(0.74, 0.54, 0.26, 0.84),
+		1,
+		8,
+		Color(0, 0, 0, 0.42),
+		8
+	)
+	style.content_margin_left = 22
+	style.content_margin_right = 22
+	style.content_margin_top = 8
+	style.content_margin_bottom = 8
+	panel.add_theme_stylebox_override("panel", style)
+
+	var label := Label.new()
+	label.text = text
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 21)
+	label.add_theme_color_override("font_color", Color("f2e4be"))
+	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
+	label.add_theme_constant_override("shadow_offset_x", 2)
+	label.add_theme_constant_override("shadow_offset_y", 2)
+	panel.add_child(label)
+	_notice_box.add_child(panel)
+
+	panel.modulate = Color(1, 1, 1, 0.0)
+	var tween := panel.create_tween()
+	tween.tween_property(panel, "modulate:a", 1.0, 0.25) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_interval(2.4)
+	tween.tween_property(panel, "modulate:a", 0.0, 0.45)
+	tween.tween_callback(panel.queue_free)
+
+
+func _ensure_notice_layer() -> void:
+	if _notice_layer:
+		return
+	_notice_layer = CanvasLayer.new()
+	_notice_layer.name = "NoticeLayer"
+	_notice_layer.layer = 21
+	add_child(_notice_layer)
+
+	_notice_box = VBoxContainer.new()
+	_notice_box.name = "NoticeBox"
+	_notice_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_notice_box.alignment = BoxContainer.ALIGNMENT_BEGIN
+	_notice_box.anchor_left = 0.5
+	_notice_box.anchor_right = 0.5
+	_notice_box.offset_left = -340.0
+	_notice_box.offset_right = 340.0
+	_notice_box.offset_top = 168.0
+	_notice_box.add_theme_constant_override("separation", 8)
+	_notice_layer.add_child(_notice_box)
 
 
 # 获得新卡（商店购买等）：幽灵卡从来源位置飞向顶栏总牌库按钮 + 计数 punch。
@@ -944,11 +1025,39 @@ func _show_elite_battle_rewards() -> void:
 	reward_scene.potion_handler = potion_handler
 
 	reward_scene.add_gold_reward(map.last_room.battle_stats.roll_gold_reward())
-	reward_scene.add_relic_reward(RELIC_REWARD_POOL.get_random_available(character, relic_handler))
+	reward_scene.add_relic_reward(RELIC_REWARD_POOL.get_random_available(
+		character, relic_handler, current_chapter, RelicRewardPool.RewardContext.ELITE
+	))
 	reward_scene.add_card_fusion_reward()
 	# 精英战必掉一个符箓丹药（槽位满则跳过）。
 	if not potion_handler.is_full():
 		reward_scene.add_potion_reward(_random_reward_potion())
+
+
+func _show_boss_battle_rewards() -> void:
+	pending_chapter_advance = true
+	var reward_scene := _change_view(BATTLE_REWARD_SCENE) as BattleReward
+	reward_scene.run_stats = stats
+	reward_scene.character_stats = character
+	reward_scene.relic_handler = relic_handler
+	reward_scene.potion_handler = potion_handler
+
+	reward_scene.add_gold_reward(map.last_room.battle_stats.roll_gold_reward())
+	reward_scene.add_card_reward()
+	var relic_choices := RELIC_REWARD_POOL.get_random_available_choices(
+		character, relic_handler, 2, current_chapter, RelicRewardPool.RewardContext.BOSS
+	)
+	reward_scene.add_relic_choice_rewards(relic_choices)
+	if not potion_handler.is_full():
+		reward_scene.add_potion_reward(_random_reward_potion())
+
+
+func _on_battle_reward_exited() -> void:
+	if pending_chapter_advance:
+		pending_chapter_advance = false
+		_advance_to_next_chapter()
+	else:
+		_show_map()
 
 
 func _on_battle_room_entered(room: Room) -> void:
@@ -963,7 +1072,7 @@ func _on_treasure_room_entered() -> void:
 	var treasure_scene := _change_view(TREASURE_SCENE) as Treasure
 	treasure_scene.relic_handler = relic_handler
 	treasure_scene.char_stats = character
-	treasure_scene.generate_relic_choices(2)
+	treasure_scene.generate_relic_choices(2, current_chapter)
 
 
 func _on_treasure_room_exited(relic_choices: Array[Relic]) -> void:
@@ -982,6 +1091,7 @@ func _on_treasure_room_exited(relic_choices: Array[Relic]) -> void:
 func _on_campfire_entered() -> void:
 	var campfire := _change_view(CAMPFIRE_SCENE) as Campfire
 	campfire.char_stats = character
+	campfire.run_stats = stats
 
 
 func _on_shop_entered() -> void:
@@ -1013,10 +1123,19 @@ func _on_battle_won() -> void:
 	if map.is_final_floor_reached():
 		if current_chapter >= TOTAL_CHAPTERS:
 			var win_screen := _change_view(WIN_SCREEN_SCENE) as WinScreen
-			win_screen.character = character
+			var difficulty_profile := DifficultyProfile.load_data()
+			var unlocked_next := difficulty_profile.record_victory(stats.difficulty_level)
+			var profile_error := difficulty_profile.save_data()
+			if profile_error != OK:
+				push_warning("无法保存心魔难度进度：%s" % profile_error)
+			win_screen.set_completion(
+				character,
+				stats.difficulty_level,
+				difficulty_profile.unlocked_level if unlocked_next else -1
+			)
 			SaveGame.delete_data()
 		else:
-			_advance_to_next_chapter()
+			_show_boss_battle_rewards()
 	elif map.last_room and map.last_room.type == Room.Type.ELITE:
 		_show_elite_battle_rewards()
 	else:
@@ -1025,11 +1144,17 @@ func _on_battle_won() -> void:
 
 func _advance_to_next_chapter() -> void:
 	current_chapter += 1
-	# 进入新一章时角色回满血
-	character.health = character.max_health
+	stats.apply_chapter_card_weights(current_chapter)
+	character.heal(stats.get_chapter_recovery_amount(character.health, character.max_health))
+	_configure_map_difficulty()
 	map.generate_new_map(current_chapter)
 	map.unlock_floor(0)
 	_show_map()
+
+
+func _configure_map_difficulty() -> void:
+	if map and map.map_generator:
+		map.map_generator.difficulty_stats = stats
 
 
 func _on_map_exited(room: Room) -> void:

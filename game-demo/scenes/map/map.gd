@@ -3,7 +3,8 @@ extends Node2D
 
 const MAP_VISUAL_SCALE := 3.35
 const SCROLL_SPEED := 15
-const SCROLL_FLOOR_CAPACITY := 17
+# 卷轴按 20 层节点的高度绘制，FLOORS 拉到 20 以内都放得下。
+const SCROLL_FLOOR_CAPACITY := 20
 const SCROLL_SIDE_PADDING := 74.0
 const SCROLL_VERTICAL_PADDING := 64.0
 const SCROLL_VIEWPORT_WIDTH_RATIO := 1.02
@@ -35,6 +36,7 @@ var tooltip_status: Label
 var tooltip_target: MapRoom
 var focused_map_room: MapRoom
 var player_marker: PlayerMarker
+var legend_panel: PanelContainer
 # 平滑滚动：滚轮改目标值，_process 里插值逼近
 var _scroll_target_y := 0.0
 # 可选路径连线脉冲
@@ -74,7 +76,9 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	_create_tooltip()
 	_create_progress_panel()
+	_create_legend_panel()
 	_update_camera_limits()
+	_sync_map_overlay_visibility()
 
 
 func _process(delta: float) -> void:
@@ -97,11 +101,14 @@ func _process(delta: float) -> void:
 			line.default_color.a = base_alpha * (0.62 + 0.38 * pulse)
 	for child: Node in rooms.get_children():
 		var map_room := child as MapRoom
-		if not map_room:
+		if not map_room or not map_room.room:
 			continue
 		if map_room.available:
 			var glow := 1.0 + 0.14 * pulse
 			map_room.modulate = Color(glow, glow, glow * 0.97, 1.0)
+		elif not map_room.room.selected and map_room.room.row < floors_climbed:
+			# 已经走过这一层但没选它：这条支线永远到不了了，强变暗（杀戮尖塔式）。
+			map_room.modulate = Color(0.5, 0.5, 0.5, 0.5)
 		elif map_room.modulate != Color.WHITE:
 			map_room.modulate = Color.WHITE
 
@@ -170,11 +177,12 @@ func create_map() -> void:
 	_spawn_room(map_data[last_floor][middle])
 
 	var content_width := MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1)
-	var content_height := MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0)
+	var content_height := MapGenerator.get_floor_span(_get_scroll_floor_slots())
 	_layout_map_visuals(content_width, content_height)
 	_ensure_player_marker()
 	_animate_map_entrance()
 	_update_progress_label()
+	_sync_map_overlay_visibility()
 
 
 # 开图演出：节点自下而上按层错落浮现，连线整体淡入。
@@ -273,8 +281,7 @@ func show_map() -> void:
 	show()
 	camera_2d.enabled = true
 	_update_progress_label()
-	if progress_panel:
-		progress_panel.show()
+	_sync_map_overlay_visibility()
 
 
 func hide_map() -> void:
@@ -282,8 +289,14 @@ func hide_map() -> void:
 	camera_2d.enabled = false
 	_hide_tooltip()
 	_set_focused_map_room(null)
+	_sync_map_overlay_visibility()
+
+
+func _sync_map_overlay_visibility() -> void:
 	if progress_panel:
-		progress_panel.hide()
+		progress_panel.visible = visible
+	if legend_panel:
+		legend_panel.visible = visible
 
 
 # 顶部「第X章 · 已登 Y / Z 层」进度牌（挂在 tooltip 同一 CanvasLayer，随地图显隐）。
@@ -327,6 +340,98 @@ func _update_progress_label() -> void:
 	]
 
 
+func _create_legend_panel() -> void:
+	legend_panel = PanelContainer.new()
+	legend_panel.name = "MapLegend"
+	legend_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	legend_panel.custom_minimum_size = Vector2(184, 278)
+	legend_panel.anchor_left = 1.0
+	legend_panel.anchor_right = 1.0
+	legend_panel.anchor_top = 0.5
+	legend_panel.anchor_bottom = 0.5
+	legend_panel.offset_left = -214.0
+	legend_panel.offset_right = -24.0
+	legend_panel.offset_top = -142.0
+	legend_panel.offset_bottom = 142.0
+	legend_panel.add_theme_stylebox_override("panel", _make_tooltip_style())
+	legend_panel.hide()
+	tooltip_layer.add_child(legend_panel)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 12)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_right", 12)
+	margin.add_theme_constant_override("margin_bottom", 10)
+	legend_panel.add_child(margin)
+
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 7)
+	margin.add_child(content)
+
+	var title := Label.new()
+	title.text = "图例"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 20)
+	title.add_theme_color_override("font_color", Color("fff0c8"))
+	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
+	title.add_theme_constant_override("shadow_offset_x", 2)
+	title.add_theme_constant_override("shadow_offset_y", 2)
+	content.add_child(title)
+
+	var entries := [
+		[Room.Type.BLESSING, "赐福", "开局强化"],
+		[Room.Type.MONSTER, "战斗", "普通敌人"],
+		[Room.Type.ELITE, "精英", "高风险奖励"],
+		[Room.Type.EVENT, "机缘", "随机事件"],
+		[Room.Type.TREASURE, "宝箱", "获得奖励"],
+		[Room.Type.CAMPFIRE, "营火", "休整疗伤"],
+		[Room.Type.SHOP, "商店", "购买补给"],
+		[Room.Type.BOSS, "首领", "章节终战"],
+	]
+	for entry in entries:
+		content.add_child(_make_legend_row(entry[0], entry[1], entry[2]))
+
+
+func _make_legend_row(room_type: int, title: String, description: String) -> Control:
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", 8)
+
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(24, 24)
+	icon.texture = MapRoom.ICONS.get(room_type, MapRoom.ICONS[Room.Type.NOT_ASSIGNED])
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(icon)
+
+	var text_box := VBoxContainer.new()
+	text_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text_box.add_theme_constant_override("separation", 0)
+	row.add_child(text_box)
+
+	var title_label := Label.new()
+	title_label.text = title
+	title_label.add_theme_font_size_override("font_size", 16)
+	title_label.add_theme_color_override("font_color", Color("f6dfaa"))
+	title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.78))
+	title_label.add_theme_constant_override("shadow_offset_x", 1)
+	title_label.add_theme_constant_override("shadow_offset_y", 1)
+	text_box.add_child(title_label)
+
+	var desc_label := Label.new()
+	desc_label.text = description
+	desc_label.add_theme_font_size_override("font_size", 12)
+	desc_label.add_theme_color_override("font_color", Color(0.77, 0.70, 0.58, 0.90))
+	desc_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.70))
+	desc_label.add_theme_constant_override("shadow_offset_x", 1)
+	desc_label.add_theme_constant_override("shadow_offset_y", 1)
+	text_box.add_child(desc_label)
+
+	return row
+
+
 func _spawn_room(room: Room) -> void:
 	var new_map_room := MAP_ROOM.instantiate() as MapRoom
 	rooms.add_child(new_map_room)
@@ -341,19 +446,52 @@ func _spawn_room(room: Room) -> void:
 		new_map_room.show_selected()
 
 
+# 杀戮尖塔式路径：虚线贴图 + 轻微弯曲的手绘感。
+# 虚线纹理运行时生成一次；弯度由端点坐标决定（确定性，重建地图不变、不消耗 RNG）。
+static var _dash_texture: ImageTexture
+
+
+static func _get_dash_texture() -> ImageTexture:
+	if _dash_texture:
+		return _dash_texture
+	var img := Image.create(20, 10, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	img.fill_rect(Rect2i(2, 1, 9, 8), Color.WHITE)
+	_dash_texture = ImageTexture.create_from_image(img)
+	return _dash_texture
+
+
 func _connect_lines(room: Room) -> void:
 	if room.next_rooms.is_empty():
 		return
-		
+
 	for next: Room in room.next_rooms:
 		var new_map_line := MAP_LINE.instantiate() as Line2D
-		new_map_line.add_point(room.position)
-		new_map_line.add_point(next.position)
+		for point in _curved_line_points(room.position, next.position):
+			new_map_line.add_point(point)
 		new_map_line.antialiased = true
+		new_map_line.texture = _get_dash_texture()
+		new_map_line.texture_mode = Line2D.LINE_TEXTURE_TILE
 		new_map_line.set_meta("from_room", room)
 		new_map_line.set_meta("to_room", next)
 		lines.add_child(new_map_line)
 		_style_map_line(new_map_line, "normal")
+
+
+func _curved_line_points(from: Vector2, to: Vector2) -> PackedVector2Array:
+	var mid := (from + to) * 0.5
+	var direction := (to - from).normalized()
+	var normal := Vector2(-direction.y, direction.x)
+	var seed_value := int(absf(from.x * 7.0 + from.y * 13.0 + to.x * 17.0 + to.y * 23.0))
+	var bow := (float(seed_value % 100) / 100.0 - 0.5) * 12.0
+	var control := mid + normal * bow
+
+	var points := PackedVector2Array()
+	var segments := 8
+	for i in range(segments + 1):
+		var t := float(i) / float(segments)
+		points.append(from.lerp(control, t).lerp(control.lerp(to, t), t))
+	return points
 
 
 func _on_map_room_clicked(room: Room) -> void:
@@ -420,7 +558,7 @@ func is_final_floor_reached() -> bool:
 
 
 func _update_camera_limits() -> void:
-	camera_min_y = -MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0) * MAP_VISUAL_SCALE
+	camera_min_y = -MapGenerator.get_floor_span(_get_scroll_floor_slots()) * MAP_VISUAL_SCALE
 	camera_max_y = 0.0
 
 	if scroll_board and scroll_board.texture:
@@ -447,7 +585,7 @@ func _on_viewport_size_changed() -> void:
 		return
 
 	var content_width := MapGenerator.X_DIST * (MapGenerator.MAP_WIDTH - 1)
-	var content_height := MapGenerator.Y_DIST * maxi(_get_scroll_floor_slots() - 1, 0)
+	var content_height := MapGenerator.get_floor_span(_get_scroll_floor_slots())
 	_layout_map_visuals(content_width, content_height)
 
 
@@ -500,6 +638,8 @@ func _update_line_states() -> void:
 		elif _is_room_available(from_room):
 			_style_map_line(line, "available")
 			_pulse_lines.append(line)
+		elif from_room and from_room.row < floors_climbed:
+			_style_map_line(line, "missed")
 		else:
 			_style_map_line(line, "normal")
 
@@ -507,17 +647,21 @@ func _update_line_states() -> void:
 func _style_map_line(line: Line2D, state: String) -> void:
 	match state:
 		"selected":
-			# 走过的路：染金发光，一眼读出来时的轨迹。
+			# 走过的路：红色高亮，和未选择路径拉开对比。
 			line.width = 4.6
-			line.default_color = Color(0.88, 0.68, 0.30, 0.95)
+			line.default_color = Color(0.86, 0.05, 0.04, 0.98)
 		"available":
-			# 可选去向：暖亮色，_process 里做呼吸脉冲。
+			# 可选去向：仍保持黑色基调，_process 里做轻微呼吸脉冲。
 			line.width = 4.0
-			line.default_color = Color(0.80, 0.74, 0.52, 0.90)
-			line.set_meta("base_alpha", 0.90)
+			line.default_color = Color(0.02, 0.018, 0.016, 0.92)
+			line.set_meta("base_alpha", 0.92)
+		"missed":
+			# 已经错过的支线：压到几乎隐去。
+			line.width = 3.0
+			line.default_color = Color(0.0, 0.0, 0.0, 0.28)
 		_:
 			line.width = 3.4
-			line.default_color = Color(0.13, 0.12, 0.18, 0.78)
+			line.default_color = Color(0.0, 0.0, 0.0, 0.82)
 
 
 func _is_room_available(room_to_check: Room) -> bool:

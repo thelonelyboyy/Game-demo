@@ -10,5 +10,5 @@ id = "grave_lantern"
 display_name = "幽冢灯"
 description = "墓道里飘出的魂灯，会借阴火强化自身。"
 ai = ExtResource("3_ai")
-max_health = 24
+max_health = 64
 art = ExtResource("2_art")

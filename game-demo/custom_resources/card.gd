@@ -7,6 +7,7 @@ enum Target {SELF, SINGLE_ENEMY, ALL_ENEMIES, EVERYONE}
 enum UpgradeType {NONE, STAT_BOOST, COST_REDUCTION}
 enum Element {NONE, METAL, WOOD, WATER, FIRE, EARTH}
 enum Profession {COMMON, BODY, SWORD, DEMONIC, BEASTMASTER}
+enum LifecycleTrigger {PLAYED, DISCARDED, EXHAUSTED}
 
 const RARITY_COLORS := {
 	Card.Rarity.COMMON: Color("e8e1cc"),
@@ -41,6 +42,29 @@ const PROFESSION_NAMES := {
 const SPIRIT_ROOT_FIRE_CHOICE := preload("res://custom_resources/spirit_root_fire_choice.gd")
 const META_SPIRIT_ROOT_FIRE_CHOICE := "spirit_root_fire_choice"
 const META_SPIRIT_ROOT_FIRE_CHOICE_USED := "spirit_root_fire_choice_used"
+const TEMPORARY_MECHANIC_TAG := "临时"
+const CONSUMABLE_MECHANIC_TAG := "消耗"
+const RETAIN_MECHANIC_TAG := "保留"
+const INNATE_MECHANIC_TAG := "固有"
+const ETHEREAL_MECHANIC_TAG := "虚无"
+const UNPLAYABLE_MECHANIC_TAG := "不可打出"
+const STATUS_MECHANIC_TAG := "状态"
+const CURSE_MECHANIC_TAG := "诅咒"
+const DISCARD_TRIGGER_MECHANIC_TAG := "弃牌触发"
+const EXHAUST_TRIGGER_MECHANIC_TAG := "消耗触发"
+const GROWTH_MECHANIC_TAG := "成长"
+const TEMPORARY_MECHANIC_TAGS := [TEMPORARY_MECHANIC_TAG, "临时牌", "temporary", "temp"]
+const CONSUMABLE_MECHANIC_TAGS := [CONSUMABLE_MECHANIC_TAG, "消耗牌", "exhaust", "exhausts", "consume"]
+const RETAIN_MECHANIC_TAGS := [RETAIN_MECHANIC_TAG, "保留牌", "retain", "retained"]
+const INNATE_MECHANIC_TAGS := [INNATE_MECHANIC_TAG, "固有牌", "innate"]
+const ETHEREAL_MECHANIC_TAGS := [ETHEREAL_MECHANIC_TAG, "虚无牌", "ethereal"]
+const UNPLAYABLE_MECHANIC_TAGS := [UNPLAYABLE_MECHANIC_TAG, "不能打出", "无法打出", "unplayable"]
+const STATUS_MECHANIC_TAGS := [STATUS_MECHANIC_TAG, "状态牌", "status"]
+const CURSE_MECHANIC_TAGS := [CURSE_MECHANIC_TAG, "诅咒牌", "curse", "cursed"]
+const DISCARD_TRIGGER_MECHANIC_TAGS := [DISCARD_TRIGGER_MECHANIC_TAG, "弃置触发", "discard_trigger", "discard"]
+const EXHAUST_TRIGGER_MECHANIC_TAGS := [EXHAUST_TRIGGER_MECHANIC_TAG, "消耗时触发", "exhaust_trigger", "on_exhaust"]
+const GROWTH_MECHANIC_TAGS := [GROWTH_MECHANIC_TAG, "成长牌", "grow", "growth"]
+const PLAYABLE_MECHANIC_TAGS := ["可打出", "可使用", "playable"]
 
 @export_group("Card Attributes")
 @export var id: String
@@ -66,6 +90,7 @@ const META_SPIRIT_ROOT_FIRE_CHOICE_USED := "spirit_root_fire_choice_used"
 var spirit_root_owner: CharacterStats
 var temporary_cost_reduction := 0
 var last_x_paid := 0
+var temporary := false
 
 
 func is_single_targeted() -> bool:
@@ -119,6 +144,7 @@ func play(targets: Array[Node], char_stats: CharacterStats, modifiers: ModifierH
 		await Events.attack_animation_finished
 
 	apply_effects(resolved_targets, modifiers)
+	handle_lifecycle_trigger(LifecycleTrigger.PLAYED, resolved_targets, modifiers)
 	_clear_spirit_root_fire_choice()
 
 
@@ -164,7 +190,7 @@ func get_profession_color() -> Color:
 
 
 func get_default_tooltip() -> String:
-	return tooltip_text
+	return with_runtime_tooltip(tooltip_text)
 
 
 func is_x_cost() -> bool:
@@ -180,7 +206,132 @@ func get_x_cost_paid() -> int:
 
 
 func get_updated_tooltip(_player_modifiers: ModifierHandler, _enemy_modifiers: ModifierHandler) -> String:
-	return tooltip_text
+	return with_runtime_tooltip(tooltip_text)
+
+
+func is_temporary_card() -> bool:
+	return temporary or has_any_mechanic_tag(TEMPORARY_MECHANIC_TAGS)
+
+
+func is_consumable_card() -> bool:
+	return exhausts or has_any_mechanic_tag(CONSUMABLE_MECHANIC_TAGS)
+
+
+func is_retained_card() -> bool:
+	return has_any_mechanic_tag(RETAIN_MECHANIC_TAGS)
+
+
+func is_innate_card() -> bool:
+	return has_any_mechanic_tag(INNATE_MECHANIC_TAGS)
+
+
+func is_ethereal_card() -> bool:
+	return has_any_mechanic_tag(ETHEREAL_MECHANIC_TAGS)
+
+
+func is_unplayable_card() -> bool:
+	return has_any_mechanic_tag(UNPLAYABLE_MECHANIC_TAGS)
+
+
+func is_status_card() -> bool:
+	return has_any_mechanic_tag(STATUS_MECHANIC_TAGS)
+
+
+func is_curse_card() -> bool:
+	return has_any_mechanic_tag(CURSE_MECHANIC_TAGS)
+
+
+func has_discard_trigger() -> bool:
+	return has_any_mechanic_tag(DISCARD_TRIGGER_MECHANIC_TAGS)
+
+
+func has_exhaust_trigger() -> bool:
+	return has_any_mechanic_tag(EXHAUST_TRIGGER_MECHANIC_TAGS)
+
+
+func is_growth_card() -> bool:
+	return has_any_mechanic_tag(GROWTH_MECHANIC_TAGS)
+
+
+func blocks_manual_play() -> bool:
+	if is_unplayable_card():
+		return true
+	return (is_status_card() or is_curse_card()) and not has_any_mechanic_tag(PLAYABLE_MECHANIC_TAGS)
+
+
+func handle_lifecycle_trigger(_trigger: LifecycleTrigger, _targets: Array[Node], _modifiers: ModifierHandler) -> void:
+	pass
+
+
+func has_any_mechanic_tag(tags: Array) -> bool:
+	if tags.is_empty():
+		return false
+
+	for mechanic_tag: String in mechanic_tags:
+		var normalized_tag := mechanic_tag.strip_edges().to_lower()
+		for candidate in tags:
+			if normalized_tag == str(candidate).strip_edges().to_lower():
+				return true
+	return false
+
+
+func ensure_mechanic_tag(tag: String) -> void:
+	var clean_tag := tag.strip_edges()
+	if clean_tag.is_empty() or has_any_mechanic_tag([clean_tag]):
+		return
+	mechanic_tags.append(clean_tag)
+
+
+func remove_mechanic_tags(tags: Array) -> void:
+	if tags.is_empty():
+		return
+	var remaining := PackedStringArray()
+	for mechanic_tag: String in mechanic_tags:
+		var should_remove := false
+		var normalized_tag := mechanic_tag.strip_edges().to_lower()
+		for candidate in tags:
+			if normalized_tag == str(candidate).strip_edges().to_lower():
+				should_remove = true
+				break
+		if not should_remove:
+			remaining.append(mechanic_tag)
+	mechanic_tags = remaining
+
+
+func with_runtime_tooltip(text: String) -> String:
+	var runtime_notes := PackedStringArray()
+	if is_retained_card():
+		runtime_notes.append("保留：回合结束时不会弃置，留到下回合。")
+	if is_innate_card():
+		runtime_notes.append("固有：战斗开始时优先进入起手。")
+	if is_temporary_card():
+		runtime_notes.append("临时：打出后移除；回合结束留在手牌也会移除，不进入抽牌堆或弃牌堆。")
+	if is_consumable_card():
+		runtime_notes.append("消耗：打出后移除，不进入抽牌堆或弃牌堆；未打出时正常弃置。")
+	if is_ethereal_card():
+		runtime_notes.append("虚无：回合结束若仍在手牌中，则移除。")
+	if blocks_manual_play():
+		runtime_notes.append("不可打出：不能主动使用这张牌。")
+	if is_status_card():
+		runtime_notes.append("状态牌：用于污染抽牌循环；默认不可打出，可用“可打出”标签覆盖。")
+	if is_curse_card():
+		runtime_notes.append("诅咒牌：负面牌库污染；默认不可打出，可用“可打出”标签覆盖。")
+	if has_discard_trigger():
+		runtime_notes.append("弃牌触发：从手牌进入弃牌堆时触发额外效果。")
+	if has_exhaust_trigger():
+		runtime_notes.append("消耗触发：被消耗移除时触发额外效果。")
+	if is_growth_card():
+		runtime_notes.append("成长：在本场战斗中按配置触发成长，提升本牌数值。")
+
+	if runtime_notes.is_empty():
+		return text
+
+	var runtime_text := "\n".join(runtime_notes)
+	if text.contains("[/center]"):
+		return text.replace("[/center]", "\n\n%s[/center]" % runtime_text)
+	if text.is_empty():
+		return runtime_text
+	return "%s\n\n%s" % [text, runtime_text]
 
 
 func bind_spirit_root_owner(owner: CharacterStats) -> void:

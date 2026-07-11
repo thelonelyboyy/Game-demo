@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "云中藏书阁"
 event_body = "散落的书页在空中自行翻动。"
-choice_texts = PackedStringArray("读完一卷：随机突破一张牌", "整理书架：获得 40 灵石", "合上书页")
+choice_texts = PackedStringArray("读完一卷：随机突破一张牌", "整理书架：获得 50 灵石", "合上书页")
 choice_effects = PackedStringArray("upgrade_random", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(0, 40, 0)
+choice_amounts = PackedInt32Array(0, 50, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

@@ -13,8 +13,8 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "小天劫云"
 event_body = "一团细小雷云拦住去路，像是在挑衅，又像是在馈赠。"
-choice_texts = PackedStringArray("引雷淬体：失去 9 生命，最大生命 +4", "借雷炼法：随机突破一张牌", "散去雷云")
-choice_effects = PackedStringArray("damage:9|max_hp:4", "upgrade_random", "skip")
+choice_texts = PackedStringArray("引雷淬体：失去 14 生命，最大生命 +4", "借雷炼法：随机突破一张牌", "散去雷云")
+choice_effects = PackedStringArray("damage:14|max_hp:4", "upgrade_random", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

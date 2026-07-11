@@ -35,6 +35,13 @@ func _get_fixed_sequence_action() -> EnemyAction:
 	return get_child(child_index) as EnemyAction
 
 
+func enter_phase_sequence(sequence: Array[int]) -> void:
+	if sequence.is_empty():
+		return
+	fixed_sequence = sequence.duplicate()
+	_sequence_index = 0
+
+
 func get_first_conditional_action() -> EnemyAction:
 	# 固定序列敌人不走条件覆盖，保证套路确定。
 	if not fixed_sequence.is_empty():

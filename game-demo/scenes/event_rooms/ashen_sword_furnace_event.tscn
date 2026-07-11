@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "灰烬剑炉"
 event_body = "断剑绕炉而鸣，炉火像一只睁开的眼。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("投牌入炉：移除随机一张牌，获得 60 灵石", "借炉淬法：失去 7 生命，随机突破一张牌", "封上炉门")
-choice_effects = PackedStringArray("remove_random:0|gain_gold:60", "damage:7|upgrade_random:0", "skip")
+choice_texts = PackedStringArray("投牌入炉：移除随机一张牌，获得 70 灵石", "借炉淬法：失去 11 生命，随机突破一张牌", "封上炉门")
+choice_effects = PackedStringArray("remove_random:0|gain_gold:70", "damage:11|upgrade_random:0", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

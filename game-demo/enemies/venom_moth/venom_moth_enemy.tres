@@ -10,5 +10,5 @@ id = "venom_moth"
 display_name = "瘴毒蛾"
 description = "翅粉带毒的妖蛾，会把浊气混进牌堆。"
 ai = ExtResource("3_ai")
-max_health = 21
+max_health = 56
 art = ExtResource("2_art")

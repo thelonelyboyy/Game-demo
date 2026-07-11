@@ -13,9 +13,9 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "欠债商人"
 event_body = "商人被妖物追得狼狈，怀里却护着钱袋。"
-choice_texts = PackedStringArray("帮他解围：获得 60 灵石，失去 5 生命", "收下谢礼：回复 8 生命", "别惹麻烦")
-choice_effects = PackedStringArray("gain_gold:60|damage:5", "heal", "skip")
-choice_amounts = PackedInt32Array(0, 8, 0)
+choice_texts = PackedStringArray("帮他解围：获得 70 灵石，失去 8 生命", "收下谢礼：回复 14 生命", "别惹麻烦")
+choice_effects = PackedStringArray("gain_gold:70|damage:8", "heal", "skip")
+choice_amounts = PackedInt32Array(0, 14, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

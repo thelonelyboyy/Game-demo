@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1_stats")
 battle_tier = 0
+chapter_min = 3
+chapter_max = 3
 weight = 1.00
 gold_reward_min = 66
 gold_reward_max = 82

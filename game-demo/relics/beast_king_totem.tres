@@ -10,6 +10,7 @@ relic_name = "兽王图腾"
 id = "beast_king_totem"
 type = 4
 character_type = 4
+rarity = 1
 icon = ExtResource("2")
 tooltip = "驭兽师专属。每回合第一次打出驭兽牌时，获得 1 层兽群。"
 match_profession = 4

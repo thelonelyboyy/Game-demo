@@ -38,7 +38,7 @@ LEGACY_EFFECT_FIELDS = {
     "spirit_beast_stacks",
     "beast_pack_stacks",
 }
-ALLOWED_EFFECTLESS_CARD_IDS = {"toxin"}
+ALLOWED_EFFECTLESS_CARD_IDS = {"toxin", "heart_demon", "eclipse_scar", "underworld_writ"}
 EXPECTED_PROFESSION_TAGS = {
     "beastmaster": ("兽系", "兽群"),
     "body_cultivator": ("金身", "血炼"),

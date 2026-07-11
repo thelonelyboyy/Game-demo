@@ -177,19 +177,13 @@ func _dedupe_cards_by_id(source_cards: Array[Card]) -> Array[Card]:
 
 
 func _generate_shop_relics() -> void:
-	var available_relics: Array = []
-	var seen_ids := {}
-	for pool_relic in RELIC_REWARD_POOL.relics:
-		_append_available_relic(pool_relic, available_relics, seen_ids)
-
-	for configured_relic in shop_relics:
-		_append_available_relic(configured_relic, available_relics, seen_ids)
-
-	RNG.array_shuffle(available_relics)
-	var shop_relics_array: Array = []
-	var relic_count: int = mini(SHOP_RELIC_COUNT, available_relics.size())
-	for i: int in range(relic_count):
-		shop_relics_array.append(available_relics[i])
+	var shop_relics_array: Array[Relic] = RELIC_REWARD_POOL.get_random_available_choices(
+		char_stats,
+		relic_handler,
+		SHOP_RELIC_COUNT,
+		run_stats.current_chapter if run_stats else 1,
+		RelicRewardPool.RewardContext.SHOP
+	)
 
 	for relic in shop_relics_array:
 		var new_shop_relic := SHOP_RELIC.instantiate() as ShopRelic
@@ -263,7 +257,10 @@ func _update_item_costs() -> void:
 
 
 func _get_updated_shop_cost(original_cost: int) -> int:
-	return modifier_handler.get_modified_value(original_cost, Modifier.Type.SHOP_COST)
+	var modified_cost := modifier_handler.get_modified_value(original_cost, Modifier.Type.SHOP_COST)
+	if run_stats:
+		modified_cost = run_stats.apply_shop_cost_multiplier(modified_cost)
+	return modified_cost
 
 
 func _get_remove_card_cost() -> int:
@@ -377,10 +374,10 @@ func _apply_shop_visuals() -> void:
 	_add_section_labels()
 
 	shop_content.offset_left = -620.0
-	shop_content.offset_top = -250.0
+	shop_content.offset_top = -214.0
 	shop_content.offset_right = 620.0
-	shop_content.offset_bottom = 326.0
-	shop_content.add_theme_constant_override("separation", 14)
+	shop_content.offset_bottom = 346.0
+	shop_content.add_theme_constant_override("separation", 10)
 
 	cards.alignment = BoxContainer.ALIGNMENT_CENTER
 	cards.add_theme_constant_override("separation", 14)
@@ -425,7 +422,7 @@ func _add_market_panel() -> void:
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.set_anchors_preset(Control.PRESET_CENTER)
 	panel.offset_left = -660.0
-	panel.offset_top = -270.0
+	panel.offset_top = -238.0
 	panel.offset_right = 660.0
 	panel.offset_bottom = 354.0
 	InkTheme.apply_screen_panel(panel)
@@ -434,11 +431,9 @@ func _add_market_panel() -> void:
 
 
 func _add_section_labels() -> void:
-	if not shop_content.has_node("CardsTitle"):
-		var cards_title := _make_section_label("")
-		cards_title.name = "CardsTitle"
-		shop_content.add_child(cards_title)
-		shop_content.move_child(cards_title, cards.get_index())
+	var cards_title := shop_content.get_node_or_null("CardsTitle")
+	if cards_title:
+		cards_title.queue_free()
 
 	if not shop_content.has_node("RelicsTitle"):
 		var relics_title := _make_section_label("法宝")
@@ -455,8 +450,9 @@ func _make_section_label(text: String) -> Label:
 	label.add_theme_color_override("font_color", Color("f2c94f"))
 	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.78))
 	label.add_theme_constant_override("shadow_offset_x", 2)
-	label.add_theme_constant_override("shadow_offset_y", 3)
-	label.add_theme_font_size_override("font_size", 24)
+	label.add_theme_constant_override("shadow_offset_y", 2)
+	label.add_theme_font_size_override("font_size", 20)
+	label.custom_minimum_size = Vector2(0.0, 24.0)
 	return label
 
 

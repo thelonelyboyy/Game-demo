@@ -9,6 +9,7 @@ relic_name = "灵巢"
 id = "beast_life_nest"
 type = 4
 character_type = 4
+rarity = 1
 icon = ExtResource("2")
 tooltip = "驭兽师专属。每回合第一次打出驭兽牌时，回复 2 点生命。"
 match_profession = 4
