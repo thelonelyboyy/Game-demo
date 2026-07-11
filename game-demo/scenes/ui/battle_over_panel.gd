@@ -6,6 +6,7 @@ const MAIN_MENU = "res://scenes/ui/main_menu.tscn"
 enum Type {WIN, LOSE}
 
 @onready var label: Label = %Label
+@onready var summary_label: Label = %SummaryLabel
 @onready var continue_button: Button = %ContinueButton
 @onready var main_menu_button: Button = %MainMenuButton
 
@@ -18,7 +19,10 @@ func _ready() -> void:
 
 
 func show_screen(text: String, type: Type) -> void:
-	label.text = text
+	var parts := text.split("\n\n本轮记要\n", false, 1)
+	label.text = parts[0]
+	summary_label.text = parts[1] if parts.size() > 1 else ""
+	summary_label.visible = not summary_label.text.is_empty()
 	continue_button.visible = type == Type.WIN
 	main_menu_button.visible = type == Type.LOSE
 	show()
@@ -55,6 +59,11 @@ func _apply_visuals() -> void:
 		0
 	))
 	InkTheme.apply_screen_title(label, 48)
+	summary_label.add_theme_font_size_override("font_size", 22)
+	summary_label.add_theme_color_override("font_color", Color("d8c9a4"))
+	summary_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.82))
+	summary_label.add_theme_constant_override("shadow_offset_x", 2)
+	summary_label.add_theme_constant_override("shadow_offset_y", 2)
 	for button: Button in [continue_button, main_menu_button]:
 		button.custom_minimum_size = Vector2(220, 58)
 		InkTheme.apply_screen_button(button)

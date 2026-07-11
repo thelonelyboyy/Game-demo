@@ -109,12 +109,22 @@ func _on_enemy_turn_ended() -> void:
 
 
 func _on_player_died() -> void:
+	if not battle_active:
+		return
 	battle_active = false
-	Events.battle_over_screen_requested.emit("渡劫失败", BattleOverPanel.Type.LOSE)
 	var failed_run_relics: Array[Relic] = relics.get_all_relics() if relics else []
 	var starting_relic := char_stats.starting_relic if char_stats else null
 	DEFEAT_LEGACY.remember_failed_run(failed_run_relics, starting_relic)
 	SaveGame.delete_data()
+	_show_defeat_summary.call_deferred()
+
+
+func _show_defeat_summary() -> void:
+	var text := "渡劫失败"
+	var summary := RunHistory.load_data().last_run_summary
+	if not summary.is_empty():
+		text += "\n\n本轮记要\n%s" % summary
+	Events.battle_over_screen_requested.emit(text, BattleOverPanel.Type.LOSE)
 
 
 func _on_relics_activated(type: Relic.Type) -> void:

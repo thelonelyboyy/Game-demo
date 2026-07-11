@@ -56,6 +56,16 @@ const CHAPTER_CARD_RARITY_WEIGHTS := {
 @export var chapter_recovery_ratio := 1.0
 @export var starting_health_ratio := 1.0
 @export_range(1, 3) var current_chapter := 1
+@export var battles_won := 0
+@export var elites_defeated := 0
+@export var bosses_defeated := 0
+@export var enemies_defeated := 0
+@export var cards_played := 0
+@export var events_resolved := 0
+@export var shops_visited := 0
+@export var campfires_visited := 0
+@export var gold_spent := 0
+@export var potions_used := 0
 
 
 func set_gold(new_amount: int) -> void:

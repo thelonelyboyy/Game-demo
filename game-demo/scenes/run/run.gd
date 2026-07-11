@@ -48,6 +48,7 @@ var legacy_choice_layer: CanvasLayer
 var debug_console
 var current_chapter := 1
 var pending_chapter_advance := false
+var run_finalized := false
 
 
 func _ready() -> void:
@@ -459,6 +460,24 @@ func _setup_event_connections() -> void:
 		Events.card_acquired_animation_requested.connect(_on_card_acquired_animation)
 	if not Events.ui_notice_requested.is_connected(_on_ui_notice_requested):
 		Events.ui_notice_requested.connect(_on_ui_notice_requested)
+	if not Events.card_played.is_connected(_on_card_played_for_stats):
+		Events.card_played.connect(_on_card_played_for_stats)
+	if not Events.enemy_died.is_connected(_on_enemy_died_for_stats):
+		Events.enemy_died.connect(_on_enemy_died_for_stats)
+	if not Events.player_died.is_connected(_on_run_defeated):
+		Events.player_died.connect(_on_run_defeated)
+	if not Events.event_choice_resolved.is_connected(_on_event_resolved_for_stats):
+		Events.event_choice_resolved.connect(_on_event_resolved_for_stats)
+	if not Events.shop_card_bought.is_connected(_on_shop_purchase_for_stats):
+		Events.shop_card_bought.connect(_on_shop_purchase_for_stats)
+	if not Events.shop_relic_bought.is_connected(_on_shop_purchase_for_stats):
+		Events.shop_relic_bought.connect(_on_shop_purchase_for_stats)
+	if not Events.shop_potion_bought.is_connected(_on_shop_purchase_for_stats):
+		Events.shop_potion_bought.connect(_on_shop_purchase_for_stats)
+	if not Events.shop_card_removed.is_connected(_on_shop_purchase_for_stats):
+		Events.shop_card_removed.connect(_on_shop_purchase_for_stats)
+	if not potion_handler.potion_used.is_connected(_on_potion_used_for_stats):
+		potion_handler.potion_used.connect(_on_potion_used_for_stats)
 	
 	battle_button.pressed.connect(_change_view.bind(BATTLE_SCENE))
 	campfire_button.pressed.connect(_change_view.bind(CAMPFIRE_SCENE))
@@ -1092,9 +1111,71 @@ func _on_blessing_room_entered() -> void:
 	blessing.setup(character, stats, current_chapter)
 
 
+func _on_card_played_for_stats(_card: Card) -> void:
+	if stats:
+		stats.cards_played += 1
+
+
+func _on_enemy_died_for_stats(_enemy: Enemy) -> void:
+	if stats:
+		stats.enemies_defeated += 1
+
+
+func _on_event_resolved_for_stats(_effect: String, _amount: int, _character: CharacterStats, _run_stats: RunStats) -> void:
+	if stats:
+		stats.events_resolved += 1
+
+
+func _on_shop_purchase_for_stats(_item, gold_cost: int) -> void:
+	if stats:
+		stats.gold_spent += maxi(gold_cost, 0)
+
+
+func _on_potion_used_for_stats(_potion: Potion) -> void:
+	if stats:
+		stats.potions_used += 1
+
+
+func _record_battle_victory() -> void:
+	if not stats:
+		return
+	stats.battles_won += 1
+	if not map.last_room:
+		return
+	match map.last_room.type:
+		Room.Type.ELITE:
+			stats.elites_defeated += 1
+		Room.Type.BOSS:
+			stats.bosses_defeated += 1
+
+
+func _on_run_defeated() -> void:
+	_finalize_run(false)
+
+
+func _finalize_run(won: bool) -> String:
+	if run_finalized:
+		return RunHistory.load_data().last_run_summary
+	run_finalized = true
+	var history := RunHistory.load_data()
+	var summary := history.record_run(
+		stats,
+		won,
+		current_chapter,
+		character.deck.cards.size() if character and character.deck else 0,
+		relic_handler.get_all_relics().size() if relic_handler else 0
+	)
+	var error := history.save_data()
+	if error != OK:
+		push_warning("无法保存轮回战绩：%s" % error)
+	return summary
+
+
 func _on_battle_won() -> void:
+	_record_battle_victory()
 	if map.is_final_floor_reached():
 		if current_chapter >= TOTAL_CHAPTERS:
+			var run_summary := _finalize_run(true)
 			var win_screen := _change_view(WIN_SCREEN_SCENE) as WinScreen
 			var difficulty_profile := DifficultyProfile.load_data()
 			var unlocked_next := difficulty_profile.record_victory(stats.difficulty_level)
@@ -1104,7 +1185,8 @@ func _on_battle_won() -> void:
 			win_screen.set_completion(
 				character,
 				stats.difficulty_level,
-				difficulty_profile.unlocked_level if unlocked_next else -1
+				difficulty_profile.unlocked_level if unlocked_next else -1,
+				run_summary
 			)
 			SaveGame.delete_data()
 		else:

@@ -32,6 +32,7 @@ CHECKS = [
     {"name": "event-progression", "args": ["res://test_data/event_progression_smoke.tscn"], "quit": False, "required_marker": "EVENT_PROGRESSION_SMOKE_OK"},
     {"name": "fusion-suite", "args": ["res://test_data/fusion_suite_smoke.tscn"], "quit": False, "required_marker": "FUSION_SUITE_SMOKE_OK"},
     {"name": "potion-economy", "args": ["res://test_data/potion_economy_smoke.tscn"], "quit": False, "required_marker": "POTION_ECONOMY_SMOKE_OK"},
+    {"name": "run-history", "args": ["res://test_data/run_history_smoke.tscn"], "quit": False, "required_marker": "RUN_HISTORY_SMOKE_OK"},
 ]
 CHECK_TIMEOUT_SECONDS = 90
 

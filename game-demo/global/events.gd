@@ -61,6 +61,7 @@ signal shop_entered(shop: Shop)
 signal shop_relic_bought(relic: Relic, gold_cost: int)
 signal shop_card_bought(card: Card, gold_cost: int)
 signal shop_potion_bought(potion: Potion, gold_cost: int)
+signal shop_card_removed(card: Card, gold_cost: int)
 signal shop_exited
 
 # Campfire-related events

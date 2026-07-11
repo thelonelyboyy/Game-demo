@@ -279,7 +279,8 @@ func _on_remove_card_button_pressed() -> void:
 	_update_remove_card_service()
 
 
-func _on_card_removed(_card: Card) -> void:
+func _on_card_removed(card: Card) -> void:
+	Events.shop_card_removed.emit(card, active_remove_cost)
 	run_stats.gold -= active_remove_cost
 	run_stats.card_remove_cost += RunStats.CARD_REMOVE_COST_INCREMENT
 	active_remove_cost = 0

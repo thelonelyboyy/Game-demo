@@ -9,6 +9,7 @@ const MESSAGE := "%s\n渡劫功成！"
 
 @onready var background: TextureRect = $Background
 @onready var message: Label = %Message
+@onready var summary_label: Label = %SummaryLabel
 @onready var character_portrait: TextureRect = %CharacterPortrait
 @onready var main_menu_button: Button = $VboxContainer/MainMenuButton
 
@@ -24,12 +25,14 @@ func set_character(new_character: CharacterStats) -> void:
 	character_portrait.texture = character.portrait
 
 
-func set_completion(new_character: CharacterStats, difficulty_level: int, unlocked_level := -1) -> void:
+func set_completion(new_character: CharacterStats, difficulty_level: int, unlocked_level := -1, run_summary := "") -> void:
 	set_character(new_character)
 	if difficulty_level > 0:
 		message.text += "\n已克服心魔 %s" % difficulty_level
 	if unlocked_level > difficulty_level:
 		message.text += "\n新难度「心魔 %s」已解锁" % unlocked_level
+	summary_label.text = "本轮记要\n%s" % run_summary if not run_summary.is_empty() else ""
+	summary_label.visible = not run_summary.is_empty()
 
 
 func _on_main_menu_button_pressed() -> void:
@@ -44,6 +47,11 @@ func _apply_visuals() -> void:
 
 	_ensure_dimmer()
 	InkTheme.apply_screen_title(message, 44)
+	summary_label.add_theme_font_size_override("font_size", 21)
+	summary_label.add_theme_color_override("font_color", Color("d8c9a4"))
+	summary_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.82))
+	summary_label.add_theme_constant_override("shadow_offset_x", 2)
+	summary_label.add_theme_constant_override("shadow_offset_y", 2)
 	InkTheme.apply_screen_button(main_menu_button)
 	main_menu_button.custom_minimum_size = Vector2(240, 62)
 
