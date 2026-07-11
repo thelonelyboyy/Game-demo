@@ -67,6 +67,7 @@ static func get_floor_span(floor_slots: int) -> float:
 
 func generate_map() -> Array[Array]:
 	battle_stats_pool.setup(current_chapter)
+	event_room_pool.begin_chapter(current_chapter)
 
 	if map_mode == MapMode.TEST_LINEAR:
 		return _generate_test_linear_map()
@@ -113,7 +114,7 @@ func _generate_test_linear_map() -> Array[Array]:
 		elif room.type == Room.Type.BOSS:
 			room.battle_stats = TEST_FIXED_BOSS_BATTLE
 		elif room.type == Room.Type.EVENT:
-			room.event_scene = event_room_pool.get_random()
+			room.event_scene = event_room_pool.get_random(current_chapter)
 
 		if i < TEST_FLOORS - 1:
 			var next_room := map_data[i + 1][middle] as Room
@@ -148,7 +149,7 @@ func _generate_test_elite_linear_map() -> Array[Array]:
 		elif room.type == Room.Type.BOSS:
 			room.battle_stats = TEST_FIXED_BOSS_BATTLE
 		elif room.type == Room.Type.EVENT:
-			room.event_scene = event_room_pool.get_random()
+			room.event_scene = event_room_pool.get_random(current_chapter)
 
 		if i < TEST_ELITE_FLOORS - 1:
 			var next_room := map_data[i + 1][middle] as Room
@@ -358,7 +359,7 @@ func _apply_room_type(room_to_set: Room, type_candidate: Room.Type) -> void:
 	elif type_candidate == Room.Type.MONSTER:
 		room_to_set.battle_stats = _battle_for_room(0)
 	elif type_candidate == Room.Type.EVENT:
-		room_to_set.event_scene = event_room_pool.get_random()
+		room_to_set.event_scene = event_room_pool.get_random(current_chapter)
 
 
 func _prepend_blessing_room() -> void:

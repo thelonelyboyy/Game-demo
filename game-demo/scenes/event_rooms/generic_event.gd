@@ -1,6 +1,8 @@
 class_name GenericEvent
 extends EventRoom
 
+const HEART_DEMON := preload("res://common_cards/status/heart_demon.tres")
+
 @export var event_title := ""
 @export_multiline var event_body := ""
 @export var event_illustration: Texture2D
@@ -75,6 +77,10 @@ func _can_apply_single_effect(effect: String, amount: int) -> bool:
 			return character_stats and character_stats.deck and character_stats.deck.cards.size() > 1
 		"upgrade_random":
 			return _get_upgrade_candidates().size() > 0
+		"gain_random_card":
+			return not _get_draftable_candidates(false).is_empty()
+		"gain_rare_card":
+			return not _get_draftable_candidates(true).is_empty()
 		_:
 			return true
 
@@ -115,6 +121,15 @@ func _apply_single_effect(effect: String, amount: int) -> void:
 				if card:
 					character_stats.deck.remove_card(card)
 					Events.ui_notice_requested.emit("移除：「%s」" % card.get_display_name())
+		"gain_random_card":
+			_add_random_draftable_cards(maxi(amount, 1), false)
+		"gain_rare_card":
+			_add_random_draftable_cards(maxi(amount, 1), true)
+		"gain_curse":
+			if character_stats and character_stats.deck:
+				var curse := HEART_DEMON.duplicate(true) as Card
+				character_stats.deck.add_card(curse)
+				Events.ui_notice_requested.emit("获得诅咒：「%s」" % curse.get_display_name())
 		_:
 			pass
 
@@ -145,6 +160,36 @@ func _get_upgrade_candidates() -> Array[Card]:
 		if card and card.can_upgrade():
 			candidates.append(card)
 	return candidates
+
+
+func _get_draftable_candidates(rare_only: bool) -> Array[Card]:
+	var candidates: Array[Card] = []
+	if not character_stats or not character_stats.draftable_cards:
+		return candidates
+	for card: Card in character_stats.draftable_cards.cards:
+		if not card or card.rarity == Card.Rarity.MYTHIC:
+			continue
+		if rare_only and card.rarity != Card.Rarity.RARE:
+			continue
+		candidates.append(card)
+	return candidates
+
+
+func _add_random_draftable_cards(count: int, rare_only: bool) -> void:
+	if not character_stats or not character_stats.deck:
+		return
+	var candidates := _get_draftable_candidates(rare_only)
+	var picked_names: Array[String] = []
+	for _i in count:
+		if candidates.is_empty():
+			break
+		var picked := RNG.array_pick_random(candidates) as Card
+		if picked:
+			var card_copy := picked.duplicate(true) as Card
+			character_stats.deck.add_card(card_copy)
+			picked_names.append(card_copy.get_display_name())
+	if not picked_names.is_empty():
+		Events.ui_notice_requested.emit("获得卡牌：%s" % "、".join(picked_names))
 
 
 func _apply_event_style() -> void:

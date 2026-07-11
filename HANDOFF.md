@@ -13,7 +13,7 @@ Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godo
 - **当前开发策略**：暂时不继续精抠单个 UI，优先把魔修职业做成可完整通关、可调试、可扩展的 Demo 闭环。
 - **Demo 职业范围已收束**：选人界面当前只开放魔修，体修/剑修/驭兽都暂时 disabled；代码和资源仍保留，后续可再恢复。
 - **UI 风格统一已推进一轮**：`InkTheme` 扩展了暗黑修仙通用面板/按钮/标题样式，并已套到战斗奖励、商店、宝箱、祝福、篝火、删牌、升牌、融合、牌堆、胜负面板、暂停菜单、调试控制台、灵根选择等界面。后续新增页面应优先复用 `scenes/ui/ink_theme.gd`，不要各自重新写一套 StyleBox。
-- **事件池临时切换**：旧事件暂时禁用，当前 `event_room_pool.tres` 只开放最近新增的 10 个事件，便于集中验证新事件质量。
+- **事件池已完成分章恢复**：45 个事件按三章各 15 个独立配置；每章地图使用洗牌袋抽取，袋内耗尽前不会重复。
 - **地图已切回正式 ROGUELIKE 模式**（2026-07-06）：`map.tscn` `map_mode = 1`，测试线性地图与自由导航已关闭；地图同轮加了走过路径染金、可选节点/连线呼吸、开图错落浮现、章节层数进度牌、平滑滚动与位置标记。
 - **调试控制台已加入**：Run 场景内按 **Ctrl + 反引号** 打开，不再使用 F8（Godot 编辑器里 F8 会直接停止运行）。可增删/升级/融合卡牌，调血量、金币、法宝、丹药，以及编辑下次造成/受到伤害，便于 Demo 调试。
 - **灵根机制已重做**：保留开局三选一与“打击/防御转元素”，新增同元素灵根职业卡、三段成长和圆满专属被动；旧圆满规则已禁用。详见第 4、6 节。
@@ -31,7 +31,7 @@ Godot Console 可执行文件：`F:\download\Godot_v4.5.2-stable_mono_win64\Godo
 - **战斗手感优化专场已完成（2026-07-06，约 25 项）**：手牌 hover/拖拽/补位、飘字/命中特效/命中停顿、回合横幅/Boss 名牌/煞气阈值演出、抽弃牌飞行、洗牌提示、死亡溶解、金币滚动、地图标记、功法牌演出等全部落地；同轮已补 CC0 音效与战斗/主菜单 BGM。详见第 6 节「战斗手感优化专场」与第 7 节文件地图。
 - **2026-07-07 Godot MCP 修复**：修复 `HitEffect` 被挂进 `EnemyHandler` 后，下一回合 typed 遍历把 `hit_effect.gd` 当 `enemy.gd` 导致崩溃的问题；特效改挂战斗世界层，`EnemyHandler` 遍历统一过滤 `Enemy`。
 - `validate_project.py` 现在 **0 error / 0 warning**（2026-07-07 复跑；校验脚本已修掉「默认值字段被当成缺失」的误报，不再有历史的 198 个假错）。
-- `run_godot_checks.py`：2026-07-11 最近一次全量运行 14 项检查全部通过，覆盖主流程、卡牌机制、三章内容、9 Boss、精英战术、心魔难度、魔修牌组/法宝和法宝经济。
+- `run_godot_checks.py`：2026-07-11 最近一次全量运行 15 项检查全部通过，覆盖主流程、卡牌机制、三章内容、9 Boss、精英战术、心魔难度、魔修牌组/法宝、法宝经济和分章事件。
 - **统一 Excel 数值总表**：`game_data.xlsx`（卡牌/祝福/怪物AI 三张数据表 + 说明）——改表回写 `.tres`/`.json`/`.tscn`，一个文件调全部数值平衡（见第 6、7 节）。旧的独立 `cards.xlsx` 已被它取代。
 - 开发路线图见根目录 `ROADMAP.md`。
 
@@ -325,7 +325,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - **灵根圆满被动落地**：火/金/水/土/木各自拥有每回合最多一次的圆满效果；回合开始重置触发状态；水的费用减免只持续本回合；木在回合结束按是否打出木牌结算；火的选择资源见 `custom_resources/spirit_root_fire_choice.gd`。
 - **失败遗产法宝替换**：新增 `custom_resources/defeat_legacy.gd`；失败后记录本局获得的法宝，下一局进入地图时可选一个替换角色本命法宝，也可保留原本命法宝。
 - **法宝 hover tooltip**：遗物/法宝说明改为鼠标悬停的小窗口，避免点击后进入全屏效果说明；相关文件在 `scenes/relic_handler/relic_tooltip.*`、`relic_ui.gd`、`relic_handler.gd`、`run.gd`。
-- **新增 10 个事件并临时只开放新事件池**：事件场景位于 `scenes/event_rooms/`，插图位于 `art/event_illustrations/`；`event_room_pool.tres` 当前只包含最近新增的 10 个事件，旧事件暂时不出现在地图事件房。
+- **新增 10 个重点事件**：事件场景位于 `scenes/event_rooms/`，插图位于 `art/event_illustrations/`；这些事件现已与旧事件一起纳入分章事件池。
 - **调试控制台**：新增 `scenes/debug/debug_console.gd` 与 `custom_resources/debug_console_state.gd`，Run 场景按 Ctrl + 反引号打开。支持增删/升级/融合卡牌，改血量/金币/法宝/丹药，以及设置下次造成/受到伤害；伤害测试钩子已接到 `card_effect.gd`、`configured_flame_effect.gd`、`configured_soul_mark_detonate_effect.gd`、`player.gd`。
 - **全局 UI 风格统一一轮**：扩展 `scenes/ui/ink_theme.gd`，新增暗黑修仙通用标题、面板、按钮、图标底板等工具函数，并套到奖励、商店、宝箱、祝福、篝火、删牌、升牌、融合、牌堆、胜负面板、暂停菜单、调试控制台、灵根选择等界面。
 - **编码配置补强**：新增 `.editorconfig` 与 `.gitattributes`，目标是统一 UTF-8 和文本文件规范，减少 Windows 终端/编辑器里中文乱码与换行差异。
@@ -557,7 +557,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 ### 事件 / 法宝说明
 
-- `game-demo/scenes/event_rooms/event_room_pool.tres`（当前仅开放 10 个新事件）
+- `game-demo/scenes/event_rooms/event_room_pool.tres`（45 个事件，三章各 15 个）
 - `game-demo/scenes/event_rooms/*_event.tscn`（事件场景）
 - `game-demo/art/event_illustrations/`（事件插图）
 - `game-demo/scenes/relic_handler/relic_tooltip.tscn` / `.gd`（法宝 hover 小 tooltip）
@@ -577,7 +577,7 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 
 - **Godot MCP 工具注入时机**：MCP 修复后，当前已经开始的 Codex turn 不会热插入 `mcp__godot__...` 命名空间；需要新开一轮、重载线程或重启 Codex 让工具列表重新生成。验证命令可用 MCP stdio client 列工具，预期包含 `open_scene`、`get_project_info`、`list_nodes`、`execute_editor_script` 等 16 个工具；Godot 侧 `get_project_info` 应返回项目名「万劫求仙」和当前场景路径。
 - **UI 统一仍需人工视觉 QA**：这轮先用现有资产和 `InkTheme` 统一了大部分页面风格，没有继续精抠每个界面的像素级布局。后续若要达到目标图级品质，应逐页进 Godot 检查按钮状态、文本遮挡、面板透明度和不同分辨率下的间距。
-- **旧事件当前被临时禁用**：`event_room_pool.tres` 只开放 10 个新事件是为了集中验证。等新事件稳定后，记得决定是恢复旧事件、分章节混池，还是按权重轮换。
+- **事件池现状**：旧事件已恢复并完成三章分类；新增事件时应同步加入 `event_rooms` 总表和且仅一个章节数组，保持章节池互斥。
 - **调试控制台快捷键**：使用 Ctrl + 反引号，不要再绑定 F8。F8 在 Godot 编辑器运行时会停止项目，看起来像“按控制台键直接退出”。
 - **战斗 UI 手感已完成一轮（2026-07-06）**：手牌 hover/drag、瞄准吸附反馈、命中反馈、hit pause、伤害数字、回合/Boss/煞气演出、音效/BGM 等已落地（第 6 节专场小节）。动效节奏为静态验证 + smoke 通过，**整体叠加后的节奏与混音还需人工进战斗跑几场做主观校验**，参数入口见第 6 节「调参入口」。
 - **单体攻击符箓/丹药目标选择仍偏简单**：无卡牌来源的攻击效果已能生效，但如果没有显式目标，当前主要走第一个存活敌人的兜底逻辑。若要做成品手感，建议后续给攻击丹药/符箓增加一次性目标选择状态。
@@ -672,3 +672,12 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - 商店法宝基础价按档位分层：普通 150–190、少见 210–260、稀有 300–380、首领 450–520；随后继续叠加折券和心魔商店倍率。
 - `RunStats.current_chapter` 统一保存当前章节，使商店和奖励曲线与继续游戏保持一致。
 - 新增 `relic-economy` smoke，覆盖四档池完整性、来源隔离、无重复多选、章节保存和价格阶梯；全量检查现为 14 项。
+
+## 16. 三章事件生态（2026-07-11）
+
+- 事件总量从临时启用的 10 个恢复并扩充到 45 个，按第一、二、三章各 15 个互不重叠的池配置。
+- `EventRoomPool` 改为按章节使用洗牌袋；地图生成同章事件时，15 个事件耗尽前不会重复，避免多条路线出现相同机缘。
+- 第一章偏资源恢复与低风险交易，第二章偏代价选择与牌组整理，第三章集中魔修、心魔、魂魄与天劫主题。
+- 第三章新增血经石壁、幽都魂拍、天焰魔眼：可用生命或灵石换金卡、删牌、双突破、最大生命，也可能把心魔加入牌组。
+- `GenericEvent` 新增随机职业牌、随机金卡和心魔诅咒效果，可供后续事件数据化复用。
+- 新增 `event-progression` smoke，验证 45 个场景全部可实例化、三章各 15 个且互斥、洗牌袋无重复，以及新卡牌/诅咒奖励实际进入牌组；全量检查现为 15 项。
