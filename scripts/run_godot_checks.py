@@ -30,6 +30,7 @@ CHECKS = [
     {"name": "demonic-relic", "args": ["res://test_data/demonic_relic_smoke.tscn"], "quit": False, "required_marker": "DEMONIC_RELIC_SMOKE_OK"},
     {"name": "relic-economy", "args": ["res://test_data/relic_economy_smoke.tscn"], "quit": False, "required_marker": "RELIC_ECONOMY_SMOKE_OK"},
     {"name": "event-progression", "args": ["res://test_data/event_progression_smoke.tscn"], "quit": False, "required_marker": "EVENT_PROGRESSION_SMOKE_OK"},
+    {"name": "fusion-suite", "args": ["res://test_data/fusion_suite_smoke.tscn"], "quit": False, "required_marker": "FUSION_SUITE_SMOKE_OK"},
 ]
 CHECK_TIMEOUT_SECONDS = 90
 

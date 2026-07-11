@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CardFusionRecipe" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/card_fusion_recipe.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+first_card_id = "demon_blood_rite_slash"
+second_card_id = "demon_desperate_burst"
+result_name = "绝命血斩"
+result_cost = 2

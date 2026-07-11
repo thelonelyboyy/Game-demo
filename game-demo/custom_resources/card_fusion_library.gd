@@ -16,11 +16,11 @@ func get_fusion_preview(card_a: Card, card_b: Card) -> Card:
 		return _create_same_card_result(card_a, card_b)
 
 	var recipe := get_recipe(card_a, card_b)
-	if not recipe or not recipe.result_card:
+	if not recipe:
 		return null
 
-	var result := recipe.result_card.duplicate(true) as Card
-	if result:
+	var result := recipe.create_result(card_a, card_b)
+	if result and recipe.result_card:
 		result.element = card_a.element
 	return result
 
