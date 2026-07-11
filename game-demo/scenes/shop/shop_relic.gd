@@ -18,6 +18,7 @@ const RELIC_PRICE_RANGES := {
 }
 
 var gold_cost := 0
+var base_gold_cost := 0
 
 
 func _ready() -> void:
@@ -56,7 +57,8 @@ func set_relic(new_relic: Relic) -> void:
 
 	relic = new_relic
 	var price_range := get_price_range(relic.rarity)
-	gold_cost = RNG.instance.randi_range(price_range.x, price_range.y)
+	base_gold_cost = RNG.instance.randi_range(price_range.x, price_range.y)
+	gold_cost = base_gold_cost
 
 	for relic_ui: RelicUI in relic_container.get_children():
 		relic_ui.queue_free()

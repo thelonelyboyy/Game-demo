@@ -258,8 +258,10 @@ func _check_shop_entry(run: Run, _room: Room) -> void:
 	_check(shop != null, "shop view opens")
 	_check(shop != null and shop.cards.get_child_count() > 0, "shop generates cards")
 	_check(shop != null and shop.relics.get_child_count() > 0, "shop generates relics")
+	_check(shop != null and shop.potions.get_child_count() > 0, "shop generates consumables")
 	if not shop:
 		return
+	_check_shop_pricing(shop, run.stats)
 
 	run.stats.gold = 10000
 	shop._update_items()
@@ -289,6 +291,50 @@ func _check_shop_entry(run: Run, _room: Room) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_check_returned_to_map(run, "shop")
+
+
+func _check_shop_pricing(shop: Shop, stats: RunStats) -> void:
+	var sale_cards: Array[ShopCard] = []
+	for shop_card: ShopCard in shop.cards.get_children():
+		_check(shop_card.base_gold_cost > 0, "shop cards preserve a positive base price")
+		if shop_card.is_on_sale:
+			sale_cards.append(shop_card)
+	_check(sale_cards.size() == 1, "each shop offers exactly one half-price card")
+	if not sale_cards.is_empty():
+		_check(sale_cards[0].gold_cost == shop._get_item_cost(sale_cards[0].base_gold_cost, 0.5), "sale card uses half of its final price")
+
+	for shop_relic: ShopRelic in shop.relics.get_children():
+		_check(shop_relic.base_gold_cost > 0, "shop relics preserve a positive base price")
+	for shop_potion: ShopPotion in shop.potions.get_children():
+		_check(shop_potion.base_gold_cost > 0, "shop consumables preserve a positive base price")
+
+	stats.shop_cost_multiplier = 1.25
+	shop._update_item_costs()
+	var before_coupon := _snapshot_shop_costs(shop)
+	var modifier := shop.modifier_handler.get_modifier(Modifier.Type.SHOP_COST)
+	var coupon := ModifierValue.create_new_modifier("smoke_coupon", ModifierValue.Type.PERCENT_BASED)
+	coupon.percent_value = -0.5
+	modifier.add_new_value(coupon)
+	shop._update_item_costs()
+	var first_refresh := _snapshot_shop_costs(shop)
+	for index in first_refresh.size():
+		_check(first_refresh[index] < before_coupon[index], "coupon lowers every current shop item")
+	if not sale_cards.is_empty():
+		_check(sale_cards[0].gold_cost == shop._get_item_cost(sale_cards[0].base_gold_cost, 0.5), "sale and coupon stack from the original card price")
+	shop._update_item_costs()
+	_check(first_refresh == _snapshot_shop_costs(shop), "shop price refresh always recomputes from base prices")
+	stats.shop_cost_multiplier = 1.0
+
+
+func _snapshot_shop_costs(shop: Shop) -> Array[int]:
+	var costs: Array[int] = []
+	for shop_card: ShopCard in shop.cards.get_children():
+		costs.append(shop_card.gold_cost)
+	for shop_relic: ShopRelic in shop.relics.get_children():
+		costs.append(shop_relic.gold_cost)
+	for shop_potion: ShopPotion in shop.potions.get_children():
+		costs.append(shop_potion.gold_cost)
+	return costs
 
 
 func _check_treasure_entry(run: Run, _room: Room) -> void:

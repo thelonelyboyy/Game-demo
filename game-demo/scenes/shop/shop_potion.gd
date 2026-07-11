@@ -16,6 +16,7 @@ const PRICE_BY_RARITY := {
 @onready var buy_button: Button = %BuyButton
 
 var gold_cost := 0
+var base_gold_cost := 0
 
 
 func _ready() -> void:
@@ -55,7 +56,8 @@ func set_potion(new_potion: Potion) -> void:
 	icon.texture = potion.icon
 	var label := "符箓" if potion.category == Potion.Category.TALISMAN else "丹药"
 	icon.tooltip_text = "%s（%s）\n%s" % [potion.potion_name, label, potion.get_tooltip()]
-	gold_cost = PRICE_BY_RARITY.get(potion.rarity, 80)
+	base_gold_cost = PRICE_BY_RARITY.get(potion.rarity, 80)
+	gold_cost = base_gold_cost
 
 
 func _on_buy_button_pressed() -> void:

@@ -19,6 +19,9 @@ const PRICE_BY_RARITY := {
 }
 
 var gold_cost := 0
+var base_gold_cost := 0
+var sale_multiplier := 1.0
+var is_on_sale := false
 var current_card_ui: CardMenuUI
 
 
@@ -62,7 +65,8 @@ func set_card(new_card: Card) -> void:
 		await ready
 
 	card = new_card
-	gold_cost = _roll_card_price(card.rarity)
+	base_gold_cost = _roll_card_price(card.rarity)
+	gold_cost = base_gold_cost
 
 	for card_menu_ui: CardMenuUI in card_container.get_children():
 		card_menu_ui.queue_free()
@@ -71,6 +75,14 @@ func set_card(new_card: Card) -> void:
 	card_container.add_child(new_card_menu_ui)
 	new_card_menu_ui.card = card
 	current_card_ui = new_card_menu_ui
+
+
+func set_on_sale(value: bool) -> void:
+	is_on_sale = value
+	sale_multiplier = 0.5 if value else 1.0
+	tooltip_text = "本店特惠：最终价格减半。" if value else ""
+	if buy_button:
+		buy_button.text = "半价购买" if value else "购买"
 
 
 func _on_buy_button_pressed() -> void:

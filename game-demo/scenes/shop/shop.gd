@@ -92,14 +92,17 @@ func _blink_timer_setup() -> void:
 func _generate_shop_cards() -> void:
 	var available_cards := _get_available_shop_cards()
 	var shop_card_array := _pick_shop_cards(available_cards)
+	var sale_index := RNG.instance.randi_range(0, shop_card_array.size() - 1) if not shop_card_array.is_empty() else -1
 
-	for card: Card in shop_card_array:
+	for index in shop_card_array.size():
+		var card: Card = shop_card_array[index]
 		card.bind_spirit_root_owner(char_stats)
 		var new_shop_card := SHOP_CARD.instantiate() as ShopCard
 		cards.add_child(new_shop_card)
 		new_shop_card.card = card
+		new_shop_card.set_on_sale(index == sale_index)
 		new_shop_card.current_card_ui.tooltip_requested.connect(card_tooltip_popup.show_tooltip)
-		new_shop_card.gold_cost = _get_updated_shop_cost(new_shop_card.gold_cost)
+		new_shop_card.gold_cost = _get_item_cost(new_shop_card.base_gold_cost, new_shop_card.sale_multiplier)
 		new_shop_card.update(run_stats)
 
 
@@ -162,7 +165,7 @@ func _generate_shop_relics() -> void:
 		var new_shop_relic := SHOP_RELIC.instantiate() as ShopRelic
 		relics.add_child(new_shop_relic)
 		new_shop_relic.relic = relic
-		new_shop_relic.gold_cost = _get_updated_shop_cost(new_shop_relic.gold_cost)
+		new_shop_relic.gold_cost = _get_item_cost(new_shop_relic.base_gold_cost)
 		new_shop_relic.update(run_stats)
 
 
@@ -196,7 +199,7 @@ func _generate_shop_potions() -> void:
 		var new_shop_potion := SHOP_POTION.instantiate() as ShopPotion
 		potions.add_child(new_shop_potion)
 		new_shop_potion.potion = potion
-		new_shop_potion.gold_cost = _get_updated_shop_cost(new_shop_potion.gold_cost)
+		new_shop_potion.gold_cost = _get_item_cost(new_shop_potion.base_gold_cost)
 		new_shop_potion.update(run_stats)
 
 
@@ -224,12 +227,16 @@ func _update_items() -> void:
 
 func _update_item_costs() -> void:
 	for shop_card: ShopCard in cards.get_children():
-		shop_card.gold_cost = _get_updated_shop_cost(shop_card.gold_cost)
+		shop_card.gold_cost = _get_item_cost(shop_card.base_gold_cost, shop_card.sale_multiplier)
 		shop_card.update(run_stats)
 
 	for shop_relic: ShopRelic in relics.get_children():
-		shop_relic.gold_cost = _get_updated_shop_cost(shop_relic.gold_cost)
+		shop_relic.gold_cost = _get_item_cost(shop_relic.base_gold_cost)
 		shop_relic.update(run_stats)
+
+	for shop_potion: ShopPotion in potions.get_children():
+		shop_potion.gold_cost = _get_item_cost(shop_potion.base_gold_cost)
+		shop_potion.update(run_stats)
 
 	_update_remove_card_service()
 
@@ -239,6 +246,10 @@ func _get_updated_shop_cost(original_cost: int) -> int:
 	if run_stats:
 		modified_cost = run_stats.apply_shop_cost_multiplier(modified_cost)
 	return modified_cost
+
+
+func _get_item_cost(base_cost: int, sale_multiplier := 1.0) -> int:
+	return maxi(1, ceili(_get_updated_shop_cost(base_cost) * sale_multiplier))
 
 
 func _get_remove_card_cost() -> int:
