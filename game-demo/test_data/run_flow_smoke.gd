@@ -35,6 +35,7 @@ func _run_smoke() -> void:
 	_check(run.character != null, "new run has character")
 	_check(run.stats != null, "new run has run stats")
 	_check(run.map != null and not run.map.map_data.is_empty(), "new run generates map")
+	await _check_map_potion_discard_persists(run)
 	_check(SaveGame.load_data() != null, "new run save can be loaded")
 
 	var rooms := _collect_rooms_by_type(run.map.map_data)
@@ -75,6 +76,25 @@ func _run_smoke() -> void:
 	_finish()
 
 
+func _check_map_potion_discard_persists(run: Run) -> void:
+	var before := run.potion_handler.get_potions()
+	_check(not before.is_empty(), "new run starts with a consumable for persistence check")
+	if before.is_empty():
+		return
+	var occupied_ui: PotionUI = null
+	for ui: PotionUI in run.potion_handler.get_children():
+		if ui.potion:
+			occupied_ui = ui
+			break
+	if not occupied_ui:
+		_check(false, "starter consumable has an occupied slot")
+		return
+	run.potion_handler._on_discard_requested(occupied_ui)
+	await get_tree().process_frame
+	var reloaded := SaveGame.load_data()
+	_check(reloaded != null and reloaded.potions.size() == before.size() - 1, "discarding on the map is persisted immediately")
+
+
 func _collect_rooms_by_type(map_data: Array[Array]) -> Dictionary:
 	var rooms := {}
 	for row: Array in map_data:
@@ -111,7 +131,12 @@ func _check_battle_entry(run: Run, room: Room) -> void:
 	if not battle:
 		return
 
-	await get_tree().create_timer(1.6).timeout
+	var hand_wait_started := Time.get_ticks_msec()
+	while (
+		battle.battle_ui.end_turn_button.disabled
+		and Time.get_ticks_msec() - hand_wait_started < 3500
+	):
+		await get_tree().process_frame
 	_check(battle.battle_ui.hand.get_child_count() > 0, "battle draws a starting hand")
 	_check(battle.battle_ui.end_turn_button.disabled == false, "end turn enables after hand draw")
 	_check(_enemies_have_intents(battle), "enemies show intents")

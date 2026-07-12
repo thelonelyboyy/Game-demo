@@ -479,6 +479,10 @@ func _setup_event_connections() -> void:
 		Events.shop_card_removed.connect(_on_shop_purchase_for_stats)
 	if not potion_handler.potion_used.is_connected(_on_potion_used_for_stats):
 		potion_handler.potion_used.connect(_on_potion_used_for_stats)
+	if not potion_handler.potion_used.is_connected(_on_potion_inventory_changed):
+		potion_handler.potion_used.connect(_on_potion_inventory_changed)
+	if not potion_handler.potion_discarded.is_connected(_on_potion_inventory_changed):
+		potion_handler.potion_discarded.connect(_on_potion_inventory_changed)
 	
 	battle_button.pressed.connect(_change_view.bind(BATTLE_SCENE))
 	campfire_button.pressed.connect(_change_view.bind(CAMPFIRE_SCENE))
@@ -1134,6 +1138,11 @@ func _on_shop_purchase_for_stats(_item, gold_cost: int) -> void:
 func _on_potion_used_for_stats(_potion: Potion) -> void:
 	if stats:
 		stats.potions_used += 1
+
+
+func _on_potion_inventory_changed(_potion: Potion) -> void:
+	if save_data and map and map.visible:
+		_save_run(true)
 
 
 func _record_battle_victory() -> void:
