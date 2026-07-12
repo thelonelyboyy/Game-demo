@@ -7,6 +7,11 @@ const BATTLE_PATH := "res://battles/demo_n_paper_wolf.tres"
 const BLOOD_DEBT_PATH := "res://characters/demonic_cultivator/cards/demon_blood_debt.tres"
 const SHA_BLADE_PATH := "res://characters/demonic_cultivator/cards/demon_sha_blade.tres"
 const MYRIAD_MARKS_PATH := "res://characters/demonic_cultivator/cards/demon_myriad_marks_return.tres"
+const SHADOW_STEP_PATH := "res://characters/demonic_cultivator/cards/shadow_step.tres"
+const SOUL_LAMP_RENEWAL_PATH := "res://characters/demonic_cultivator/cards/demon_soul_lamp_renewal.tres"
+const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
+const DEFEND_PATH := "res://characters/demonic_cultivator/cards/demon_defend.tres"
+const BLOOD_WARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_ward.tres"
 const SHA_QI_PATH := "res://statuses/sha_qi.tres"
 const SOUL_MARK_PATH := "res://statuses/soul_mark.tres"
 
@@ -54,6 +59,8 @@ func _run_smoke() -> void:
 		await _check_sha_blade(battle, enemies[0])
 		current_step = "myriad_marks"
 		await _check_myriad_marks(battle, enemies)
+		current_step = "pile_tutors"
+		await _check_pile_tutors(battle, enemies[0])
 
 	current_step = "cleanup"
 	get_tree().paused = false
@@ -99,6 +106,36 @@ func _check_myriad_marks(battle: Battle, enemies: Array[Enemy]) -> void:
 	for i in enemies.size():
 		_check(enemies[i].status_handler.get_status_stacks("soul_mark") == 0, "myriad marks consumes all marks on enemy %s" % i)
 		_check(before[i] - enemies[i].stats.health >= 6, "myriad marks damages enemy %s from consumed marks" % i)
+
+
+func _check_pile_tutors(battle: Battle, enemy: Enemy) -> void:
+	var character := battle.player_handler.character
+	character.draw_pile.clear()
+	character.draw_pile.add_card((load(STRIKE_PATH) as Card).duplicate(true) as Card)
+	character.draw_pile.add_card((load(DEFEND_PATH) as Card).duplicate(true) as Card)
+	character.draw_pile.add_card((load(BLOOD_WARD_PATH) as Card).duplicate(true) as Card)
+	var hand_before := battle.battle_ui.hand.get_child_count()
+	var shadow_step := (load(SHADOW_STEP_PATH) as Card).duplicate(true) as CultivationCard
+	shadow_step.apply_effects([battle.player], battle.player.modifier_handler)
+	await get_tree().process_frame
+	_check(battle.battle_ui.hand.get_child_count() == hand_before + 2, "shadow step tutors two skills into hand")
+	_check(character.draw_pile.cards.size() == 1 and character.draw_pile.cards[0].type == Card.Type.ATTACK, "shadow step leaves nonmatching attacks in draw pile")
+
+	character.discard.clear()
+	character.discard.add_card((load(DEFEND_PATH) as Card).duplicate(true) as Card)
+	character.discard.add_card((load(STRIKE_PATH) as Card).duplicate(true) as Card)
+	var recent_skill := (load(BLOOD_WARD_PATH) as Card).duplicate(true) as Card
+	character.discard.add_card(recent_skill)
+	var mark := (load(SOUL_MARK_PATH) as Status).duplicate() as Status
+	mark.stacks = 2
+	enemy.status_handler.add_status(mark)
+	hand_before = battle.battle_ui.hand.get_child_count()
+	var renewal := (load(SOUL_LAMP_RENEWAL_PATH) as Card).duplicate(true) as CultivationCard
+	renewal.apply_effects([enemy], battle.player.modifier_handler)
+	await get_tree().process_frame
+	_check(battle.battle_ui.hand.get_child_count() == hand_before + 1, "soul lamp renewal returns one skill to hand")
+	_check(not character.discard.cards.has(recent_skill), "soul lamp renewal takes the most recent matching discard")
+	_check(character.discard.cards.size() == 2, "soul lamp renewal leaves older and nonmatching discards")
 
 
 func _get_live_enemies(battle: Battle) -> Array[Enemy]:

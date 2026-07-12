@@ -2,22 +2,24 @@
 
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://dc5hqpdarhl0q" path="res://art/cards/demonic_cultivator/ai/shadow_step.png" id="2"]
-[ext_resource type="Script" uid="uid://37ewyomluh2u" path="res://custom_resources/effects/configured_draw_effect.gd" id="auto_effect_draw"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_pile_tutor_effect.gd" id="auto_effect_tutor"]
 
-[sub_resource type="Resource" id="AutoEffect_1_draw"]
-script = ExtResource("auto_effect_draw")
+[sub_resource type="Resource" id="AutoEffect_1_tutor"]
+script = ExtResource("auto_effect_tutor")
 amount = 2
+card_filter = 2
 
 [resource]
 script = ExtResource("1")
-configured_effects = Array[Resource]([SubResource("AutoEffect_1_draw")])
-effect_text = "抽 {draw} 张牌。"
+configured_effects = Array[Resource]([SubResource("AutoEffect_1_tutor")])
+effect_text = "从抽牌堆检索 2 张技能牌加入手牌。"
 id = "shadow_step"
 type = 1
 rarity = 1
+cost = 1
 exhausts = true
 upgrade_type = 1
 element = 4
-mechanic_tags = null
+mechanic_tags = PackedStringArray("检索", "消耗")
 display_name = "影遁"
 icon = ExtResource("2")

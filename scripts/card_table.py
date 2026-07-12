@@ -32,6 +32,7 @@ EFFECT_LABEL = {
     "configured_status_effect": "状态",
     "configured_mana_effect": "灵气",
     "configured_exhaust_random_effect": "消耗",
+    "configured_pile_tutor_effect": "牌堆检索",
     "configured_self_damage_scaling_damage_effect": "血债清算",
     "configured_consume_status_to_damage_effect": "耗煞伤害",
     "low_health_bonus_damage_effect": "半血爆伤",

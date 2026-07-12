@@ -308,6 +308,38 @@ func add_discovered_cards_to_hand(cards: Array[Card], origin_global := Vector2.Z
 		hand.enable_hand()
 
 
+func move_matching_cards_to_hand(from_discard: bool, card_type_filter: int, amount: int) -> Array[Card]:
+	var moved: Array[Card] = []
+	if not _can_use_card_piles() or not hand or amount <= 0:
+		return moved
+	var pile := character.discard if from_discard else character.draw_pile
+	if not pile:
+		return moved
+	var candidates: Array[Card] = []
+	for card: Card in pile.cards:
+		if card and (card_type_filter < 0 or card.type == card_type_filter):
+			candidates.append(card)
+	if from_discard:
+		candidates.reverse()
+	for card: Card in candidates:
+		if moved.size() >= amount or hand.is_full():
+			break
+		if not pile.remove_card(card):
+			continue
+		if hand.add_card(card):
+			moved.append(card)
+			Events.card_drawn.emit(card)
+		else:
+			if from_discard:
+				pile.add_card(card)
+			else:
+				pile.add_card_to_top(card)
+			break
+	if player_actions_enabled and not moved.is_empty():
+		hand.enable_hand()
+	return moved
+
+
 func _notify_hand_full() -> void:
 	if _hand_full_notice_emitted_this_turn:
 		return
