@@ -22,4 +22,4 @@ func execute(card: CultivationCard, targets: Array[Node], _modifiers: ModifierHa
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
 	if not description_template.is_empty():
 		return super.get_description(card, player_modifiers, enemy_modifiers)
-	return "弃掉 %s 张随机手牌。" % get_modified_amount(card, player_modifiers, enemy_modifiers)
+	return "消耗 %s 张随机手牌。" % get_modified_amount(card, player_modifiers, enemy_modifiers)

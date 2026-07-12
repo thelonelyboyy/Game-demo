@@ -19,4 +19,4 @@ func execute(targets: Array[Node]) -> void:
 	
 	for card_ui in cards:
 		if card_ui is CardUI:
-			player_handler.discard_card_from_hand(card_ui, false)
+			player_handler.exhaust_card_from_hand(card_ui, true)

@@ -46,6 +46,8 @@ func start_battle(char_stats: CharacterStats) -> void:
 	character.draw_pile.move_innate_cards_to_top()
 	character.discard = CardPile.new()
 	character.discard.bind_cards_to_owner(character)
+	character.exhaust_pile = CardPile.new()
+	character.exhaust_pile.bind_cards_to_owner(character)
 	battle_running = true
 	player_actions_enabled = false
 
@@ -215,6 +217,7 @@ func _on_card_played(card: Card) -> void:
 	if card.is_consumable_card() or card.type == Card.Type.POWER:
 		if card.is_consumable_card():
 			_trigger_card_lifecycle(card, Card.LifecycleTrigger.EXHAUSTED)
+			_add_card_to_exhaust_pile(card)
 		return
 	
 	character.discard.add_card(card)
@@ -364,8 +367,20 @@ func exhaust_card_from_hand(card_ui: CardUI, trigger_effects := true) -> void:
 	var card := card_ui.card
 	if card and trigger_effects:
 		_trigger_card_lifecycle(card, Card.LifecycleTrigger.EXHAUSTED)
+	if card:
+		_add_card_to_exhaust_pile(card)
 	if hand:
 		hand.discard_card(card_ui, false)
+
+
+func _add_card_to_exhaust_pile(card: Card) -> void:
+	if not card or not character:
+		return
+	if not character.exhaust_pile:
+		character.exhaust_pile = CardPile.new()
+		character.exhaust_pile.bind_cards_to_owner(character)
+	character.exhaust_pile.add_card(card)
+	Events.card_exhausted.emit(card)
 
 
 func remove_card_from_hand(card_ui: CardUI) -> void:

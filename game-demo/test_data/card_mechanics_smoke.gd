@@ -36,6 +36,7 @@ func _run_smoke() -> void:
 	_check_demonic_pool_depth()
 	_check_hero_skill_growth()
 	_check_hand_size_limit()
+	_check_exhaust_pile_lifecycle()
 	_finish()
 
 
@@ -252,6 +253,38 @@ func _check_hand_size_limit() -> void:
 
 	full_hand.free()
 	handler.hand = null
+	handler.free()
+
+
+func _check_exhaust_pile_lifecycle() -> void:
+	var handler := PlayerHandler.new()
+	handler.character = CharacterStats.new()
+	handler.character.draw_pile = CardPile.new()
+	handler.character.discard = CardPile.new()
+	handler.character.exhaust_pile = CardPile.new()
+	handler.battle_running = true
+	var consumable := Card.new()
+	consumable.id = "smoke_consumable"
+	consumable.exhausts = true
+	handler._on_card_played(consumable)
+	_check(handler.character.exhaust_pile.cards.has(consumable), "played consumable enters exhaust pile")
+	_check(handler.character.discard.cards.is_empty(), "played consumable never enters discard pile")
+	var power := Card.new()
+	power.id = "smoke_power"
+	power.type = Card.Type.POWER
+	handler._on_card_played(power)
+	_check(not handler.character.exhaust_pile.cards.has(power), "played power stays out of exhaust pile")
+	var temporary := Card.new()
+	temporary.id = "smoke_temporary"
+	temporary.temporary = true
+	temporary.exhausts = true
+	handler._on_card_played(temporary)
+	_check(not handler.character.exhaust_pile.cards.has(temporary), "played temporary card is removed instead of exhausted")
+	var regular := Card.new()
+	regular.id = "smoke_regular"
+	regular.type = Card.Type.SKILL
+	handler._on_card_played(regular)
+	_check(handler.character.discard.cards.has(regular), "played regular skill still enters discard pile")
 	handler.free()
 
 

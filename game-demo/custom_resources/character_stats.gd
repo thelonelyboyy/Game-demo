@@ -23,6 +23,7 @@ var mana: int : set = set_mana
 var deck: CardPile
 var discard: CardPile
 var draw_pile: CardPile
+var exhaust_pile: CardPile
 var spirit_root_perfect_triggered_this_turn := false
 var spirit_root_wood_played_this_turn := false
 
@@ -68,6 +69,8 @@ func create_instance(selected_spirit_root: Card.Element = Card.Element.NONE) -> 
 	instance.draw_pile.bind_cards_to_owner(instance)
 	instance.discard = CardPile.new()
 	instance.discard.bind_cards_to_owner(instance)
+	instance.exhaust_pile = CardPile.new()
+	instance.exhaust_pile.bind_cards_to_owner(instance)
 	return instance
 
 
@@ -262,6 +265,8 @@ func bind_all_card_piles_to_owner() -> void:
 		draw_pile.bind_cards_to_owner(self)
 	if discard:
 		discard.bind_cards_to_owner(self)
+	if exhaust_pile:
+		exhaust_pile.bind_cards_to_owner(self)
 	refresh_spirit_root_bonus_cards()
 
 
@@ -272,3 +277,5 @@ func reset_temporary_card_costs() -> void:
 		draw_pile.reset_temporary_card_costs()
 	if discard:
 		discard.reset_temporary_card_costs()
+	if exhaust_pile:
+		exhaust_pile.reset_temporary_card_costs()

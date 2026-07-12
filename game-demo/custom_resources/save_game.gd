@@ -84,6 +84,7 @@ func _migrate_card_resources() -> void:
 		_migrate_card_pile(char_stats.deck)
 		_migrate_card_pile(char_stats.draw_pile)
 		_migrate_card_pile(char_stats.discard)
+		_migrate_card_pile(char_stats.exhaust_pile)
 
 
 func _migrate_card_pile(card_pile: CardPile) -> void:
