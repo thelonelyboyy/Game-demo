@@ -7,6 +7,7 @@ enum Type {CONDITIONAL, CHANCE_BASED}
 @export var sound: AudioStream
 @export var type: Type
 @export_range(0.0, 10.0) var chance_weight := 0.0
+@export_range(1, 10) var max_consecutive_uses := 2
 
 @onready var accumulated_weight := 0.0
 

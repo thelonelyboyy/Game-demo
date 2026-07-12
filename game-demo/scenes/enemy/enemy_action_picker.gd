@@ -9,6 +9,8 @@ extends Node
 @onready var total_weight := 0.0
 
 var _sequence_index := 0
+var _last_chance_action: EnemyAction
+var _chance_repeat_count := 0
 
 
 func _ready() -> void:
@@ -22,6 +24,7 @@ func get_action() -> EnemyAction:
 
 	var action := get_first_conditional_action()
 	if action:
+		_reset_chance_history()
 		return action
 
 	return get_chance_based_action()
@@ -40,6 +43,7 @@ func enter_phase_sequence(sequence: Array[int]) -> void:
 		return
 	fixed_sequence = sequence.duplicate()
 	_sequence_index = 0
+	_reset_chance_history()
 
 
 func get_first_conditional_action() -> EnemyAction:
@@ -57,16 +61,46 @@ func get_first_conditional_action() -> EnemyAction:
 
 
 func get_chance_based_action() -> EnemyAction:
-	var roll := RNG.instance.randf_range(0.0, total_weight)
-	
+	var all_actions: Array[EnemyAction] = []
 	for action: EnemyAction in get_children():
-		if not action or action.type != EnemyAction.Type.CHANCE_BASED:
+		if not action or action.type != EnemyAction.Type.CHANCE_BASED or action.chance_weight <= 0.0:
 			continue
-		
-		if action.accumulated_weight > roll:
-			return action
-	
-	return null
+		all_actions.append(action)
+	if all_actions.is_empty():
+		return null
+
+	var eligible := all_actions.filter(
+		func(action: EnemyAction):
+			return action != _last_chance_action or _chance_repeat_count < action.max_consecutive_uses
+	)
+	if eligible.is_empty():
+		eligible = all_actions
+
+	var eligible_weight := 0.0
+	for action: EnemyAction in eligible:
+		eligible_weight += action.chance_weight
+	var roll := RNG.instance.randf_range(0.0, eligible_weight)
+	var selected := eligible.back() as EnemyAction
+	for action: EnemyAction in eligible:
+		roll -= action.chance_weight
+		if roll <= 0.0:
+			selected = action
+			break
+	_record_chance_action(selected)
+	return selected
+
+
+func _record_chance_action(action: EnemyAction) -> void:
+	if action == _last_chance_action:
+		_chance_repeat_count += 1
+	else:
+		_last_chance_action = action
+		_chance_repeat_count = 1
+
+
+func _reset_chance_history() -> void:
+	_last_chance_action = null
+	_chance_repeat_count = 0
 
 
 func setup_chances() -> void:

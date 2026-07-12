@@ -17,9 +17,34 @@ func _ready() -> void:
 
 
 func _run_smoke() -> void:
+	_check_random_action_repeat_guard()
 	for spec: Dictionary in ELITE_BATTLES:
 		await _check_elite_battle(String(spec.path), String(spec.kind))
 	_finish()
+
+
+func _check_random_action_repeat_guard() -> void:
+	var picker := EnemyActionPicker.new()
+	for index in 3:
+		var action := EnemyAction.new()
+		action.name = "ChanceAction%s" % index
+		action.type = EnemyAction.Type.CHANCE_BASED
+		action.chance_weight = 1.0
+		action.max_consecutive_uses = 2
+		picker.add_child(action)
+	RNG.instance.seed = 81723
+	var previous: EnemyAction
+	var streak := 0
+	for _i in 200:
+		var picked := picker.get_chance_based_action()
+		_check(picked != null, "weighted action picker always returns an action")
+		if picked == previous:
+			streak += 1
+		else:
+			previous = picked
+			streak = 1
+		_check(streak <= 2, "weighted enemy actions never repeat more than configured")
+	picker.free()
 
 
 func _check_elite_battle(battle_path: String, kind: String) -> void:
