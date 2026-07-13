@@ -58,8 +58,7 @@ func _check_boss_battle(battle_path: String) -> void:
 	_check(battle.enemy_handler.get_child_count() > 0, "%s spawns boss enemy" % battle_path)
 	_check(_enemies_have_actions(battle), "%s boss has intent action" % battle_path)
 
-	battle.battle_ui._on_end_turn_button_pressed()
-	await get_tree().create_timer(2.0).timeout
+	_check(await _end_turn_and_wait(battle), "%s enemy turn finishes within the smoke timeout" % battle_path)
 	_check(battle.player != null and battle.player.stats != null and battle.player.stats.health > 0, "%s enemy turn completes without killing smoke player" % battle_path)
 	if battle_path.contains("black_lotus"):
 		_check(_discard_contains(battle, "heart_demon"), "%s adds heart demon curse to discard" % battle_path)
@@ -76,7 +75,6 @@ func _check_boss_battle(battle_path: String) -> void:
 	if battle_path.contains("underworld_judge"):
 		_check(_find_combat_card(battle, "underworld_writ") != null, "%s adds a persistent writ status" % battle_path)
 	if battle_path.contains("eclipse_tyrant"):
-		await get_tree().create_timer(1.0).timeout
 		var eclipse_bosses := _get_live_enemies(battle)
 		var eclipse_boss := eclipse_bosses[0] if not eclipse_bosses.is_empty() else null
 		_check(eclipse_boss != null and eclipse_boss.current_action != null, "%s advances to gather intent" % battle_path)
@@ -103,6 +101,21 @@ func _check_boss_battle(battle_path: String) -> void:
 	battle.queue_free()
 	relic_handler.queue_free()
 	await get_tree().process_frame
+
+
+func _end_turn_and_wait(battle: Battle, timeout_seconds := 12.0) -> bool:
+	var state := {"ended": false}
+	var on_turn_ended := func() -> void: state.ended = true
+	Events.enemy_turn_ended.connect(on_turn_ended, CONNECT_ONE_SHOT)
+	battle.battle_ui._on_end_turn_button_pressed()
+	var deadline := Time.get_ticks_msec() + int(timeout_seconds * 1000.0)
+	while is_instance_valid(battle) and battle.battle_active and not state.ended:
+		if Time.get_ticks_msec() >= deadline:
+			break
+		await get_tree().process_frame
+	if Events.enemy_turn_ended.is_connected(on_turn_ended):
+		Events.enemy_turn_ended.disconnect(on_turn_ended)
+	return state.ended
 
 
 func _check_boss_phase_transition(boss: Enemy, battle_path: String) -> void:

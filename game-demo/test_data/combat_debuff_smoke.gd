@@ -6,6 +6,7 @@ const CHARACTER_PATH := "res://characters/demonic_cultivator/demonic_cultivator.
 const BATTLE_PATH := "res://battles/demo_n_spirit_leech.tres"
 const WEAK_PATH := "res://statuses/weak.tres"
 const FRAIL_PATH := "res://statuses/frail.tres"
+const EXPOSED_PATH := "res://statuses/exposed.tres"
 const STRIKE_PATH := "res://common_cards/strike.tres"
 const DEFEND_PATH := "res://common_cards/defend.tres"
 const ENEMY_ACTION_CONFIGS := [
@@ -88,16 +89,28 @@ func _check_real_weak_action(battle: Battle, enemy: Enemy) -> void:
 	var was_connected := Events.enemy_action_completed.is_connected(completion_callable)
 	if was_connected:
 		Events.enemy_action_completed.disconnect(completion_callable)
+	var exposed_effect := StatusEffect.new()
+	exposed_effect.status = load(EXPOSED_PATH) as Status
+	var player_targets: Array[Node] = [battle.player]
+	exposed_effect.execute(player_targets)
+	await get_tree().process_frame
+	action.update_intent_text()
+	_check(action.intent.current_text.begins_with("18"), "enemy intent applies exposed exactly once")
 	var health_before := battle.char_stats.health
 	action.perform_action()
-	await get_tree().create_timer(1.2).timeout
+	await Events.enemy_action_completed
 	if was_connected and is_instance_valid(battle.enemy_handler):
 		Events.enemy_action_completed.connect(completion_callable)
 
 	var weak := battle.player.status_handler.get_status("weak")
-	_check(health_before - battle.char_stats.health == 12, "attack-and-status action deals its advertised damage")
+	_check(health_before - battle.char_stats.health == 18, "action completion waits for advertised exposed damage to resolve exactly once")
 	_check(weak != null and weak.duration == 2, "attack-and-status action applies weak before turn ticking")
 	_check(battle.player.modifier_handler.get_modified_value(20, Modifier.Type.DMG_DEALT) == 15, "weak reduces outgoing damage by twenty-five percent")
+	var exposed := battle.player.status_handler.get_status("exposed")
+	if exposed:
+		exposed.duration = 0
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 	var strike := (load(STRIKE_PATH) as CultivationCard).duplicate(true) as CultivationCard
 	var enemy_health_before := enemy.stats.health

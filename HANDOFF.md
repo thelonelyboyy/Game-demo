@@ -1127,3 +1127,13 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - 当前固定基线全部胜利：血契为 `93 / 85 / 1` 剩余生命，魂印为 `100 / 100 / 24`，魔焰为 `95 / 81 / 37`；血契 Boss 余量最低，需要后续多种子重点观察。完整牌组、法宝和限制见 `game-demo/docs/AUTOPLAY_BALANCE.md`。
 - 对局日志发现血契只堆献祭会快速推高煞气，并在高档同时放大承伤；代表构筑加入 0 费煞刃作为煞气出口。`血气护体` 同步从每次自损固定护体改为按实际每点自损结算，使高额献祭获得与风险成比例的防御回报，tooltip 已明确新语义。
 - `scripts/run_godot_checks.py` 接入第 34 项 `archetype-autoplay`。本轮完成的是固定样本回归，不等同于完整胜率模拟；下一步应扩展多种子、全部精英/Boss、心魔 1–15 和卡牌使用率统计。
+
+## 72. 跨章 Boss 矩阵与敌方伤害时序修复（2026-07-13）
+
+- 自动对战牌表、法宝和战斗搭建抽到 `demonic_autoplay_catalog.gd` / `battle_autoplay_harness.gd`；固定基线与 Boss 矩阵共享同一套真实资源。运行器增加 15 秒单场墙钟保护与流派/Boss/种子环境变量过滤，深测不会无限挂起。
+- 新增 `archetype-boss-matrix`：冥骨龙、深渊剑魂、幽冥判官各跑 2 个固定种子，按章节使用 0/4/8 张突破牌。血契 3/6、魂印 5/6、魔焰 6/6；三名 Boss 均至少被两条流派击败。血契对幽冥判官 0/2，保留为高煞气路线的明确克制关系。
+- 修复敌方动作先结束、玩家受击伤害后落地的问题。`Player` 追踪待结算伤害 tween，`EnemyAction` 在发出 `enemy_action_completed` 前等待 `all_damage_resolved`；玩家死亡后的残余 `enemy_turn_ended` 不再启动新回合或刷新已释放玩家的意图。
+- 修复七类敌方攻击重复计算玩家承伤倍率：这些动作的 `_get_final_damage()` 已包含玩家 `DMG_TAKEN`，传给 `DamageEffect` 时改用 `NO_MODIFIER`。破绽或高煞气不再在意图计算后被二次放大，显示伤害与真实进入护体前的伤害一致。
+- `combat-debuff` 现在给玩家施加破绽后执行真实攻击减益动作，精确验证意图 `18`、动作完成时实际扣血 `18`，同时锁住倍率与时序。修复后的固定基线为血契 `96/78/43`、魂印 `100/100/46`、魔焰 `95/95/77`。
+- Boss 与精英战 smoke 不再用固定秒数猜测敌方回合结束，而是在按下结束回合前订阅 `enemy_turn_ended`，并设置 12 秒保护上限；多段受击动画变长后仍能稳定检查下一行动、污染牌和召唤结果。
+- `scripts/run_godot_checks.py` 接入第 35 项 `archetype-boss-matrix`；完整 18 场在本机约 66 秒，低于单项 90 秒超时。完整数据见 `game-demo/docs/AUTOPLAY_BALANCE.md`。

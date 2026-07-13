@@ -13,6 +13,7 @@ func perform_action() -> void:
 	var damage_effect := DamageEffect.new()
 	var target_array: Array[Node] = [target]
 	damage_effect.amount = _get_final_damage()
+	damage_effect.receiver_modifier_type = Modifier.Type.NO_MODIFIER
 	damage_effect.sound = sound
 	
 	tween.tween_property(enemy, "global_position", end, 0.4)

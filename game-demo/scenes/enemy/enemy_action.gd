@@ -32,14 +32,21 @@ func complete_action_when_tween_finishes(tween: Tween) -> void:
 	if not tween or not enemy:
 		return
 	_completion_enemy_id = enemy.get_instance_id()
-	tween.finished.connect(_emit_completed_for_stored_enemy)
+	tween.finished.connect(_complete_after_pending_damage)
 
 
 func complete_action_after_delay(delay: float) -> void:
 	if not enemy:
 		return
 	_completion_enemy_id = enemy.get_instance_id()
-	get_tree().create_timer(delay, false).timeout.connect(_emit_completed_for_stored_enemy)
+	get_tree().create_timer(delay, false).timeout.connect(_complete_after_pending_damage)
+
+
+func _complete_after_pending_damage() -> void:
+	var player := target as Player
+	if is_instance_valid(player) and player.has_pending_damage():
+		await player.all_damage_resolved
+	_emit_completed_for_stored_enemy()
 
 
 func _emit_completed_for_stored_enemy() -> void:

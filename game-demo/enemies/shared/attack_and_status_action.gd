@@ -14,6 +14,7 @@ func perform_action() -> void:
 	var target_array: Array[Node] = [target]
 	var damage_effect := DamageEffect.new()
 	damage_effect.amount = _get_final_damage()
+	damage_effect.receiver_modifier_type = Modifier.Type.NO_MODIFIER
 	damage_effect.sound = sound
 	var tween := create_tween().set_trans(Tween.TRANS_QUINT)
 	var start := enemy.global_position

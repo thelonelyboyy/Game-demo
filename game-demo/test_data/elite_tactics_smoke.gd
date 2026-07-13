@@ -73,8 +73,7 @@ func _check_elite_battle(battle_path: String, kind: String, summon_id: String) -
 	_check(enemies.size() == 2, "%s spawns a two-enemy elite formation" % battle_path)
 	_check(_enemies_have_actions(enemies), "%s gives every elite an intent" % battle_path)
 
-	battle.battle_ui._on_end_turn_button_pressed()
-	await get_tree().create_timer(3.8).timeout
+	_check(await _end_turn_and_wait(battle), "%s first enemy turn finishes within the smoke timeout" % battle_path)
 	enemies = _get_live_enemies(battle)
 	match kind:
 		"pack_buff":
@@ -86,8 +85,7 @@ func _check_elite_battle(battle_path: String, kind: String, summon_id: String) -
 		"deck_pollution":
 			_check(_discard_contains(battle, "eclipse_scar"), "%s adds eclipse scar to discard" % battle_path)
 
-	battle.battle_ui._on_end_turn_button_pressed()
-	await get_tree().create_timer(5.0).timeout
+	_check(await _end_turn_and_wait(battle), "%s second enemy turn finishes within the smoke timeout" % battle_path)
 	enemies = _get_live_enemies(battle)
 	_check(enemies.size() == 3, "%s summons a third combatant on its second enemy turn" % battle_path)
 	_check(_count_enemy_id(enemies, summon_id) == 2, "%s summons the advertised reinforcement" % battle_path)
@@ -102,6 +100,21 @@ func _check_elite_battle(battle_path: String, kind: String, summon_id: String) -
 	battle.queue_free()
 	relic_handler.queue_free()
 	await get_tree().process_frame
+
+
+func _end_turn_and_wait(battle: Battle, timeout_seconds := 12.0) -> bool:
+	var state := {"ended": false}
+	var on_turn_ended := func() -> void: state.ended = true
+	Events.enemy_turn_ended.connect(on_turn_ended, CONNECT_ONE_SHOT)
+	battle.battle_ui._on_end_turn_button_pressed()
+	var deadline := Time.get_ticks_msec() + int(timeout_seconds * 1000.0)
+	while is_instance_valid(battle) and battle.battle_active and not state.ended:
+		if Time.get_ticks_msec() >= deadline:
+			break
+		await get_tree().process_frame
+	if Events.enemy_turn_ended.is_connected(on_turn_ended):
+		Events.enemy_turn_ended.disconnect(on_turn_ended)
+	return state.ended
 
 
 func _enemies_have_actions(enemies: Array[Enemy]) -> bool:

@@ -22,6 +22,7 @@ CHECKS = [
     {"name": "card-lifecycle", "args": ["res://test_data/card_lifecycle_smoke.tscn"], "quit": False, "required_marker": "CARD_LIFECYCLE_SMOKE_OK"},
     {"name": "pile-control", "args": ["res://test_data/pile_control_smoke.tscn"], "quit": False, "required_marker": "PILE_CONTROL_SMOKE_OK"},
     {"name": "archetype-autoplay", "args": ["res://test_data/archetype_autoplay_smoke.tscn"], "quit": False, "required_marker": "ARCHETYPE_AUTOPLAY_SMOKE_OK"},
+    {"name": "archetype-boss-matrix", "args": ["res://test_data/archetype_boss_matrix_smoke.tscn"], "quit": False, "required_marker": "ARCHETYPE_BOSS_MATRIX_SMOKE_OK"},
     {"name": "card-reward-simulation", "args": ["res://test_data/card_reward_simulation_smoke.tscn"], "quit": False, "required_marker": "CARD_REWARD_SIMULATION_SMOKE_OK"},
     {"name": "content-progression", "args": ["res://test_data/content_progression_smoke.tscn"], "quit": False, "required_marker": "CONTENT_PROGRESSION_SMOKE_OK"},
     {"name": "battle", "args": ["res://scenes/battle/battle.tscn"], "quit": True},

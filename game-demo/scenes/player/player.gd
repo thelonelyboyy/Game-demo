@@ -1,6 +1,8 @@
 class_name Player
 extends Node2D
 
+signal all_damage_resolved
+
 const MAX_BATTLE_ART_HEIGHT := 65.6
 const HEALTH_BAR_HALF_WIDTH := 124.0
 const STATUS_ROW_HALF_WIDTH := 30.0
@@ -26,6 +28,8 @@ const ANIM_DEFS := {
 var sprite_visible_size := Vector2.ZERO
 var animated_sprite: AnimatedSprite2D
 var _suppress_self_damage_feedback := false
+var _pending_damage_tweens := 0
+var _death_resolving := false
 # 战斗信息卡尺寸（画布像素），battle_ui 对齐世界节点时写入；飘字/特效以卡为基准。
 var aligned_feedback_extents := Vector2.ZERO
 
@@ -239,6 +243,7 @@ func _queue_damage(damage: int, which_modifier: Modifier.Type, self_inflicted: b
 		animated_sprite.play("attacked")
 		hit_delay = _anim_duration("attacked")
 
+	_pending_damage_tweens += 1
 	var tween := create_tween()
 	if hit_delay > 0.0:
 		tween.tween_interval(hit_delay)
@@ -307,8 +312,18 @@ func _feedback_radius() -> float:
 
 
 func _on_damage_tween_finished() -> void:
+	_pending_damage_tweens = maxi(_pending_damage_tweens - 1, 0)
 	if stats.health <= 0:
-		_play_death_and_die()
+		if not _death_resolving:
+			_death_resolving = true
+			await _play_death_and_die()
+		return
+	if _pending_damage_tweens == 0:
+		all_damage_resolved.emit()
+
+
+func has_pending_damage() -> bool:
+	return _pending_damage_tweens > 0 or _death_resolving
 
 
 func _anim_duration(anim_name: String) -> float:
@@ -326,4 +341,5 @@ func _play_death_and_die() -> void:
 		animated_sprite.play("death")
 		await animated_sprite.animation_finished
 	Events.player_died.emit()
+	all_damage_resolved.emit()
 	queue_free()

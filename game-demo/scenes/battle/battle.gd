@@ -104,6 +104,8 @@ func _check_for_battle_victory() -> void:
 
 
 func _on_enemy_turn_ended() -> void:
+	if not battle_active or not is_instance_valid(player) or not player.stats or player.stats.health <= 0:
+		return
 	player_handler.start_turn()
 	enemy_handler.reset_enemy_actions()
 

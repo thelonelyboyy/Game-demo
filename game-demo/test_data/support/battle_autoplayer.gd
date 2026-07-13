@@ -3,13 +3,17 @@ extends RefCounted
 
 const MAX_CARDS_PER_TURN := 16
 const MAX_WAIT_FRAMES := 2400
+const MAX_WALL_TIME_MSEC := 15000
 
 var cards_played := 0
 var turns_played := 0
 var play_log := PackedStringArray()
+var timed_out := false
+var _deadline_msec := 0
 
 
 func run(battle: Battle, max_turns := 18) -> Dictionary:
+	_deadline_msec = Time.get_ticks_msec() + MAX_WALL_TIME_MSEC
 	while battle and battle.battle_active and turns_played < max_turns:
 		if not await _wait_for_player_turn(battle):
 			break
@@ -38,6 +42,7 @@ func run(battle: Battle, max_turns := 18) -> Dictionary:
 		"cards_played": cards_played,
 		"player_health": player_health,
 		"enemies_remaining": live_enemies.size(),
+		"timed_out": timed_out,
 		"play_log": play_log.duplicate(),
 	}
 
@@ -135,10 +140,32 @@ func _incoming_damage(battle: Battle) -> int:
 	var total := 0
 	for enemy: Enemy in _get_live_enemies(battle):
 		if enemy.current_action and enemy.current_action.intent:
-			var text := enemy.current_action.intent.current_text
-			if text.is_valid_int():
-				total += text.to_int()
+			total += _parse_intent_damage(enemy.current_action.intent)
 	return total
+
+
+func _parse_intent_damage(intent: Intent) -> int:
+	if not intent or intent.category in [
+		Intent.Category.DEFEND,
+		Intent.Category.BUFF,
+		Intent.Category.UNKNOWN,
+		Intent.Category.SUMMON,
+		Intent.Category.HEAL,
+		Intent.Category.ESCAPE,
+		Intent.Category.SLEEP,
+	]:
+		return 0
+	var matcher := RegEx.new()
+	if matcher.compile("^\\s*(\\d+)(?:\\s*[xX×]\\s*(\\d+))?") != OK:
+		return 0
+	var result := matcher.search(intent.current_text)
+	if not result:
+		return 0
+	var damage := int(result.get_string(1))
+	var hits_text := result.get_string(2)
+	if not hits_text.is_empty():
+		damage *= int(hits_text)
+	return damage
 
 
 func _pick_target(battle: Battle) -> Enemy:
@@ -158,6 +185,8 @@ func _total_enemy_health(battle: Battle) -> int:
 
 func _wait_for_player_turn(battle: Battle) -> bool:
 	for _frame in MAX_WAIT_FRAMES:
+		if _wall_time_expired():
+			return false
 		if not battle or not is_instance_valid(battle) or not battle.battle_active:
 			return false
 		if battle.player_handler.player_actions_enabled:
@@ -168,11 +197,20 @@ func _wait_for_player_turn(battle: Battle) -> bool:
 
 func _wait_for_resolution(battle: Battle) -> void:
 	for _frame in 240:
+		if _wall_time_expired():
+			return
 		if not battle or not is_instance_valid(battle):
 			return
 		if _get_live_enemies(battle).is_empty() or not battle.player_handler.battle_running:
 			return
 		await battle.get_tree().process_frame
+
+
+func _wall_time_expired() -> bool:
+	if _deadline_msec <= 0 or Time.get_ticks_msec() <= _deadline_msec:
+		return false
+	timed_out = true
+	return true
 
 
 func _get_live_enemies(battle: Battle) -> Array[Enemy]:
