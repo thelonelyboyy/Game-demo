@@ -27,6 +27,7 @@ CHECKS = [
     {"name": "run-flow", "args": ["res://test_data/run_flow_smoke.tscn"], "quit": False, "required_marker": "RUN_FLOW_SMOKE_OK"},
     {"name": "boss-battle", "args": ["res://test_data/boss_battle_smoke.tscn"], "quit": False, "required_marker": "BOSS_BATTLE_SMOKE_OK"},
     {"name": "elite-tactics", "args": ["res://test_data/elite_tactics_smoke.tscn"], "quit": False, "required_marker": "ELITE_TACTICS_SMOKE_OK"},
+    {"name": "normal-tactics", "args": ["res://test_data/normal_tactics_smoke.tscn"], "quit": False, "required_marker": "NORMAL_TACTICS_SMOKE_OK"},
     {"name": "difficulty", "args": ["res://test_data/difficulty_smoke.tscn"], "quit": False, "required_marker": "DIFFICULTY_SMOKE_OK"},
     {"name": "demonic-card-suite", "args": ["res://test_data/demonic_card_suite_smoke.tscn"], "quit": False, "required_marker": "DEMONIC_CARD_SUITE_SMOKE_OK"},
     {"name": "demonic-relic", "args": ["res://test_data/demonic_relic_smoke.tscn"], "quit": False, "required_marker": "DEMONIC_RELIC_SMOKE_OK"},

@@ -1,0 +1,55 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
+[ext_resource type="Script" path="res://enemies/shared/apply_status_action.gd" id="2"]
+[ext_resource type="Script" path="res://enemies/crab/crab_attack_action.gd" id="3"]
+[ext_resource type="Script" path="res://custom_resources/intent.gd" id="4"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/attack_negative.png" id="5"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_attack.png" id="6"]
+[ext_resource type="Resource" path="res://statuses/mana_seal.tres" id="7"]
+[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="8"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="9"]
+
+[sub_resource type="Resource" id="IntentSeal"]
+script = ExtResource("4")
+base_text = "下回合 -1 灵力"
+icon = ExtResource("5")
+category = 5
+
+[sub_resource type="Resource" id="IntentBite"]
+script = ExtResource("4")
+base_text = "%s"
+icon = ExtResource("6")
+category = 0
+
+[sub_resource type="Resource" id="IntentDrain"]
+script = ExtResource("4")
+base_text = "%s"
+icon = ExtResource("6")
+category = 0
+
+[node name="SpiritLeechAI" type="Node"]
+script = ExtResource("1")
+fixed_sequence = Array[int]([0, 1, 2])
+
+[node name="ManaSealAction" type="Node" parent="."]
+script = ExtResource("2")
+intent = SubResource("IntentSeal")
+sound = ExtResource("8")
+type = 1
+status = ExtResource("7")
+notice_name = "锁灵"
+
+[node name="BiteAction" type="Node" parent="."]
+script = ExtResource("3")
+intent = SubResource("IntentBite")
+sound = ExtResource("9")
+type = 1
+damage = 8
+
+[node name="DrainAction" type="Node" parent="."]
+script = ExtResource("3")
+intent = SubResource("IntentDrain")
+sound = ExtResource("9")
+type = 1
+damage = 12

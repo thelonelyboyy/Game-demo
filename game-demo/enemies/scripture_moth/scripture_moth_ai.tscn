@@ -1,0 +1,53 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
+[ext_resource type="Script" path="res://enemies/shared/block_and_exhaust_draw_action.gd" id="2"]
+[ext_resource type="Script" path="res://enemies/crab/crab_attack_action.gd" id="3"]
+[ext_resource type="Script" path="res://custom_resources/intent.gd" id="4"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/toxic_ghost_block.png" id="5"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_attack.png" id="6"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="7"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="8"]
+
+[sub_resource type="Resource" id="IntentDevour"]
+script = ExtResource("4")
+base_text = "10 · 消耗抽牌堆1张"
+icon = ExtResource("5")
+category = 5
+
+[sub_resource type="Resource" id="IntentWing"]
+script = ExtResource("4")
+base_text = "%s"
+icon = ExtResource("6")
+category = 0
+
+[sub_resource type="Resource" id="IntentPowder"]
+script = ExtResource("4")
+base_text = "%s"
+icon = ExtResource("6")
+category = 0
+
+[node name="ScriptureMothAI" type="Node"]
+script = ExtResource("1")
+fixed_sequence = Array[int]([0, 1, 2])
+
+[node name="DevourScriptureAction" type="Node" parent="."]
+script = ExtResource("2")
+intent = SubResource("IntentDevour")
+sound = ExtResource("7")
+type = 1
+block = 10
+
+[node name="WingCutAction" type="Node" parent="."]
+script = ExtResource("3")
+intent = SubResource("IntentWing")
+sound = ExtResource("8")
+type = 1
+damage = 12
+
+[node name="PoisonPowderAction" type="Node" parent="."]
+script = ExtResource("3")
+intent = SubResource("IntentPowder")
+sound = ExtResource("8")
+type = 1
+damage = 18
