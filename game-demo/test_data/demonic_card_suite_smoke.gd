@@ -9,6 +9,7 @@ const SHA_BLADE_PATH := "res://characters/demonic_cultivator/cards/demon_sha_bla
 const MYRIAD_MARKS_PATH := "res://characters/demonic_cultivator/cards/demon_myriad_marks_return.tres"
 const SHADOW_STEP_PATH := "res://characters/demonic_cultivator/cards/shadow_step.tres"
 const SOUL_LAMP_RENEWAL_PATH := "res://characters/demonic_cultivator/cards/demon_soul_lamp_renewal.tres"
+const FLESH_REBIRTH_PATH := "res://characters/demonic_cultivator/cards/demon_flesh_rebirth.tres"
 const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
 const DEFEND_PATH := "res://characters/demonic_cultivator/cards/demon_defend.tres"
 const BLOOD_WARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_ward.tres"
@@ -136,6 +137,25 @@ func _check_pile_tutors(battle: Battle, enemy: Enemy) -> void:
 	_check(battle.battle_ui.hand.get_child_count() == hand_before + 1, "soul lamp renewal returns one skill to hand")
 	_check(not character.discard.cards.has(recent_skill), "soul lamp renewal takes the most recent matching discard")
 	_check(character.discard.cards.size() == 2, "soul lamp renewal leaves older and nonmatching discards")
+
+	character.exhaust_pile.clear()
+	var older_exhaust := (load(STRIKE_PATH) as Card).duplicate(true) as Card
+	var recent_exhaust := (load(DEFEND_PATH) as Card).duplicate(true) as Card
+	var rebirth := (load(FLESH_REBIRTH_PATH) as Card).duplicate(true) as CultivationCard
+	character.exhaust_pile.add_card(older_exhaust)
+	character.exhaust_pile.add_card(recent_exhaust)
+	# 打出消耗牌时 card_played 信号先把自身放入消耗区，再执行卡牌效果。
+	character.exhaust_pile.add_card(rebirth)
+	hand_before = battle.battle_ui.hand.get_child_count()
+	var health_before := maxi(battle.player.stats.max_health - 12, 1)
+	battle.player.stats.health = health_before
+	rebirth.apply_effects([battle.player], battle.player.modifier_handler)
+	await get_tree().process_frame
+	_check(battle.battle_ui.hand.get_child_count() == hand_before + 1, "flesh rebirth retrieves one exhausted card")
+	_check(not character.exhaust_pile.cards.has(recent_exhaust), "flesh rebirth retrieves the most recent prior exhaust")
+	_check(character.exhaust_pile.cards.has(rebirth), "flesh rebirth excludes itself from exhaust retrieval")
+	_check(character.exhaust_pile.cards.has(older_exhaust), "flesh rebirth leaves older exhausted cards in place")
+	_check(battle.player.stats.health == mini(health_before + 8, battle.player.stats.max_health), "flesh rebirth still heals for eight")
 
 
 func _get_live_enemies(battle: Battle) -> Array[Enemy]:

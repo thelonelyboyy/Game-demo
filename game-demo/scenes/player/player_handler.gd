@@ -311,18 +311,25 @@ func add_discovered_cards_to_hand(cards: Array[Card], origin_global := Vector2.Z
 		hand.enable_hand()
 
 
-func move_matching_cards_to_hand(from_discard: bool, card_type_filter: int, amount: int) -> Array[Card]:
+func move_matching_cards_to_hand(source_pile: int, card_type_filter: int, amount: int, exclude_card: Card = null) -> Array[Card]:
 	var moved: Array[Card] = []
 	if not _can_use_card_piles() or not hand or amount <= 0:
 		return moved
-	var pile := character.discard if from_discard else character.draw_pile
+	var pile: CardPile
+	match source_pile:
+		ConfiguredPileTutorEffect.SourcePile.DISCARD_PILE:
+			pile = character.discard
+		ConfiguredPileTutorEffect.SourcePile.EXHAUST_PILE:
+			pile = character.exhaust_pile
+		_:
+			pile = character.draw_pile
 	if not pile:
 		return moved
 	var candidates: Array[Card] = []
 	for card: Card in pile.cards:
-		if card and (card_type_filter < 0 or card.type == card_type_filter):
+		if card and card != exclude_card and (card_type_filter < 0 or card.type == card_type_filter):
 			candidates.append(card)
-	if from_discard:
+	if source_pile != ConfiguredPileTutorEffect.SourcePile.DRAW_PILE:
 		candidates.reverse()
 	for card: Card in candidates:
 		if moved.size() >= amount or hand.is_full():
@@ -333,7 +340,7 @@ func move_matching_cards_to_hand(from_discard: bool, card_type_filter: int, amou
 			moved.append(card)
 			Events.card_drawn.emit(card)
 		else:
-			if from_discard:
+			if source_pile != ConfiguredPileTutorEffect.SourcePile.DRAW_PILE:
 				pile.add_card(card)
 			else:
 				pile.add_card_to_top(card)

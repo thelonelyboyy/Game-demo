@@ -1,7 +1,7 @@
 class_name ConfiguredPileTutorEffect
 extends "res://custom_resources/effects/card_effect.gd"
 
-enum SourcePile {DRAW_PILE, DISCARD_PILE}
+enum SourcePile {DRAW_PILE, DISCARD_PILE, EXHAUST_PILE}
 enum CardFilter {ANY, ATTACK, SKILL, POWER}
 
 @export var source_pile := SourcePile.DRAW_PILE
@@ -18,17 +18,24 @@ func execute(card: CultivationCard, targets: Array[Node], _modifiers: ModifierHa
 	if not player_handler:
 		return
 	player_handler.move_matching_cards_to_hand(
-		source_pile == SourcePile.DISCARD_PILE,
+		source_pile,
 		_get_card_type_filter(),
-		get_modified_amount(card)
+		get_modified_amount(card),
+		card
 	)
 
 
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
 	if not description_template.is_empty():
 		return super.get_description(card, player_modifiers, enemy_modifiers)
-	var verb := "回收最近的" if source_pile == SourcePile.DISCARD_PILE else "检索"
-	var pile_name := "弃牌堆" if source_pile == SourcePile.DISCARD_PILE else "抽牌堆"
+	var verb := "检索"
+	var pile_name := "抽牌堆"
+	if source_pile == SourcePile.DISCARD_PILE:
+		verb = "回收最近的"
+		pile_name = "弃牌堆"
+	elif source_pile == SourcePile.EXHAUST_PILE:
+		verb = "取回最近的"
+		pile_name = "消耗牌堆"
 	return "从%s%s %s 张%s加入手牌。" % [pile_name, verb, get_modified_amount(card, player_modifiers, enemy_modifiers), _get_filter_name()]
 
 
