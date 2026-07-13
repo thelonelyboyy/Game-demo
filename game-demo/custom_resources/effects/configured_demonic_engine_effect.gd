@@ -32,7 +32,7 @@ func get_description(_card: CultivationCard, _player_modifiers: ModifierHandler 
 
 	match engine:
 		DemonicEngine.BLOOD_QI_GUARD:
-			return "功法：每当你因自损失去生命，获得 %d 点护体。" % value
+			return "功法：每因自损失去 1 点生命，获得 %d 点护体。" % value
 		DemonicEngine.BLOODTHIRST:
 			return "功法：每当你因自损失去生命，本回合攻击伤害 +%d。" % value
 		DemonicEngine.BLOOD_RECOMPENSE:

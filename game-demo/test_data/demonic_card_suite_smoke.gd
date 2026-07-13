@@ -34,6 +34,7 @@ const TOXIN_PATH := "res://common_cards/toxin.tres"
 const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
 const DEFEND_PATH := "res://characters/demonic_cultivator/cards/demon_defend.tres"
 const BLOOD_WARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_ward.tres"
+const BLOOD_QI_GUARD_PATH := "res://characters/demonic_cultivator/cards/engines/demon_blood_qi_guard.tres"
 const SHA_QI_PATH := "res://statuses/sha_qi.tres"
 const SOUL_MARK_PATH := "res://statuses/soul_mark.tres"
 
@@ -87,6 +88,8 @@ func _run_smoke() -> void:
 		await _check_affliction_purge(battle)
 		current_step = "blood_debt"
 		await _check_blood_debt(battle, enemies[0])
+		current_step = "blood_qi_guard"
+		await _check_blood_qi_guard(battle)
 		current_step = "sha_blade"
 		await _check_sha_blade(battle, enemies[0])
 		current_step = "myriad_marks"
@@ -374,6 +377,15 @@ func _check_blood_debt(battle: Battle, enemy: Enemy) -> void:
 	card.apply_effects([enemy], battle.player.modifier_handler)
 	await get_tree().create_timer(0.25).timeout
 	_check(before - enemy.stats.health == 9, "blood debt converts current-turn self damage into attack damage")
+
+
+func _check_blood_qi_guard(battle: Battle) -> void:
+	var card := (load(BLOOD_QI_GUARD_PATH) as Card).duplicate(true) as CultivationCard
+	card.apply_effects([battle.player], battle.player.modifier_handler)
+	var block_before := battle.player.stats.block
+	Events.player_self_damaged.emit(3)
+	await get_tree().process_frame
+	_check(battle.player.stats.block == block_before + 6, "blood qi guard grants block for each life lost to self damage")
 
 
 func _check_curse_lifecycle(battle: Battle) -> void:

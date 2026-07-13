@@ -471,7 +471,7 @@ func _on_player_self_damaged(amount: int) -> void:
 	var guard := _engine_value(DemonicEngine.BLOOD_QI_GUARD)
 	if guard > 0:
 		var block_effect := BlockEffect.new()
-		block_effect.amount = guard
+		block_effect.amount = guard * amount
 		block_effect.execute([player])
 
 	var bloodthirst := _engine_value(DemonicEngine.BLOODTHIRST)
