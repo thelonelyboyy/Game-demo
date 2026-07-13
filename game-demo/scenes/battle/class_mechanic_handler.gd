@@ -68,6 +68,7 @@ var _powers_played_this_turn := 0
 var _cards_exhausted_this_turn := 0
 var _cards_exhausted_this_combat := 0
 var _cards_discarded_this_turn := 0
+var _cards_played_this_turn_history: Array[Card] = []
 # 一次性创建、原地更新的 modifier 值（避免 remove_value 的 queue_free 延迟问题）
 var _mv_dealt_flat: ModifierValue
 var _mv_dealt_mult: ModifierValue
@@ -131,6 +132,7 @@ func _on_card_played(card: Card) -> void:
 	if not card or not player:
 		return
 	_cards_played_this_turn += 1
+	_cards_played_this_turn_history.append(card)
 	match card.type:
 		Card.Type.ATTACK:
 			_attacks_played_this_turn += 1
@@ -209,6 +211,14 @@ func is_card_in_count_source(source: int, card: Card) -> bool:
 			return false
 
 
+func get_previous_card_played(current_card: Card = null) -> Card:
+	for index in range(_cards_played_this_turn_history.size() - 1, -1, -1):
+		var candidate := _cards_played_this_turn_history[index]
+		if candidate and candidate != current_card:
+			return candidate
+	return null
+
+
 func _reset_card_turn_counts() -> void:
 	_cards_played_this_turn = 0
 	_attacks_played_this_turn = 0
@@ -216,6 +226,7 @@ func _reset_card_turn_counts() -> void:
 	_powers_played_this_turn = 0
 	_cards_exhausted_this_turn = 0
 	_cards_discarded_this_turn = 0
+	_cards_played_this_turn_history.clear()
 
 
 func _on_enemy_died(enemy: Enemy) -> void:

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_copy_previous_card_effect.gd" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_lantern_shadow.png" id="3"]
+[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="4"]
+
+[sub_resource type="Resource" id="CopyPrevious"]
+script = ExtResource("2")
+affected_by_spirit_root = false
+temporary_cost_reduction = 1
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("CopyPrevious")])
+id = "demon_shadow_reenactment"
+type = 1
+rarity = 2
+cost = 1
+exhausts = true
+upgrade_type = 2
+element = 4
+profession = 3
+mechanic_tags = PackedStringArray("复刻", "连锁", "消耗")
+display_name = "魔影复刻"
+icon = ExtResource("3")
+sound = ExtResource("4")

@@ -17,6 +17,23 @@ enum GrowthTrigger {NONE, PLAYED, DISCARDED, EXHAUSTED}
 var growth_accumulated := 0
 
 
+func create_runtime_copy() -> Card:
+	var copy := super.create_runtime_copy() as CultivationCard
+	if not copy:
+		return null
+	copy.configured_effects = _duplicate_effects(configured_effects)
+	copy.discard_trigger_effects = _duplicate_effects(discard_trigger_effects)
+	copy.exhaust_trigger_effects = _duplicate_effects(exhaust_trigger_effects)
+	return copy
+
+
+func _duplicate_effects(source: Array[Resource]) -> Array[Resource]:
+	var copies: Array[Resource] = []
+	for effect: Resource in source:
+		copies.append(effect.duplicate(true) if effect else null)
+	return copies
+
+
 func get_default_tooltip() -> String:
 	return _build_configured_tooltip()
 

@@ -311,6 +311,26 @@ func add_discovered_cards_to_hand(cards: Array[Card], origin_global := Vector2.Z
 		hand.enable_hand()
 
 
+func add_temporary_cards_to_hand(cards: Array[Card], origin_global := Vector2.ZERO) -> Array[Card]:
+	var added: Array[Card] = []
+	if not battle_running or not hand:
+		return added
+	for card: Card in cards:
+		if not card:
+			continue
+		card.temporary = true
+		card.ensure_mechanic_tag(Card.TEMPORARY_MECHANIC_TAG)
+		card.bind_spirit_root_owner(character)
+		if hand.add_card(card, false, origin_global):
+			added.append(card)
+			Events.card_drawn.emit(card)
+	if added.size() < cards.size():
+		Events.ui_notice_requested.emit("手牌已满，未能加入全部临时牌")
+	if player_actions_enabled and not added.is_empty():
+		hand.enable_hand()
+	return added
+
+
 func move_matching_cards_to_hand(source_pile: int, card_type_filter: int, amount: int, exclude_card: Card = null) -> Array[Card]:
 	var moved: Array[Card] = []
 	if not _can_use_card_piles() or not hand or amount <= 0:

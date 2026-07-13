@@ -244,7 +244,8 @@ func _check_demonic_pool_depth() -> void:
 			var upgraded := card.duplicate(true) as Card
 			_check(upgraded.can_upgrade(), "%s can upgrade" % card.id)
 			_check(upgraded.upgrade(), "%s upgrade resolves" % card.id)
-	_check(unique_ids.size() == 83, "demonic draft pool contains eighty-three unique cards")
+	_check(unique_ids.size() == 84, "demonic draft pool contains eighty-four unique cards")
+	_check(unique_ids.has("demon_shadow_reenactment"), "demonic draft pool includes shadow reenactment")
 	_check(found_new.size() == NEW_DEMONIC_CARD_IDS.size(), "all seven construction bridge cards are in draft pool")
 
 	var common_ids := {}

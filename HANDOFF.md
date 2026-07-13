@@ -942,3 +942,12 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - `ConfiguredCountScalingEffect.exclude_current_card` 与 `ClassMechanicHandler.is_card_in_count_source()` 解决“牌先进入弃牌堆再执行效果”导致自身被计数的问题；弃念成罡按玩家实际可见的旧弃牌堆数量结算。
 - `card-mechanics` smoke 验证八张资源 ID、通用职业归属、突破能力和四职业奖励池接入；`demonic-card-suite` 在真实战斗中验证七类数值公式、抽牌、治疗、0 费伤害与消耗去向。
 - 新牌暂复用项目内已有高分辨率卡图，不使用低清占位图；后续替换独立插画不会改变卡牌 ID、牌池或存档语义。`game_data.xlsx` 已重新导出，Excel→Godot 回写为 0 文件变化。
+
+## 50. 上一张牌复刻机制（2026-07-13）
+
+- `ClassMechanicHandler` 维护本回合真实出牌历史，`get_previous_card_played(current_card)` 会跳过正在结算的牌；玩家回合开始时与其他回合计数一并清空，跨回合不能复刻。
+- `Card.create_runtime_copy()` 只复制牌资源本身并解除 `spirit_root_owner`；`CultivationCard` 再独立深拷贝主效果、弃牌触发和消耗触发。这样副本数值可独立变化，同时不会沿角色所有权引用深拷贝整个战斗对象图。
+- 新增数据驱动效果 `ConfiguredCopyPreviousCardEffect`：复制上一张可主动打出的牌，赋予临时标记、重置临时费用后降低指定费用，并通过 `PlayerHandler.add_temporary_cards_to_hand()` 加入手牌；手牌满时沿用统一提示。
+- 魔修金色技能「魔影复刻」为 1 费消耗牌：把本回合上一张牌复制为费用 -1 的临时牌。副本打出或回合结束都会移除，不进入抽牌堆或弃牌堆；突破后本体费用降为 0。
+- 「魔影复刻」已加入魔修奖励池，唯一 ID 数由 83 增至 84；`card_table.py` 和 `game_data.xlsx` 已识别“复刻”效果，Excel→Godot 回写为 0 文件变化。
+- `demonic-card-suite` 在真实战斗中验证副本身份、临时生命周期、费用降低、本体消耗去向与新回合历史清空；`card-mechanics` 验证 84 张唯一奖励牌和新牌池接入。

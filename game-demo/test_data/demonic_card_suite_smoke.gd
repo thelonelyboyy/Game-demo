@@ -21,6 +21,7 @@ const RETURNING_LIGHT_PATH := "res://common_cards/returning_light.tres"
 const DISCARD_AEGIS_PATH := "res://common_cards/discard_aegis.tres"
 const ASH_HEART_GUARD_PATH := "res://common_cards/ash_heart_guard.tres"
 const SPIRIT_STONE_NEEDLE_PATH := "res://common_cards/spirit_stone_needle.tres"
+const SHADOW_REENACTMENT_PATH := "res://characters/demonic_cultivator/cards/demon_shadow_reenactment.tres"
 const BLOOD_DEBT_CURSE_PATH := "res://common_cards/status/blood_debt_curse.tres"
 const KARMIC_FIRE_CURSE_PATH := "res://common_cards/status/karmic_fire_curse.tres"
 const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
@@ -71,6 +72,8 @@ func _run_smoke() -> void:
 		await _check_count_scaling_cards(battle, enemies)
 		current_step = "common_cards"
 		await _check_common_card_combat(battle, enemies[0])
+		current_step = "copy_previous"
+		await _check_copy_previous_card(battle)
 		current_step = "blood_debt"
 		await _check_blood_debt(battle, enemies[0])
 		current_step = "sha_blade"
@@ -162,6 +165,7 @@ func _check_common_card_combat(battle: Battle, enemy: Enemy) -> void:
 	Events.player_turn_started.emit()
 	await get_tree().process_frame
 
+
 	var flowing_guard := (load(FLOWING_CLOUD_GUARD_PATH) as Card).duplicate(true) as CultivationCard
 	Events.card_played.emit(flowing_guard)
 	var block_before := battle.player.stats.block
@@ -236,6 +240,31 @@ func _check_common_card_combat(battle: Battle, enemy: Enemy) -> void:
 	await get_tree().process_frame
 	Events.player_turn_started.emit()
 	await get_tree().process_frame
+
+
+func _check_copy_previous_card(battle: Battle) -> void:
+	Events.player_turn_started.emit()
+	await get_tree().process_frame
+	var previous := (load(BLOOD_WARD_PATH) as Card).duplicate(true) as Card
+	Events.card_played.emit(previous)
+	var reenactment := (load(SHADOW_REENACTMENT_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(reenactment)
+	var hand_before := battle.player_handler.hand.get_child_count()
+	reenactment.apply_effects([battle.player], battle.player.modifier_handler)
+	await get_tree().process_frame
+	_check(battle.player_handler.hand.get_child_count() == hand_before + 1, "shadow reenactment adds one copied card to hand")
+	var copied_ui := battle.player_handler.hand.get_child(battle.player_handler.hand.get_child_count() - 1) as CardUI
+	var copied := copied_ui.card if copied_ui else null
+	_check(copied != null and copied.id == previous.id, "shadow reenactment copies the previous card identity")
+	_check(copied != null and copied.is_temporary_card(), "shadow reenactment copy is temporary")
+	_check(copied != null and copied.cost == maxi(previous.cost - 1, 0), "shadow reenactment discounts the copied card by one")
+	_check(battle.char_stats.exhaust_pile.cards.has(reenactment), "shadow reenactment exhausts after use")
+	if copied_ui:
+		copied_ui.queue_free()
+	await get_tree().process_frame
+	Events.player_turn_started.emit()
+	await get_tree().process_frame
+	_check(battle.class_mechanic_handler.get_previous_card_played() == null, "new turn clears previous-card history")
 
 
 func _check_blood_debt(battle: Battle, enemy: Enemy) -> void:

@@ -338,6 +338,14 @@ func bind_spirit_root_owner(owner: CharacterStats) -> void:
 	spirit_root_owner = owner
 
 
+func create_runtime_copy() -> Card:
+	# Runtime owner links can lead back into the entire combat object graph.
+	var copy := duplicate(false) as Card
+	if copy:
+		copy.spirit_root_owner = null
+	return copy
+
+
 func is_selected_spirit_root_element() -> bool:
 	return spirit_root_owner and spirit_root_owner.has_spirit_root() and element == spirit_root_owner.spirit_root
 
