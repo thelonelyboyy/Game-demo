@@ -340,6 +340,52 @@ func add_temporary_cards_to_hand(cards: Array[Card], origin_global := Vector2.ZE
 	return added
 
 
+func filter_afflictions_from_draw_pile(inspect_count: int, max_cards := 0) -> Array[Card]:
+	var filtered: Array[Card] = []
+	if not _can_use_card_piles() or inspect_count <= 0:
+		return filtered
+
+	var inspect_limit := mini(inspect_count, character.draw_pile.cards.size())
+	var inspected: Array[Card] = []
+	for index in inspect_limit:
+		inspected.append(character.draw_pile.cards[index])
+	for card: Card in inspected:
+		if max_cards > 0 and filtered.size() >= max_cards:
+			break
+		if not card or (not card.is_status_card() and not card.is_curse_card()):
+			continue
+		if not character.draw_pile.remove_card(card):
+			continue
+		card.reset_temporary_cost()
+		character.discard.add_card(card)
+		filtered.append(card)
+
+	if not filtered.is_empty():
+		Events.ui_notice_requested.emit("滤去牌顶 %s 张污染牌，已送入弃牌堆" % filtered.size())
+	return filtered
+
+
+func discard_random_cards_from_hand(amount: int, exclude_card: Card = null) -> Array[Card]:
+	var discarded: Array[Card] = []
+	if not battle_running or not hand or amount <= 0:
+		return discarded
+
+	var candidates: Array[CardUI] = []
+	for child: Node in hand.get_children():
+		var card_ui := child as CardUI
+		if card_ui and card_ui.card and card_ui.card != exclude_card:
+			candidates.append(card_ui)
+	RNG.array_shuffle(candidates)
+	for card_ui: CardUI in candidates:
+		if discarded.size() >= amount:
+			break
+		if not is_instance_valid(card_ui) or not card_ui.card:
+			continue
+		discarded.append(card_ui.card)
+		discard_card_from_hand(card_ui)
+	return discarded
+
+
 func move_matching_cards_to_hand(source_pile: int, card_type_filter: int, amount: int, exclude_card: Card = null) -> Array[Card]:
 	var moved: Array[Card] = []
 	if not _can_use_card_piles() or not hand or amount <= 0:

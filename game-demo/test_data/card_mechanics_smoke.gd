@@ -274,12 +274,15 @@ func _check_demonic_pool_depth() -> void:
 				_check(advanced_upgrade.configured_effects[0].amount == 2, "burn impurity upgrade cleanses two debuffs")
 				_check(advanced_upgrade.configured_effects[1].amount == 8, "burn impurity upgrade raises base block to eight")
 				_check(advanced_upgrade.configured_effects[2].amount == 6, "burn impurity upgrade raises block per affliction to six")
-	_check(unique_ids.size() == 88, "demonic draft pool contains eighty-eight unique cards")
+	_check(unique_ids.size() == 91, "demonic draft pool contains ninety-one unique cards")
 	_check(unique_ids.has("demon_shadow_reenactment"), "demonic draft pool includes shadow reenactment")
 	_check(unique_ids.has("demon_calamity_embryo"), "demonic draft pool includes calamity embryo")
 	_check(unique_ids.has("demon_lurking_soul_curse"), "demonic draft pool includes lurking soul curse")
 	_check(unique_ids.has("demon_burn_impurity"), "demonic draft pool includes burn impurity")
 	_check(unique_ids.has("demon_ash_barrier"), "demonic draft pool includes ash barrier")
+	_check(unique_ids.has("demon_mind_sieve"), "demonic draft pool includes mind sieve")
+	_check(unique_ids.has("demon_blood_castoff"), "demonic draft pool includes blood castoff")
+	_check(unique_ids.has("demon_ash_recollection"), "demonic draft pool includes ash recollection")
 	_check(found_new.size() == NEW_DEMONIC_CARD_IDS.size(), "all seven construction bridge cards are in draft pool")
 
 	var common_ids := {}
