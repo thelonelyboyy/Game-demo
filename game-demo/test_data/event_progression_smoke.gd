@@ -2,6 +2,12 @@ extends Node
 
 const EVENT_POOL_PATH := "res://scenes/event_rooms/event_room_pool.tres"
 const CHARACTER_PATH := "res://characters/demonic_cultivator/demonic_cultivator.tres"
+const SPIRIT_SPRING_PATH := "res://scenes/event_rooms/spirit_spring_event.tscn"
+const SPIRIT_ROOT_EVENT_PATHS := [
+	SPIRIT_SPRING_PATH,
+	"res://scenes/event_rooms/thunder_tree_event.tscn",
+	"res://scenes/event_rooms/starfall_pillar_event.tscn",
+]
 const NEW_EVENT_PATHS := [
 	"res://scenes/event_rooms/blood_script_wall_event.tscn",
 	"res://scenes/event_rooms/soul_auction_event.tscn",
@@ -55,6 +61,7 @@ func _run_smoke() -> void:
 
 	_check_new_event_effects(character_resource)
 	_check_curse_pool(character_resource)
+	_check_spirit_root_event_branches(character_resource)
 	_finish()
 
 
@@ -103,6 +110,63 @@ func _check_curse_pool(character_resource: CharacterStats) -> void:
 	_check(karmic_fire.is_consumable_card() and karmic_fire.cost == 1, "karmic fire costs one mana and exhausts")
 	_check(karmic_fire.configured_effects[0].amount == 3, "burning karmic fire costs three life")
 	event.free()
+
+
+func _check_spirit_root_event_branches(character_resource: CharacterStats) -> void:
+	for path: String in SPIRIT_ROOT_EVENT_PATHS:
+		var branch_scene := load(path) as PackedScene
+		var branch_event := branch_scene.instantiate() as GenericEvent if branch_scene else null
+		_check(branch_event != null, "%s loads as a spirit-root event" % path)
+		if not branch_event:
+			continue
+		_check(branch_event.spirit_root_choice_index >= 0, "%s declares a root-specific choice slot" % path)
+		_check(branch_event.spirit_root_choice_texts.size() == 6 and branch_event.spirit_root_choice_effects.size() == 6, "%s provides all five element branches" % path)
+		for element in range(Card.Element.METAL, Card.Element.EARTH + 1):
+			_check(not branch_event.spirit_root_choice_texts[element].is_empty() and not branch_event.spirit_root_choice_effects[element].is_empty(), "%s element %s branch is complete" % [path, element])
+		branch_event.free()
+
+	var scene := load(SPIRIT_SPRING_PATH) as PackedScene
+	_check(scene != null, "spirit spring event loads for root branch checks")
+	if not scene:
+		return
+
+	var expected_prefixes := ["", "金灵共鸣", "木灵共鸣", "水灵共鸣", "火灵共鸣", "土灵共鸣"]
+	for element in range(Card.Element.METAL, Card.Element.EARTH + 1):
+		var character := character_resource.create_instance(element) as CharacterStats
+		var event := scene.instantiate() as GenericEvent
+		event.character_stats = character
+		event.run_stats = RunStats.new()
+		var text := event._get_choice_text(2)
+		var effect := event._get_choice_effect(2)
+		_check(text.begins_with(expected_prefixes[element]), "element %s receives its named spirit-root event choice" % element)
+
+		if element == Card.Element.WOOD or element == Card.Element.WATER:
+			character.health = maxi(character.max_health - 40, 1)
+		var health_before := character.health
+		var max_health_before := character.max_health
+		var gold_before := event.run_stats.gold
+		var upgraded_before := character.deck.cards.filter(func(card: Card): return card.upgraded).size()
+		event._apply_effect_sequence(effect, event._get_choice_amount(2))
+		match element:
+			Card.Element.METAL:
+				_check(event.run_stats.gold == gold_before + 60, "metal root extracts sixty spirit stones")
+			Card.Element.WOOD:
+				_check(character.health == health_before + 14 and character.max_health == max_health_before + 2, "wood root heals twelve and increases max health by two")
+			Card.Element.WATER:
+				_check(character.health == health_before + 28, "water root restores twenty-eight health")
+			Card.Element.FIRE:
+				var upgraded_after := character.deck.cards.filter(func(card: Card): return card.upgraded).size()
+				_check(character.health == health_before - 5 and upgraded_after == upgraded_before + 1, "fire root trades five health for one breakthrough")
+			Card.Element.EARTH:
+				_check(character.health == health_before - 1 and character.max_health == max_health_before + 4, "earth root trades five health for four max health")
+		event.free()
+
+	var rootless_character := character_resource.create_instance() as CharacterStats
+	var rootless_event := scene.instantiate() as GenericEvent
+	rootless_event.character_stats = rootless_character
+	_check(rootless_event._get_choice_text(2).begins_with("装满水囊"), "rootless path keeps the default event choice")
+	_check(rootless_event._get_choice_effect(2) == "gain_gold" and rootless_event._get_choice_amount(2) == 30, "rootless path keeps the default event reward")
+	rootless_event.free()
 
 
 func _check(condition: bool, message: String) -> void:

@@ -13,6 +13,12 @@ const CURSE_POOL: Array[Card] = [HEART_DEMON, BLOOD_DEBT_CURSE, KARMIC_FIRE_CURS
 @export var choice_effects := PackedStringArray()
 @export var choice_amounts := PackedInt32Array()
 
+@export_group("Spirit Root Choice Override")
+@export_range(-1, 2) var spirit_root_choice_index := -1
+@export var spirit_root_choice_texts := PackedStringArray()
+@export var spirit_root_choice_effects := PackedStringArray()
+@export var spirit_root_choice_amounts := PackedInt32Array()
+
 @onready var background: ColorRect = $ColorRect
 @onready var content_box: VBoxContainer = $VBoxContainer
 @onready var title_label: Label = %TitleLabel
@@ -43,7 +49,7 @@ func setup() -> void:
 		var effect := _get_choice_effect(index)
 		var amount := _get_choice_amount(index)
 		button.show()
-		button.text = choice_texts[index]
+		button.text = _get_choice_text(index)
 		button.disabled = not _can_apply_effect(effect, amount)
 		button.event_button_callback = _apply_choice.bind(index)
 		_apply_choice_button_style(button)
@@ -57,11 +63,34 @@ func _apply_choice(index: int) -> void:
 
 
 func _get_choice_effect(index: int) -> String:
+	var root_index := _get_spirit_root_override_index(index)
+	if root_index >= 0 and root_index < spirit_root_choice_effects.size():
+		var root_effect := spirit_root_choice_effects[root_index]
+		if not root_effect.is_empty():
+			return root_effect
 	return choice_effects[index] if index < choice_effects.size() else "skip"
 
 
 func _get_choice_amount(index: int) -> int:
+	var root_index := _get_spirit_root_override_index(index)
+	if root_index >= 0 and root_index < spirit_root_choice_amounts.size():
+		return spirit_root_choice_amounts[root_index]
 	return choice_amounts[index] if index < choice_amounts.size() else 0
+
+
+func _get_choice_text(index: int) -> String:
+	var root_index := _get_spirit_root_override_index(index)
+	if root_index >= 0 and root_index < spirit_root_choice_texts.size():
+		var root_text := spirit_root_choice_texts[root_index]
+		if not root_text.is_empty():
+			return root_text
+	return choice_texts[index] if index < choice_texts.size() else "离开"
+
+
+func _get_spirit_root_override_index(index: int) -> int:
+	if index != spirit_root_choice_index or not character_stats or not character_stats.has_spirit_root():
+		return -1
+	return int(character_stats.spirit_root)
 
 
 func _can_apply_effect(effect: String, amount: int) -> bool:

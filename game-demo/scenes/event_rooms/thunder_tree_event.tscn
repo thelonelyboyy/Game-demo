@@ -16,6 +16,10 @@ event_body = "焦黑古树仍有电光在年轮中游走。"
 choice_texts = PackedStringArray("引雷淬体：失去 11 生命，生命上限 +5", "削下木心：获得 50 灵石", "远离雷光")
 choice_effects = PackedStringArray("damage:11|max_hp:5", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 50, 0)
+spirit_root_choice_index = 2
+spirit_root_choice_texts = PackedStringArray("", "金灵共鸣：牵引雷髓，获得 75 灵石", "木灵共鸣：唤醒新芽，回复 24 生命，生命上限 +1", "水灵共鸣：化雷为液，回复 32 生命", "火灵共鸣：吞炼雷火，失去 8 生命，随机突破一张牌", "土灵共鸣：承接地脉，失去 6 生命，生命上限 +5")
+spirit_root_choice_effects = PackedStringArray("", "gain_gold:75", "heal:24|max_hp:1", "heal:32", "damage:8|upgrade_random:0", "damage:6|max_hp:5")
+spirit_root_choice_amounts = PackedInt32Array(0, 0, 0, 0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
