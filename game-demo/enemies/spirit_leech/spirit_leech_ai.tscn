@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
 [ext_resource type="Script" path="res://enemies/shared/apply_status_action.gd" id="2"]
@@ -9,6 +9,8 @@
 [ext_resource type="Resource" path="res://statuses/mana_seal.tres" id="7"]
 [ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="8"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="9"]
+[ext_resource type="Script" path="res://enemies/shared/attack_and_status_action.gd" id="10"]
+[ext_resource type="Resource" path="res://statuses/weak.tres" id="11"]
 
 [sub_resource type="Resource" id="IntentSeal"]
 script = ExtResource("4")
@@ -24,9 +26,9 @@ category = 0
 
 [sub_resource type="Resource" id="IntentDrain"]
 script = ExtResource("4")
-base_text = "%s"
+base_text = "%s · 虚弱1回合"
 icon = ExtResource("6")
-category = 0
+category = 5
 
 [node name="SpiritLeechAI" type="Node"]
 script = ExtResource("1")
@@ -48,8 +50,10 @@ type = 1
 damage = 8
 
 [node name="DrainAction" type="Node" parent="."]
-script = ExtResource("3")
+script = ExtResource("10")
 intent = SubResource("IntentDrain")
 sound = ExtResource("9")
 type = 1
 damage = 12
+status = ExtResource("11")
+notice_name = "虚弱"

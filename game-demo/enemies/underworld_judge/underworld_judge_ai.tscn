@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
 [ext_resource type="Script" path="res://enemies/shared/add_card_to_discard_action.gd" id="2"]
@@ -12,6 +12,8 @@
 [ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="10"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="11"]
 [ext_resource type="Resource" path="res://common_cards/status/underworld_writ.tres" id="12"]
+[ext_resource type="Script" path="res://enemies/shared/attack_and_status_action.gd" id="13"]
+[ext_resource type="Resource" path="res://statuses/weak.tres" id="14"]
 
 [sub_resource type="Resource" id="IntentWrit"]
 script = ExtResource("5")
@@ -21,9 +23,9 @@ category = 5
 
 [sub_resource type="Resource" id="IntentStrike"]
 script = ExtResource("5")
-base_text = "%s"
+base_text = "%s · 虚弱1回合"
 icon = ExtResource("7")
-category = 0
+category = 5
 
 [sub_resource type="Resource" id="IntentGuard"]
 script = ExtResource("5")
@@ -50,11 +52,13 @@ card_to_add = ExtResource("12")
 copies = 1
 
 [node name="SoulStrikeAction" type="Node" parent="."]
-script = ExtResource("3")
+script = ExtResource("13")
 intent = SubResource("IntentStrike")
 sound = ExtResource("10")
 type = 1
 damage = 18
+status = ExtResource("14")
+notice_name = "虚弱"
 
 [node name="CourtGuardAction" type="Node" parent="."]
 script = ExtResource("4")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
 [ext_resource type="Script" path="res://enemies/shared/pile_scaling_attack_action.gd" id="2"]
@@ -9,6 +9,8 @@
 [ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_block.png" id="7"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="8"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="9"]
+[ext_resource type="Script" path="res://enemies/shared/attack_and_status_action.gd" id="10"]
+[ext_resource type="Resource" path="res://statuses/frail.tres" id="11"]
 
 [sub_resource type="Resource" id="IntentDebt"]
 script = ExtResource("5")
@@ -24,9 +26,9 @@ category = 2
 
 [sub_resource type="Resource" id="IntentSentence"]
 script = ExtResource("5")
-base_text = "%s"
+base_text = "%s · 碎甲1回合"
 icon = ExtResource("6")
-category = 0
+category = 5
 
 [node name="KarmaCollectorAI" type="Node"]
 script = ExtResource("1")
@@ -49,8 +51,10 @@ type = 1
 block = 14
 
 [node name="SentenceAction" type="Node" parent="."]
-script = ExtResource("4")
+script = ExtResource("10")
 intent = SubResource("IntentSentence")
 sound = ExtResource("8")
 type = 1
-damage = 20
+damage = 18
+status = ExtResource("11")
+notice_name = "碎甲"

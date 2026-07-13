@@ -12,6 +12,8 @@ const DEBUFF_PATHS := [
 	"res://statuses/enemy_exposed.tres",
 	"res://statuses/mana_seal.tres",
 	"res://statuses/soul_mark.tres",
+	"res://statuses/weak.tres",
+	"res://statuses/frail.tres",
 ]
 const WARDED_ENEMIES := {
 	"res://enemies/heartpiercer_shade/heartpiercer_shade_enemy.tres": 1,

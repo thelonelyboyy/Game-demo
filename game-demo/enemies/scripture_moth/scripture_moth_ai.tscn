@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
 [ext_resource type="Script" path="res://enemies/shared/block_and_exhaust_draw_action.gd" id="2"]
@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_attack.png" id="6"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="7"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="8"]
+[ext_resource type="Script" path="res://enemies/shared/attack_and_status_action.gd" id="9"]
+[ext_resource type="Resource" path="res://statuses/frail.tres" id="10"]
 
 [sub_resource type="Resource" id="IntentDevour"]
 script = ExtResource("4")
@@ -23,9 +25,9 @@ category = 0
 
 [sub_resource type="Resource" id="IntentPowder"]
 script = ExtResource("4")
-base_text = "%s"
+base_text = "%s · 碎甲1回合"
 icon = ExtResource("6")
-category = 0
+category = 5
 
 [node name="ScriptureMothAI" type="Node"]
 script = ExtResource("1")
@@ -46,8 +48,10 @@ type = 1
 damage = 12
 
 [node name="PoisonPowderAction" type="Node" parent="."]
-script = ExtResource("3")
+script = ExtResource("9")
 intent = SubResource("IntentPowder")
 sound = ExtResource("8")
 type = 1
-damage = 18
+damage = 16
+status = ExtResource("10")
+notice_name = "碎甲"
