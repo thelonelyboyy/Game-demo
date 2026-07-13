@@ -2,6 +2,11 @@ extends Node
 
 const RELIC_POOL_PATH := "res://relics/relic_reward_pool.tres"
 const CHARACTER_PATH := "res://characters/demonic_cultivator/demonic_cultivator.tres"
+const PACT_PATHS := [
+	"res://relics/demon_blood_pact_crown.tres",
+	"res://relics/demon_flame_pact_wheel.tres",
+	"res://relics/demon_ash_pact_scripture.tres",
+]
 
 var failures: PackedStringArray = []
 
@@ -23,15 +28,16 @@ func _run_smoke() -> void:
 	for relic: Relic in pool.relics:
 		if relic and relic.rarity < rarity_counts.size():
 			rarity_counts[relic.rarity] += 1
-	_check(pool.relics.size() == 50, "reward pool contains fifty relics")
+	_check(pool.relics.size() == 53, "reward pool contains fifty-three relics")
 	for rarity in Relic.Rarity.values():
 		_check(rarity_counts[rarity] > 0, "rarity %s has at least one relic" % rarity)
-	_check(rarity_counts[Relic.Rarity.BOSS] == 6, "demonic reward pool contains six boss relics")
+	_check(rarity_counts[Relic.Rarity.BOSS] == 9, "demonic reward pool contains nine boss relics")
 
 	_check_context(pool, character, RelicRewardPool.RewardContext.STANDARD, false, true)
 	_check_context(pool, character, RelicRewardPool.RewardContext.SHOP, false, true)
 	_check_context(pool, character, RelicRewardPool.RewardContext.BOSS, true, false)
 	await _check_three_chapter_boss_choices(pool, character)
+	await _check_pact_exclusivity(pool, character)
 
 	var choices := pool.get_random_available_choices(
 		character, null, 4, 3, RelicRewardPool.RewardContext.TREASURE
@@ -87,6 +93,39 @@ func _check_three_chapter_boss_choices(pool: RelicRewardPool, character: Charact
 		_check(unique_ids.size() == 3, "chapter %s boss choices are unique" % chapter)
 		if not choices.is_empty():
 			handler.add_relic(choices[0])
+	handler.queue_free()
+	await get_tree().process_frame
+
+
+func _check_pact_exclusivity(pool: RelicRewardPool, character: CharacterStats) -> void:
+	var handler_scene := load("res://scenes/relic_handler/relic_handler.tscn") as PackedScene
+	var handler := handler_scene.instantiate() as RelicHandler
+	add_child(handler)
+	await get_tree().process_frame
+
+	for _sample in 80:
+		var choices := pool.get_random_available_choices(
+			character, handler, 3, 3, RelicRewardPool.RewardContext.BOSS
+		)
+		var seen_groups := {}
+		for relic: Relic in choices:
+			if relic.exclusive_group.is_empty():
+				continue
+			_check(not seen_groups.has(relic.exclusive_group), "one reward set never repeats an exclusive relic group")
+			seen_groups[relic.exclusive_group] = true
+
+	var first_pact := load(PACT_PATHS[0]) as Relic
+	handler.add_relic(first_pact)
+	_check(handler.has_relic(first_pact.id), "the first pact can be equipped")
+	handler.add_relic(load(PACT_PATHS[1]) as Relic)
+	_check(not handler.has_relic((load(PACT_PATHS[1]) as Relic).id), "direct relic grants respect pact exclusivity")
+	for _sample in 80:
+		var choices := pool.get_random_available_choices(
+			character, handler, 3, 3, RelicRewardPool.RewardContext.BOSS
+		)
+		for relic: Relic in choices:
+			_check(relic.exclusive_group != first_pact.exclusive_group, "owned pact group is removed from later rewards")
+
 	handler.queue_free()
 	await get_tree().process_frame
 

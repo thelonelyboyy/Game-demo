@@ -11,6 +11,7 @@ enum Rarity {COMMON, UNCOMMON, RARE, BOSS}
 @export var character_type: CharacterType
 @export var rarity: Rarity = Rarity.COMMON
 @export var starter_relic: bool = false
+@export var exclusive_group := ""
 @export var icon: Texture
 @export_multiline var tooltip: String
 

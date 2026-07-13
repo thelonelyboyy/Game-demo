@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="DemonicPactRelic" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/demonic_pact_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/demon_blood_oath_mirror.png" id="2"]
+[ext_resource type="Resource" path="res://statuses/exposed.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "血海魔冠"
+id = "demon_blood_pact_crown"
+type = 4
+character_type = 3
+rarity = 3
+exclusive_group = "demonic_mana_pact"
+icon = ExtResource("2")
+tooltip = "魔修首领法宝。每回合额外获得 1 点灵力；若本回合因自己的卡牌失去生命不足 4 点，回合结束时获得 1 回合破绽。魔契法宝互斥。"
+requirement = 0
+requirement_amount = 4
+mana_amount = 1
+failure_status = ExtResource("3")

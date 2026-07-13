@@ -47,6 +47,10 @@ func add_relic(relic: Relic) -> void:
 
 	if has_relic(relic.id):
 		return
+	if not relic.exclusive_group.is_empty():
+		for owned_relic: Relic in get_all_relics():
+			if owned_relic and owned_relic.exclusive_group == relic.exclusive_group:
+				return
 	
 	var new_relic_ui := RELIC_UI.instantiate() as RelicUI
 	relics.add_child(new_relic_ui)

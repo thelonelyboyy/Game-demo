@@ -55,13 +55,22 @@ func get_random_available_choices(
 	context := RewardContext.STANDARD
 ) -> Array[Relic]:
 	var available_relics: Array[Relic] = []
+	var owned_exclusive_groups := {}
+	if relic_handler:
+		for owned_relic: Relic in relic_handler.get_all_relics():
+			if owned_relic and not owned_relic.exclusive_group.is_empty():
+				owned_exclusive_groups[owned_relic.exclusive_group] = true
 	for relic: Relic in relics:
 		if not relic:
 			continue
 
 		var can_appear: bool = relic.can_appear_as_reward(char_stats)
 		var already_had_it: bool = relic_handler and relic_handler.has_relic(relic.id)
-		if can_appear and not already_had_it:
+		var conflicts_with_owned := (
+			not relic.exclusive_group.is_empty()
+			and owned_exclusive_groups.has(relic.exclusive_group)
+		)
+		if can_appear and not already_had_it and not conflicts_with_owned:
 			available_relics.append(relic)
 
 	if available_relics.is_empty():
@@ -73,7 +82,13 @@ func get_random_available_choices(
 		if not picked:
 			break
 		choices.append(picked)
-		available_relics.erase(picked)
+		if picked.exclusive_group.is_empty():
+			available_relics.erase(picked)
+		else:
+			available_relics = available_relics.filter(
+				func(candidate: Relic):
+					return candidate.exclusive_group != picked.exclusive_group
+			)
 	return choices
 
 
