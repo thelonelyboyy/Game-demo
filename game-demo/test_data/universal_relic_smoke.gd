@@ -15,6 +15,7 @@ const RELIC_PATHS := [
 	"res://relics/spirit_cleaver_talisman.tres",
 	"res://relics/nirvana_ember.tres",
 	"res://relics/formation_breaker_drum.tres",
+	"res://relics/clarified_spirit_jade.tres",
 ]
 
 var failures: PackedStringArray = []
@@ -53,9 +54,10 @@ func _run_smoke() -> void:
 	battle.battle_stats = battle_stats
 	battle.relics = relic_handler
 	battle.start_battle()
-	await get_tree().create_timer(2.4).timeout
+	await get_tree().create_timer(3.0).timeout
 
 	_check(battle.player.status_handler.get_status_stacks("muscle") == 1, "formation breaker drum grants one muscle at combat start")
+	_check(battle.player.status_handler.get_status_stacks("spell_ward") == 1, "clarified spirit jade grants one spell ward at combat start")
 	_add_draw_cards(battle, 12)
 	await _check_card_type_relics(battle)
 	_check_timing_relics(battle, relic_handler)

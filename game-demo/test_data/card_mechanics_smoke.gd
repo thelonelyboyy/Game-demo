@@ -271,8 +271,9 @@ func _check_demonic_pool_depth() -> void:
 					_check(delayed.delayed_effects[0].amount == 18, "lurking soul curse upgrade raises delayed damage to eighteen")
 					_check(delayed.delayed_effects[1].amount == 2, "lurking soul curse upgrade raises delayed soul mark to two")
 			elif card.id == "demon_burn_impurity":
-				_check(advanced_upgrade.configured_effects[0].amount == 8, "burn impurity upgrade raises base block to eight")
-				_check(advanced_upgrade.configured_effects[1].amount == 6, "burn impurity upgrade raises block per affliction to six")
+				_check(advanced_upgrade.configured_effects[0].amount == 2, "burn impurity upgrade cleanses two debuffs")
+				_check(advanced_upgrade.configured_effects[1].amount == 8, "burn impurity upgrade raises base block to eight")
+				_check(advanced_upgrade.configured_effects[2].amount == 6, "burn impurity upgrade raises block per affliction to six")
 	_check(unique_ids.size() == 88, "demonic draft pool contains eighty-eight unique cards")
 	_check(unique_ids.has("demon_shadow_reenactment"), "demonic draft pool includes shadow reenactment")
 	_check(unique_ids.has("demon_calamity_embryo"), "demonic draft pool includes calamity embryo")

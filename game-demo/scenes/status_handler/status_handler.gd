@@ -88,6 +88,37 @@ func get_status(id: String) -> Status:
 func get_status_stacks(id: String) -> int:
 	var status := _get_status(id)
 	return status.stacks if status else 0
+
+
+func get_debuff_count() -> int:
+	var count := 0
+	for status: Status in _get_all_statuses():
+		if status and status.is_debuff:
+			count += 1
+	return count
+
+
+func remove_debuffs(max_count := 0) -> Array[Status]:
+	var removed: Array[Status] = []
+	for status_ui: StatusUI in get_children():
+		if max_count > 0 and removed.size() >= max_count:
+			break
+		if not status_ui or status_ui.is_queued_for_deletion():
+			continue
+		var status := status_ui.status
+		if not status or not status.is_debuff:
+			continue
+		removed.append(status)
+		_remove_status_ui(status_ui)
+	return removed
+
+
+func remove_status(id: String) -> bool:
+	for status_ui: StatusUI in get_children():
+		if status_ui and status_ui.status and status_ui.status.id == id:
+			_remove_status_ui(status_ui)
+			return true
+	return false
 	
 
 func _has_status(id: String) -> bool:
@@ -112,6 +143,18 @@ func _get_all_statuses() -> Array[Status]:
 		statuses.append(status_ui.status)
 		
 	return statuses
+
+
+func _remove_status_ui(status_ui: StatusUI) -> void:
+	if not status_ui or not status_ui.status:
+		return
+	var status := status_ui.status
+	if status.can_expire:
+		status.duration = 0
+	elif status.stack_type == Status.StackType.INTENSITY:
+		status.stacks = 0
+	else:
+		status_ui.queue_free()
 
 
 func _on_status_applied(status: Status) -> void:

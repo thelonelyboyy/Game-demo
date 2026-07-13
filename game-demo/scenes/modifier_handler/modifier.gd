@@ -26,11 +26,14 @@ func add_new_value(value: ModifierValue) -> void:
 func remove_value(source: String) -> void:
 	for value: ModifierValue in get_children():
 		if value.source == source:
+			remove_child(value)
 			value.queue_free()
+			return
 
 
 func clear_values() -> void:
 	for value: ModifierValue in get_children():
+		remove_child(value)
 		value.queue_free()
 
 
