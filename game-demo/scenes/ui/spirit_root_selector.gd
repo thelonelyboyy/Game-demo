@@ -162,7 +162,10 @@ func _create_root_row(root: Card.Element) -> Button:
 
 	var name_label := Label.new()
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	name_label.text = "%s灵根" % SpiritRootText.element_name(root)
+	name_label.text = "%s灵根 · 职业卡池 %s 张" % [
+		SpiritRootText.element_name(root),
+		_get_element_supply(root),
+	]
 	name_label.add_theme_color_override("font_color", SpiritRootText.element_color(root).lightened(0.16))
 	name_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.76))
 	name_label.add_theme_constant_override("shadow_offset_x", 2)
@@ -182,6 +185,12 @@ func _create_root_row(root: Card.Element) -> Button:
 	text_box.add_child(effect)
 
 	return button
+
+
+func _get_element_supply(root: Card.Element) -> int:
+	if not run_startup or not run_startup.picked_character:
+		return 0
+	return run_startup.picked_character.count_draftable_cards_of_element(root)
 
 
 func _create_rootless_row() -> Button:

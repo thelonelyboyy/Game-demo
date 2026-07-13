@@ -872,3 +872,10 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - `RunStats.apply_rootless_start()` 是补偿的唯一结算入口，并以 `CharacterStats.rootless_path` 防止重复发放；无相身份随角色存档保存，继续游戏不会丢失。
 - 顶栏灵根徽章与悬停说明会显示“无相之路”及其开局补偿，不再误显示为“灵根未定”。
 - `content-progression` smoke 覆盖无元素、最大生命、灵石、牌组张数、随机突破和重复发放保护；全量检查仍为 20 项。
+
+## 41. 灵根卡池供给提示（2026-07-13）
+
+- 每个灵根选项现在直接显示当前职业可选卡池中对应元素牌的准确数量，玩家可以同时权衡圆满效果与实际成型难度。
+- 供给量由 `CharacterStats.count_draftable_cards_of_element()` 从职业 `draftable_cards` 实时统计，不维护第二份展示常数；换职业或调整卡池后自动同步。
+- 中立牌和 `NONE` 不计入灵根供给，避免把无法推动灵根阶段的牌误算为构筑资源。
+- `content-progression` smoke 逐元素与原始卡池交叉计数，验证展示数据不会随资源调整漂移。

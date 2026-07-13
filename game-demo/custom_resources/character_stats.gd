@@ -133,6 +133,17 @@ func count_spirit_root_cards() -> int:
 	return count_cards_of_element(spirit_root)
 
 
+func count_draftable_cards_of_element(element: Card.Element) -> int:
+	if element == Card.Element.NONE or not draftable_cards:
+		return 0
+
+	var count := 0
+	for card: Card in draftable_cards.cards:
+		if card and card.element == element:
+			count += 1
+	return count
+
+
 func count_cards_of_element(element: Card.Element) -> int:
 	if not has_spirit_root() or not deck:
 		return 0

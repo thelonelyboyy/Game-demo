@@ -54,6 +54,7 @@ func _run_smoke() -> void:
 
 	_check_chapter_card_weights()
 	_check_rootless_start()
+	_check_element_supply_counts()
 
 	_finish()
 
@@ -95,6 +96,21 @@ func _check_rootless_start() -> void:
 	_check(stats.apply_rootless_start(character) == null, "rootless compensation cannot be granted twice")
 	_check(character.max_health == max_health_after_first_grant, "duplicate rootless grant does not add max health")
 	_check(stats.gold == gold_after_first_grant, "duplicate rootless grant does not add gold")
+
+
+func _check_element_supply_counts() -> void:
+	var character := load("res://characters/demonic_cultivator/demonic_cultivator.tres") as CharacterStats
+	var counted_total := 0
+	for element in [Card.Element.METAL, Card.Element.WOOD, Card.Element.WATER, Card.Element.FIRE, Card.Element.EARTH]:
+		var expected := 0
+		for card: Card in character.draftable_cards.cards:
+			if card and card.element == element:
+				expected += 1
+		var actual := character.count_draftable_cards_of_element(element)
+		_check(actual == expected, "spirit root selector reports the exact element supply")
+		counted_total += actual
+	_check(character.count_draftable_cards_of_element(Card.Element.NONE) == 0, "neutral cards are excluded from spirit root supply")
+	_check(counted_total > 0, "demonic draft pool exposes element supply choices")
 
 
 func _battle_id(battle: BattleStats) -> String:
