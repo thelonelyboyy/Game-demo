@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EndTurnHandBlockRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/end_turn_hand_block_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/ink_guard_talisman.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "镇魔经夹"
+id = "affliction_binding_clip"
+type = 2
+character_type = 0
+rarity = 1
+icon = ExtResource("2")
+tooltip = "回合结束时，每有 1 张状态牌或诅咒牌留在手中便获得 4 点护体，最多计算 2 张。"
+card_filter = 1
+block_per_card = 4
+maximum_cards_counted = 2

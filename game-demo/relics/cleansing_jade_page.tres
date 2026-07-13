@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AfflictionDrawRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/affliction_draw_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/lotus_mirror.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "涤尘玉页"
+id = "cleansing_jade_page"
+type = 4
+character_type = 0
+rarity = 1
+icon = ExtResource("2")
+tooltip = "每回合第一次抽到状态牌或诅咒牌时，额外抽 1 张牌。"
+draw_amount = 1
+once_per_turn = true
