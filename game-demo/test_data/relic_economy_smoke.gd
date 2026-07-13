@@ -28,10 +28,10 @@ func _run_smoke() -> void:
 	for relic: Relic in pool.relics:
 		if relic and relic.rarity < rarity_counts.size():
 			rarity_counts[relic.rarity] += 1
-	_check(pool.relics.size() == 61, "reward pool contains sixty-one relics")
+	_check(pool.relics.size() == 64, "reward pool contains sixty-four relics")
 	for rarity in Relic.Rarity.values():
 		_check(rarity_counts[rarity] > 0, "rarity %s has at least one relic" % rarity)
-	_check(rarity_counts[Relic.Rarity.BOSS] == 9, "demonic reward pool contains nine boss relics")
+	_check(rarity_counts[Relic.Rarity.BOSS] == 12, "reward pool contains twelve boss relics")
 
 	_check_context(pool, character, RelicRewardPool.RewardContext.STANDARD, false, true)
 	_check_context(pool, character, RelicRewardPool.RewardContext.SHOP, false, true)

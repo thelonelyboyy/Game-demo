@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EnemyEmpowerManaBossRelic" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/enemy_empower_mana_boss_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/spirit_spring_gourd.png" id="2"]
+[ext_resource type="Resource" path="res://statuses/muscle.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "吞天气海"
+id = "heaven_devouring_core"
+type = 1
+character_type = 0
+rarity = 3
+icon = ExtResource("2")
+tooltip = "吞天气海\n每回合额外获得 1 点灵力。每场战斗开始时，所有敌人获得 2 层劲气。"
+mana_amount = 1
+enemy_status = ExtResource("3")
+enemy_stacks = 2

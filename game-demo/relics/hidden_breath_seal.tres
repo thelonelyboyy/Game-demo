@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="RetainedManaBossRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/retained_mana_boss_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/mana_potion.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "归藏玉玺"
+id = "hidden_breath_seal"
+type = 1
+character_type = 0
+rarity = 3
+icon = ExtResource("2")
+tooltip = "归藏玉玺\n回合结束时，至多保留 2 点未使用的灵力到下一回合。"
+max_retained = 2
