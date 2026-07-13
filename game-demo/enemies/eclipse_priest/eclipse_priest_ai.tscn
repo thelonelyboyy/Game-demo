@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
 [ext_resource type="Script" path="res://enemies/shared/add_card_to_discard_action.gd" id="2"]
@@ -12,6 +12,8 @@
 [ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="10"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="11"]
 [ext_resource type="Resource" path="res://common_cards/status/eclipse_scar.tres" id="12"]
+[ext_resource type="Script" path="res://enemies/shared/summon_enemy_action.gd" id="13"]
+[ext_resource type="Resource" path="res://enemies/venom_moth/venom_moth_enemy.tres" id="14"]
 
 [sub_resource type="Resource" id="IntentScar"]
 script = ExtResource("5")
@@ -31,9 +33,15 @@ base_text = "10"
 icon = ExtResource("8")
 category = 2
 
+[sub_resource type="Resource" id="IntentSummon"]
+script = ExtResource("5")
+base_text = "召唤瘴毒蛾 · 满员护体14"
+icon = ExtResource("6")
+category = 8
+
 [node name="EclipsePriestAI" type="Node"]
 script = ExtResource("1")
-fixed_sequence = Array[int]([0, 1, 2, 1])
+fixed_sequence = Array[int]([0, 3, 1, 2, 1])
 
 [node name="EclipseScarAction" type="Node" parent="."]
 script = ExtResource("2")
@@ -56,3 +64,12 @@ intent = SubResource("IntentVeil")
 sound = ExtResource("11")
 type = 1
 block = 10
+
+[node name="SummonMothAction" type="Node" parent="."]
+script = ExtResource("13")
+intent = SubResource("IntentSummon")
+sound = ExtResource("9")
+type = 1
+summon_stats = ExtResource("14")
+max_enemies = 3
+fallback_block = 14

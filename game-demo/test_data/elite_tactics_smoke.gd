@@ -4,9 +4,9 @@ const BATTLE_SCENE_PATH := "res://scenes/battle/battle.tscn"
 const RELIC_HANDLER_SCENE_PATH := "res://scenes/relic_handler/relic_handler.tscn"
 const CHARACTER_PATH := "res://characters/sword_cultivator/sword_cultivator.tres"
 const ELITE_BATTLES := [
-	{"path": "res://battles/demo_e_blood_moon_hunt.tres", "kind": "pack_buff"},
-	{"path": "res://battles/demo_e_bronze_formation.tres", "kind": "team_block"},
-	{"path": "res://battles/demo_e_eclipse_ritual.tres", "kind": "deck_pollution"},
+	{"path": "res://battles/demo_e_blood_moon_hunt.tres", "kind": "pack_buff", "summon_id": "mist_wolf"},
+	{"path": "res://battles/demo_e_bronze_formation.tres", "kind": "team_block", "summon_id": "paper_soldier"},
+	{"path": "res://battles/demo_e_eclipse_ritual.tres", "kind": "deck_pollution", "summon_id": "venom_moth"},
 ]
 
 var failures: PackedStringArray = []
@@ -19,7 +19,7 @@ func _ready() -> void:
 func _run_smoke() -> void:
 	_check_random_action_repeat_guard()
 	for spec: Dictionary in ELITE_BATTLES:
-		await _check_elite_battle(String(spec.path), String(spec.kind))
+		await _check_elite_battle(String(spec.path), String(spec.kind), String(spec.summon_id))
 	_finish()
 
 
@@ -47,7 +47,7 @@ func _check_random_action_repeat_guard() -> void:
 	picker.free()
 
 
-func _check_elite_battle(battle_path: String, kind: String) -> void:
+func _check_elite_battle(battle_path: String, kind: String, summon_id: String) -> void:
 	var battle_stats := load(battle_path) as BattleStats
 	var battle_scene := load(BATTLE_SCENE_PATH) as PackedScene
 	var relic_handler_scene := load(RELIC_HANDLER_SCENE_PATH) as PackedScene
@@ -86,6 +86,17 @@ func _check_elite_battle(battle_path: String, kind: String) -> void:
 		"deck_pollution":
 			_check(_discard_contains(battle, "eclipse_scar"), "%s adds eclipse scar to discard" % battle_path)
 
+	battle.battle_ui._on_end_turn_button_pressed()
+	await get_tree().create_timer(5.0).timeout
+	enemies = _get_live_enemies(battle)
+	_check(enemies.size() == 3, "%s summons a third combatant on its second enemy turn" % battle_path)
+	_check(_count_enemy_id(enemies, summon_id) == 2, "%s summons the advertised reinforcement" % battle_path)
+	_check(_enemies_have_actions(enemies), "%s gives summoned reinforcements a future intent" % battle_path)
+	_check(battle.battle_active, "%s remains active after reinforcement joins" % battle_path)
+	if not enemies.is_empty():
+		var overflow := battle.enemy_handler.summon_enemy(enemies.back().stats, 3)
+		_check(overflow == null and _get_live_enemies(battle).size() == 3, "%s enforces the three-enemy summon cap" % battle_path)
+
 	_check(battle.player != null and battle.player.stats.health > 0, "%s first enemy turn is survivable" % battle_path)
 	get_tree().paused = false
 	battle.queue_free()
@@ -100,6 +111,14 @@ func _enemies_have_actions(enemies: Array[Enemy]) -> bool:
 		if not enemy.current_action:
 			return false
 	return true
+
+
+func _count_enemy_id(enemies: Array[Enemy], enemy_id: String) -> int:
+	var count := 0
+	for enemy: Enemy in enemies:
+		if enemy.stats and enemy.stats.id == enemy_id:
+			count += 1
+	return count
 
 
 func _discard_contains(battle: Battle, card_id: String) -> bool:

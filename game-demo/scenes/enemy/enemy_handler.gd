@@ -1,7 +1,10 @@
 class_name EnemyHandler
 extends Node2D
 
+const ENEMY_SCENE := preload("res://scenes/enemy/enemy.tscn")
+
 var acting_enemies: Array[Enemy] = []
+var active_battle_stats: BattleStats
 
 
 func _ready() -> void:
@@ -17,6 +20,7 @@ func _ready() -> void:
 func setup_enemies(battle_stats: BattleStats) -> void:
 	if not battle_stats:
 		return
+	active_battle_stats = battle_stats
 	
 	for child in get_children():
 		remove_child(child)
@@ -31,6 +35,22 @@ func setup_enemies(battle_stats: BattleStats) -> void:
 		new_enemy_child.status_handler.statuses_applied.connect(_on_enemy_statuses_applied.bind(new_enemy_child))
 		
 	all_new_enemies.queue_free()
+
+
+func summon_enemy(enemy_stats: EnemyStats, max_enemies := 3) -> Enemy:
+	if not enemy_stats or get_live_enemies().size() >= maxi(max_enemies, 1):
+		return null
+
+	var summoned := ENEMY_SCENE.instantiate() as Enemy
+	summoned.stats = enemy_stats
+	add_child(summoned)
+	if active_battle_stats:
+		_apply_battle_modifiers(summoned, active_battle_stats)
+	if not summoned.status_handler.statuses_applied.is_connected(_on_enemy_statuses_applied):
+		summoned.status_handler.statuses_applied.connect(_on_enemy_statuses_applied.bind(summoned))
+	summoned.current_action = null
+	summoned.update_action.call_deferred()
+	return summoned
 
 
 func _apply_battle_modifiers(enemy: Enemy, battle_stats: BattleStats) -> void:

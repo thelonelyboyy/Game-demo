@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
 [ext_resource type="Script" path="res://enemies/shared/block_allies_action.gd" id="2"]
@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_attack.png" id="6"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="7"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="8"]
+[ext_resource type="Script" path="res://enemies/shared/summon_enemy_action.gd" id="9"]
+[ext_resource type="Resource" path="res://enemies/paper_soldier/paper_soldier_enemy.tres" id="10"]
 
 [sub_resource type="Resource" id="IntentFormation"]
 script = ExtResource("4")
@@ -27,9 +29,15 @@ base_text = "%s"
 icon = ExtResource("6")
 category = 0
 
+[sub_resource type="Resource" id="IntentSummon"]
+script = ExtResource("4")
+base_text = "召唤符纸兵 · 满员护体12"
+icon = ExtResource("5")
+category = 8
+
 [node name="BronzeOverseerAI" type="Node"]
 script = ExtResource("1")
-fixed_sequence = Array[int]([0, 1, 0, 2])
+fixed_sequence = Array[int]([0, 3, 1, 0, 2])
 
 [node name="FormationAction" type="Node" parent="."]
 script = ExtResource("2")
@@ -51,3 +59,12 @@ intent = SubResource("IntentCrush")
 sound = ExtResource("8")
 type = 1
 damage = 18
+
+[node name="SummonSoldierAction" type="Node" parent="."]
+script = ExtResource("9")
+intent = SubResource("IntentSummon")
+sound = ExtResource("7")
+type = 1
+summon_stats = ExtResource("10")
+max_enemies = 3
+fallback_block = 12
