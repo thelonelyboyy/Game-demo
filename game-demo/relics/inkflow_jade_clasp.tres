@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardPlayDrawRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/card_play_draw_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/water_moon_bottle.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "流墨玉扣"
+id = "inkflow_jade_clasp"
+type = 4
+character_type = 0
+rarity = 1
+icon = ExtResource("2")
+tooltip = "每回合第一次打出技能牌时，抽 1 张牌。"
+match_type = 1
+draw_amount = 1
+once_per_turn = true

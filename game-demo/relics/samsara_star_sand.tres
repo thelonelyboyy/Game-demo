@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DeckReshuffleRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/deck_reshuffle_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/star_compass.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "轮回星砂"
+id = "samsara_star_sand"
+type = 4
+character_type = 0
+rarity = 2
+icon = ExtResource("2")
+tooltip = "每回合第一次将弃牌堆洗回抽牌堆时，获得 1 点灵力和 6 点护体。"
+block_amount = 6
+mana_amount = 1
+once_per_turn = true

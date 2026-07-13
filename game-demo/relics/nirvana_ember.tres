@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyKillRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/enemy_kill_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/healing_potion.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "涅槃余烬"
+id = "nirvana_ember"
+type = 4
+character_type = 0
+rarity = 2
+icon = ExtResource("2")
+tooltip = "每次击杀敌人时，回复 2 点生命。"
+reward_mode = 3
+amount = 2
+once_per_turn = false

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyKillRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/enemy_kill_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/sword_execution_tally.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "斩灵符"
+id = "spirit_cleaver_talisman"
+type = 4
+character_type = 0
+rarity = 0
+icon = ExtResource("2")
+tooltip = "每回合第一次击杀敌人时，抽 1 张牌。"
+reward_mode = 2
+amount = 1
+once_per_turn = true
