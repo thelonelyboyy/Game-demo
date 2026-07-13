@@ -79,6 +79,13 @@ func _refresh() -> void:
 	if not icon_label or not name_label:
 		return
 
+	if character and character.rootless_path:
+		icon_label.text = "无"
+		icon_label.add_theme_color_override("font_color", Color("e0d4ba"))
+		name_label.text = "无相\n之路"
+		tooltip_text = "无相之路\n放弃灵根成长。开局最大生命 +8、获得 80 灵石，并随机突破 1 张初始牌。"
+		return
+
 	if not character or not character.has_spirit_root():
 		icon_label.text = "灵"
 		icon_label.add_theme_color_override("font_color", Color("b8ad8e"))

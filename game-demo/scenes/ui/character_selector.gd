@@ -163,6 +163,8 @@ func _on_start_button_pressed() -> void:
 	GameSfx.play(GameSfx.GONG, -4.0)
 	run_startup.type = RunStartup.Type.NEW_RUN
 	run_startup.picked_character = current_character
+	run_startup.selected_spirit_root = Card.Element.NONE
+	run_startup.spirit_root_declined = false
 	run_startup.difficulty_level = _difficulty_profile.selected_level if _difficulty_profile else 0
 	get_tree().change_scene_to_packed(SPIRIT_ROOT_SELECTOR_SCENE)
 

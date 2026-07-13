@@ -15,6 +15,7 @@ const SPIRIT_ROOT_BONUS_TAG := "spirit_root_bonus"
 @export var max_mana: int
 @export var starting_relic: Relic
 @export var spirit_root: Card.Element = Card.Element.NONE
+@export var rootless_path := false
 @export_range(1, 3) var hero_skill_stage := 1
 # 战斗帧动画前缀：非空时玩家在战斗里用 art/frame_animation/<id>_standby|attack|attacked 帧动画
 @export var battle_anim_id: String = ""
@@ -61,6 +62,7 @@ func create_instance(selected_spirit_root: Card.Element = Card.Element.NONE) -> 
 	instance.reset_mana()
 	instance.deck = instance.starting_deck.custom_duplicate()
 	instance.spirit_root = selected_spirit_root
+	instance.rootless_path = false
 	instance.deck.bind_cards_to_owner(instance)
 	instance.convert_random_starter_to_spirit_root()
 	instance.grant_spirit_root_profession_card()

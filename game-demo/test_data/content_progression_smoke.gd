@@ -53,6 +53,7 @@ func _run_smoke() -> void:
 				_check(_sets_are_disjoint(first, second), "tier %s encounter pools do not repeat across chapters" % tier)
 
 	_check_chapter_card_weights()
+	_check_rootless_start()
 
 	_finish()
 
@@ -70,6 +71,30 @@ func _check_chapter_card_weights() -> void:
 		_check(high_rarity > previous_high_rarity, "chapter %s increases high-rarity reward chance" % chapter)
 		previous_common = stats.common_weight
 		previous_high_rarity = high_rarity
+
+
+func _check_rootless_start() -> void:
+	var base_character := load("res://characters/demonic_cultivator/demonic_cultivator.tres") as CharacterStats
+	var character := base_character.create_instance(Card.Element.NONE) as CharacterStats
+	var stats := RunStats.new()
+	stats.configure_difficulty(0)
+	var initial_max_health := character.max_health
+	var initial_gold := stats.gold
+	var initial_deck_size := character.deck.cards.size()
+
+	var upgraded := stats.apply_rootless_start(character)
+	_check(character.rootless_path, "declining a spirit root records the rootless path")
+	_check(not character.has_spirit_root(), "rootless start does not grant an element")
+	_check(character.max_health == initial_max_health + RunStats.ROOTLESS_MAX_HEALTH_BONUS, "rootless start grants max health")
+	_check(stats.gold == initial_gold + RunStats.ROOTLESS_GOLD_BONUS, "rootless start grants gold")
+	_check(character.deck.cards.size() == initial_deck_size, "rootless start does not change deck size")
+	_check(upgraded != null and upgraded.upgraded, "rootless start upgrades one starter card")
+
+	var max_health_after_first_grant := character.max_health
+	var gold_after_first_grant := stats.gold
+	_check(stats.apply_rootless_start(character) == null, "rootless compensation cannot be granted twice")
+	_check(character.max_health == max_health_after_first_grant, "duplicate rootless grant does not add max health")
+	_check(stats.gold == gold_after_first_grant, "duplicate rootless grant does not add gold")
 
 
 func _battle_id(battle: BattleStats) -> String:

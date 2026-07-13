@@ -34,7 +34,7 @@ func _roll_spirit_roots() -> void:
 
 func _setup_buttons() -> void:
 	title.text = "选择灵根"
-	description.text = "从三种灵根中选择一种，开局会将一张打击或防御转化为所选元素，并获得一张对应元素的职业卡。"
+	description.text = "选择一种灵根获得元素成长，或放弃灵根踏上无相之路。"
 
 	for child: Node in buttons.get_children():
 		child.queue_free()
@@ -45,12 +45,26 @@ func _setup_buttons() -> void:
 		InkTheme.wire_button_sfx(row)
 		InkTheme.animate_item_entrance(row, 0.12)
 
+	var rootless_row := _create_rootless_row()
+	buttons.add_child(rootless_row)
+	InkTheme.wire_button_sfx(rootless_row)
+	InkTheme.animate_item_entrance(rootless_row, 0.12)
+
 
 func _on_root_selected(root: Card.Element) -> void:
 	# 定灵根的仪式感：与选人「开始修行」呼应的一记锣。
 	GameSfx.play(GameSfx.GONG, -4.0)
 	run_startup.type = RunStartup.Type.NEW_RUN
 	run_startup.selected_spirit_root = root
+	run_startup.spirit_root_declined = false
+	get_tree().change_scene_to_packed(RUN_SCENE)
+
+
+func _on_rootless_selected() -> void:
+	GameSfx.play(GameSfx.GONG, -4.0)
+	run_startup.type = RunStartup.Type.NEW_RUN
+	run_startup.selected_spirit_root = Card.Element.NONE
+	run_startup.spirit_root_declined = true
 	get_tree().change_scene_to_packed(RUN_SCENE)
 
 
@@ -73,13 +87,13 @@ func _apply_custom_background() -> void:
 func _apply_content_layout() -> void:
 	content.set_anchors_preset(Control.PRESET_CENTER)
 	content.offset_left = -470.0
-	content.offset_top = -108.0
+	content.offset_top = -152.0
 	content.offset_right = 470.0
-	content.offset_bottom = 360.0
+	content.offset_bottom = 390.0
 	content.add_theme_constant_override("separation", 14)
 
 	buttons.add_theme_constant_override("separation", 12)
-	buttons.custom_minimum_size = Vector2(940, 264)
+	buttons.custom_minimum_size = Vector2(940, 354)
 
 
 func _apply_title_style() -> void:
@@ -167,6 +181,20 @@ func _create_root_row(root: Card.Element) -> Button:
 	effect.add_theme_font_size_override("font_size", 21)
 	text_box.add_child(effect)
 
+	return button
+
+
+func _create_rootless_row() -> Button:
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(940, 78)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.focus_mode = Control.FOCUS_NONE
+	button.text = "无相之路  ·  最大生命 +8，获得 80 灵石，随机突破 1 张初始牌"
+	button.tooltip_text = "放弃灵根及其元素成长。补偿只在开局发放一次。"
+	button.pressed.connect(_on_rootless_selected)
+	InkTheme.apply_secondary_button(button, 22)
+	button.add_theme_stylebox_override("normal", _make_round_style(Color(0.035, 0.035, 0.040, 0.86), Color("857b68"), 1, 8))
+	button.add_theme_stylebox_override("hover", _make_round_style(Color(0.075, 0.070, 0.065, 0.94), Color("ead9a4"), 2, 8, Color(0.75, 0.65, 0.45, 0.12), 8))
 	return button
 
 

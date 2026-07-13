@@ -4,6 +4,9 @@ extends Resource
 signal gold_changed
 
 const STARTING_GOLD := 70
+const ROOTLESS_MAX_HEALTH_BONUS := 8
+const ROOTLESS_GOLD_BONUS := 80
+const ROOTLESS_UPGRADE_COUNT := 1
 const BASE_CARD_REWARDS := 3
 const BASE_COMMON_WEIGHT := 85.0
 const BASE_UNCOMMON_WEIGHT := 10.0
@@ -76,6 +79,28 @@ const CHAPTER_CARD_RARITY_WEIGHTS := {
 func set_gold(new_amount: int) -> void:
 	gold = new_amount
 	gold_changed.emit()
+
+
+func apply_rootless_start(character: CharacterStats) -> Card:
+	if not character or character.rootless_path or character.has_spirit_root():
+		return null
+
+	character.rootless_path = true
+	character.max_health += ROOTLESS_MAX_HEALTH_BONUS
+	gold += ROOTLESS_GOLD_BONUS
+
+	var candidates: Array[Card] = []
+	if character.deck:
+		for card: Card in character.deck.cards:
+			if card and card.can_upgrade():
+				candidates.append(card)
+	RNG.array_shuffle(candidates)
+
+	var upgraded_card: Card
+	for index in mini(ROOTLESS_UPGRADE_COUNT, candidates.size()):
+		candidates[index].upgrade()
+		upgraded_card = candidates[index]
+	return upgraded_card
 
 
 func reset_weights() -> void:

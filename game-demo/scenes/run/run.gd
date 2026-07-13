@@ -73,6 +73,8 @@ func _start_run() -> void:
 	current_chapter = 1
 	character.hero_skill_stage = current_chapter
 	stats.apply_chapter_card_weights(current_chapter)
+	if run_startup.spirit_root_declined:
+		stats.apply_rootless_start(character)
 	character.health = stats.get_starting_health(character.max_health)
 	
 	_setup_event_connections()

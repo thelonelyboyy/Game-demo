@@ -69,6 +69,8 @@ static func next_stage_hint(count: int) -> String:
 
 
 static func status_tooltip(character: CharacterStats) -> String:
+	if character and character.rootless_path:
+		return "无相之路\n放弃灵根成长。开局最大生命 +8、获得 80 灵石，并随机突破 1 张初始牌。"
 	if not character or not character.has_spirit_root():
 		return "灵根\n尚未选择灵根。"
 
