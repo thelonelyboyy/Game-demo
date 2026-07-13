@@ -14,6 +14,7 @@ const NEW_RELIC_PATHS := [
 	"res://relics/demon_wraith_banner.tres",
 	"res://relics/demon_sha_urn.tres",
 	"res://relics/demon_flame_wheel_core.tres",
+	"res://relics/demon_ash_furnace.tres",
 ]
 
 var failures: PackedStringArray = []
@@ -55,6 +56,7 @@ func _run_smoke() -> void:
 	await _check_self_damage_relics(battle)
 	await _check_soul_mark_relics(battle)
 	await _check_flame_relic(battle)
+	await _check_exhaust_relic(battle)
 
 	get_tree().paused = false
 	battle.queue_free()
@@ -65,7 +67,7 @@ func _run_smoke() -> void:
 
 func _check_reward_pool(character: CharacterStats, other_character: CharacterStats) -> void:
 	var pool := load(RELIC_POOL_PATH) as RelicRewardPool
-	_check(pool != null and pool.relics.size() == 45, "reward pool contains forty-five relics")
+	_check(pool != null and pool.relics.size() == 46, "reward pool contains forty-six relics")
 	if not pool:
 		return
 	var found := 0
@@ -75,7 +77,7 @@ func _check_reward_pool(character: CharacterStats, other_character: CharacterSta
 		found += 1
 		_check(relic.can_appear_as_reward(character), "%s appears for demonic cultivator" % relic.id)
 		_check(not relic.can_appear_as_reward(other_character), "%s stays out of other class pools" % relic.id)
-	_check(found == NEW_RELIC_PATHS.size(), "all six demonic relics are in reward pool")
+	_check(found == NEW_RELIC_PATHS.size(), "all seven demonic relics are in reward pool")
 
 
 func _check_self_damage_relics(battle: Battle) -> void:
@@ -123,6 +125,35 @@ func _check_flame_relic(battle: Battle) -> void:
 	Events.card_played.emit(flame)
 	await get_tree().create_timer(0.45).timeout
 	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "flame wheel core triggers only once per turn")
+
+
+func _check_exhaust_relic(battle: Battle) -> void:
+	for i in 3:
+		var draw_card := Card.new()
+		draw_card.id = "ash_furnace_draw_%s" % i
+		battle.char_stats.draw_pile.add_card(draw_card)
+
+	var initial_hand := battle.player_handler.hand.get_child_count()
+	var first_exhaust := Card.new()
+	first_exhaust.id = "ash_furnace_first_exhaust"
+	battle.player_handler._add_card_to_exhaust_pile(first_exhaust)
+	await get_tree().create_timer(0.45).timeout
+	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "ash furnace draws on first exhausted card")
+
+	var second_exhaust := Card.new()
+	second_exhaust.id = "ash_furnace_second_exhaust"
+	battle.player_handler._add_card_to_exhaust_pile(second_exhaust)
+	await get_tree().create_timer(0.45).timeout
+	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "ash furnace triggers only once per turn")
+
+	Events.player_turn_started.emit()
+	await get_tree().process_frame
+	var third_exhaust := Card.new()
+	third_exhaust.id = "ash_furnace_next_turn_exhaust"
+	battle.player_handler._add_card_to_exhaust_pile(third_exhaust)
+	await get_tree().create_timer(0.45).timeout
+	_check(battle.player_handler.hand.get_child_count() == initial_hand + 2, "ash furnace resets at the next player turn")
+	_check(battle.char_stats.exhaust_pile.cards.has(third_exhaust), "ash furnace does not alter exhaust pile lifecycle")
 
 
 func _get_live_enemies(battle: Battle) -> Array[Enemy]:
