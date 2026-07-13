@@ -22,6 +22,8 @@ const DISCARD_AEGIS_PATH := "res://common_cards/discard_aegis.tres"
 const ASH_HEART_GUARD_PATH := "res://common_cards/ash_heart_guard.tres"
 const SPIRIT_STONE_NEEDLE_PATH := "res://common_cards/spirit_stone_needle.tres"
 const SHADOW_REENACTMENT_PATH := "res://characters/demonic_cultivator/cards/demon_shadow_reenactment.tres"
+const CALAMITY_EMBRYO_PATH := "res://characters/demonic_cultivator/cards/demon_calamity_embryo.tres"
+const LURKING_SOUL_CURSE_PATH := "res://characters/demonic_cultivator/cards/demon_lurking_soul_curse.tres"
 const BLOOD_DEBT_CURSE_PATH := "res://common_cards/status/blood_debt_curse.tres"
 const KARMIC_FIRE_CURSE_PATH := "res://common_cards/status/karmic_fire_curse.tres"
 const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
@@ -35,7 +37,7 @@ var current_step := "startup"
 
 
 func _ready() -> void:
-	get_tree().create_timer(12.0, true).timeout.connect(_on_watchdog_timeout)
+	get_tree().create_timer(15.0, true).timeout.connect(_on_watchdog_timeout)
 	call_deferred("_run_smoke")
 
 
@@ -74,6 +76,8 @@ func _run_smoke() -> void:
 		await _check_common_card_combat(battle, enemies[0])
 		current_step = "copy_previous"
 		await _check_copy_previous_card(battle)
+		current_step = "delayed_cast"
+		await _check_delayed_cast(battle, enemies[0])
 		current_step = "blood_debt"
 		await _check_blood_debt(battle, enemies[0])
 		current_step = "sha_blade"
@@ -265,6 +269,62 @@ func _check_copy_previous_card(battle: Battle) -> void:
 	Events.player_turn_started.emit()
 	await get_tree().process_frame
 	_check(battle.class_mechanic_handler.get_previous_card_played() == null, "new turn clears previous-card history")
+
+
+func _check_delayed_cast(battle: Battle, enemy: Enemy) -> void:
+	Events.player_turn_started.emit()
+	await get_tree().process_frame
+	var card := (load(CALAMITY_EMBRYO_PATH) as Card).duplicate(true) as CultivationCard
+	var hand_before := battle.player_handler.hand.get_child_count()
+	var health_before := battle.player.stats.max_health
+	battle.player.stats.health = health_before
+	battle.char_stats.mana = 0
+	Events.card_played.emit(card)
+	card.apply_effects([battle.player], battle.player.modifier_handler)
+	await get_tree().process_frame
+	_check(battle.player.stats.health == health_before - 3, "calamity embryo pays self-damage immediately")
+	_check(battle.char_stats.mana == 0 and battle.player_handler.hand.get_child_count() == hand_before, "calamity embryo does not grant its delayed rewards immediately")
+	_check(battle.class_mechanic_handler.get_pending_delayed_effect_count() == 1, "calamity embryo queues one delayed cast")
+	_check(battle.char_stats.exhaust_pile.cards.has(card), "calamity embryo enters the exhaust pile")
+
+	for index in 2:
+		var draw_card := Card.new()
+		draw_card.id = "calamity_embryo_draw_%s" % index
+		battle.char_stats.draw_pile.add_card_to_top(draw_card)
+	Events.player_turn_started.emit()
+	await get_tree().create_timer(0.7).timeout
+	_check(battle.class_mechanic_handler.get_pending_delayed_effect_count() == 0, "next turn consumes the delayed cast")
+	_check(battle.char_stats.mana == 2, "calamity embryo grants two mana next turn")
+	_check(battle.player_handler.hand.get_child_count() == hand_before + 2, "calamity embryo draws two cards next turn")
+
+	for index in range(battle.player_handler.hand.get_child_count() - 1, hand_before - 1, -1):
+		battle.player_handler.hand.get_child(index).queue_free()
+	await get_tree().process_frame
+
+	var curse := (load(LURKING_SOUL_CURSE_PATH) as Card).duplicate(true) as CultivationCard
+	enemy.stats.health = enemy.stats.max_health
+	var enemy_health_before := enemy.stats.health
+	var marks_before := enemy.status_handler.get_status_stacks("soul_mark")
+	Events.card_played.emit(curse)
+	curse.apply_effects([enemy], battle.player.modifier_handler)
+	await get_tree().process_frame
+	_check(enemy.stats.health == enemy_health_before, "lurking soul curse does not hit its target immediately")
+	_check(battle.class_mechanic_handler.get_pending_delayed_effect_count() == 1, "lurking soul curse preserves one delayed target")
+	Events.player_turn_started.emit()
+	await get_tree().create_timer(0.3).timeout
+	_check(enemy_health_before - enemy.stats.health == 12, "lurking soul curse damages the preserved target next turn")
+	_check(enemy.status_handler.get_status_stacks("soul_mark") == marks_before + 1, "lurking soul curse applies one soul mark next turn")
+	_check(battle.class_mechanic_handler.get_pending_delayed_effect_count() == 0, "targeted delayed cast leaves no stale queue entry")
+
+	var soul_mark := enemy.status_handler.get_status("soul_mark")
+	if soul_mark:
+		soul_mark.stacks = 0
+	enemy.stats.health = enemy.stats.max_health
+	battle.player.stats.health = battle.player.stats.max_health
+	var sha_status := battle.player.status_handler.get_status("sha_qi")
+	if sha_status:
+		sha_status.stacks = 0
+	await get_tree().process_frame
 
 
 func _check_blood_debt(battle: Battle, enemy: Enemy) -> void:

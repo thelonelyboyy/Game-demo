@@ -69,6 +69,7 @@ var _cards_exhausted_this_turn := 0
 var _cards_exhausted_this_combat := 0
 var _cards_discarded_this_turn := 0
 var _cards_played_this_turn_history: Array[Card] = []
+var _pending_delayed_effects: Array[Dictionary] = []
 # 一次性创建、原地更新的 modifier 值（避免 remove_value 的 queue_free 延迟问题）
 var _mv_dealt_flat: ModifierValue
 var _mv_dealt_mult: ModifierValue
@@ -86,6 +87,7 @@ func setup(
 	player = battle_player
 	player_handler = battle_player_handler
 	enemy_handler = battle_enemy_handler
+	_pending_delayed_effects.clear()
 
 	# 让魔焰效果能通过组找到本处理器读取/更新焰轮
 	if not is_in_group("class_mechanic"):
@@ -217,6 +219,104 @@ func get_previous_card_played(current_card: Card = null) -> Card:
 		if candidate and candidate != current_card:
 			return candidate
 	return null
+
+
+func schedule_delayed_effects(
+	source_card: CultivationCard,
+	effects: Array[Resource],
+	delay_turns: int,
+	target_mode: int,
+	original_targets: Array[Node]
+) -> bool:
+	if not source_card or effects.is_empty() or delay_turns <= 0:
+		return false
+
+	var stored_card := source_card.create_runtime_copy() as CultivationCard
+	if not stored_card:
+		return false
+	stored_card.bind_spirit_root_owner(character)
+	var stored_effects: Array[Resource] = []
+	for effect: Resource in effects:
+		if effect:
+			stored_effects.append(effect.duplicate(true))
+	if stored_effects.is_empty():
+		return false
+
+	var target_ids: Array[int] = []
+	for target: Node in original_targets:
+		if is_instance_valid(target):
+			target_ids.append(target.get_instance_id())
+	_pending_delayed_effects.append({
+		"card": stored_card,
+		"effects": stored_effects,
+		"turns_left": delay_turns,
+		"target_mode": target_mode,
+		"target_ids": target_ids,
+	})
+	Events.ui_notice_requested.emit("已布下延迟术法：%s（%s 回合后生效）" % [stored_card.get_display_name(), delay_turns])
+	return true
+
+
+func get_pending_delayed_effect_count() -> int:
+	return _pending_delayed_effects.size()
+
+
+func _advance_and_resolve_delayed_effects() -> void:
+	if _pending_delayed_effects.is_empty():
+		return
+	var waiting: Array[Dictionary] = []
+	var ready: Array[Dictionary] = []
+	for entry: Dictionary in _pending_delayed_effects:
+		var turns_left := maxi(int(entry.get("turns_left", 1)) - 1, 0)
+		entry["turns_left"] = turns_left
+		if turns_left <= 0:
+			ready.append(entry)
+		else:
+			waiting.append(entry)
+	_pending_delayed_effects = waiting
+
+	for entry: Dictionary in ready:
+		_resolve_delayed_effect(entry)
+
+
+func _resolve_delayed_effect(entry: Dictionary) -> void:
+	if not player or not player.stats or player.stats.health <= 0:
+		return
+	var source_card := entry.get("card") as CultivationCard
+	if not source_card:
+		return
+	var targets := _resolve_delayed_targets(entry)
+	if int(entry.get("target_mode", CardEffect.TargetMode.CARD_TARGETS)) == CardEffect.TargetMode.CARD_TARGETS and targets.is_empty():
+		Events.ui_notice_requested.emit("延迟术法失去目标：%s" % source_card.get_display_name())
+		return
+	for effect: Resource in entry.get("effects", []):
+		if effect and effect.has_method("execute"):
+			effect.execute(source_card, targets, player.modifier_handler)
+	Events.ui_notice_requested.emit("延迟术法生效：%s" % source_card.get_display_name())
+
+
+func _resolve_delayed_targets(entry: Dictionary) -> Array[Node]:
+	var targets: Array[Node] = []
+	match int(entry.get("target_mode", CardEffect.TargetMode.CARD_TARGETS)):
+		CardEffect.TargetMode.PLAYER:
+			if is_instance_valid(player):
+				targets.append(player)
+		CardEffect.TargetMode.ALL_ENEMIES:
+			for enemy: Node in get_tree().get_nodes_in_group("enemies"):
+				if is_instance_valid(enemy) and not enemy.is_queued_for_deletion():
+					targets.append(enemy)
+		CardEffect.TargetMode.EVERYONE:
+			if is_instance_valid(player):
+				targets.append(player)
+			for enemy: Node in get_tree().get_nodes_in_group("enemies"):
+				if is_instance_valid(enemy) and not enemy.is_queued_for_deletion():
+					targets.append(enemy)
+		_:
+			for target_id: int in entry.get("target_ids", []):
+				var target := instance_from_id(target_id) as Node
+				if is_instance_valid(target) and not target.is_queued_for_deletion():
+					targets.append(target)
+	return targets
 
 
 func _reset_card_turn_counts() -> void:
@@ -604,6 +704,7 @@ func _on_player_turn_started() -> void:
 	_clear_flame_wheel()
 	_flame_damage_bonus = 0
 	_reset_blood_turn_state()
+	_advance_and_resolve_delayed_effects()
 	if not _is_demonic():
 		return
 	_restore_retained_flame_color()

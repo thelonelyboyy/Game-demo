@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="2"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_delayed_effect.gd" id="3"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="4"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_mana_effect.gd" id="5"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_black_contract.png" id="6"]
+[ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="7"]
+
+[sub_resource type="Resource" id="SelfDamage"]
+script = ExtResource("2")
+amount = 3
+affected_by_spirit_root = false
+
+[sub_resource type="Resource" id="DelayedDraw"]
+script = ExtResource("4")
+amount = 2
+affected_by_spirit_root = false
+
+[sub_resource type="Resource" id="DelayedMana"]
+script = ExtResource("5")
+amount = 2
+affected_by_spirit_root = false
+
+[sub_resource type="Resource" id="Delay"]
+script = ExtResource("3")
+affected_by_spirit_root = false
+delay_turns = 1
+target_mode = 1
+delayed_effects = Array[Resource]([SubResource("DelayedDraw"), SubResource("DelayedMana")])
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("SelfDamage"), SubResource("Delay")])
+id = "demon_calamity_embryo"
+type = 1
+rarity = 2
+cost = 1
+exhausts = true
+upgrade_type = 2
+element = 4
+profession = 3
+mechanic_tags = PackedStringArray("献祭", "延迟", "过牌", "消耗")
+display_name = "劫火魔胎"
+icon = ExtResource("6")
+sound = ExtResource("7")

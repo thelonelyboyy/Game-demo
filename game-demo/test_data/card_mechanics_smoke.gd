@@ -32,6 +32,11 @@ const NEW_DEMONIC_CARD_IDS := [
 	"demon_soul_lamp_renewal",
 	"demon_myriad_marks_return",
 ]
+const ADVANCED_DEMONIC_CARD_IDS := [
+	"demon_shadow_reenactment",
+	"demon_calamity_embryo",
+	"demon_lurking_soul_curse",
+]
 
 var failures := PackedStringArray()
 var resolved_card_count := -1
@@ -244,8 +249,21 @@ func _check_demonic_pool_depth() -> void:
 			var upgraded := card.duplicate(true) as Card
 			_check(upgraded.can_upgrade(), "%s can upgrade" % card.id)
 			_check(upgraded.upgrade(), "%s upgrade resolves" % card.id)
-	_check(unique_ids.size() == 84, "demonic draft pool contains eighty-four unique cards")
+		if ADVANCED_DEMONIC_CARD_IDS.has(card.id):
+			var advanced_upgrade := card.duplicate(true) as CultivationCard
+			_check(advanced_upgrade.can_upgrade() and advanced_upgrade.upgrade(), "%s advanced mechanic upgrade resolves" % card.id)
+			if card.id == "demon_calamity_embryo":
+				_check(advanced_upgrade.cost == 0, "calamity embryo upgrade reduces its cost to zero")
+			elif card.id == "demon_lurking_soul_curse":
+				var delayed := advanced_upgrade.configured_effects[0] as Resource
+				_check(delayed != null and delayed.delayed_effects.size() == 2, "lurking soul curse keeps both delayed effects after upgrade")
+				if delayed and delayed.delayed_effects.size() == 2:
+					_check(delayed.delayed_effects[0].amount == 18, "lurking soul curse upgrade raises delayed damage to eighteen")
+					_check(delayed.delayed_effects[1].amount == 2, "lurking soul curse upgrade raises delayed soul mark to two")
+	_check(unique_ids.size() == 86, "demonic draft pool contains eighty-six unique cards")
 	_check(unique_ids.has("demon_shadow_reenactment"), "demonic draft pool includes shadow reenactment")
+	_check(unique_ids.has("demon_calamity_embryo"), "demonic draft pool includes calamity embryo")
+	_check(unique_ids.has("demon_lurking_soul_curse"), "demonic draft pool includes lurking soul curse")
 	_check(found_new.size() == NEW_DEMONIC_CARD_IDS.size(), "all seven construction bridge cards are in draft pool")
 
 	var common_ids := {}
