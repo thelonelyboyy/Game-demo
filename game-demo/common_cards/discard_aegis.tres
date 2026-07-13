@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_count_scaling_effect.gd" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_black_contract.png" id="3"]
+[ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="4"]
+
+[sub_resource type="Resource" id="DiscardBlock"]
+script = ExtResource("2")
+result = 1
+count_source = 7
+amount = 4
+amount_per_count = 1
+target_mode = 1
+exclude_current_card = true
+description_template = "获得 {amount} 点护体；弃牌堆中每有 1 张牌，额外获得 {per} 点护体（当前 {total}）。"
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("DiscardBlock")])
+id = "discard_aegis"
+type = 1
+rarity = 2
+cost = 1
+upgrade_type = 2
+mechanic_tags = PackedStringArray("通用", "弃牌堆", "护体")
+display_name = "弃念成罡"
+icon = ExtResource("3")
+sound = ExtResource("4")

@@ -197,6 +197,18 @@ func get_combat_card_count(source: int) -> int:
 			return _cards_played_this_turn
 
 
+func is_card_in_count_source(source: int, card: Card) -> bool:
+	if not card or not character:
+		return false
+	match source:
+		CombatCardCount.DISCARD_PILE_SIZE:
+			return character.discard and character.discard.cards.has(card)
+		CombatCardCount.EXHAUST_PILE_SIZE:
+			return character.exhaust_pile and character.exhaust_pile.cards.has(card)
+		_:
+			return false
+
+
 func _reset_card_turn_counts() -> void:
 	_cards_played_this_turn = 0
 	_attacks_played_this_turn = 0

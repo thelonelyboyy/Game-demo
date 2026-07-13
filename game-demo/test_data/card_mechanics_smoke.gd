@@ -6,6 +6,22 @@ const EXHAUST_CARD_PATH := "res://characters/demonic_cultivator/cards/engines/de
 const DISCOVER_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_forbidden_archive.tres"
 const DRAFT_POOL_PATH := "res://characters/demonic_cultivator/demonic_cultivator_draftable_cards.tres"
 const DEMONIC_CHARACTER_PATH := "res://characters/demonic_cultivator/demonic_cultivator.tres"
+const DRAFT_POOL_PATHS := [
+	DRAFT_POOL_PATH,
+	"res://characters/body_cultivator/body_cultivator_draftable_cards.tres",
+	"res://characters/sword_cultivator/sword_cultivator_draftable_cards.tres",
+	"res://characters/beastmaster/beastmaster_draftable_cards.tres",
+]
+const NEW_COMMON_CARD_PATHS := [
+	"res://common_cards/circulating_breath.tres",
+	"res://common_cards/flowing_cloud_guard.tres",
+	"res://common_cards/momentum_pursuit.tres",
+	"res://common_cards/embers_return.tres",
+	"res://common_cards/returning_light.tres",
+	"res://common_cards/discard_aegis.tres",
+	"res://common_cards/ash_heart_guard.tres",
+	"res://common_cards/spirit_stone_needle.tres",
+]
 const DISCOVERY_REQUEST_SCRIPT := preload("res://custom_resources/card_discovery_request.gd")
 const NEW_DEMONIC_CARD_IDS := [
 	"demon_blood_reversal",
@@ -228,8 +244,32 @@ func _check_demonic_pool_depth() -> void:
 			var upgraded := card.duplicate(true) as Card
 			_check(upgraded.can_upgrade(), "%s can upgrade" % card.id)
 			_check(upgraded.upgrade(), "%s upgrade resolves" % card.id)
-	_check(unique_ids.size() == 75, "demonic draft pool contains seventy-five unique cards")
+	_check(unique_ids.size() == 83, "demonic draft pool contains eighty-three unique cards")
 	_check(found_new.size() == NEW_DEMONIC_CARD_IDS.size(), "all seven construction bridge cards are in draft pool")
+
+	var common_ids := {}
+	for path: String in NEW_COMMON_CARD_PATHS:
+		var card := load(path) as Card
+		_check(card != null, "%s common card loads" % path)
+		if not card:
+			continue
+		common_ids[card.id] = true
+		_check(card.get_profession() == Card.Profession.COMMON, "%s remains profession-neutral" % card.id)
+		var upgraded := card.duplicate(true) as Card
+		_check(upgraded.can_upgrade() and upgraded.upgrade(), "%s common card can upgrade" % card.id)
+	_check(common_ids.size() == 8, "eight new common construction cards have unique ids")
+
+	for pool_path: String in DRAFT_POOL_PATHS:
+		var profession_pool := load(pool_path) as CardPile
+		_check(profession_pool != null, "%s draft pool loads" % pool_path)
+		if not profession_pool:
+			continue
+		var pool_ids := {}
+		for card: Card in profession_pool.cards:
+			if card:
+				pool_ids[card.id] = true
+		for common_id: String in common_ids:
+			_check(pool_ids.has(common_id), "%s includes common card %s" % [pool_path, common_id])
 
 
 func _check_hero_skill_growth() -> void:

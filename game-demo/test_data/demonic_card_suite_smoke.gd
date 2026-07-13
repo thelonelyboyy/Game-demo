@@ -13,6 +13,14 @@ const FLESH_REBIRTH_PATH := "res://characters/demonic_cultivator/cards/demon_fle
 const BLOOD_MEMBRANE_PATH := "res://characters/demonic_cultivator/cards/engines/demon_blood_membrane.tres"
 const HUNDRED_GHOSTS_PATH := "res://characters/demonic_cultivator/cards/phase3/demon_hundred_ghosts.tres"
 const TEN_THOUSAND_SACRIFICE_PATH := "res://characters/demonic_cultivator/cards/phase3/demon_ten_thousand_sacrifice.tres"
+const CIRCULATING_BREATH_PATH := "res://common_cards/circulating_breath.tres"
+const FLOWING_CLOUD_GUARD_PATH := "res://common_cards/flowing_cloud_guard.tres"
+const MOMENTUM_PURSUIT_PATH := "res://common_cards/momentum_pursuit.tres"
+const EMBERS_RETURN_PATH := "res://common_cards/embers_return.tres"
+const RETURNING_LIGHT_PATH := "res://common_cards/returning_light.tres"
+const DISCARD_AEGIS_PATH := "res://common_cards/discard_aegis.tres"
+const ASH_HEART_GUARD_PATH := "res://common_cards/ash_heart_guard.tres"
+const SPIRIT_STONE_NEEDLE_PATH := "res://common_cards/spirit_stone_needle.tres"
 const BLOOD_DEBT_CURSE_PATH := "res://common_cards/status/blood_debt_curse.tres"
 const KARMIC_FIRE_CURSE_PATH := "res://common_cards/status/karmic_fire_curse.tres"
 const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
@@ -61,6 +69,8 @@ func _run_smoke() -> void:
 	if enemies.size() >= 2:
 		current_step = "count_scaling"
 		await _check_count_scaling_cards(battle, enemies)
+		current_step = "common_cards"
+		await _check_common_card_combat(battle, enemies[0])
 		current_step = "blood_debt"
 		await _check_blood_debt(battle, enemies[0])
 		current_step = "sha_blade"
@@ -145,6 +155,87 @@ func _check_count_scaling_cards(battle: Battle, enemies: Array[Enemy]) -> void:
 	_check(battle.class_mechanic_handler.get_combat_card_count(4) == 0, "new turn resets turn exhaust count")
 	_check(battle.class_mechanic_handler.get_combat_card_count(6) == 0, "new turn resets discard count")
 	_check(battle.class_mechanic_handler.get_combat_card_count(5) == expected_exhaust_count, "new turn preserves combat exhaust count")
+
+
+func _check_common_card_combat(battle: Battle, enemy: Enemy) -> void:
+	var initial_hand := battle.player_handler.hand.get_child_count()
+	Events.player_turn_started.emit()
+	await get_tree().process_frame
+
+	var flowing_guard := (load(FLOWING_CLOUD_GUARD_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(flowing_guard)
+	var block_before := battle.player.stats.block
+	flowing_guard.apply_effects([battle.player], battle.player.modifier_handler)
+	_check(battle.player.stats.block == block_before + 2, "flowing cloud guard counts itself as the first card in the chain")
+
+	var pursuit := (load(MOMENTUM_PURSUIT_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(pursuit)
+	var enemy_health_before := enemy.stats.health
+	pursuit.apply_effects([enemy], battle.player.modifier_handler)
+	await get_tree().create_timer(0.25).timeout
+	_check(enemy_health_before - enemy.stats.health == 5, "momentum pursuit starts at five damage for the first attack")
+
+	var draw_one := Card.new()
+	draw_one.id = "common_cycle_draw"
+	battle.char_stats.draw_pile.add_card_to_top(draw_one)
+	var breath := (load(CIRCULATING_BREATH_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(breath)
+	block_before = battle.player.stats.block
+	var hand_before := battle.player_handler.hand.get_child_count()
+	breath.apply_effects([battle.player], battle.player.modifier_handler)
+	await get_tree().create_timer(0.45).timeout
+	_check(battle.player.stats.block == block_before + 5 and battle.player_handler.hand.get_child_count() == hand_before + 1, "circulating breath grants block and draws one")
+
+	for i in 2:
+		var draw_card := Card.new()
+		draw_card.id = "embers_return_draw_%s" % i
+		battle.char_stats.draw_pile.add_card_to_top(draw_card)
+	var embers := (load(EMBERS_RETURN_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(embers)
+	block_before = battle.player.stats.block
+	hand_before = battle.player_handler.hand.get_child_count()
+	embers.apply_effects([battle.player], battle.player.modifier_handler)
+	await get_tree().create_timer(0.45).timeout
+	_check(battle.player.stats.block == block_before + 3 and battle.player_handler.hand.get_child_count() == hand_before + 2, "embers return grants block and draws two")
+	_check(battle.char_stats.exhaust_pile.cards.has(embers), "embers return enters the exhaust pile")
+
+	battle.player.stats.health = maxi(battle.player.stats.max_health - 12, 1)
+	var returning_light := (load(RETURNING_LIGHT_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(returning_light)
+	var health_before := battle.player.stats.health
+	returning_light.apply_effects([battle.player], battle.player.modifier_handler)
+	_check(battle.player.stats.health == health_before + 5, "returning light heals five")
+	_check(battle.char_stats.exhaust_pile.cards.has(returning_light), "returning light exhausts after use")
+
+	var discard_count := battle.char_stats.discard.cards.size()
+	var discard_aegis := (load(DISCARD_AEGIS_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(discard_aegis)
+	block_before = battle.player.stats.block
+	discard_aegis.apply_effects([battle.player], battle.player.modifier_handler)
+	_check(battle.player.stats.block == block_before + 4 + discard_count, "discard aegis scales with the visible discard pile and excludes itself")
+
+	var exhaust_count := battle.class_mechanic_handler.get_combat_card_count(5)
+	var ash_guard := (load(ASH_HEART_GUARD_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(ash_guard)
+	block_before = battle.player.stats.block
+	ash_guard.apply_effects([battle.player], battle.player.modifier_handler)
+	_check(battle.player.stats.block == block_before + 2 + exhaust_count * 2, "ash heart guard scales with combat exhaust count")
+
+	var needle := (load(SPIRIT_STONE_NEEDLE_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(needle)
+	enemy_health_before = enemy.stats.health
+	needle.apply_effects([enemy], battle.player.modifier_handler)
+	await get_tree().create_timer(0.25).timeout
+	_check(enemy_health_before - enemy.stats.health == 3, "spirit stone needle deals three damage for zero mana")
+	_check(battle.char_stats.exhaust_pile.cards.has(needle), "spirit stone needle exhausts after use")
+
+	enemy.stats.health = enemy.stats.max_health
+	battle.player.stats.health = battle.player.stats.max_health
+	for index in range(battle.player_handler.hand.get_child_count() - 1, initial_hand - 1, -1):
+		battle.player_handler.hand.get_child(index).queue_free()
+	await get_tree().process_frame
+	Events.player_turn_started.emit()
+	await get_tree().process_frame
 
 
 func _check_blood_debt(battle: Battle, enemy: Enemy) -> void:

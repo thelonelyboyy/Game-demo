@@ -19,6 +19,7 @@ enum CountSource {
 @export var amount_per_count := 1
 @export var minimum_count := 0
 @export var target_mode := TargetMode.CARD_TARGETS
+@export var exclude_current_card := false
 
 
 func execute(card: CultivationCard, targets: Array[Node], modifiers: ModifierHandler) -> void:
@@ -39,7 +40,7 @@ func execute(card: CultivationCard, targets: Array[Node], modifiers: ModifierHan
 
 
 func get_modified_amount(card: CultivationCard, _player_modifiers: ModifierHandler = null, _enemy_modifiers: ModifierHandler = null) -> int:
-	var count := maxi(_get_count(), minimum_count)
+	var count := maxi(_get_count(card), minimum_count)
 	var value := amount + amount_per_count * count
 	if affected_by_spirit_root and card:
 		value = card.get_spirit_root_modified_value(value)
@@ -49,7 +50,7 @@ func get_modified_amount(card: CultivationCard, _player_modifiers: ModifierHandl
 
 
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
-	var count := maxi(_get_count(), minimum_count)
+	var count := maxi(_get_count(card), minimum_count)
 	var total := get_modified_amount(card, player_modifiers, enemy_modifiers)
 	if not description_template.is_empty():
 		return description_template.replace("{amount}", str(amount)).replace("{per}", str(amount_per_count)).replace("{count}", str(count)).replace("{total}", str(total)).replace("{source}", _source_name())
@@ -62,11 +63,15 @@ func upgrade_values() -> void:
 	amount_per_count = _upgrade_number(amount_per_count)
 
 
-func _get_count() -> int:
+func _get_count(card: Card = null) -> int:
 	var handler := _get_class_mechanic_handler()
 	if not handler or not handler.has_method("get_combat_card_count"):
 		return 0
-	return handler.get_combat_card_count(count_source)
+	var count: int = handler.get_combat_card_count(count_source)
+	if exclude_current_card and card and handler.has_method("is_card_in_count_source"):
+		if handler.is_card_in_count_source(count_source, card):
+			count -= 1
+	return maxi(count, 0)
 
 
 func _source_name() -> String:

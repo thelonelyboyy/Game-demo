@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_count_scaling_effect.gd" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_cut_soul.png" id="3"]
+[ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="4"]
+
+[sub_resource type="Resource" id="CountDamage"]
+script = ExtResource("2")
+count_source = 1
+amount = 3
+amount_per_count = 2
+minimum_count = 1
+description_template = "造成 {amount} 点伤害；本回合每打出 1 张攻击牌，额外造成 {per} 点伤害（当前 {total}）。"
+
+[resource]
+script = ExtResource("1")
+configured_effects = Array[Resource]([SubResource("CountDamage")])
+id = "momentum_pursuit"
+target = 1
+cost = 1
+rarity = 1
+upgrade_type = 1
+mechanic_tags = PackedStringArray("通用", "连锁")
+display_name = "乘势追击"
+icon = ExtResource("3")
+sound = ExtResource("4")
