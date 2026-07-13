@@ -143,15 +143,51 @@ func add_potion_reward(potion: Potion) -> void:
 	var potion_reward := REWARD_BUTTON.instantiate() as RewardButton
 	potion_reward.reward_icon = potion.icon
 	potion_reward.reward_text = potion.potion_name
-	potion_reward.reward_subtext = "获得%s · %s" % [label, potion.get_tooltip().replace("\n", " ")]
+	var reward_description := "获得%s · %s" % [label, potion.get_tooltip().replace("\n", " ")]
+	potion_reward.reward_subtext = reward_description
 	potion_reward.accent_color = Color("c0508c") if potion.category == Potion.Category.TALISMAN else Color("5fb18a")
-	potion_reward.pressed.connect(_on_potion_reward_taken.bind(potion))
+	potion_reward.auto_consume = false
+	potion_reward.set_meta("potion_reward", true)
+	potion_reward.set_meta("reward_description", reward_description)
+	potion_reward.pressed.connect(_on_potion_reward_taken.bind(potion, potion_reward))
 	rewards.add_child.call_deferred(potion_reward)
+	_connect_potion_inventory_refresh()
+	_refresh_potion_reward_buttons.call_deferred()
 
 
-func _on_potion_reward_taken(potion: Potion) -> void:
-	if potion and potion_handler:
-		potion_handler.add_potion(potion)
+func _on_potion_reward_taken(potion: Potion, reward_button: RewardButton) -> void:
+	if not potion or not potion_handler or not potion_handler.add_potion(potion):
+		Events.ui_notice_requested.emit("药囊已满，请先右键丢弃一件符箓或丹药")
+		_refresh_potion_reward_buttons()
+		return
+	if is_instance_valid(reward_button):
+		reward_button.queue_free()
+
+
+func _connect_potion_inventory_refresh() -> void:
+	if not potion_handler:
+		return
+	if not potion_handler.potion_discarded.is_connected(_refresh_potion_reward_buttons):
+		potion_handler.potion_discarded.connect(_refresh_potion_reward_buttons)
+	if not potion_handler.potion_used.is_connected(_refresh_potion_reward_buttons):
+		potion_handler.potion_used.connect(_refresh_potion_reward_buttons)
+
+
+func _refresh_potion_reward_buttons(_potion: Potion = null) -> void:
+	if not rewards:
+		return
+	var inventory_full := potion_handler and potion_handler.is_full()
+	for child: Node in rewards.get_children():
+		var reward_button := child as RewardButton
+		if not reward_button or not reward_button.has_meta("potion_reward"):
+			continue
+		var description := str(reward_button.get_meta("reward_description", ""))
+		reward_button.reward_subtext = (
+			"药囊已满 · 右键丢弃已有物品后领取"
+			if inventory_full
+			else description
+		)
+		reward_button.tooltip_text = "需要一个空药囊槽位。" if inventory_full else ""
 
 
 func add_card_fusion_reward() -> void:

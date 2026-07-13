@@ -1025,8 +1025,8 @@ func _show_regular_battle_rewards() -> void:
 	reward_scene.potion_handler = potion_handler
 	reward_scene.add_gold_reward(map.last_room.battle_stats.roll_gold_reward())
 	reward_scene.add_card_reward()
-	# 只有槽位可用时才推进掉落保底；连续三次未掉后下一次必定出现。
-	if not potion_handler.is_full() and stats.roll_standard_potion_drop():
+	# 掉落即使药囊已满也会展示，玩家可在奖励页丢弃旧物后领取。
+	if stats.roll_standard_potion_drop():
 		reward_scene.add_potion_reward(_random_reward_potion(PotionRewardPool.RewardContext.STANDARD))
 
 
@@ -1043,9 +1043,8 @@ func _show_elite_battle_rewards() -> void:
 	))
 	reward_scene.add_card_reward(BattleReward.CardRewardTier.ELITE)
 	reward_scene.add_card_fusion_reward()
-	# 精英战必掉一个符箓丹药（槽位满则跳过）。
-	if not potion_handler.is_full():
-		reward_scene.add_potion_reward(_random_reward_potion(PotionRewardPool.RewardContext.ELITE))
+	# 精英战必掉一个符箓丹药；满槽时允许先丢弃旧物再领取。
+	reward_scene.add_potion_reward(_random_reward_potion(PotionRewardPool.RewardContext.ELITE))
 
 
 func _show_boss_battle_rewards() -> void:
@@ -1062,8 +1061,7 @@ func _show_boss_battle_rewards() -> void:
 		character, relic_handler, 3, current_chapter, RelicRewardPool.RewardContext.BOSS
 	)
 	reward_scene.add_relic_choice_rewards(relic_choices)
-	if not potion_handler.is_full():
-		reward_scene.add_potion_reward(_random_reward_potion(PotionRewardPool.RewardContext.BOSS))
+	reward_scene.add_potion_reward(_random_reward_potion(PotionRewardPool.RewardContext.BOSS))
 
 
 func _on_battle_reward_exited() -> void:

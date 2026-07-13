@@ -2,6 +2,7 @@ extends Node
 
 const CHARACTER_PATH := "res://characters/demonic_cultivator/demonic_cultivator.tres"
 const POTION_HANDLER_SCENE_PATH := "res://scenes/potion_handler/potion_handler.tscn"
+const BATTLE_REWARD_SCENE_PATH := "res://scenes/battle_reward/battle_reward.tscn"
 
 var failures: PackedStringArray = []
 
@@ -51,6 +52,7 @@ func _run_smoke() -> void:
 	_check_weight_curves()
 	_check_standard_drop_pity()
 	await _check_potion_discard(available[0])
+	await _check_full_inventory_reward(available[0])
 	_finish()
 
 
@@ -102,6 +104,47 @@ func _check_potion_discard(potion: Potion) -> void:
 		_check(handler.count() == 1 and handler._aiming_ui == null, "right-click while aiming cancels targeting without discarding")
 		handler._on_discard_requested(occupied_ui)
 		_check(handler.count() == 0 and occupied_ui.potion == null, "right-click discard clears the occupied slot")
+	handler.queue_free()
+	await get_tree().process_frame
+
+
+func _check_full_inventory_reward(potion: Potion) -> void:
+	var handler_scene := load(POTION_HANDLER_SCENE_PATH) as PackedScene
+	var reward_scene := load(BATTLE_REWARD_SCENE_PATH) as PackedScene
+	var handler := handler_scene.instantiate() as PotionHandler
+	var reward := reward_scene.instantiate() as BattleReward
+	add_child(handler)
+	add_child(reward)
+	await get_tree().process_frame
+	reward.potion_handler = handler
+	for _i in PotionHandler.MAX_SLOTS:
+		_check(handler.add_potion(potion), "test inventory can be filled")
+	_check(handler.is_full(), "test inventory reaches its slot cap")
+
+	reward.add_potion_reward(potion)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var reward_button: RewardButton
+	for child: Node in reward.rewards.get_children():
+		if child is RewardButton and child.has_meta("potion_reward"):
+			reward_button = child
+			break
+	_check(reward_button != null and not reward_button.auto_consume, "full inventory keeps the consumable reward claimable")
+	_check(reward_button != null and reward_button.reward_subtext.contains("药囊已满"), "full inventory reward explains how to make room")
+
+	if reward_button:
+		reward._on_potion_reward_taken(potion, reward_button)
+		_check(handler.count() == PotionHandler.MAX_SLOTS and not reward_button.is_queued_for_deletion(), "failed full-inventory claim does not consume the reward")
+
+	var occupied_ui := handler.get_child(0) as PotionUI
+	handler._on_discard_requested(occupied_ui)
+	await get_tree().process_frame
+	_check(reward_button != null and not reward_button.reward_subtext.contains("药囊已满"), "discarding refreshes the pending reward state")
+	if reward_button:
+		reward._on_potion_reward_taken(potion, reward_button)
+		_check(handler.is_full() and reward_button.is_queued_for_deletion(), "reward is consumed only after the potion enters an open slot")
+
+	reward.queue_free()
 	handler.queue_free()
 	await get_tree().process_frame
 
