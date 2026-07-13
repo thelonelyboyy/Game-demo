@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/enemies_redesign/paper_soldier.png" id="2"]
+[ext_resource type="PackedScene" path="res://enemies/ash_sutra_monk/ash_sutra_monk_ai.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = "ash_sutra_monk"
+display_name = "灰经邪僧"
+description = "不断把蚀痕写入抽弃牌堆；拖延越久，未来回合越容易被污染占满。"
+ai = ExtResource("3")
+max_health = 94
+art = ExtResource("2")

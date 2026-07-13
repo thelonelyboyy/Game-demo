@@ -1,0 +1,55 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
+[ext_resource type="Script" path="res://enemies/shared/attack_and_block_action.gd" id="2"]
+[ext_resource type="Script" path="res://enemies/crab/crab_attack_action.gd" id="3"]
+[ext_resource type="Script" path="res://enemies/crab/crab_block_action.gd" id="4"]
+[ext_resource type="Script" path="res://custom_resources/intent.gd" id="5"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_attack.png" id="6"]
+[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/enemy_intents/crab_block.png" id="7"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="8"]
+[ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="9"]
+
+[sub_resource type="Resource" id="IntentRam"]
+script = ExtResource("5")
+base_text = "%s · 护体%s"
+icon = ExtResource("6")
+category = 3
+
+[sub_resource type="Resource" id="IntentSmash"]
+script = ExtResource("5")
+base_text = "%s"
+icon = ExtResource("6")
+category = 0
+
+[sub_resource type="Resource" id="IntentBrace"]
+script = ExtResource("5")
+base_text = "14"
+icon = ExtResource("7")
+category = 2
+
+[node name="WardedHuskAI" type="Node"]
+script = ExtResource("1")
+fixed_sequence = Array[int]([0, 1, 0, 2])
+
+[node name="ArmoredRamAction" type="Node" parent="."]
+script = ExtResource("2")
+intent = SubResource("IntentRam")
+sound = ExtResource("8")
+type = 1
+damage = 8
+block = 8
+
+[node name="FurnaceSmashAction" type="Node" parent="."]
+script = ExtResource("3")
+intent = SubResource("IntentSmash")
+sound = ExtResource("8")
+type = 1
+damage = 14
+
+[node name="SealArmorAction" type="Node" parent="."]
+script = ExtResource("4")
+intent = SubResource("IntentBrace")
+sound = ExtResource("9")
+type = 1
+block = 14

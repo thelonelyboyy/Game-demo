@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/enemies_redesign/blood_tiger.png" id="2"]
+[ext_resource type="PackedScene" path="res://enemies/blood_revenant/blood_revenant_ai.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = "blood_revenant"
+display_name = "饮血尸傀"
+description = "以攻击汲取生命；零散伤害会被迅速抹平，集中爆发才能压住其续航。"
+ai = ExtResource("3")
+max_health = 122
+art = ExtResource("2")

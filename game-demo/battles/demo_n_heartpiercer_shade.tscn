@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/enemy/enemy.tscn" id="1"]
+[ext_resource type="Resource" path="res://enemies/heartpiercer_shade/heartpiercer_shade_enemy.tres" id="2"]
+
+[node name="Enemies" type="Node2D"]
+
+[node name="Enemy1" parent="." instance=ExtResource("1")]
+position = Vector2(286, 122)
+stats = ExtResource("2")

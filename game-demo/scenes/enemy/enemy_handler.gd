@@ -8,6 +8,10 @@ func _ready() -> void:
 	Events.enemy_died.connect(_on_enemy_died)
 	Events.enemy_action_completed.connect(_on_enemy_action_completed)
 	Events.player_hand_drawn.connect(_on_player_hand_drawn)
+	Events.card_played.connect(_on_card_pile_changed)
+	Events.card_discarded.connect(_on_card_pile_changed)
+	Events.card_exhausted.connect(_on_card_pile_changed)
+	Events.player_hit.connect(_on_player_health_changed)
 
 
 func setup_enemies(battle_stats: BattleStats) -> void:
@@ -98,6 +102,18 @@ func _on_enemy_action_completed(enemy: Enemy) -> void:
 
 
 func _on_player_hand_drawn() -> void:
+	_refresh_intents()
+
+
+func _on_card_pile_changed(_card: Card, _from_global_center := Vector2.ZERO) -> void:
+	_refresh_intents.call_deferred()
+
+
+func _on_player_health_changed() -> void:
+	_refresh_intents.call_deferred()
+
+
+func _refresh_intents() -> void:
 	for enemy: Enemy in get_live_enemies():
 		enemy.update_intent()
 

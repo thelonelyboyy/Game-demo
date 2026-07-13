@@ -2,9 +2,9 @@ extends Node
 
 const BATTLE_POOL_PATH := "res://battles/battle_stats_pool.tres"
 const EXPECTED_COUNTS := {
-	1: [9, 3, 3],
-	2: [9, 3, 3],
-	3: [9, 3, 3],
+	1: [11, 3, 3],
+	2: [11, 3, 3],
+	3: [11, 3, 3],
 }
 
 var failures := PackedStringArray()

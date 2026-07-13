@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BattleStatsPool" load_steps=48 format=3 uid="uid://by8ka073e8sah"]
+[gd_resource type="Resource" script_class="BattleStatsPool" load_steps=54 format=3 uid="uid://by8ka073e8sah"]
 
 [ext_resource type="Script" path="res://custom_resources/battle_stats_pool.gd" id="1_pool"]
 [ext_resource type="Script" path="res://custom_resources/battle_stats.gd" id="2_stats"]
@@ -47,7 +47,13 @@
 [ext_resource type="Resource" path="res://battles/demo_n_spirit_leech.tres" id="battle_43"]
 [ext_resource type="Resource" path="res://battles/demo_n_scripture_moth.tres" id="battle_44"]
 [ext_resource type="Resource" path="res://battles/demo_n_karma_collector.tres" id="battle_45"]
+[ext_resource type="Resource" path="res://battles/demo_n_blood_rite_acolyte.tres" id="battle_46"]
+[ext_resource type="Resource" path="res://battles/demo_n_warded_husk.tres" id="battle_47"]
+[ext_resource type="Resource" path="res://battles/demo_n_heartpiercer_shade.tres" id="battle_48"]
+[ext_resource type="Resource" path="res://battles/demo_n_ash_sutra_monk.tres" id="battle_49"]
+[ext_resource type="Resource" path="res://battles/demo_n_blood_revenant.tres" id="battle_50"]
+[ext_resource type="Resource" path="res://battles/demo_n_heavenly_clerk.tres" id="battle_51"]
 
 [resource]
 script = ExtResource("1_pool")
-pool = Array[ExtResource("2_stats")]([ExtResource("battle_1"), ExtResource("battle_2"), ExtResource("battle_3"), ExtResource("battle_4"), ExtResource("battle_5"), ExtResource("battle_6"), ExtResource("battle_7"), ExtResource("battle_8"), ExtResource("battle_9"), ExtResource("battle_10"), ExtResource("battle_11"), ExtResource("battle_12"), ExtResource("battle_13"), ExtResource("battle_14"), ExtResource("battle_15"), ExtResource("battle_16"), ExtResource("battle_17"), ExtResource("battle_18"), ExtResource("battle_19"), ExtResource("battle_20"), ExtResource("battle_21"), ExtResource("battle_22"), ExtResource("battle_23"), ExtResource("battle_24"), ExtResource("battle_25"), ExtResource("battle_26"), ExtResource("battle_27"), ExtResource("battle_28"), ExtResource("battle_29"), ExtResource("battle_30"), ExtResource("battle_31"), ExtResource("battle_32"), ExtResource("battle_33"), ExtResource("battle_34"), ExtResource("battle_35"), ExtResource("battle_36"), ExtResource("battle_37"), ExtResource("battle_38"), ExtResource("battle_39"), ExtResource("battle_40"), ExtResource("battle_41"), ExtResource("battle_42"), ExtResource("battle_43"), ExtResource("battle_44"), ExtResource("battle_45")])
+pool = Array[ExtResource("2_stats")]([ExtResource("battle_1"), ExtResource("battle_2"), ExtResource("battle_3"), ExtResource("battle_4"), ExtResource("battle_5"), ExtResource("battle_6"), ExtResource("battle_7"), ExtResource("battle_8"), ExtResource("battle_9"), ExtResource("battle_10"), ExtResource("battle_11"), ExtResource("battle_12"), ExtResource("battle_13"), ExtResource("battle_14"), ExtResource("battle_15"), ExtResource("battle_16"), ExtResource("battle_17"), ExtResource("battle_18"), ExtResource("battle_19"), ExtResource("battle_20"), ExtResource("battle_21"), ExtResource("battle_22"), ExtResource("battle_23"), ExtResource("battle_24"), ExtResource("battle_25"), ExtResource("battle_26"), ExtResource("battle_27"), ExtResource("battle_28"), ExtResource("battle_29"), ExtResource("battle_30"), ExtResource("battle_31"), ExtResource("battle_32"), ExtResource("battle_33"), ExtResource("battle_34"), ExtResource("battle_35"), ExtResource("battle_36"), ExtResource("battle_37"), ExtResource("battle_38"), ExtResource("battle_39"), ExtResource("battle_40"), ExtResource("battle_41"), ExtResource("battle_42"), ExtResource("battle_43"), ExtResource("battle_44"), ExtResource("battle_45"), ExtResource("battle_46"), ExtResource("battle_47"), ExtResource("battle_48"), ExtResource("battle_49"), ExtResource("battle_50"), ExtResource("battle_51")])

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/enemies_redesign/bronze_puppet.png" id="2"]
+[ext_resource type="PackedScene" path="res://enemies/warded_husk/warded_husk_ai.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = "warded_husk"
+display_name = "镇炉甲傀"
+description = "每次撞击都同步结成护体，迫使修士在进攻与防守之间取舍。"
+ai = ExtResource("3")
+max_health = 64
+art = ExtResource("2")

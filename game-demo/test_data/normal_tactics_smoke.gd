@@ -7,6 +7,12 @@ const NORMAL_BATTLES := [
 	{"path": "res://battles/demo_n_spirit_leech.tres", "kind": "mana_seal"},
 	{"path": "res://battles/demo_n_scripture_moth.tres", "kind": "draw_exhaust"},
 	{"path": "res://battles/demo_n_karma_collector.tres", "kind": "discard_scaling"},
+	{"path": "res://battles/demo_n_blood_rite_acolyte.tres", "kind": "blood_rite"},
+	{"path": "res://battles/demo_n_warded_husk.tres", "kind": "attack_guard"},
+	{"path": "res://battles/demo_n_heartpiercer_shade.tres", "kind": "exposed_setup"},
+	{"path": "res://battles/demo_n_ash_sutra_monk.tres", "kind": "draw_pollution"},
+	{"path": "res://battles/demo_n_blood_revenant.tres", "kind": "blood_drain"},
+	{"path": "res://battles/demo_n_heavenly_clerk.tres", "kind": "missing_health"},
 ]
 
 var failures: PackedStringArray = []
@@ -50,6 +56,18 @@ func _check_normal_battle(battle_path: String, kind: String) -> void:
 	var health_before := battle.char_stats.health
 	var hand_before := battle.player_handler.hand.get_child_count()
 	var exhaust_before := battle.char_stats.exhaust_pile.cards.size()
+	var pollution_before := _count_card_id(battle, "eclipse_scar")
+	var enemy_health_before := enemies[0].stats.health if not enemies.is_empty() else 0
+	if kind == "blood_drain" and not enemies.is_empty():
+		enemies[0].stats.health -= 15
+		enemy_health_before = enemies[0].stats.health
+	elif kind == "missing_health":
+		battle.char_stats.health = maxi(battle.char_stats.max_health - 40, 1)
+		Events.player_hit.emit()
+		await get_tree().process_frame
+		health_before = battle.char_stats.health
+		var expected_intent := 10 + floori(40.0 / float(battle.char_stats.max_health) * 16.0)
+		_check(not enemies.is_empty() and enemies[0].current_action.intent.current_text == str(expected_intent), "%s refreshes its intent after player health changes" % battle_path)
 
 	battle.battle_ui._on_end_turn_button_pressed()
 	await get_tree().create_timer(4.2).timeout
@@ -64,6 +82,25 @@ func _check_normal_battle(battle_path: String, kind: String) -> void:
 		"discard_scaling":
 			var expected_damage := 8 + mini(hand_before * 2, 16)
 			_check(health_before - battle.char_stats.health == expected_damage, "%s scales damage from the discarded hand" % battle_path)
+		"blood_rite":
+			_check(not enemies.is_empty() and enemies[0].stats.health == enemy_health_before - 4, "%s pays its advertised blood-rite health" % battle_path)
+			_check(not enemies.is_empty() and enemies[0].status_handler.get_status_stacks("muscle") == 2, "%s gains two muscle from its blood rite" % battle_path)
+			_check(battle.char_stats.health == health_before, "%s blood rite deals no hidden player damage" % battle_path)
+		"attack_guard":
+			_check(health_before - battle.char_stats.health == 8, "%s deals its attack-and-guard damage" % battle_path)
+			_check(not enemies.is_empty() and enemies[0].stats.block == 8, "%s keeps its attack-and-guard block" % battle_path)
+		"exposed_setup":
+			var exposed := battle.player.status_handler.get_status("exposed")
+			_check(exposed != null and exposed.duration == 1, "%s leaves one enemy-turn window of exposed" % battle_path)
+			_check(battle.char_stats.health == health_before, "%s telegraphs exposed before its multi-hit" % battle_path)
+		"draw_pollution":
+			_check(_count_card_id(battle, "eclipse_scar") == pollution_before + 1, "%s adds exactly one eclipse scar across combat piles" % battle_path)
+		"blood_drain":
+			_check(health_before - battle.char_stats.health == 14, "%s deals its advertised drain damage" % battle_path)
+			_check(not enemies.is_empty() and enemies[0].stats.health == enemy_health_before + 10, "%s restores ten health after draining" % battle_path)
+		"missing_health":
+			var expected_damage := 10 + floori(40.0 / float(battle.char_stats.max_health) * 16.0)
+			_check(health_before - battle.char_stats.health == expected_damage, "%s scales damage from missing health" % battle_path)
 
 	_check(battle.player != null and battle.player.stats.health > 0, "%s first enemy turn is survivable" % battle_path)
 	get_tree().paused = false
@@ -81,6 +118,21 @@ func _get_live_enemies(battle: Battle) -> Array[Enemy]:
 		if enemy and not enemy.is_queued_for_deletion():
 			enemies.append(enemy)
 	return enemies
+
+
+func _count_card_id(battle: Battle, card_id: String) -> int:
+	var count := 0
+	for pile: CardPile in [battle.char_stats.draw_pile, battle.char_stats.discard, battle.char_stats.exhaust_pile]:
+		if not pile:
+			continue
+		for card: Card in pile.cards:
+			if card and card.id == card_id:
+				count += 1
+	for child: Node in battle.player_handler.hand.get_children():
+		var card_ui := child as CardUI
+		if card_ui and card_ui.card and card_ui.card.id == card_id:
+			count += 1
+	return count
 
 
 func _check(condition: bool, message: String) -> void:
