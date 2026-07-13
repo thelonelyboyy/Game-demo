@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Status" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/status.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/status_sword_guard.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "spell_ward"
+type = 2
+stack_type = 1
+can_expire = false
+is_debuff = false
+duration = 0
+stacks = 2
+icon = ExtResource("2")
+tooltip = "法障：抵消接下来 %s 次负面状态。"

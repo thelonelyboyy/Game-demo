@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/shadow_reaper.png" id="2"]
 [ext_resource type="PackedScene" path="res://enemies/underworld_judge/underworld_judge_ai.tscn" id="3"]
+[ext_resource type="Resource" path="res://statuses/spell_ward_3.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -10,6 +11,7 @@ id = "underworld_judge"
 display_name = "幽冥判官"
 description = "以判牒封堵牌序，宣判之后落下不可回避的重击。"
 ai = ExtResource("3")
+starting_statuses = Array[Resource("res://custom_resources/status.gd")]([ExtResource("4")])
 phase_two_health_ratio = 0.60
 phase_two_name = "阴司开堂"
 phase_two_block = 30

@@ -9,6 +9,7 @@ id = "bleed"
 type = 0
 stack_type = 2
 can_expire = true
+is_debuff = true
 duration = 1
 stacks = 0
 icon = ExtResource("1")

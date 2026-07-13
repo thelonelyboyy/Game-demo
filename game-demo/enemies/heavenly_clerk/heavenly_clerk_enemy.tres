@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/shadow_reaper.png" id="2"]
 [ext_resource type="PackedScene" path="res://enemies/heavenly_clerk/heavenly_clerk_ai.tscn" id="3"]
+[ext_resource type="Resource" path="res://statuses/spell_ward.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -10,5 +11,6 @@ id = "heavenly_clerk"
 display_name = "天罚司吏"
 description = "按修士已损生命追加伤害；残血时继续贪攻会招致更重的天罚。"
 ai = ExtResource("3")
+starting_statuses = Array[Resource("res://custom_resources/status.gd")]([ExtResource("4")])
 max_health = 128
 art = ExtResource("2")

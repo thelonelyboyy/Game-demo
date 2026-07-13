@@ -5,6 +5,7 @@ extends Stats
 @export var display_name := ""
 @export_multiline var description := ""
 @export var ai: PackedScene
+@export var starting_statuses: Array[Status] = []
 
 @export_group("Phase Two")
 @export_range(0.0, 1.0) var phase_two_health_ratio := 0.0

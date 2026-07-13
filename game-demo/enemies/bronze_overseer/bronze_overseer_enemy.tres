@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/bronze_puppet.png" id="2"]
 [ext_resource type="PackedScene" path="res://enemies/bronze_overseer/bronze_overseer_ai.tscn" id="3"]
+[ext_resource type="Resource" path="res://statuses/spell_ward.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -10,5 +11,6 @@ id = "bronze_overseer"
 display_name = "铜傀督军"
 description = "统御残存傀儡结阵护身，并以重拳惩罚久战。"
 ai = ExtResource("3")
+starting_statuses = Array[Resource("res://custom_resources/status.gd")]([ExtResource("4")])
 max_health = 118
 art = ExtResource("2")

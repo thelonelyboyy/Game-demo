@@ -31,6 +31,7 @@ var sprite_visible_size := Vector2.ZERO
 var _highlight_tween: Tween
 var _dying := false
 var _phase_two_triggered := false
+var _starting_statuses_applied := false
 # 战斗信息卡尺寸（画布像素）。battle_ui 把本节点对齐到信息卡时写入，
 # 之后碰撞体/选中框/飘字/特效全部以信息卡为基准。
 var aligned_feedback_extents := Vector2.ZERO
@@ -50,6 +51,7 @@ func set_current_action(value: EnemyAction) -> void:
 
 func set_enemy_stats(value: EnemyStats) -> void:
 	stats = value.create_instance()
+	_starting_statuses_applied = false
 	
 	if not stats.stats_changed.is_connected(update_stats):
 		stats.stats_changed.connect(update_stats)
@@ -101,7 +103,17 @@ func update_enemy() -> void:
 	sprite_2d.texture = stats.art
 	_fit_sprite_and_overlays()
 	setup_ai()
+	_apply_starting_statuses()
 	update_stats()
+
+
+func _apply_starting_statuses() -> void:
+	if _starting_statuses_applied or not stats or not status_handler:
+		return
+	_starting_statuses_applied = true
+	for starting_status: Status in stats.starting_statuses:
+		if starting_status:
+			status_handler.add_status(starting_status.duplicate() as Status)
 
 
 func update_intent() -> void:

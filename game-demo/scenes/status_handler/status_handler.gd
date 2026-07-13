@@ -2,9 +2,11 @@ class_name StatusHandler
 extends GridContainer
 
 signal statuses_applied(type: Status.Type)
+signal status_blocked(status: Status)
 
 const STATUS_APPLY_INTERVAL := 0.25
 const STATUS_UI = preload("res://scenes/status_handler/status_ui.tscn")
+const SPELL_WARD_ID := "spell_ward"
 
 @export var status_owner: Node2D
 
@@ -30,6 +32,10 @@ func apply_statuses_by_type(type: Status.Type) -> void:
 
 
 func add_status(status: Status) -> void:
+	if not status:
+		return
+	if status.is_debuff and _consume_spell_ward(status):
+		return
 	var stackable := status.stack_type != Status.StackType.NONE
 	
 	# Add it if it's new
@@ -53,6 +59,26 @@ func add_status(status: Status) -> void:
 	# If it's stackable, stack it
 	if status.stack_type == Status.StackType.INTENSITY:
 		_get_status(status.id).stacks += status.stacks
+
+
+func _consume_spell_ward(blocked_status: Status) -> bool:
+	var spell_ward := _get_status(SPELL_WARD_ID)
+	if not spell_ward or spell_ward.stacks <= 0:
+		return false
+	spell_ward.stacks -= 1
+	status_blocked.emit(blocked_status)
+	Events.ui_notice_requested.emit("%s 的法障抵消了一项负面状态" % _get_owner_name())
+	return true
+
+
+func _get_owner_name() -> String:
+	var enemy := status_owner as Enemy
+	if enemy and enemy.stats:
+		return enemy.stats.display_name
+	var player := status_owner as Player
+	if player and player.stats:
+		return player.stats.character_name
+	return "目标"
 
 
 func get_status(id: String) -> Status:
