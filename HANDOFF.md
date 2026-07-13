@@ -857,3 +857,10 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - 点击后复用 `CardPileView` 展示完整消耗牌堆，按真实进入顺序排列，不随机打乱；玩家可以判断「血肉重生」下一张会取回什么。
 - `BattleUI.initialize_card_pile_ui()` 统一绑定 `CharacterStats.exhaust_pile` 的按钮和查看器，计数随 `card_pile_size_changed` 即时更新。
 - `demonic-card-suite` 在真实战斗消耗测试牌后打开查看器，验证按钮绑定、页面显示和卡牌数量完全一致。
+
+## 39. 跳过卡牌奖励补偿（2026-07-13）
+
+- 战斗卡牌奖励选择“跳过”时获得 10 灵石，为瘦牌组和主动放弃低协同牌提供小额正反馈；金额明显低于正常战斗金币主奖励，不替代拿牌决策。
+- 跳过按钮直接显示“跳过 · +10 灵石”，结算后同时显示居中提示；玩家无需猜测隐藏收益。
+- `_on_card_reward_taken` 只有在缓存奖励仍存在时才结算，跳过后立即清空并消费奖励按钮；重复信号或重复调用不会再次增加灵石。
+- `card-mechanics` 验证首次跳过 +10、奖励缓存清空和第二次调用不加钱；`run-flow` 验证真实奖励页面文案。

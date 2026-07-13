@@ -259,6 +259,7 @@ func _check_reward_entry(run: Run, room: Room) -> void:
 		var card_rewards := reward.active_card_rewards
 		_check(card_rewards != null, "card reward picker opens")
 		_check(card_rewards != null and not card_rewards.rewards.is_empty(), "card reward picker has choices")
+		_check(card_rewards != null and card_rewards.skip_card_reward.text.contains("+10 灵石"), "card reward picker shows skip compensation")
 		if card_rewards and not card_rewards.rewards.is_empty():
 			card_rewards._show_tooltip(card_rewards.rewards[0])
 			card_rewards.take_button.pressed.emit()

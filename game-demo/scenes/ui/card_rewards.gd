@@ -13,6 +13,7 @@ const CARD_MENU_UI = preload("res://scenes/ui/card_menu_ui.tscn")
 @onready var take_button: Button = %TakeButton
 
 var selected_card: Card
+var skip_gold_reward := 0 : set = set_skip_gold_reward
 
 
 func _ready() -> void:
@@ -26,6 +27,19 @@ func _ready() -> void:
 			card_reward_selected.emit(null)
 			queue_free()
 	)
+	_update_skip_button_text()
+
+
+func set_skip_gold_reward(value: int) -> void:
+	skip_gold_reward = maxi(value, 0)
+	if is_node_ready():
+		_update_skip_button_text()
+
+
+func _update_skip_button_text() -> void:
+	if not skip_card_reward:
+		return
+	skip_card_reward.text = "跳过 · +%s 灵石" % skip_gold_reward if skip_gold_reward > 0 else "跳过"
 
 
 func _on_take_button_pressed() -> void:

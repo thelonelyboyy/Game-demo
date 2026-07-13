@@ -12,6 +12,7 @@ const CARD_ICON := preload("res://art/ui/rewards/card_reward_icon.png")
 const FUSION_ICON := preload("res://art/map/nodes/map_node_elite.png")
 const FUSION_TEXT := "术法熔炼"
 const CARD_TEXT := "择取新术法"
+const CARD_REWARD_SKIP_GOLD := 10
 const RARE_PITY_WEIGHT_PER_MISS := 2.0
 const RARE_PITY_MAX_BONUS := 12.0
 const RARE_PITY_HARD_LIMIT := 6
@@ -155,6 +156,7 @@ func _show_card_rewards(card_reward: RewardButton) -> void:
 
 	active_card_rewards = CARD_REWARDS.instantiate() as CardRewards
 	add_child(active_card_rewards)
+	active_card_rewards.skip_gold_reward = CARD_REWARD_SKIP_GOLD
 	active_card_rewards.card_reward_selected.connect(_on_card_reward_taken.bind(card_reward))
 
 	if card_reward_choices.is_empty():
@@ -321,11 +323,14 @@ func _on_gold_reward_taken(amount: int) -> void:
 
 func _on_card_reward_taken(card: Card, card_reward: RewardButton) -> void:
 	active_card_rewards = null
-	if not character_stats:
+	if not character_stats or card_reward_choices.is_empty():
 		return
 
 	if card:
 		character_stats.deck.add_card(card)
+	elif run_stats:
+		run_stats.gold += CARD_REWARD_SKIP_GOLD
+		Events.ui_notice_requested.emit("放弃术法，获得 %s 灵石" % CARD_REWARD_SKIP_GOLD)
 	card_reward_choices.clear()
 	if is_instance_valid(card_reward):
 		card_reward.queue_free()

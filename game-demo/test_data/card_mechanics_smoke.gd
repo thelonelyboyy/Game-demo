@@ -139,8 +139,12 @@ func _check_card_reward_choices() -> void:
 
 	var reward_button := RewardButton.new()
 	reward.card_reward_choices = [common_card]
+	var gold_before_skip := reward.run_stats.gold
 	reward._on_card_reward_taken(null, reward_button)
 	_check(reward.card_reward_choices.is_empty(), "skipping consumes cached card choices")
+	_check(reward.run_stats.gold == gold_before_skip + BattleReward.CARD_REWARD_SKIP_GOLD, "skipping a card reward grants ten gold")
+	reward._on_card_reward_taken(null, reward_button)
+	_check(reward.run_stats.gold == gold_before_skip + BattleReward.CARD_REWARD_SKIP_GOLD, "consumed card reward cannot grant skip gold twice")
 	_check(reward_button.is_queued_for_deletion(), "skipping consumes the card reward button")
 	reward_button.free()
 	reward.free()
