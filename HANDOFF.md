@@ -879,3 +879,10 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - 供给量由 `CharacterStats.count_draftable_cards_of_element()` 从职业 `draftable_cards` 实时统计，不维护第二份展示常数；换职业或调整卡池后自动同步。
 - 中立牌和 `NONE` 不计入灵根供给，避免把无法推动灵根阶段的牌误算为构筑资源。
 - `content-progression` smoke 逐元素与原始卡池交叉计数，验证展示数据不会随资源调整漂移。
+
+## 42. 非战斗探索音乐（2026-07-13）
+
+- 地图、商店、事件、篝火、宝箱和赐福房统一接入已有 CC0 曲目 `vampires_piano_tad_cc0.mp3`，不再让普通/精英/Boss 战斗曲延续到整段探索流程。
+- 探索曲运行时显式循环并以 `-7 dB` 播放；进入战斗仍由 `Battle` 按普通/精英或 Boss 切换原有曲目，主菜单也保持自己的主题。
+- `MusicPlayer.play()` 在单曲模式下检测到同一音频已播放时只更新音量、不停止重播，因此连续经过非战斗房间时音乐保持完整连续。
+- 新开局、地图返回和读档恢复到非战斗房间都会进入探索音乐路径；不改动现有 UI 或房间结算逻辑。

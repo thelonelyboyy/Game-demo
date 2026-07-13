@@ -6,6 +6,10 @@ func play(audio: AudioStream, single := false, volume_db := 0.0) -> void:
 		return
 
 	if single:
+		for player: AudioStreamPlayer in get_children():
+			if player.playing and player.stream == audio:
+				player.volume_db = volume_db
+				return
 		stop()
 
 	for player: AudioStreamPlayer in get_children():

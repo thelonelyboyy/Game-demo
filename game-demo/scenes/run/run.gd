@@ -17,6 +17,8 @@ const DEFEAT_LEGACY := preload("res://custom_resources/defeat_legacy.gd")
 const POTION_REWARD_PATHS := PotionRewardPool.POTION_PATHS
 const MAIN_MENU_PATH := "res://scenes/ui/main_menu.tscn"
 const TOTAL_CHAPTERS := 3
+const MUSIC_EXPLORATION := preload("res://art/audio/collected_dark_roguelike/bgm/vampires_piano_tad_cc0.mp3")
+const EXPLORATION_MUSIC_VOLUME_DB := -7.0
 
 @export var run_startup: RunStartup
 
@@ -48,6 +50,7 @@ var debug_console
 var current_chapter := 1
 var pending_chapter_advance := false
 var run_finalized := false
+var exploration_music: AudioStreamMP3
 
 
 func _ready() -> void:
@@ -86,6 +89,7 @@ func _start_run() -> void:
 	map.unlock_floor(0)
 
 	_grant_starter_potions()
+	_play_exploration_music()
 
 	save_data = SaveGame.new()
 	_save_run(true)
@@ -421,6 +425,8 @@ func _load_run() -> void:
 	map.load_map(save_data.map_data, save_data.floors_climbed, save_data.last_room)
 	if save_data.last_room and not save_data.was_on_map:
 		_on_map_exited(save_data.last_room)
+	else:
+		_play_exploration_music()
 
 
 func _change_view(scene: PackedScene) -> Node:
@@ -440,6 +446,7 @@ func _show_map() -> void:
 		current_view.get_child(0).queue_free()
 
 	get_tree().paused = false
+	_play_exploration_music()
 	map.show_map()
 	if map.last_room:
 		map.unlock_next_rooms()
@@ -447,6 +454,13 @@ func _show_map() -> void:
 		map.unlock_floor(0)
 	
 	_save_run(true)
+
+
+func _play_exploration_music() -> void:
+	if not exploration_music:
+		exploration_music = MUSIC_EXPLORATION.duplicate() as AudioStreamMP3
+		exploration_music.loop = true
+	MusicPlayer.play(exploration_music, true, EXPLORATION_MUSIC_VOLUME_DB)
 
 
 func _setup_event_connections() -> void:
@@ -1068,6 +1082,7 @@ func _on_battle_room_entered(room: Room) -> void:
 
 
 func _on_treasure_room_entered() -> void:
+	_play_exploration_music()
 	var treasure_scene := _change_view(TREASURE_SCENE) as Treasure
 	treasure_scene.relic_handler = relic_handler
 	treasure_scene.char_stats = character
@@ -1088,11 +1103,13 @@ func _on_treasure_room_exited(relic_choices: Array[Relic]) -> void:
 
 
 func _on_campfire_entered() -> void:
+	_play_exploration_music()
 	var campfire := _change_view(CAMPFIRE_SCENE) as Campfire
 	campfire.setup(character, stats)
 
 
 func _on_shop_entered() -> void:
+	_play_exploration_music()
 	var shop := _change_view(SHOP_SCENE) as Shop
 	shop.char_stats = character
 	shop.run_stats = stats
@@ -1103,6 +1120,7 @@ func _on_shop_entered() -> void:
 
 
 func _on_event_room_entered(room: Room) -> void:
+	_play_exploration_music()
 	var event_room := _change_view(room.event_scene) as EventRoom
 	event_room.character_stats = character
 	event_room.run_stats = stats
@@ -1112,6 +1130,7 @@ func _on_event_room_entered(room: Room) -> void:
 
 
 func _on_blessing_room_entered() -> void:
+	_play_exploration_music()
 	var blessing := _change_view(BLESSING_SCENE) as Blessing
 	blessing.relic_handler = relic_handler
 	blessing.setup(character, stats, current_chapter)
