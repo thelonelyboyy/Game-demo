@@ -11,6 +11,8 @@ const SHADOW_STEP_PATH := "res://characters/demonic_cultivator/cards/shadow_step
 const SOUL_LAMP_RENEWAL_PATH := "res://characters/demonic_cultivator/cards/demon_soul_lamp_renewal.tres"
 const FLESH_REBIRTH_PATH := "res://characters/demonic_cultivator/cards/demon_flesh_rebirth.tres"
 const BLOOD_MEMBRANE_PATH := "res://characters/demonic_cultivator/cards/engines/demon_blood_membrane.tres"
+const HUNDRED_GHOSTS_PATH := "res://characters/demonic_cultivator/cards/phase3/demon_hundred_ghosts.tres"
+const TEN_THOUSAND_SACRIFICE_PATH := "res://characters/demonic_cultivator/cards/phase3/demon_ten_thousand_sacrifice.tres"
 const BLOOD_DEBT_CURSE_PATH := "res://common_cards/status/blood_debt_curse.tres"
 const KARMIC_FIRE_CURSE_PATH := "res://common_cards/status/karmic_fire_curse.tres"
 const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
@@ -57,6 +59,8 @@ func _run_smoke() -> void:
 	var enemies := _get_live_enemies(battle)
 	_check(enemies.size() == 2, "demonic suite starts with two enemies")
 	if enemies.size() >= 2:
+		current_step = "count_scaling"
+		await _check_count_scaling_cards(battle, enemies)
 		current_step = "blood_debt"
 		await _check_blood_debt(battle, enemies[0])
 		current_step = "sha_blade"
@@ -77,6 +81,70 @@ func _run_smoke() -> void:
 	await get_tree().process_frame
 	current_step = "finish"
 	_finish()
+
+
+func _check_count_scaling_cards(battle: Battle, enemies: Array[Enemy]) -> void:
+	Events.player_turn_started.emit()
+	await get_tree().process_frame
+
+	var filler_attack := Card.new()
+	filler_attack.id = "count_filler_attack"
+	filler_attack.type = Card.Type.ATTACK
+	Events.card_played.emit(filler_attack)
+	var filler_skill := Card.new()
+	filler_skill.id = "count_filler_skill"
+	filler_skill.type = Card.Type.SKILL
+	Events.card_played.emit(filler_skill)
+
+	var hundred_ghosts := (load(HUNDRED_GHOSTS_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(hundred_ghosts)
+	var before_chain: Array[int] = []
+	var chain_targets: Array[Node] = []
+	for enemy: Enemy in enemies:
+		before_chain.append(enemy.stats.health)
+		chain_targets.append(enemy)
+	hundred_ghosts.apply_effects(chain_targets, battle.player.modifier_handler)
+	await get_tree().create_timer(0.25).timeout
+	for i in enemies.size():
+		_check(before_chain[i] - enemies[i].stats.health == 6, "hundred ghosts deals two damage for each of three cards to enemy %s" % i)
+	_check(battle.class_mechanic_handler.get_combat_card_count(0) == 3, "combat counter tracks all cards played this turn")
+	_check(battle.class_mechanic_handler.get_combat_card_count(1) == 2, "combat counter separates attack cards")
+	_check(battle.class_mechanic_handler.get_combat_card_count(2) == 1, "combat counter separates skill cards")
+	Events.card_discarded.emit(filler_skill, Vector2.ZERO)
+	_check(battle.class_mechanic_handler.get_combat_card_count(6) == 1, "combat counter tracks cards discarded this turn")
+
+	var exhaust_before := battle.class_mechanic_handler.get_combat_card_count(5)
+	for i in 2:
+		var prep_exhaust := Card.new()
+		prep_exhaust.id = "count_prep_exhaust_%s" % i
+		prep_exhaust.exhausts = true
+		Events.card_played.emit(prep_exhaust)
+	var sacrifice := (load(TEN_THOUSAND_SACRIFICE_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(sacrifice)
+	var expected_exhaust_count := exhaust_before + 3
+	_check(battle.class_mechanic_handler.get_combat_card_count(5) == expected_exhaust_count, "combat exhaust counter includes the finisher itself")
+	var enemy_health_before := enemies[0].stats.health
+	var player_health_before := battle.player.stats.health
+	sacrifice.apply_effects([enemies[0]], battle.player.modifier_handler)
+	await get_tree().create_timer(0.25).timeout
+	_check(enemy_health_before - enemies[0].stats.health == 10 + expected_exhaust_count * 4, "ten thousand sacrifice scales with combat exhaust count")
+	_check(player_health_before - battle.player.stats.health == 6, "ten thousand sacrifice retains its self-damage cost")
+	_check(battle.char_stats.exhaust_pile.cards.has(sacrifice), "ten thousand sacrifice enters the exhaust pile")
+	_check(battle.class_mechanic_handler.get_combat_card_count(7) == battle.char_stats.discard.cards.size(), "combat counter exposes live discard pile size")
+	_check(battle.class_mechanic_handler.get_combat_card_count(8) == battle.char_stats.exhaust_pile.cards.size(), "combat counter exposes live exhaust pile size")
+
+	for enemy: Enemy in enemies:
+		enemy.stats.health = enemy.stats.max_health
+	battle.player.stats.health = player_health_before
+	var sha_status := battle.player.status_handler.get_status("sha_qi")
+	if sha_status:
+		sha_status.stacks = 0
+	Events.player_turn_started.emit()
+	await get_tree().process_frame
+	_check(battle.class_mechanic_handler.get_combat_card_count(0) == 0, "new turn resets cards-played count")
+	_check(battle.class_mechanic_handler.get_combat_card_count(4) == 0, "new turn resets turn exhaust count")
+	_check(battle.class_mechanic_handler.get_combat_card_count(6) == 0, "new turn resets discard count")
+	_check(battle.class_mechanic_handler.get_combat_card_count(5) == expected_exhaust_count, "new turn preserves combat exhaust count")
 
 
 func _check_blood_debt(battle: Battle, enemy: Enemy) -> void:

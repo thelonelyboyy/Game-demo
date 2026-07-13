@@ -3,13 +3,16 @@
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://c5oxnsf3e12vh" path="res://art/cards/demonic_cultivator/ai/demon_ten_thousand_sacrifice.png" id="2"]
 [ext_resource type="AudioStream" uid="uid://b1vpjjmi5cj3n" path="res://art/audio/axe.ogg" id="3"]
-[ext_resource type="Script" uid="uid://c0o6dt8q7xb3r" path="res://custom_resources/effects/low_health_bonus_damage_effect.gd" id="auto_effect_low_health_damage"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_count_scaling_effect.gd" id="auto_effect_low_health_damage"]
 [ext_resource type="Script" uid="uid://cknickcitjj0m" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="auto_effect_self_damage"]
 
 [sub_resource type="Resource" id="AutoEffect_1_low_health_damage"]
 script = ExtResource("auto_effect_low_health_damage")
-amount = 18
-bonus_amount = 10
+count_source = 5
+amount = 10
+amount_per_count = 4
+minimum_count = 1
+description_template = "造成 {amount} 点伤害；本场每消耗 1 张牌，额外造成 {per} 点伤害（当前 {total}）。"
 
 [sub_resource type="Resource" id="AutoEffect_2_self_damage"]
 script = ExtResource("auto_effect_self_damage")
@@ -19,16 +22,16 @@ affected_by_spirit_root = false
 [resource]
 script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_low_health_damage"), SubResource("AutoEffect_2_self_damage")])
-effect_text = "失去 {self_damage} 点生命，造成 {damage} 点伤害。若生命不高于一半，额外造成 {blood_bonus} 点伤害。"
+effect_text = "造成 10 点伤害，本场每消耗 1 张牌额外造成 4 点伤害；失去 6 点生命。"
 id = "demon_ten_thousand_sacrifice"
 rarity = 2
 target = 1
 cost = 2
 exhausts = true
-upgrade_type = 1
+upgrade_type = 2
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("献祭")
+mechanic_tags = PackedStringArray("献祭", "消耗", "消耗联动")
 display_name = "万祭归一"
 icon = ExtResource("2")
 sound = ExtResource("3")

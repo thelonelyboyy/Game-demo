@@ -3,14 +3,16 @@
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://s07bpi4prgj8" path="res://art/cards/demonic_cultivator/ai/demon_hundred_ghosts.png" id="2"]
 [ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/audio/slash.ogg" id="3"]
-[ext_resource type="Script" uid="uid://bfbtae55pt1yq" path="res://custom_resources/effects/configured_damage_effect.gd" id="auto_effect_damage"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_count_scaling_effect.gd" id="auto_effect_damage"]
 [ext_resource type="Script" uid="uid://dpgu18d4ll1s7" path="res://custom_resources/effects/configured_status_effect.gd" id="auto_effect_status"]
 [ext_resource type="Resource" path="res://statuses/soul_mark.tres" id="auto_status_soul_mark"]
 
 [sub_resource type="Resource" id="AutoEffect_1_damage"]
 script = ExtResource("auto_effect_damage")
+amount_per_count = 2
+minimum_count = 1
 target_mode = 2
-amount = 4
+description_template = "本回合每打出 1 张牌，对所有敌人造成 {per} 点伤害（当前 {total}）。"
 
 [sub_resource type="Resource" id="AutoEffect_2_status"]
 script = ExtResource("auto_effect_status")
@@ -21,7 +23,7 @@ amount = 1
 [resource]
 script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_status")])
-effect_text = "对所有敌人造成 {damage} 点伤害，并施加 {soul_mark} 层魂印。"
+effect_text = "本回合每打出 1 张牌，对所有敌人造成 2 点伤害，并施加 1 层魂印。"
 id = "demon_hundred_ghosts"
 rarity = 1
 target = 2
@@ -29,7 +31,7 @@ cost = 2
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("魂印")
+mechanic_tags = PackedStringArray("魂印", "连锁")
 display_name = "百鬼留痕"
 icon = ExtResource("2")
 sound = ExtResource("3")

@@ -33,6 +33,18 @@ enum DemonicEngine {
 	EXHAUST_GUARD,
 }
 
+enum CombatCardCount {
+	CARDS_PLAYED_THIS_TURN,
+	ATTACKS_PLAYED_THIS_TURN,
+	SKILLS_PLAYED_THIS_TURN,
+	POWERS_PLAYED_THIS_TURN,
+	CARDS_EXHAUSTED_THIS_TURN,
+	CARDS_EXHAUSTED_THIS_COMBAT,
+	CARDS_DISCARDED_THIS_TURN,
+	DISCARD_PILE_SIZE,
+	EXHAUST_PILE_SIZE,
+}
+
 var character: CharacterStats
 var player: Player
 var player_handler: PlayerHandler
@@ -49,6 +61,13 @@ var _demonic_engines := {}
 var _self_damage_this_turn := 0
 var _blood_recompense_triggered := false
 var _bloodthirst_turn_bonus := 0
+var _cards_played_this_turn := 0
+var _attacks_played_this_turn := 0
+var _skills_played_this_turn := 0
+var _powers_played_this_turn := 0
+var _cards_exhausted_this_turn := 0
+var _cards_exhausted_this_combat := 0
+var _cards_discarded_this_turn := 0
 # 一次性创建、原地更新的 modifier 值（避免 remove_value 的 queue_free 延迟问题）
 var _mv_dealt_flat: ModifierValue
 var _mv_dealt_mult: ModifierValue
@@ -85,6 +104,8 @@ func setup(
 		Events.player_turn_ended.connect(_on_player_turn_ended)
 	if not Events.card_exhausted.is_connected(_on_card_exhausted):
 		Events.card_exhausted.connect(_on_card_exhausted)
+	if not Events.card_discarded.is_connected(_on_card_discarded):
+		Events.card_discarded.connect(_on_card_discarded)
 
 
 func _exit_tree() -> void:
@@ -102,11 +123,21 @@ func _exit_tree() -> void:
 		Events.player_turn_ended.disconnect(_on_player_turn_ended)
 	if Events.card_exhausted.is_connected(_on_card_exhausted):
 		Events.card_exhausted.disconnect(_on_card_exhausted)
+	if Events.card_discarded.is_connected(_on_card_discarded):
+		Events.card_discarded.disconnect(_on_card_discarded)
 
 
 func _on_card_played(card: Card) -> void:
 	if not card or not player:
 		return
+	_cards_played_this_turn += 1
+	match card.type:
+		Card.Type.ATTACK:
+			_attacks_played_this_turn += 1
+		Card.Type.SKILL:
+			_skills_played_this_turn += 1
+		Card.Type.POWER:
+			_powers_played_this_turn += 1
 
 	if _has_tag(card, "兽群") or _has_tag(card, "兽系"):
 		_add_status_to_player(BEAST_PACK_STATUS, 1)
@@ -128,6 +159,8 @@ func _on_card_played(card: Card) -> void:
 
 
 func _on_card_exhausted(_card: Card) -> void:
+	_cards_exhausted_this_turn += 1
+	_cards_exhausted_this_combat += 1
 	if not _is_demonic():
 		return
 	var block := _engine_value(DemonicEngine.EXHAUST_GUARD)
@@ -136,6 +169,41 @@ func _on_card_exhausted(_card: Card) -> void:
 	var block_effect := BlockEffect.new()
 	block_effect.amount = block
 	block_effect.execute([player])
+
+
+func _on_card_discarded(_card: Card, _from_global_center: Vector2) -> void:
+	_cards_discarded_this_turn += 1
+
+
+func get_combat_card_count(source: int) -> int:
+	match source:
+		CombatCardCount.ATTACKS_PLAYED_THIS_TURN:
+			return _attacks_played_this_turn
+		CombatCardCount.SKILLS_PLAYED_THIS_TURN:
+			return _skills_played_this_turn
+		CombatCardCount.POWERS_PLAYED_THIS_TURN:
+			return _powers_played_this_turn
+		CombatCardCount.CARDS_EXHAUSTED_THIS_TURN:
+			return _cards_exhausted_this_turn
+		CombatCardCount.CARDS_EXHAUSTED_THIS_COMBAT:
+			return _cards_exhausted_this_combat
+		CombatCardCount.CARDS_DISCARDED_THIS_TURN:
+			return _cards_discarded_this_turn
+		CombatCardCount.DISCARD_PILE_SIZE:
+			return character.discard.cards.size() if character and character.discard else 0
+		CombatCardCount.EXHAUST_PILE_SIZE:
+			return character.exhaust_pile.cards.size() if character and character.exhaust_pile else 0
+		_:
+			return _cards_played_this_turn
+
+
+func _reset_card_turn_counts() -> void:
+	_cards_played_this_turn = 0
+	_attacks_played_this_turn = 0
+	_skills_played_this_turn = 0
+	_powers_played_this_turn = 0
+	_cards_exhausted_this_turn = 0
+	_cards_discarded_this_turn = 0
 
 
 func _on_enemy_died(enemy: Enemy) -> void:
@@ -509,6 +577,7 @@ func _is_flame_card(card: Card) -> bool:
 
 
 func _on_player_turn_started() -> void:
+	_reset_card_turn_counts()
 	_clear_flame_wheel()
 	_flame_damage_bonus = 0
 	_reset_blood_turn_state()

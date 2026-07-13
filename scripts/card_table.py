@@ -35,6 +35,7 @@ EFFECT_LABEL = {
     "configured_pile_tutor_effect": "牌堆检索",
     "configured_self_damage_scaling_damage_effect": "血债清算",
     "configured_consume_status_to_damage_effect": "耗煞伤害",
+    "configured_count_scaling_effect": "计数增幅",
     "low_health_bonus_damage_effect": "半血爆伤",
 }
 
