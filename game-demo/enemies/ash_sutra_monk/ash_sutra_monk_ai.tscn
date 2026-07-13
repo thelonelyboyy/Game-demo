@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scenes/enemy/enemy_action_picker.gd" id="1"]
 [ext_resource type="Script" path="res://enemies/shared/add_card_to_draw_action.gd" id="2"]
@@ -11,11 +11,12 @@
 [ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="9"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_attack.ogg" id="10"]
 [ext_resource type="AudioStream" path="res://art/audio/enemy_block.ogg" id="11"]
-[ext_resource type="Resource" path="res://common_cards/status/eclipse_scar.tres" id="12"]
+[ext_resource type="Resource" path="res://common_cards/status/spirit_lock_seal.tres" id="12"]
+[ext_resource type="Resource" path="res://common_cards/status/calamity_ember_brand.tres" id="13"]
 
 [sub_resource type="Resource" id="IntentScripture"]
 script = ExtResource("5")
-base_text = "抽牌堆混入蚀痕"
+base_text = "抽牌堆混入封灵符"
 icon = ExtResource("6")
 category = 5
 
@@ -27,7 +28,7 @@ category = 0
 
 [sub_resource type="Resource" id="IntentAshVeil"]
 script = ExtResource("5")
-base_text = "12 · 弃牌堆混入蚀痕"
+base_text = "12 · 弃牌堆混入劫火烙"
 icon = ExtResource("8")
 category = 5
 
@@ -56,5 +57,5 @@ intent = SubResource("IntentAshVeil")
 sound = ExtResource("11")
 type = 1
 block = 12
-card_to_add = ExtResource("12")
+card_to_add = ExtResource("13")
 copies = 1

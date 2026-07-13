@@ -8,6 +8,9 @@ const DISCARD_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_bloo
 const EXHAUST_CARD_PATH := "res://characters/demonic_cultivator/cards/engines/demon_sha_return.tres"
 const GROWTH_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_rite_slash.tres"
 const DISCOVER_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_forbidden_archive.tres"
+const DRAW_TRIGGER_CARD_PATH := "res://common_cards/status/spirit_lock_seal.tres"
+const END_TURN_TRIGGER_CARD_PATH := "res://common_cards/status/calamity_ember_brand.tres"
+const POLLUTION_ENEMY_AI_PATH := "res://enemies/ash_sutra_monk/ash_sutra_monk_ai.tscn"
 
 var failures: PackedStringArray = []
 var discovered_cards: Array[Card] = []
@@ -48,8 +51,11 @@ func _run_smoke() -> void:
 	_check(battle.player_handler.player_actions_enabled, "real battle reaches the playable player turn")
 	await _check_discard_trigger(battle)
 	await _check_exhaust_trigger(battle)
+	await _check_draw_trigger(battle)
+	await _check_end_turn_trigger(battle)
 	await _check_growth_cycle(battle)
 	await _check_discovery_cycle(battle)
+	_check_pollution_enemy_loadout()
 
 	get_tree().paused = false
 	battle.queue_free()
@@ -89,6 +95,44 @@ func _check_exhaust_trigger(battle: Battle) -> void:
 	_check(battle.char_stats.mana == 1, "exhausting returning sha grants one mana")
 	_check(battle.char_stats.exhaust_pile.cards.has(card), "exhaust trigger card enters the exhaust pile")
 	_check(not battle.char_stats.discard.cards.has(card), "exhaust trigger card stays out of the discard pile")
+
+
+func _check_draw_trigger(battle: Battle) -> void:
+	var card := (load(DRAW_TRIGGER_CARD_PATH) as Card).duplicate(true) as CultivationCard
+	_check(card != null and card.has_draw_trigger(), "draw trigger pollution card loads in battle")
+	if not card:
+		return
+
+	battle.char_stats.mana = 3
+	battle.char_stats.draw_pile.add_card_to_top(card)
+	battle.player_handler.draw_card()
+	await get_tree().process_frame
+	_check(battle.char_stats.mana == 2, "drawing spirit lock seal removes one mana")
+	var card_ui := _find_card_ui(battle.player_handler.hand, card)
+	_check(card_ui != null, "draw trigger pollution enters the real hand")
+	_check(card.is_ethereal_card(), "spirit lock seal remains ethereal after triggering")
+	if card_ui:
+		battle.player_handler.remove_card_from_hand(card_ui)
+	await get_tree().process_frame
+
+
+func _check_end_turn_trigger(battle: Battle) -> void:
+	var card := (load(END_TURN_TRIGGER_CARD_PATH) as Card).duplicate(true) as CultivationCard
+	_check(card != null and card.has_end_turn_trigger(), "end-turn pollution card loads in battle")
+	if not card:
+		return
+
+	battle.char_stats.health = 20
+	_check(battle.player_handler.hand.add_card(card, false), "end-turn pollution enters the real hand")
+	await get_tree().process_frame
+	_check(battle.player_handler._resolve_end_of_turn_hand_triggers(), "end-turn hand trigger pass completes while player survives")
+	_check(battle.char_stats.health == 18, "calamity ember brand deals two end-turn self damage")
+	var card_ui := _find_card_ui(battle.player_handler.hand, card)
+	_check(card_ui != null, "end-turn trigger does not bypass the normal discard lifecycle")
+	if card_ui:
+		battle.player_handler.discard_card_from_hand(card_ui, false)
+	await get_tree().process_frame
+	_check(battle.char_stats.discard.cards.has(card), "calamity ember brand enters discard after triggering")
 
 
 func _check_growth_cycle(battle: Battle) -> void:
@@ -191,6 +235,28 @@ func _auto_resolve_discovery(request) -> void:
 		selected.append(request.choices[index])
 	discovered_cards.assign(selected)
 	request.resolve(selected)
+
+
+func _check_pollution_enemy_loadout() -> void:
+	var scene := load(POLLUTION_ENEMY_AI_PATH) as PackedScene
+	_check(scene != null, "pollution lifecycle enemy AI loads")
+	if not scene:
+		return
+	var ai := scene.instantiate()
+	add_child(ai)
+	var draw_action := ai.get_node_or_null("CorruptScriptureAction")
+	var discard_action := ai.get_node_or_null("AshVeilAction")
+	var draw_pollution := draw_action.get("card_to_add") as Card if draw_action else null
+	var discard_pollution := discard_action.get("card_to_add") as Card if discard_action else null
+	_check(
+		draw_pollution and draw_pollution.id == "spirit_lock_seal",
+		"ash sutra monk injects draw-trigger pollution"
+	)
+	_check(
+		discard_pollution and discard_pollution.id == "calamity_ember_brand",
+		"ash sutra monk injects end-turn pollution"
+	)
+	ai.queue_free()
 
 
 func _find_card_ui(hand: Hand, card: Card) -> CardUI:

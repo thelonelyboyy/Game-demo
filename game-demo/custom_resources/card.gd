@@ -7,7 +7,7 @@ enum Target {SELF, SINGLE_ENEMY, ALL_ENEMIES, EVERYONE}
 enum UpgradeType {NONE, STAT_BOOST, COST_REDUCTION}
 enum Element {NONE, METAL, WOOD, WATER, FIRE, EARTH}
 enum Profession {COMMON, BODY, SWORD, DEMONIC, BEASTMASTER}
-enum LifecycleTrigger {PLAYED, DISCARDED, EXHAUSTED}
+enum LifecycleTrigger {PLAYED, DISCARDED, EXHAUSTED, DRAWN, TURN_ENDED_IN_HAND}
 
 const RARITY_COLORS := {
 	Card.Rarity.COMMON: Color("e8e1cc"),
@@ -53,6 +53,8 @@ const CURSE_MECHANIC_TAG := "诅咒"
 const DISCARD_TRIGGER_MECHANIC_TAG := "弃牌触发"
 const EXHAUST_TRIGGER_MECHANIC_TAG := "消耗触发"
 const GROWTH_MECHANIC_TAG := "成长"
+const DRAW_TRIGGER_MECHANIC_TAG := "抽牌触发"
+const END_TURN_TRIGGER_MECHANIC_TAG := "滞留触发"
 const TEMPORARY_MECHANIC_TAGS := [TEMPORARY_MECHANIC_TAG, "临时牌", "temporary", "temp"]
 const CONSUMABLE_MECHANIC_TAGS := [CONSUMABLE_MECHANIC_TAG, "消耗牌", "exhaust", "exhausts", "consume"]
 const RETAIN_MECHANIC_TAGS := [RETAIN_MECHANIC_TAG, "保留牌", "retain", "retained"]
@@ -64,6 +66,8 @@ const CURSE_MECHANIC_TAGS := [CURSE_MECHANIC_TAG, "诅咒牌", "curse", "cursed"
 const DISCARD_TRIGGER_MECHANIC_TAGS := [DISCARD_TRIGGER_MECHANIC_TAG, "弃置触发", "discard_trigger", "discard"]
 const EXHAUST_TRIGGER_MECHANIC_TAGS := [EXHAUST_TRIGGER_MECHANIC_TAG, "消耗时触发", "exhaust_trigger", "on_exhaust"]
 const GROWTH_MECHANIC_TAGS := [GROWTH_MECHANIC_TAG, "成长牌", "grow", "growth"]
+const DRAW_TRIGGER_MECHANIC_TAGS := [DRAW_TRIGGER_MECHANIC_TAG, "抽到时触发", "draw_trigger", "on_draw"]
+const END_TURN_TRIGGER_MECHANIC_TAGS := [END_TURN_TRIGGER_MECHANIC_TAG, "回合结束触发", "end_turn_trigger", "on_turn_end_in_hand"]
 const PLAYABLE_MECHANIC_TAGS := ["可打出", "可使用", "playable"]
 
 @export_group("Card Attributes")
@@ -253,6 +257,14 @@ func is_growth_card() -> bool:
 	return has_any_mechanic_tag(GROWTH_MECHANIC_TAGS)
 
 
+func has_draw_trigger() -> bool:
+	return has_any_mechanic_tag(DRAW_TRIGGER_MECHANIC_TAGS)
+
+
+func has_end_turn_trigger() -> bool:
+	return has_any_mechanic_tag(END_TURN_TRIGGER_MECHANIC_TAGS)
+
+
 func blocks_manual_play() -> bool:
 	if is_unplayable_card():
 		return true
@@ -322,6 +334,10 @@ func with_runtime_tooltip(text: String) -> String:
 		runtime_notes.append("消耗触发：被消耗移除时触发额外效果。")
 	if is_growth_card():
 		runtime_notes.append("成长：在本场战斗中按配置触发成长，提升本牌数值。")
+	if has_draw_trigger():
+		runtime_notes.append("抽牌触发：从抽牌堆进入手牌时触发额外效果。")
+	if has_end_turn_trigger():
+		runtime_notes.append("滞留触发：回合结束时若仍在手牌中，先触发额外效果再结算弃牌、保留或消耗。")
 
 	if runtime_notes.is_empty():
 		return text

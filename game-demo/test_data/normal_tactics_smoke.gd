@@ -56,7 +56,8 @@ func _check_normal_battle(battle_path: String, kind: String) -> void:
 	var health_before := battle.char_stats.health
 	var hand_before := battle.player_handler.hand.get_child_count()
 	var exhaust_before := battle.char_stats.exhaust_pile.cards.size()
-	var pollution_before := _count_card_id(battle, "eclipse_scar")
+	var pollution_id := "spirit_lock_seal" if kind == "draw_pollution" else "eclipse_scar"
+	var pollution_before := _count_card_id(battle, pollution_id)
 	var enemy_health_before := enemies[0].stats.health if not enemies.is_empty() else 0
 	if kind == "blood_drain" and not enemies.is_empty():
 		enemies[0].stats.health -= 15
@@ -94,7 +95,10 @@ func _check_normal_battle(battle_path: String, kind: String) -> void:
 			_check(exposed != null and exposed.duration == 1, "%s leaves one enemy-turn window of exposed" % battle_path)
 			_check(battle.char_stats.health == health_before, "%s telegraphs exposed before its multi-hit" % battle_path)
 		"draw_pollution":
-			_check(_count_card_id(battle, "eclipse_scar") == pollution_before + 1, "%s adds exactly one eclipse scar across combat piles" % battle_path)
+			_check(
+				_count_card_id(battle, pollution_id) == pollution_before + 1,
+				"%s adds exactly one draw-trigger pollution card across combat piles" % battle_path
+			)
 		"blood_drain":
 			_check(health_before - battle.char_stats.health == 14, "%s deals its advertised drain damage" % battle_path)
 			_check(not enemies.is_empty() and enemies[0].stats.health == enemy_health_before + 10, "%s restores ten health after draining" % battle_path)

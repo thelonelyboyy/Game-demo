@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1_card"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/forbidden_mantra.png" id="2_icon"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_mana_loss_effect.gd" id="3_mana_loss"]
+
+[sub_resource type="Resource" id="DrawManaLoss"]
+script = ExtResource("3_mana_loss")
+amount = 1
+affected_by_spirit_root = false
+affected_by_card_growth = false
+
+[resource]
+script = ExtResource("1_card")
+draw_trigger_effects = Array[Resource]([SubResource("DrawManaLoss")])
+effect_text = "封禁灵脉，抽到时灵力受阻，随后于回合结束消散。"
+id = "spirit_lock_seal"
+type = 1
+rarity = 0
+target = 0
+cost = 0
+mechanic_tags = PackedStringArray("状态", "不可打出", "虚无", "抽牌触发")
+display_name = "封灵符"
+icon = ExtResource("2_icon")

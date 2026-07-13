@@ -7,6 +7,8 @@ enum GrowthTrigger {NONE, PLAYED, DISCARDED, EXHAUSTED}
 @export var configured_effects: Array[Resource] = []
 @export var discard_trigger_effects: Array[Resource] = []
 @export var exhaust_trigger_effects: Array[Resource] = []
+@export var draw_trigger_effects: Array[Resource] = []
+@export var end_turn_trigger_effects: Array[Resource] = []
 @export_multiline var effect_text := ""
 
 @export_group("Growth")
@@ -24,6 +26,8 @@ func create_runtime_copy() -> Card:
 	copy.configured_effects = _duplicate_effects(configured_effects)
 	copy.discard_trigger_effects = _duplicate_effects(discard_trigger_effects)
 	copy.exhaust_trigger_effects = _duplicate_effects(exhaust_trigger_effects)
+	copy.draw_trigger_effects = _duplicate_effects(draw_trigger_effects)
+	copy.end_turn_trigger_effects = _duplicate_effects(end_turn_trigger_effects)
 	return copy
 
 
@@ -54,6 +58,10 @@ func handle_lifecycle_trigger(trigger: LifecycleTrigger, targets: Array[Node], m
 			_execute_trigger_effects(discard_trigger_effects, targets, modifiers)
 		Card.LifecycleTrigger.EXHAUSTED:
 			_execute_trigger_effects(exhaust_trigger_effects, targets, modifiers)
+		Card.LifecycleTrigger.DRAWN:
+			_execute_trigger_effects(draw_trigger_effects, targets, modifiers)
+		Card.LifecycleTrigger.TURN_ENDED_IN_HAND:
+			_execute_trigger_effects(end_turn_trigger_effects, targets, modifiers)
 	_maybe_grow(trigger)
 
 
@@ -75,6 +83,12 @@ func _build_configured_tooltip(player_modifiers: ModifierHandler = null, enemy_m
 	trigger_lines = _build_trigger_tooltip(exhaust_trigger_effects, "消耗触发", player_modifiers, enemy_modifiers)
 	if not trigger_lines.is_empty():
 		text = _append_tooltip_line(text, trigger_lines)
+	trigger_lines = _build_trigger_tooltip(draw_trigger_effects, "抽牌触发", player_modifiers, enemy_modifiers)
+	if not trigger_lines.is_empty():
+		text = _append_tooltip_line(text, trigger_lines)
+	trigger_lines = _build_trigger_tooltip(end_turn_trigger_effects, "滞留触发", player_modifiers, enemy_modifiers)
+	if not trigger_lines.is_empty():
+		text = _append_tooltip_line(text, trigger_lines)
 	var growth_text := _get_growth_tooltip()
 	if not growth_text.is_empty():
 		text = _append_tooltip_line(text, growth_text)
@@ -89,6 +103,12 @@ func _upgrade_values() -> void:
 		if effect:
 			effect.upgrade_values()
 	for effect in exhaust_trigger_effects:
+		if effect:
+			effect.upgrade_values()
+	for effect in draw_trigger_effects:
+		if effect:
+			effect.upgrade_values()
+	for effect in end_turn_trigger_effects:
 		if effect:
 			effect.upgrade_values()
 

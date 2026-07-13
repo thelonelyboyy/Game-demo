@@ -141,7 +141,13 @@ def card_script_path(text: str, properties: dict[str, str]) -> str | None:
 
 
 def has_configured_effects(properties: dict[str, str]) -> bool:
-    effect_fields = ("configured_effects", "discard_trigger_effects", "exhaust_trigger_effects")
+    effect_fields = (
+        "configured_effects",
+        "discard_trigger_effects",
+        "exhaust_trigger_effects",
+        "draw_trigger_effects",
+        "end_turn_trigger_effects",
+    )
     return any("SubResource(" in properties.get(field, "") for field in effect_fields)
 
 

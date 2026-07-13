@@ -48,6 +48,8 @@ func create_result(card_a: Card, card_b: Card) -> Card:
 	result.configured_effects = _merge_effects(first.configured_effects, second.configured_effects)
 	result.discard_trigger_effects = _merge_effects(first.discard_trigger_effects, second.discard_trigger_effects)
 	result.exhaust_trigger_effects = _merge_effects(first.exhaust_trigger_effects, second.exhaust_trigger_effects)
+	result.draw_trigger_effects = _merge_effects(first.draw_trigger_effects, second.draw_trigger_effects)
+	result.end_turn_trigger_effects = _merge_effects(first.end_turn_trigger_effects, second.end_turn_trigger_effects)
 	result.mechanic_tags = _merge_tags(first.mechanic_tags, second.mechanic_tags, result.exhausts)
 	return result
 

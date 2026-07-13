@@ -33,6 +33,8 @@ func _ready() -> void:
 		Events.card_played.connect(_on_card_played)
 	if not Events.hero_skill_requested.is_connected(use_hero_skill):
 		Events.hero_skill_requested.connect(use_hero_skill)
+	if not Events.player_died.is_connected(_on_player_died):
+		Events.player_died.connect(_on_player_died)
 
 
 func start_battle(char_stats: CharacterStats) -> void:
@@ -137,6 +139,9 @@ func draw_card(is_start_of_turn_draw := false) -> void:
 		character.draw_pile.add_card_to_top(card)
 		_notify_hand_full()
 		return
+	_trigger_card_lifecycle(card, Card.LifecycleTrigger.DRAWN)
+	if not battle_running:
+		return
 	Events.card_drawn.emit(card)
 	if not is_start_of_turn_draw:
 		Events.card_extra_drawn.emit(card)
@@ -160,6 +165,8 @@ func draw_cards(amount: int, is_start_of_turn_draw: bool = false) -> void:
 
 func discard_cards() -> void:
 	if not _can_use_card_piles() or not hand:
+		return
+	if not _resolve_end_of_turn_hand_triggers():
 		return
 
 	if hand.get_child_count() == 0:
@@ -274,6 +281,8 @@ func _exit_tree() -> void:
 		Events.card_played.disconnect(_on_card_played)
 	if Events.hero_skill_requested.is_connected(use_hero_skill):
 		Events.hero_skill_requested.disconnect(use_hero_skill)
+	if Events.player_died.is_connected(_on_player_died):
+		Events.player_died.disconnect(_on_player_died)
 	if relics and relics.relics_activated.is_connected(_on_relics_activated):
 		relics.relics_activated.disconnect(_on_relics_activated)
 	if player and player.status_handler and player.status_handler.statuses_applied.is_connected(_on_statuses_applied):
@@ -442,6 +451,28 @@ func _trigger_card_lifecycle(card: Card, trigger: Card.LifecycleTrigger) -> void
 	if player:
 		targets.append(player)
 	card.handle_lifecycle_trigger(trigger, targets, player.modifier_handler if player else null)
+
+
+func _resolve_end_of_turn_hand_triggers() -> bool:
+	if not battle_running or not hand:
+		return false
+	for child: Node in hand.get_children():
+		var card_ui := child as CardUI
+		if not card_ui or not card_ui.card:
+			continue
+		_trigger_card_lifecycle(card_ui.card, Card.LifecycleTrigger.TURN_ENDED_IN_HAND)
+		if not battle_running:
+			return false
+	return true
+
+
+func _on_player_died() -> void:
+	battle_running = false
+	player_actions_enabled = false
+	if draw_tween and draw_tween.is_running():
+		draw_tween.kill()
+	if discard_tween and discard_tween.is_running():
+		discard_tween.kill()
 
 
 func _reset_retained_card_cost(card_ui: CardUI) -> void:
