@@ -2,6 +2,9 @@ class_name GenericEvent
 extends EventRoom
 
 const HEART_DEMON := preload("res://common_cards/status/heart_demon.tres")
+const BLOOD_DEBT_CURSE := preload("res://common_cards/status/blood_debt_curse.tres")
+const KARMIC_FIRE_CURSE := preload("res://common_cards/status/karmic_fire_curse.tres")
+const CURSE_POOL: Array[Card] = [HEART_DEMON, BLOOD_DEBT_CURSE, KARMIC_FIRE_CURSE]
 
 @export var event_title := ""
 @export_multiline var event_body := ""
@@ -126,10 +129,7 @@ func _apply_single_effect(effect: String, amount: int) -> void:
 		"gain_rare_card":
 			_add_random_draftable_cards(maxi(amount, 1), true)
 		"gain_curse":
-			if character_stats and character_stats.deck:
-				var curse := HEART_DEMON.duplicate(true) as Card
-				character_stats.deck.add_card(curse)
-				Events.ui_notice_requested.emit("获得诅咒：「%s」" % curse.get_display_name())
+			_add_random_curses(maxi(amount, 1))
 		_:
 			pass
 
@@ -190,6 +190,28 @@ func _add_random_draftable_cards(count: int, rare_only: bool) -> void:
 			picked_names.append(card_copy.get_display_name())
 	if not picked_names.is_empty():
 		Events.ui_notice_requested.emit("获得卡牌：%s" % "、".join(picked_names))
+
+
+func _add_random_curses(count: int) -> Array[Card]:
+	var added: Array[Card] = []
+	if not character_stats or not character_stats.deck or count <= 0:
+		return added
+
+	var candidates: Array[Card] = CURSE_POOL.duplicate()
+	RNG.array_shuffle(candidates)
+	for _i in mini(count, candidates.size()):
+		var curse := candidates.pop_back().duplicate(true) as Card
+		if not curse:
+			continue
+		character_stats.deck.add_card(curse)
+		added.append(curse)
+
+	if not added.is_empty():
+		var names := PackedStringArray()
+		for curse: Card in added:
+			names.append(curse.get_display_name())
+		Events.ui_notice_requested.emit("获得诅咒：%s" % "、".join(names))
+	return added
 
 
 func _apply_event_style() -> void:

@@ -139,8 +139,8 @@ def card_script_path(text: str, properties: dict[str, str]) -> str | None:
 
 
 def has_configured_effects(properties: dict[str, str]) -> bool:
-    value = properties.get("configured_effects", "")
-    return "SubResource(" in value
+    effect_fields = ("configured_effects", "discard_trigger_effects", "exhaust_trigger_effects")
+    return any("SubResource(" in properties.get(field, "") for field in effect_fields)
 
 
 def has_nonzero_legacy_field(properties: dict[str, str]) -> bool:
@@ -214,7 +214,7 @@ def validate_cards(issues: list[Issue]) -> None:
         issues.append(Issue("ERROR", None, f"Duplicate card id {card_id}: {owners}"))
 
     for path in effectless_cards[:20]:
-        issues.append(Issue("WARN", path, "Card has no configured_effects and no legacy effect fields"))
+        issues.append(Issue("WARN", path, "Card has no configured or lifecycle effects and no legacy effect fields"))
     if len(effectless_cards) > 20:
         issues.append(Issue("WARN", None, f"{len(effectless_cards) - 20} more effectless card(s) omitted"))
 

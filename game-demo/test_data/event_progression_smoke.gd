@@ -54,6 +54,7 @@ func _run_smoke() -> void:
 		_check(all_paths.has(path), "%s is registered in the event catalog" % path)
 
 	_check_new_event_effects(character_resource)
+	_check_curse_pool(character_resource)
 	_finish()
 
 
@@ -74,7 +75,33 @@ func _check_new_event_effects(character_resource: CharacterStats) -> void:
 
 	event._apply_single_effect("gain_curse", 1)
 	_check(character.deck.cards.size() == deck_size + 2, "event can add a curse")
-	_check(character.deck.cards.back().id == "heart_demon", "event curse is heart demon")
+	_check(character.deck.cards.back().is_curse_card(), "event curse is marked as a curse")
+	event.free()
+
+
+func _check_curse_pool(character_resource: CharacterStats) -> void:
+	var character := character_resource.create_instance() as CharacterStats
+	var event := GenericEvent.new()
+	event.character_stats = character
+	var deck_size := character.deck.cards.size()
+	var curses := event._add_random_curses(3)
+	_check(curses.size() == 3, "event curse pool contains three outcomes")
+	_check(character.deck.cards.size() == deck_size + 3, "multi-curse effects add each curse to the permanent deck")
+
+	var ids := {}
+	for curse: Card in curses:
+		ids[curse.id] = true
+		_check(curse.is_curse_card(), "every curse pool card has the curse marker")
+	_check(ids.size() == 3, "a multi-curse effect does not repeat before pool exhaustion")
+
+	var blood_debt := curses.filter(func(card: Card): return card.id == "blood_debt_curse").front() as CultivationCard
+	_check(blood_debt.blocks_manual_play(), "blood debt cannot be manually played")
+	_check(blood_debt.has_discard_trigger() and blood_debt.discard_trigger_effects[0].amount == 2, "blood debt loses two life when discarded")
+
+	var karmic_fire := curses.filter(func(card: Card): return card.id == "karmic_fire_curse").front() as CultivationCard
+	_check(not karmic_fire.blocks_manual_play(), "karmic fire can be manually burned away")
+	_check(karmic_fire.is_consumable_card() and karmic_fire.cost == 1, "karmic fire costs one mana and exhausts")
+	_check(karmic_fire.configured_effects[0].amount == 3, "burning karmic fire costs three life")
 	event.free()
 
 

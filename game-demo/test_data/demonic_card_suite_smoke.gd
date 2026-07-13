@@ -11,6 +11,8 @@ const SHADOW_STEP_PATH := "res://characters/demonic_cultivator/cards/shadow_step
 const SOUL_LAMP_RENEWAL_PATH := "res://characters/demonic_cultivator/cards/demon_soul_lamp_renewal.tres"
 const FLESH_REBIRTH_PATH := "res://characters/demonic_cultivator/cards/demon_flesh_rebirth.tres"
 const BLOOD_MEMBRANE_PATH := "res://characters/demonic_cultivator/cards/engines/demon_blood_membrane.tres"
+const BLOOD_DEBT_CURSE_PATH := "res://common_cards/status/blood_debt_curse.tres"
+const KARMIC_FIRE_CURSE_PATH := "res://common_cards/status/karmic_fire_curse.tres"
 const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
 const DEFEND_PATH := "res://characters/demonic_cultivator/cards/demon_defend.tres"
 const BLOOD_WARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_ward.tres"
@@ -65,6 +67,8 @@ func _run_smoke() -> void:
 		await _check_pile_tutors(battle, enemies[0])
 		current_step = "exhaust_engine"
 		await _check_exhaust_guard_engine(battle)
+		current_step = "curse_lifecycle"
+		await _check_curse_lifecycle(battle)
 
 	current_step = "cleanup"
 	get_tree().paused = false
@@ -82,6 +86,22 @@ func _check_blood_debt(battle: Battle, enemy: Enemy) -> void:
 	card.apply_effects([enemy], battle.player.modifier_handler)
 	await get_tree().create_timer(0.25).timeout
 	_check(before - enemy.stats.health == 9, "blood debt converts current-turn self damage into attack damage")
+
+
+func _check_curse_lifecycle(battle: Battle) -> void:
+	var blood_debt := (load(BLOOD_DEBT_CURSE_PATH) as Card).duplicate(true) as CultivationCard
+	var health_before_discard := battle.player.stats.health
+	blood_debt.handle_lifecycle_trigger(Card.LifecycleTrigger.DISCARDED, [], battle.player.modifier_handler)
+	await get_tree().process_frame
+	_check(health_before_discard - battle.player.stats.health == 2, "discarding blood debt loses two life in combat")
+
+	var karmic_fire := (load(KARMIC_FIRE_CURSE_PATH) as Card).duplicate(true) as CultivationCard
+	var health_before_burn := battle.player.stats.health
+	karmic_fire.apply_effects([], battle.player.modifier_handler)
+	battle.player_handler._on_card_played(karmic_fire)
+	await get_tree().process_frame
+	_check(health_before_burn - battle.player.stats.health == 3, "burning karmic fire loses three life in combat")
+	_check(battle.char_stats.exhaust_pile.cards.has(karmic_fire), "burned karmic fire enters the exhaust pile")
 
 
 func _check_sha_blade(battle: Battle, enemy: Enemy) -> void:
