@@ -175,6 +175,27 @@ offset_bottom = 62.0
 text = "99"
 horizontal_alignment = 1
 
+[node name="ExhaustPileButton" parent="BattleUI" node_paths=PackedStringArray("counter") instance=ExtResource("17_djv03")]
+unique_name_in_owner = true
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 276.0
+offset_top = -136.0
+offset_right = 380.0
+offset_bottom = 20.0
+grow_vertical = 0
+counter = NodePath("Counter")
+
+[node name="Counter" type="Label" parent="BattleUI/ExhaustPileButton"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 40.0
+offset_right = 38.0
+offset_bottom = 62.0
+text = "0"
+horizontal_alignment = 1
+
 [node name="RedFlash" type="CanvasLayer" parent="."]
 layer = 2
 script = ExtResource("15_qvh8t")
@@ -206,6 +227,10 @@ unique_name_in_owner = true
 visible = false
 
 [node name="DiscardPileView" parent="CardPileViews" instance=ExtResource("21_rnul2")]
+unique_name_in_owner = true
+visible = false
+
+[node name="ExhaustPileView" parent="CardPileViews" instance=ExtResource("21_rnul2")]
 unique_name_in_owner = true
 visible = false
 

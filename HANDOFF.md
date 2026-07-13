@@ -850,3 +850,10 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - 功法尚未生效或角色不是魔修时不会响应；触发只增加护体，不改变卡牌进入消耗区的原始生命周期。
 - `demonic-card-suite` 在真实战斗中先启用血膜，再消耗一张测试牌，验证护体精确 +2 且卡牌仍进入消耗牌堆。
 - `game_data.xlsx` 已同步，Excel→Godot 回写为 0 文件变化。至此消耗路线具备消耗区记录、跨区回收和持续防御收益。
+
+## 38. 消耗牌堆查看入口（2026-07-13）
+
+- 战斗左下角在抽牌堆、弃牌堆之后新增“消耗”入口，实时显示本场消耗牌数量；复用现有 `CardPileOpener`，以紫色调区分，不引入新的 UI 体系。
+- 点击后复用 `CardPileView` 展示完整消耗牌堆，按真实进入顺序排列，不随机打乱；玩家可以判断「血肉重生」下一张会取回什么。
+- `BattleUI.initialize_card_pile_ui()` 统一绑定 `CharacterStats.exhaust_pile` 的按钮和查看器，计数随 `card_pile_size_changed` 即时更新。
+- `demonic-card-suite` 在真实战斗消耗测试牌后打开查看器，验证按钮绑定、页面显示和卡牌数量完全一致。

@@ -8,8 +8,10 @@ extends CanvasLayer
 @onready var end_turn_button: Button = %EndTurnButton
 @onready var draw_pile_button: CardPileOpener = %DrawPileButton
 @onready var discard_pile_button: CardPileOpener = %DiscardPileButton
+@onready var exhaust_pile_button: CardPileOpener = %ExhaustPileButton
 @onready var draw_pile_view: CardPileView = %DrawPileView
 @onready var discard_pile_view: CardPileView = %DiscardPileView
+@onready var exhaust_pile_view: CardPileView = %ExhaustPileView
 
 const REFERENCE_SIZE := Vector2(1920.0, 1080.0)
 const DRAW_PILE_ICON := preload("res://assets/ui/generated/icons/icon_card_deck_stack.png")
@@ -76,6 +78,7 @@ func _ready() -> void:
 		hero_skill_button.pressed.connect(_on_hero_skill_button_pressed)
 	draw_pile_button.pressed.connect(draw_pile_view.show_current_view.bind("抽牌堆", true))
 	discard_pile_button.pressed.connect(discard_pile_view.show_current_view.bind("弃牌堆"))
+	exhaust_pile_button.pressed.connect(exhaust_pile_view.show_current_view.bind("消耗牌堆"))
 	_layout_battle_controls()
 
 
@@ -84,6 +87,8 @@ func initialize_card_pile_ui() -> void:
 	draw_pile_view.card_pile = char_stats.draw_pile
 	discard_pile_button.card_pile = char_stats.discard
 	discard_pile_view.card_pile = char_stats.discard
+	exhaust_pile_button.card_pile = char_stats.exhaust_pile
+	exhaust_pile_view.card_pile = char_stats.exhaust_pile
 
 
 var _boss_banner_shown := false
@@ -648,6 +653,8 @@ func _polish_ui() -> void:
 	_add_hero_skill_button()
 	_polish_pile_button(draw_pile_button, "抽牌堆", false)
 	_polish_pile_button(discard_pile_button, "弃牌堆", true)
+	_polish_pile_button(exhaust_pile_button, "消耗", true)
+	_tint_exhaust_pile_button()
 
 
 func _add_hero_skill_button() -> void:
@@ -911,6 +918,20 @@ func _polish_pile_button(button: CardPileOpener, title: String, align_right := f
 		button.counter.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 
+func _tint_exhaust_pile_button() -> void:
+	if not exhaust_pile_button:
+		return
+	var panel := exhaust_pile_button.get_node_or_null("BattlePilePanel") as TextureRect
+	if panel:
+		panel.modulate = Color(0.78, 0.64, 1.0, 0.96)
+	var icon := exhaust_pile_button.get_node_or_null("BattlePileIcon") as TextureRect
+	if icon:
+		icon.modulate = Color(0.82, 0.58, 1.0, 0.92)
+	var title_label := exhaust_pile_button.get_node_or_null("BattlePileTitle") as Label
+	if title_label:
+		title_label.add_theme_color_override("font_color", Color("e0c2ff"))
+
+
 func _layout_battle_controls() -> void:
 	if not is_inside_tree():
 		return
@@ -931,6 +952,7 @@ func _layout_battle_controls() -> void:
 	_place_bottom_left($FlameWheelUI as Control, Vector2(34, 208), Vector2(220, 172), scale_factor)
 	_place_bottom_left(draw_pile_button, Vector2(48, 40), Vector2(104, 156), scale_factor)
 	_place_bottom_left(discard_pile_button, Vector2(162, 40), Vector2(104, 156), scale_factor)
+	_place_bottom_left(exhaust_pile_button, Vector2(276, 40), Vector2(104, 156), scale_factor)
 	_place_bottom_right(end_turn_button, Vector2(264, 366), Vector2(316, 104), scale_factor)
 	if hero_skill_button:
 		# 技能行贴在角色牌正下方：魔焰焚心在左，右侧留白给未来第二技能。

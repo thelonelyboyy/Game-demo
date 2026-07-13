@@ -172,6 +172,12 @@ func _check_exhaust_guard_engine(battle: Battle) -> void:
 	battle.player_handler._on_card_played(consumable)
 	_check(battle.player.stats.block == block_before + 2, "blood membrane grants block when a card is exhausted")
 	_check(battle.player_handler.character.exhaust_pile.cards.has(consumable), "exhaust guard trigger preserves normal exhaust destination")
+	_check(battle.battle_ui.exhaust_pile_button.card_pile == battle.player_handler.character.exhaust_pile, "battle UI tracks the active exhaust pile")
+	battle.battle_ui.exhaust_pile_button.pressed.emit()
+	await get_tree().process_frame
+	_check(battle.battle_ui.exhaust_pile_view.visible, "exhaust pile viewer opens from its button")
+	_check(battle.battle_ui.exhaust_pile_view.cards.get_child_count() == battle.player_handler.character.exhaust_pile.cards.size(), "exhaust pile viewer shows every exhausted card")
+	battle.battle_ui.exhaust_pile_view.hide()
 
 
 func _get_live_enemies(battle: Battle) -> Array[Enemy]:
