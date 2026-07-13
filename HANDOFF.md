@@ -900,3 +900,4 @@ python scripts\run_godot_checks.py --godot "F:\download\Godot_v4.5.2-stable_mono
 - 血债复用统一弃牌触发生命周期，因此回合末弃置与其他弃牌效果都会结算；业火复用可打出/消耗规则，焚除后进入消耗区且本场不再循环。
 - `GenericEvent._add_random_curses()` 支持一次加入多张且首轮不重复，现有 `gain_curse:1` 事件自动从池中抽取，无需逐场景维护资源路径。
 - 三种诅咒都是永久牌组污染，可在商店净化、篝火血炼或事件移牌中移除；`event-progression` smoke 覆盖资源标记、三种唯一结果和两张新诅咒的数值生命周期。
+- `game_data.xlsx` 已重新导出并包含两张新诅咒；随后执行 Excel→Godot 回写为 0 文件变化，数值管线保持幂等。
