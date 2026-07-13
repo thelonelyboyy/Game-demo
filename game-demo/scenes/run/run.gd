@@ -1041,6 +1041,7 @@ func _show_elite_battle_rewards() -> void:
 	reward_scene.add_relic_reward(RELIC_REWARD_POOL.get_random_available(
 		character, relic_handler, current_chapter, RelicRewardPool.RewardContext.ELITE
 	))
+	reward_scene.add_card_reward(BattleReward.CardRewardTier.ELITE)
 	reward_scene.add_card_fusion_reward()
 	# 精英战必掉一个符箓丹药（槽位满则跳过）。
 	if not potion_handler.is_full():
@@ -1056,7 +1057,7 @@ func _show_boss_battle_rewards() -> void:
 	reward_scene.potion_handler = potion_handler
 
 	reward_scene.add_gold_reward(map.last_room.battle_stats.roll_gold_reward())
-	reward_scene.add_card_reward()
+	reward_scene.add_card_reward(BattleReward.CardRewardTier.BOSS)
 	var relic_choices := RELIC_REWARD_POOL.get_random_available_choices(
 		character, relic_handler, 3, current_chapter, RelicRewardPool.RewardContext.BOSS
 	)

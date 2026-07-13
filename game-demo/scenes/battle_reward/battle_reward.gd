@@ -1,6 +1,8 @@
 class_name BattleReward
 extends Control
 
+enum CardRewardTier {NORMAL, ELITE, BOSS}
+
 const CARD_REWARDS = preload("res://scenes/ui/card_rewards.tscn")
 const CARD_FUSION = preload("res://scenes/card_fusion/card_fusion.tscn")
 const CARD_FUSION_LIBRARY := preload("res://fusion_recipes/card_fusion_library.tres")
@@ -48,6 +50,7 @@ var card_reward_choices: Array[Card] = []
 var active_card_rewards: CardRewards
 var active_card_fusion: CardFusion
 var relic_choice_locked := false
+var card_reward_tier := CardRewardTier.NORMAL
 var card_rarity_weights := {
 	Card.Rarity.COMMON: 0.0,
 	Card.Rarity.UNCOMMON: 0.0,
@@ -73,15 +76,27 @@ func add_gold_reward(amount: int) -> void:
 	rewards.add_child.call_deferred(gold_reward)
 
 
-func add_card_reward() -> void:
+func add_card_reward(tier := CardRewardTier.NORMAL) -> void:
+	card_reward_tier = clampi(tier, CardRewardTier.NORMAL, CardRewardTier.BOSS)
 	var card_reward := REWARD_BUTTON.instantiate() as RewardButton
 	card_reward.reward_icon = CARD_ICON
 	card_reward.reward_text = CARD_TEXT
-	card_reward.reward_subtext = "从 %s 张术法中选择一张" % (run_stats.card_rewards if run_stats else 3)
+	card_reward.reward_subtext = _get_card_reward_subtext()
 	card_reward.accent_color = Color("b88ad8")
 	card_reward.auto_consume = false
 	card_reward.pressed.connect(_show_card_rewards.bind(card_reward))
 	rewards.add_child.call_deferred(card_reward)
+
+
+func _get_card_reward_subtext() -> String:
+	var choice_count := run_stats.card_rewards if run_stats else 3
+	match card_reward_tier:
+		CardRewardTier.ELITE:
+			return "从 %s 张术法中选择一张 · 至少一张蓝卡" % choice_count
+		CardRewardTier.BOSS:
+			return "从 %s 张术法中选择一张 · 至少一张金卡" % choice_count
+		_:
+			return "从 %s 张术法中选择一张" % choice_count
 
 
 func add_relic_reward(relic: Relic) -> void:
@@ -170,12 +185,17 @@ func _generate_card_reward_choices() -> Array[Card]:
 	var card_reward_array: Array[Card] = []
 	var available_cards: Array[Card] = character_stats.draftable_cards.duplicate_cards()
 
-	var guarantee_rare := run_stats.card_reward_miss_streak >= RARE_PITY_HARD_LIMIT
+	var guarantee_rare := (
+		card_reward_tier == CardRewardTier.BOSS
+		or run_stats.card_reward_miss_streak >= RARE_PITY_HARD_LIMIT
+	)
 	for i in run_stats.card_rewards:
 		_setup_card_chances()
 		var picked_card: Card
 		if guarantee_rare and i == 0:
 			picked_card = _get_random_available_card(available_cards, Card.Rarity.RARE)
+		elif card_reward_tier == CardRewardTier.ELITE and i == 0:
+			picked_card = _get_random_available_card(available_cards, Card.Rarity.UNCOMMON)
 		else:
 			picked_card = _pick_reward_card(available_cards)
 		if not picked_card:

@@ -31,6 +31,7 @@ func _run_smoke() -> void:
 	_check_discover_card()
 	_check_discovery_request()
 	_check_card_reward_choices()
+	_check_card_reward_tiers()
 	_check_card_reward_archetype_synergy()
 	_check_card_reward_chapter_upgrades()
 	_check_demonic_pool_depth()
@@ -147,6 +148,24 @@ func _check_card_reward_choices() -> void:
 	_check(reward.run_stats.gold == gold_before_skip + BattleReward.CARD_REWARD_SKIP_GOLD, "consumed card reward cannot grant skip gold twice")
 	_check(reward_button.is_queued_for_deletion(), "skipping consumes the card reward button")
 	reward_button.free()
+	reward.free()
+
+
+func _check_card_reward_tiers() -> void:
+	var character_resource := load(DEMONIC_CHARACTER_PATH) as CharacterStats
+	var reward := BattleReward.new()
+	reward.character_stats = character_resource.create_instance()
+	reward.run_stats = RunStats.new()
+
+	reward.card_reward_tier = BattleReward.CardRewardTier.ELITE
+	var elite_choices := reward._generate_card_reward_choices()
+	_check(elite_choices.any(func(card: Card): return card.rarity >= Card.Rarity.UNCOMMON), "elite rewards guarantee at least one uncommon card")
+	_check(reward._get_card_reward_subtext().contains("蓝卡"), "elite reward copy explains its quality floor")
+
+	reward.card_reward_tier = BattleReward.CardRewardTier.BOSS
+	var boss_choices := reward._generate_card_reward_choices()
+	_check(boss_choices.any(func(card: Card): return card.rarity >= Card.Rarity.RARE), "boss rewards guarantee at least one rare card")
+	_check(reward._get_card_reward_subtext().contains("金卡"), "boss reward copy explains its quality floor")
 	reward.free()
 
 
