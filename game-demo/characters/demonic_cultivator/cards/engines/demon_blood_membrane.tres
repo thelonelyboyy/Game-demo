@@ -5,7 +5,7 @@
 [ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
 [ext_resource type="Script" uid="uid://cknickcitjj0m" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="4"]
 [ext_resource type="Script" uid="uid://bo8gedp7cx6tx" path="res://custom_resources/effects/configured_block_effect.gd" id="5"]
-[ext_resource type="Script" path="res://custom_resources/effects/configured_mana_effect.gd" id="6"]
+[ext_resource type="Script" path="res://custom_resources/effects/configured_demonic_engine_effect.gd" id="6"]
 
 [sub_resource type="Resource" id="E1"]
 script = ExtResource("4")
@@ -16,22 +16,23 @@ affected_by_spirit_root = false
 script = ExtResource("5")
 amount = 6
 
-[sub_resource type="Resource" id="ExhaustMana"]
+[sub_resource type="Resource" id="ExhaustGuard"]
 script = ExtResource("6")
-amount = 1
-affected_by_spirit_root = false
-description_template = "获得 {amount} 点灵力。"
+engine = 10
+value = 2
 
 [resource]
 script = ExtResource("1")
-configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
-exhaust_trigger_effects = Array[Resource]([SubResource("ExhaustMana")])
+configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2"), SubResource("ExhaustGuard")])
+effect_text = "失去 2 点生命，获得 6 点护体。功法：每当一张牌被消耗，获得 2 点护体。"
 id = "demon_blood_membrane"
-type = 1
-exhausts = true
+type = 2
+rarity = 1
+cost = 1
+upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("献祭", "消耗触发")
+mechanic_tags = PackedStringArray("功法", "献祭", "消耗联动")
 display_name = "血膜"
 icon = ExtResource("2")
 sound = ExtResource("3")

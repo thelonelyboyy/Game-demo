@@ -2,7 +2,7 @@ extends Node
 
 const GROWTH_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_rite_slash.tres"
 const DISCARD_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_repay.tres"
-const EXHAUST_CARD_PATH := "res://characters/demonic_cultivator/cards/engines/demon_blood_membrane.tres"
+const EXHAUST_CARD_PATH := "res://characters/demonic_cultivator/cards/engines/demon_sha_return.tres"
 const DISCOVER_CARD_PATH := "res://characters/demonic_cultivator/cards/demon_forbidden_archive.tres"
 const DRAFT_POOL_PATH := "res://characters/demonic_cultivator/demonic_cultivator_draftable_cards.tres"
 const DEMONIC_CHARACTER_PATH := "res://characters/demonic_cultivator/demonic_cultivator.tres"

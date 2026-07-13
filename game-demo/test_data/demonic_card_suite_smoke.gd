@@ -10,6 +10,7 @@ const MYRIAD_MARKS_PATH := "res://characters/demonic_cultivator/cards/demon_myri
 const SHADOW_STEP_PATH := "res://characters/demonic_cultivator/cards/shadow_step.tres"
 const SOUL_LAMP_RENEWAL_PATH := "res://characters/demonic_cultivator/cards/demon_soul_lamp_renewal.tres"
 const FLESH_REBIRTH_PATH := "res://characters/demonic_cultivator/cards/demon_flesh_rebirth.tres"
+const BLOOD_MEMBRANE_PATH := "res://characters/demonic_cultivator/cards/engines/demon_blood_membrane.tres"
 const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
 const DEFEND_PATH := "res://characters/demonic_cultivator/cards/demon_defend.tres"
 const BLOOD_WARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_ward.tres"
@@ -62,6 +63,8 @@ func _run_smoke() -> void:
 		await _check_myriad_marks(battle, enemies)
 		current_step = "pile_tutors"
 		await _check_pile_tutors(battle, enemies[0])
+		current_step = "exhaust_engine"
+		await _check_exhaust_guard_engine(battle)
 
 	current_step = "cleanup"
 	get_tree().paused = false
@@ -156,6 +159,19 @@ func _check_pile_tutors(battle: Battle, enemy: Enemy) -> void:
 	_check(character.exhaust_pile.cards.has(rebirth), "flesh rebirth excludes itself from exhaust retrieval")
 	_check(character.exhaust_pile.cards.has(older_exhaust), "flesh rebirth leaves older exhausted cards in place")
 	_check(battle.player.stats.health == mini(health_before + 8, battle.player.stats.max_health), "flesh rebirth still heals for eight")
+
+
+func _check_exhaust_guard_engine(battle: Battle) -> void:
+	var membrane := (load(BLOOD_MEMBRANE_PATH) as Card).duplicate(true) as CultivationCard
+	membrane.apply_effects([battle.player], battle.player.modifier_handler)
+	await get_tree().process_frame
+	var block_before := battle.player.stats.block
+	var consumable := Card.new()
+	consumable.id = "exhaust_guard_smoke"
+	consumable.exhausts = true
+	battle.player_handler._on_card_played(consumable)
+	_check(battle.player.stats.block == block_before + 2, "blood membrane grants block when a card is exhausted")
+	_check(battle.player_handler.character.exhaust_pile.cards.has(consumable), "exhaust guard trigger preserves normal exhaust destination")
 
 
 func _get_live_enemies(battle: Battle) -> Array[Enemy]:

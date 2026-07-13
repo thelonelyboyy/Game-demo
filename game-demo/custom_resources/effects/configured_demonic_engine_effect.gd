@@ -12,6 +12,7 @@ enum DemonicEngine {
 	FLAME_CONTINUITY,
 	FLAME_REFINING,
 	SHA_NURTURE,
+	EXHAUST_GUARD,
 }
 
 @export var engine: DemonicEngine = DemonicEngine.BLOOD_QI_GUARD
@@ -50,6 +51,8 @@ func get_description(_card: CultivationCard, _player_modifiers: ModifierHandler 
 			return "功法：每当你打出魔焰牌，令手牌中 1 张魔焰牌本回合费用 -%d。" % value
 		DemonicEngine.SHA_NURTURE:
 			return "功法：回合结束时，获得 %d 点煞气。" % value
+		DemonicEngine.EXHAUST_GUARD:
+			return "功法：每当一张牌被消耗，获得 %d 点护体。" % value
 		_:
 			return ""
 

@@ -30,6 +30,7 @@ enum DemonicEngine {
 	FLAME_CONTINUITY,
 	FLAME_REFINING,
 	SHA_NURTURE,
+	EXHAUST_GUARD,
 }
 
 var character: CharacterStats
@@ -82,6 +83,8 @@ func setup(
 		Events.player_turn_started.connect(_on_player_turn_started)
 	if not Events.player_turn_ended.is_connected(_on_player_turn_ended):
 		Events.player_turn_ended.connect(_on_player_turn_ended)
+	if not Events.card_exhausted.is_connected(_on_card_exhausted):
+		Events.card_exhausted.connect(_on_card_exhausted)
 
 
 func _exit_tree() -> void:
@@ -97,6 +100,8 @@ func _exit_tree() -> void:
 		Events.player_turn_started.disconnect(_on_player_turn_started)
 	if Events.player_turn_ended.is_connected(_on_player_turn_ended):
 		Events.player_turn_ended.disconnect(_on_player_turn_ended)
+	if Events.card_exhausted.is_connected(_on_card_exhausted):
+		Events.card_exhausted.disconnect(_on_card_exhausted)
 
 
 func _on_card_played(card: Card) -> void:
@@ -120,6 +125,17 @@ func _on_card_played(card: Card) -> void:
 		if _engine_value(DemonicEngine.FLAME_REFINING) > 0 and _is_flame_card(card):
 			reduce_flame_card_costs(_engine_value(DemonicEngine.FLAME_REFINING), card)
 		_ensure_sha_qi_connected.call_deferred()
+
+
+func _on_card_exhausted(_card: Card) -> void:
+	if not _is_demonic():
+		return
+	var block := _engine_value(DemonicEngine.EXHAUST_GUARD)
+	if block <= 0:
+		return
+	var block_effect := BlockEffect.new()
+	block_effect.amount = block
+	block_effect.execute([player])
 
 
 func _on_enemy_died(enemy: Enemy) -> void:
