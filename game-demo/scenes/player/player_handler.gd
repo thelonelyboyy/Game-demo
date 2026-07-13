@@ -370,6 +370,23 @@ func move_matching_cards_to_hand(source_pile: int, card_type_filter: int, amount
 	return moved
 
 
+func exhaust_affliction_cards_from_hand(max_cards := 0, exclude_card: Card = null) -> Array[Card]:
+	var exhausted: Array[Card] = []
+	if not battle_running or not hand:
+		return exhausted
+	for card_ui: CardUI in hand.get_children():
+		if max_cards > 0 and exhausted.size() >= max_cards:
+			break
+		var candidate := card_ui.card
+		if not candidate or candidate == exclude_card:
+			continue
+		if not candidate.is_status_card() and not candidate.is_curse_card():
+			continue
+		exhausted.append(candidate)
+		exhaust_card_from_hand(card_ui)
+	return exhausted
+
+
 func _notify_hand_full() -> void:
 	if _hand_full_notice_emitted_this_turn:
 		return

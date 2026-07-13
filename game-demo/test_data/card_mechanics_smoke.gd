@@ -36,6 +36,7 @@ const ADVANCED_DEMONIC_CARD_IDS := [
 	"demon_shadow_reenactment",
 	"demon_calamity_embryo",
 	"demon_lurking_soul_curse",
+	"demon_burn_impurity",
 ]
 
 var failures := PackedStringArray()
@@ -260,10 +261,14 @@ func _check_demonic_pool_depth() -> void:
 				if delayed and delayed.delayed_effects.size() == 2:
 					_check(delayed.delayed_effects[0].amount == 18, "lurking soul curse upgrade raises delayed damage to eighteen")
 					_check(delayed.delayed_effects[1].amount == 2, "lurking soul curse upgrade raises delayed soul mark to two")
-	_check(unique_ids.size() == 86, "demonic draft pool contains eighty-six unique cards")
+			elif card.id == "demon_burn_impurity":
+				_check(advanced_upgrade.configured_effects[0].amount == 8, "burn impurity upgrade raises base block to eight")
+				_check(advanced_upgrade.configured_effects[1].amount == 6, "burn impurity upgrade raises block per affliction to six")
+	_check(unique_ids.size() == 87, "demonic draft pool contains eighty-seven unique cards")
 	_check(unique_ids.has("demon_shadow_reenactment"), "demonic draft pool includes shadow reenactment")
 	_check(unique_ids.has("demon_calamity_embryo"), "demonic draft pool includes calamity embryo")
 	_check(unique_ids.has("demon_lurking_soul_curse"), "demonic draft pool includes lurking soul curse")
+	_check(unique_ids.has("demon_burn_impurity"), "demonic draft pool includes burn impurity")
 	_check(found_new.size() == NEW_DEMONIC_CARD_IDS.size(), "all seven construction bridge cards are in draft pool")
 
 	var common_ids := {}

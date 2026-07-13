@@ -38,6 +38,7 @@ EFFECT_LABEL = {
     "configured_count_scaling_effect": "计数增幅",
     "configured_copy_previous_card_effect": "复刻",
     "configured_delayed_effect": "延迟施放",
+    "configured_purge_affliction_effect": "焚化污染",
     "low_health_bonus_damage_effect": "半血爆伤",
 }
 

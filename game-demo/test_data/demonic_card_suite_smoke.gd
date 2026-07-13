@@ -24,8 +24,12 @@ const SPIRIT_STONE_NEEDLE_PATH := "res://common_cards/spirit_stone_needle.tres"
 const SHADOW_REENACTMENT_PATH := "res://characters/demonic_cultivator/cards/demon_shadow_reenactment.tres"
 const CALAMITY_EMBRYO_PATH := "res://characters/demonic_cultivator/cards/demon_calamity_embryo.tres"
 const LURKING_SOUL_CURSE_PATH := "res://characters/demonic_cultivator/cards/demon_lurking_soul_curse.tres"
+const BURN_IMPURITY_PATH := "res://characters/demonic_cultivator/cards/demon_burn_impurity.tres"
 const BLOOD_DEBT_CURSE_PATH := "res://common_cards/status/blood_debt_curse.tres"
 const KARMIC_FIRE_CURSE_PATH := "res://common_cards/status/karmic_fire_curse.tres"
+const HEART_DEMON_PATH := "res://common_cards/status/heart_demon.tres"
+const UNDERWORLD_WRIT_PATH := "res://common_cards/status/underworld_writ.tres"
+const TOXIN_PATH := "res://common_cards/toxin.tres"
 const STRIKE_PATH := "res://characters/demonic_cultivator/cards/demon_strike.tres"
 const DEFEND_PATH := "res://characters/demonic_cultivator/cards/demon_defend.tres"
 const BLOOD_WARD_PATH := "res://characters/demonic_cultivator/cards/demon_blood_ward.tres"
@@ -78,6 +82,8 @@ func _run_smoke() -> void:
 		await _check_copy_previous_card(battle)
 		current_step = "delayed_cast"
 		await _check_delayed_cast(battle, enemies[0])
+		current_step = "affliction_purge"
+		await _check_affliction_purge(battle)
 		current_step = "blood_debt"
 		await _check_blood_debt(battle, enemies[0])
 		current_step = "sha_blade"
@@ -324,6 +330,39 @@ func _check_delayed_cast(battle: Battle, enemy: Enemy) -> void:
 	var sha_status := battle.player.status_handler.get_status("sha_qi")
 	if sha_status:
 		sha_status.stacks = 0
+	await get_tree().process_frame
+
+
+func _check_affliction_purge(battle: Battle) -> void:
+	var hand := battle.player_handler.hand
+	var hand_before := hand.get_child_count()
+	var afflictions: Array[Card] = [
+		(load(HEART_DEMON_PATH) as Card).duplicate(true) as Card,
+		(load(UNDERWORLD_WRIT_PATH) as Card).duplicate(true) as Card,
+		(load(TOXIN_PATH) as Card).duplicate(true) as Card,
+	]
+	for affliction: Card in afflictions:
+		_check(hand.add_card(affliction, false), "%s enters the hand for purge testing" % affliction.id)
+	var normal_card := (load(DEFEND_PATH) as Card).duplicate(true) as Card
+	_check(hand.add_card(normal_card, false), "normal card enters the hand beside afflictions")
+	await get_tree().process_frame
+	_check(afflictions[2].is_status_card() and not afflictions[2].blocks_manual_play(), "toxin is a playable status card")
+
+	var exhaust_before := battle.char_stats.exhaust_pile.cards.size()
+	var block_before := battle.player.stats.block
+	var purge := (load(BURN_IMPURITY_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(purge)
+	purge.apply_effects([battle.player], battle.player.modifier_handler)
+	await get_tree().process_frame
+	_check(battle.player.stats.block == block_before + 17, "burn impurity grants base block plus four per purged affliction")
+	_check(battle.char_stats.exhaust_pile.cards.size() == exhaust_before + 3, "burn impurity exhausts all three afflictions")
+	for affliction: Card in afflictions:
+		_check(battle.char_stats.exhaust_pile.cards.has(affliction), "%s moves to the exhaust pile" % affliction.id)
+	_check(hand.get_child_count() == hand_before + 1, "burn impurity leaves the normal card in hand")
+	_check(battle.char_stats.discard.cards.has(purge), "burn impurity remains in the normal draw-discard cycle")
+
+	for index in range(hand.get_child_count() - 1, hand_before - 1, -1):
+		hand.get_child(index).queue_free()
 	await get_tree().process_frame
 
 
