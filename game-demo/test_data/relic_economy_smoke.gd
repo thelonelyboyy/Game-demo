@@ -23,7 +23,7 @@ func _run_smoke() -> void:
 	for relic: Relic in pool.relics:
 		if relic and relic.rarity < rarity_counts.size():
 			rarity_counts[relic.rarity] += 1
-	_check(pool.relics.size() == 46, "reward pool contains forty-six relics")
+	_check(pool.relics.size() == 50, "reward pool contains fifty relics")
 	for rarity in Relic.Rarity.values():
 		_check(rarity_counts[rarity] > 0, "rarity %s has at least one relic" % rarity)
 	_check(rarity_counts[Relic.Rarity.BOSS] == 6, "demonic reward pool contains six boss relics")

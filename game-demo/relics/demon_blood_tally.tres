@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SelfDamageThresholdRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/self_damage_threshold_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/jade_abacus.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "血劫算盘"
+id = "demon_blood_tally"
+type = 4
+character_type = 3
+rarity = 1
+icon = ExtResource("2")
+tooltip = "魔修专属。每回合因自己的卡牌累计失去 4 点生命后，获得 1 点灵力。每回合限一次。"
+damage_threshold = 4
+mana_amount = 1

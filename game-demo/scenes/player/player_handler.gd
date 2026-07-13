@@ -104,7 +104,7 @@ func use_hero_skill(origin_global := Vector2.ZERO) -> void:
 
 	_hero_skill_used_this_turn = true
 	# 代价走真实伤害结算：会被护体吸收并吃伤害修正，致死沿用角色受伤时序。
-	player.take_damage(_get_hero_skill_self_damage(), Modifier.Type.DMG_TAKEN)
+	player.take_self_damage(_get_hero_skill_self_damage(), Modifier.Type.DMG_TAKEN)
 	if not battle_running:
 		return
 

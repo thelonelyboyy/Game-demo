@@ -15,13 +15,17 @@ const NEW_RELIC_PATHS := [
 	"res://relics/demon_sha_urn.tres",
 	"res://relics/demon_flame_wheel_core.tres",
 	"res://relics/demon_ash_furnace.tres",
+	"res://relics/demon_blood_tally.tres",
+	"res://relics/demon_flame_lantern.tres",
+	"res://relics/demon_soul_censer.tres",
+	"res://relics/demon_ash_ledger.tres",
 ]
 
 var failures: PackedStringArray = []
 
 
 func _ready() -> void:
-	get_tree().create_timer(15.0, true).timeout.connect(_on_watchdog_timeout)
+	get_tree().create_timer(20.0, true).timeout.connect(_on_watchdog_timeout)
 	call_deferred("_run_smoke")
 
 
@@ -67,7 +71,7 @@ func _run_smoke() -> void:
 
 func _check_reward_pool(character: CharacterStats, other_character: CharacterStats) -> void:
 	var pool := load(RELIC_POOL_PATH) as RelicRewardPool
-	_check(pool != null and pool.relics.size() == 46, "reward pool contains forty-six relics")
+	_check(pool != null and pool.relics.size() == 50, "reward pool contains fifty relics")
 	if not pool:
 		return
 	var found := 0
@@ -77,25 +81,42 @@ func _check_reward_pool(character: CharacterStats, other_character: CharacterSta
 		found += 1
 		_check(relic.can_appear_as_reward(character), "%s appears for demonic cultivator" % relic.id)
 		_check(not relic.can_appear_as_reward(other_character), "%s stays out of other class pools" % relic.id)
-	_check(found == NEW_RELIC_PATHS.size(), "all seven demonic relics are in reward pool")
+	_check(found == NEW_RELIC_PATHS.size(), "all eleven tested demonic relics are in reward pool")
 
 
 func _check_self_damage_relics(battle: Battle) -> void:
-	var initial_block := battle.player.stats.block
 	var initial_hand := battle.player_handler.hand.get_child_count()
-	Events.player_self_damaged.emit(2)
-	await get_tree().create_timer(0.45).timeout
-	_check(battle.player.stats.block == initial_block + 3, "blood crucible grants block on self damage")
-	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "crimson gourd draws on first self damage")
+	var initial_mana := battle.char_stats.mana
+	var initial_health := battle.player.stats.health
+	battle.player.stats.block = 2
+	battle.player.take_self_damage(2, Modifier.Type.DMG_TAKEN)
+	await get_tree().create_timer(1.0).timeout
+	_check(battle.player.stats.health == initial_health, "fully blocked self-inflicted damage does not count as lost life")
+	_check(battle.player.stats.block == 0, "hero-style self damage still consumes block")
+	_check(battle.player_handler.hand.get_child_count() == initial_hand, "fully blocked self damage does not trigger blood relics")
 
-	Events.player_self_damaged.emit(2)
-	await get_tree().create_timer(0.45).timeout
-	_check(battle.player.stats.block == initial_block + 6, "blood crucible can trigger repeatedly")
+	battle.player.take_self_damage(2, Modifier.Type.DMG_TAKEN)
+	await get_tree().create_timer(1.0).timeout
+	_check(battle.player.stats.health == initial_health - 2, "self-inflicted damage reports actual lost life")
+	_check(battle.player.stats.block == 3, "blood crucible grants block on self damage")
+	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "crimson gourd draws on first self damage")
+	_check(battle.char_stats.mana == initial_mana, "blood tally waits for cumulative self damage threshold")
+
+	battle.player.stats.block = 0
+	battle.player.take_self_damage(2, Modifier.Type.DMG_TAKEN)
+	await get_tree().create_timer(1.0).timeout
+	_check(battle.player.stats.health == initial_health - 4, "repeated self-inflicted damage uses the same actual-loss path")
+	_check(battle.player.stats.block == 3, "blood crucible can trigger repeatedly")
 	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "crimson gourd triggers only once per turn")
+	_check(battle.char_stats.mana == initial_mana + 1, "blood tally grants mana at four cumulative self damage")
+	Events.player_self_damaged.emit(4)
+	await get_tree().process_frame
+	_check(battle.char_stats.mana == initial_mana + 1, "blood tally triggers only once per turn")
 
 
 func _check_soul_mark_relics(battle: Battle) -> void:
 	battle.player.stats.mana = 0
+	var block_before := battle.player.stats.block
 	var enemies := _get_live_enemies(battle)
 	var health_before: Array[int] = []
 	for enemy: Enemy in enemies:
@@ -103,6 +124,7 @@ func _check_soul_mark_relics(battle: Battle) -> void:
 	Events.soul_mark_spent.emit(3, true)
 	await get_tree().create_timer(0.25).timeout
 	_check(battle.player.stats.mana == 1, "soul bell grants mana on first soul mark spend")
+	_check(battle.player.stats.block == block_before + 6, "soul censer grants block after spending at least three marks at once")
 	for i in enemies.size():
 		_check(health_before[i] - enemies[i].stats.health == 3, "wraith banner damages enemy %s per spent mark" % i)
 
@@ -112,48 +134,85 @@ func _check_soul_mark_relics(battle: Battle) -> void:
 	Events.soul_mark_spent.emit(2, false)
 	await get_tree().create_timer(0.25).timeout
 	_check(battle.player.stats.mana == 1, "soul bell triggers only once per turn")
+	_check(battle.player.stats.block == block_before + 6, "soul censer triggers only once per turn")
 	for i in enemies.size():
 		_check(second_health[i] == enemies[i].stats.health, "wraith banner triggers only once per turn for enemy %s" % i)
+
+	Events.player_turn_started.emit()
+	await get_tree().process_frame
+	var next_turn_block := battle.player.stats.block
+	Events.soul_mark_spent.emit(2, false)
+	await get_tree().process_frame
+	_check(battle.player.stats.block == next_turn_block, "soul censer ignores a spend below three marks")
+	Events.soul_mark_spent.emit(3, false)
+	await get_tree().process_frame
+	_check(battle.player.stats.block == next_turn_block + 6, "a below-threshold spend does not consume soul censer's turn trigger")
 
 
 func _check_flame_relic(battle: Battle) -> void:
 	var flame := load(FLAME_CARD_PATH) as Card
 	var initial_hand := battle.player_handler.hand.get_child_count()
+	battle.char_stats.mana = 0
 	Events.card_played.emit(flame)
 	await get_tree().create_timer(0.45).timeout
 	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "flame wheel core draws on first flame card")
 	Events.card_played.emit(flame)
 	await get_tree().create_timer(0.45).timeout
 	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "flame wheel core triggers only once per turn")
+	Events.flame_wheel_changed.emit([0, 1])
+	await get_tree().process_frame
+	_check(battle.char_stats.mana == 0, "flame lantern waits for three distinct colors")
+	Events.flame_wheel_changed.emit([0, 1, 2])
+	await get_tree().process_frame
+	_check(battle.char_stats.mana == 1, "flame lantern grants mana at three distinct colors")
+	Events.flame_wheel_changed.emit([0, 1, 2, 3])
+	await get_tree().process_frame
+	_check(battle.char_stats.mana == 1, "flame lantern triggers only once per turn")
 
 
 func _check_exhaust_relic(battle: Battle) -> void:
-	for i in 3:
+	for i in 7:
 		var draw_card := Card.new()
 		draw_card.id = "ash_furnace_draw_%s" % i
 		battle.char_stats.draw_pile.add_card(draw_card)
 
+	battle.char_stats.mana = 0
 	var initial_hand := battle.player_handler.hand.get_child_count()
-	var first_exhaust := Card.new()
-	first_exhaust.id = "ash_furnace_first_exhaust"
-	battle.player_handler._add_card_to_exhaust_pile(first_exhaust)
-	await get_tree().create_timer(0.45).timeout
+	var exhausted_cards: Array[Card] = []
+	for i in 6:
+		var exhausted := Card.new()
+		exhausted.id = "ash_ledger_exhaust_%s" % i
+		exhausted_cards.append(exhausted)
+
+	battle.player_handler._add_card_to_exhaust_pile(exhausted_cards[0])
+	await get_tree().create_timer(0.35).timeout
 	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "ash furnace draws on first exhausted card")
+	_check(battle.char_stats.mana == 0, "ash ledger waits for its third exhausted card")
 
-	var second_exhaust := Card.new()
-	second_exhaust.id = "ash_furnace_second_exhaust"
-	battle.player_handler._add_card_to_exhaust_pile(second_exhaust)
-	await get_tree().create_timer(0.45).timeout
+	battle.player_handler._add_card_to_exhaust_pile(exhausted_cards[1])
+	await get_tree().create_timer(0.35).timeout
 	_check(battle.player_handler.hand.get_child_count() == initial_hand + 1, "ash furnace triggers only once per turn")
+	_check(battle.char_stats.mana == 0, "ash ledger still waits after two exhausted cards")
 
+	battle.player_handler._add_card_to_exhaust_pile(exhausted_cards[2])
+	await get_tree().create_timer(0.35).timeout
+	_check(battle.player_handler.hand.get_child_count() == initial_hand + 2, "ash ledger draws on the third exhausted card")
+	_check(battle.char_stats.mana == 1, "ash ledger grants mana on the third exhausted card")
+
+	for _i in 2:
+		var card_ui := battle.player_handler.hand.get_child(0)
+		card_ui.queue_free()
+		await get_tree().process_frame
+	var next_turn_hand := battle.player_handler.hand.get_child_count()
 	Events.player_turn_started.emit()
 	await get_tree().process_frame
-	var third_exhaust := Card.new()
-	third_exhaust.id = "ash_furnace_next_turn_exhaust"
-	battle.player_handler._add_card_to_exhaust_pile(third_exhaust)
-	await get_tree().create_timer(0.45).timeout
-	_check(battle.player_handler.hand.get_child_count() == initial_hand + 2, "ash furnace resets at the next player turn")
-	_check(battle.char_stats.exhaust_pile.cards.has(third_exhaust), "ash furnace does not alter exhaust pile lifecycle")
+	for i in range(3, 6):
+		battle.player_handler._add_card_to_exhaust_pile(exhausted_cards[i])
+		await get_tree().create_timer(0.35).timeout
+	_check(battle.player_handler.hand.get_child_count() == next_turn_hand + 2, "exhaust relic draws reset independently next turn")
+	_check(battle.char_stats.mana == 2, "ash ledger counter resets at the next player turn")
+	for exhausted: Card in exhausted_cards:
+		_check(battle.char_stats.exhaust_pile.cards.has(exhausted), "exhaust relics preserve %s in the exhaust pile" % exhausted.id)
 
 
 func _get_live_enemies(battle: Battle) -> Array[Enemy]:

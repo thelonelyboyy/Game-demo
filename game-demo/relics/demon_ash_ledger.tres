@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardExhaustThresholdRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/card_exhaust_threshold_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/fate_ledger.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "灰契残卷"
+id = "demon_ash_ledger"
+type = 4
+character_type = 3
+rarity = 2
+icon = ExtResource("2")
+tooltip = "魔修专属。每回合消耗第 3 张牌时，获得 1 点灵力并抽 1 张牌。"
+exhaust_threshold = 3
+mana_amount = 1
+draw_amount = 1

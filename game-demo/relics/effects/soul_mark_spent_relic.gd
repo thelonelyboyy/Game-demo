@@ -5,6 +5,7 @@ enum RewardMode {MANA, BLOCK, DAMAGE_ALL}
 
 @export var reward_mode := RewardMode.MANA
 @export var amount := 1
+@export var minimum_consumed := 1
 @export var scale_by_consumed := false
 @export var once_per_turn := true
 
@@ -32,7 +33,7 @@ func _on_player_turn_started() -> void:
 
 
 func _on_soul_mark_spent(consumed: int, _detonated: bool) -> void:
-	if consumed <= 0 or (once_per_turn and triggered_this_turn):
+	if consumed < maxi(minimum_consumed, 1) or (once_per_turn and triggered_this_turn):
 		return
 	if not relic_ui or not is_instance_valid(relic_ui):
 		return

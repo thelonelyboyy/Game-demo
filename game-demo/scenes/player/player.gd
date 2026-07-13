@@ -25,6 +25,7 @@ const ANIM_DEFS := {
 
 var sprite_visible_size := Vector2.ZERO
 var animated_sprite: AnimatedSprite2D
+var _suppress_self_damage_feedback := false
 # 战斗信息卡尺寸（画布像素），battle_ui 对齐世界节点时写入；飘字/特效以卡为基准。
 var aligned_feedback_extents := Vector2.ZERO
 
@@ -218,6 +219,14 @@ func _on_animation_finished() -> void:
 
 
 func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
+	_queue_damage(damage, which_modifier, false)
+
+
+func take_self_damage(damage: int, which_modifier: Modifier.Type) -> void:
+	_queue_damage(damage, which_modifier, true)
+
+
+func _queue_damage(damage: int, which_modifier: Modifier.Type, self_inflicted: bool) -> void:
 	if stats.health <= 0:
 		return
 
@@ -234,10 +243,22 @@ func take_damage(damage: int, which_modifier: Modifier.Type) -> void:
 	if hit_delay > 0.0:
 		tween.tween_interval(hit_delay)
 	tween.tween_callback(_spawn_damage_feedback.bind(modified_damage))
-	tween.tween_callback(stats.take_damage.bind(modified_damage))
+	tween.tween_callback(_apply_queued_damage.bind(modified_damage, self_inflicted))
 	tween.tween_interval(0.17)
 
 	tween.finished.connect(_on_damage_tween_finished)
+
+
+func _apply_queued_damage(amount: int, self_inflicted: bool) -> void:
+	if not stats or stats.health <= 0:
+		return
+	var initial_health := stats.health
+	stats.take_damage(amount)
+	var actual_lost := maxi(0, initial_health - stats.health)
+	if self_inflicted and actual_lost > 0:
+		_suppress_self_damage_feedback = true
+		Events.player_self_damaged.emit(actual_lost)
+		_suppress_self_damage_feedback = false
 
 
 # 伤害落地瞬间的飘字：按当前护体拆出"被格挡"和"实际扣血"。
@@ -265,7 +286,7 @@ func _spawn_damage_feedback(amount: int) -> void:
 
 # 自损（血祭/献祭类效果直接扣血、不走 take_damage），用暗红飘字区分敌方伤害。
 func _on_self_damaged(amount: int) -> void:
-	if amount <= 0 or not is_inside_tree():
+	if amount <= 0 or not is_inside_tree() or _suppress_self_damage_feedback:
 		return
 	GameSfx.play(GameSfx.HIT, -8.0)
 	FloatingCombatText.spawn_self_damage(self, amount, _damage_text_offset())

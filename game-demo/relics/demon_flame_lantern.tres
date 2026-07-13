@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="FlameWheelThresholdRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/flame_wheel_threshold_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/fire_spark_pearl.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "三曜焰灯"
+id = "demon_flame_lantern"
+type = 4
+character_type = 3
+rarity = 2
+icon = ExtResource("2")
+tooltip = "魔修专属。每回合焰轮首次点亮 3 种颜色时，获得 1 点灵力。"
+color_threshold = 3
+mana_amount = 1
