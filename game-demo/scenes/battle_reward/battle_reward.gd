@@ -367,6 +367,8 @@ func _get_card_archetypes(card: Card) -> PackedStringArray:
 		archetypes.append("flame")
 	if searchable.contains("魂印") or searchable.contains("soul_mark") or searchable.contains("soul"):
 		archetypes.append("soul")
+	if searchable.contains("消耗") or searchable.contains("净化") or searchable.contains("exhaust"):
+		archetypes.append("exhaust")
 	return archetypes
 
 

@@ -25,6 +25,7 @@ const SHADOW_REENACTMENT_PATH := "res://characters/demonic_cultivator/cards/demo
 const CALAMITY_EMBRYO_PATH := "res://characters/demonic_cultivator/cards/demon_calamity_embryo.tres"
 const LURKING_SOUL_CURSE_PATH := "res://characters/demonic_cultivator/cards/demon_lurking_soul_curse.tres"
 const BURN_IMPURITY_PATH := "res://characters/demonic_cultivator/cards/demon_burn_impurity.tres"
+const ASH_BARRIER_PATH := "res://characters/demonic_cultivator/cards/demon_ash_barrier.tres"
 const BLOOD_DEBT_CURSE_PATH := "res://common_cards/status/blood_debt_curse.tres"
 const KARMIC_FIRE_CURSE_PATH := "res://common_cards/status/karmic_fire_curse.tres"
 const HEART_DEMON_PATH := "res://common_cards/status/heart_demon.tres"
@@ -473,12 +474,11 @@ func _check_exhaust_guard_engine(battle: Battle) -> void:
 	membrane.apply_effects([battle.player], battle.player.modifier_handler)
 	await get_tree().process_frame
 	var block_before := battle.player.stats.block
-	var consumable := Card.new()
-	consumable.id = "exhaust_guard_smoke"
-	consumable.exhausts = true
-	battle.player_handler._on_card_played(consumable)
-	_check(battle.player.stats.block == block_before + 2, "blood membrane grants block when a card is exhausted")
-	_check(battle.player_handler.character.exhaust_pile.cards.has(consumable), "exhaust guard trigger preserves normal exhaust destination")
+	var ash_barrier := (load(ASH_BARRIER_PATH) as Card).duplicate(true) as CultivationCard
+	Events.card_played.emit(ash_barrier)
+	ash_barrier.apply_effects([battle.player], battle.player.modifier_handler)
+	_check(battle.player.stats.block == block_before + 6, "ash barrier grants four block and triggers two more from blood membrane")
+	_check(battle.player_handler.character.exhaust_pile.cards.has(ash_barrier), "ash barrier enters the normal exhaust destination")
 	_check(battle.battle_ui.exhaust_pile_button.card_pile == battle.player_handler.character.exhaust_pile, "battle UI tracks the active exhaust pile")
 	battle.battle_ui.exhaust_pile_button.pressed.emit()
 	await get_tree().process_frame

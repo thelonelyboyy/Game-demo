@@ -10,6 +10,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
+import demonic_pool_balance
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = REPO_ROOT / "game-demo"
 
@@ -345,6 +347,23 @@ def validate_profession_content(issues: list[Issue]) -> None:
                 issues.append(Issue("ERROR", draftable_path, f"Draftable pile has too few unique profession cards: {len(set(profession_refs))}/20"))
 
 
+def validate_demonic_pool_balance(issues: list[Issue]) -> None:
+    try:
+        analysis = demonic_pool_balance.load_pool_analysis()
+        expected_report = demonic_pool_balance.render_report(analysis)
+    except Exception as error:
+        issues.append(Issue("ERROR", demonic_pool_balance.POOL_PATH, f"Demonic pool analysis failed: {error}"))
+        return
+
+    for error in demonic_pool_balance.validate_analysis(analysis):
+        issues.append(Issue("ERROR", demonic_pool_balance.POOL_PATH, f"Demonic pool balance: {error}"))
+    report_path = demonic_pool_balance.REPORT_PATH
+    if not report_path.exists():
+        issues.append(Issue("ERROR", report_path, "Missing generated demonic balance report"))
+    elif report_path.read_text(encoding="utf-8") != expected_report:
+        issues.append(Issue("ERROR", report_path, "Balance report is stale; run python scripts/demonic_pool_balance.py --write"))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--strict-content", action="store_true", help="Treat content scale gaps as errors.")
@@ -363,6 +382,7 @@ def main() -> int:
     validate_battle_pool_tiers(issues)
     validate_relic_trigger_coverage(issues)
     validate_profession_content(issues)
+    validate_demonic_pool_balance(issues)
 
     if args.strict_content:
         for issue in issues:

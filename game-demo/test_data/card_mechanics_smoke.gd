@@ -207,6 +207,15 @@ func _check_card_reward_archetype_synergy() -> void:
 	neutral_candidate.id = "neutral_candidate"
 	_check(is_equal_approx(reward._get_card_synergy_weight(neutral_candidate), 1.0), "neutral rewards keep base weight")
 	_check(is_equal_approx(reward._get_card_synergy_weight(soul_candidate), 1.9), "archetype reward bonus reaches its configured cap")
+	for i in range(3):
+		var exhaust_support := Card.new()
+		exhaust_support.id = "consumable_support_%s" % i
+		exhaust_support.mechanic_tags = PackedStringArray(["消耗"])
+		reward.character_stats.deck.add_card(exhaust_support)
+	var exhaust_candidate := Card.new()
+	exhaust_candidate.id = "purge_candidate"
+	exhaust_candidate.mechanic_tags = PackedStringArray(["净化"])
+	_check(is_equal_approx(reward._get_card_synergy_weight(exhaust_candidate), 1.54), "exhaust archetype receives reward synergy from three matching cards")
 	var blood_candidate := Card.new()
 	blood_candidate.id = "blood_candidate"
 	blood_candidate.mechanic_tags = PackedStringArray(["献祭"])
@@ -264,11 +273,12 @@ func _check_demonic_pool_depth() -> void:
 			elif card.id == "demon_burn_impurity":
 				_check(advanced_upgrade.configured_effects[0].amount == 8, "burn impurity upgrade raises base block to eight")
 				_check(advanced_upgrade.configured_effects[1].amount == 6, "burn impurity upgrade raises block per affliction to six")
-	_check(unique_ids.size() == 87, "demonic draft pool contains eighty-seven unique cards")
+	_check(unique_ids.size() == 88, "demonic draft pool contains eighty-eight unique cards")
 	_check(unique_ids.has("demon_shadow_reenactment"), "demonic draft pool includes shadow reenactment")
 	_check(unique_ids.has("demon_calamity_embryo"), "demonic draft pool includes calamity embryo")
 	_check(unique_ids.has("demon_lurking_soul_curse"), "demonic draft pool includes lurking soul curse")
 	_check(unique_ids.has("demon_burn_impurity"), "demonic draft pool includes burn impurity")
+	_check(unique_ids.has("demon_ash_barrier"), "demonic draft pool includes ash barrier")
 	_check(found_new.size() == NEW_DEMONIC_CARD_IDS.size(), "all seven construction bridge cards are in draft pool")
 
 	var common_ids := {}

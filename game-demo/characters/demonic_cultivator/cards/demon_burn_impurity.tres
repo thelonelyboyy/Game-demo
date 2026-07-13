@@ -22,7 +22,6 @@ script = ExtResource("1")
 configured_effects = Array[Resource]([SubResource("BaseBlock"), SubResource("Purge")])
 id = "demon_burn_impurity"
 type = 1
-rarity = 1
 target = 0
 cost = 1
 upgrade_type = 1
