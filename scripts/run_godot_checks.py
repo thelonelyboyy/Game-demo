@@ -38,6 +38,7 @@ CHECKS = [
     {"name": "demonic-pact-relic", "args": ["res://test_data/demonic_pact_relic_smoke.tscn"], "quit": False, "required_marker": "DEMONIC_PACT_RELIC_SMOKE_OK"},
     {"name": "relic-economy", "args": ["res://test_data/relic_economy_smoke.tscn"], "quit": False, "required_marker": "RELIC_ECONOMY_SMOKE_OK"},
     {"name": "universal-relic", "args": ["res://test_data/universal_relic_smoke.tscn"], "quit": False, "required_marker": "UNIVERSAL_RELIC_SMOKE_OK"},
+    {"name": "lifecycle-relic", "args": ["res://test_data/lifecycle_relic_smoke.tscn"], "quit": False, "required_marker": "LIFECYCLE_RELIC_SMOKE_OK"},
     {"name": "boss-relic", "args": ["res://test_data/boss_relic_smoke.tscn"], "quit": False, "required_marker": "BOSS_RELIC_SMOKE_OK"},
     {"name": "event-progression", "args": ["res://test_data/event_progression_smoke.tscn"], "quit": False, "required_marker": "EVENT_PROGRESSION_SMOKE_OK"},
     {"name": "fusion-suite", "args": ["res://test_data/fusion_suite_smoke.tscn"], "quit": False, "required_marker": "FUSION_SUITE_SMOKE_OK"},

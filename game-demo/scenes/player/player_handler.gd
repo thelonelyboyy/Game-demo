@@ -401,6 +401,7 @@ func discard_card_from_hand(card_ui: CardUI, play_discard_animation := true) -> 
 	if card:
 		_trigger_card_lifecycle(card, Card.LifecycleTrigger.DISCARDED)
 		character.discard.add_card(card)
+		Events.card_discarded_from_hand.emit(card)
 	if hand:
 		hand.discard_card(card_ui, play_discard_animation)
 

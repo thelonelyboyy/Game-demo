@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DiscoveryAssistRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/discovery_assist_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/star_compass.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "万象残签"
+id = "myriad_archive_tally"
+type = 4
+character_type = 0
+rarity = 2
+exclusive_group = "discovery_guidance"
+icon = ExtResource("2")
+tooltip = "每回合第一次发现时，额外选择 1 张牌。"
+extra_picks = 1
+bonus_upgrades = 0
+once_per_turn = true

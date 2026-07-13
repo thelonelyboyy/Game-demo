@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardLifecycleBlockRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/card_lifecycle_block_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/stone_heart_bell.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "焚简墨斗"
+id = "ember_ink_measure"
+type = 4
+character_type = 0
+rarity = 1
+icon = ExtResource("2")
+tooltip = "每回合第一次消耗一张牌时，获得 6 点护体。"
+trigger = 1
+block_amount = 6
+once_per_turn = true

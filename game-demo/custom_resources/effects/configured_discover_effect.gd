@@ -29,6 +29,7 @@ func execute(card: CultivationCard, targets: Array[Node], _modifiers: ModifierHa
 	request.picks = clampi(maxi(1, get_modified_amount(card)), 1, choices.size())
 	request.allow_skip = allow_skip
 	request.completed.connect(_on_discovery_completed.bind(player_handler))
+	Events.card_discovery_prepared.emit(request)
 
 	if Events.card_discovery_requested.get_connections().is_empty():
 		request.resolve(choices.slice(0, request.picks))

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="GrowthEchoRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/growth_echo_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/wood_earth_seed.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "养刃灵石"
+id = "growth_echo_stone"
+type = 4
+character_type = 0
+rarity = 1
+icon = ExtResource("2")
+tooltip = "每回合第一次打出成长牌时，使其在效果结算前额外成长 1 次。"
+extra_growth_triggers = 1
+once_per_turn = true
