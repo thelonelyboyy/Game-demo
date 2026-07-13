@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DeckSizeStartRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/deck_size_start_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/fate_ledger.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "万卷经匣"
+id = "myriad_scroll_case"
+type = 1
+character_type = 0
+rarity = 1
+exclusive_group = "deck_shape"
+icon = ExtResource("2")
+tooltip = "战斗开始时，若永久牌组至少有 20 张，获得 15 点护体。"
+minimum_deck_size = 20
+maximum_deck_size = 0
+block_amount = 15
+status_stacks = 0

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradedCardBlockRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/upgraded_card_block_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/metal_edge_ring.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "百炼经印"
+id = "tempered_scripture_seal"
+type = 4
+character_type = 0
+rarity = 0
+icon = ExtResource("2")
+tooltip = "每回合第一次打出已突破的牌时，获得 5 点护体。"
+block_amount = 5

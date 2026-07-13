@@ -71,7 +71,7 @@ func _run_smoke() -> void:
 
 func _check_reward_pool(character: CharacterStats, other_character: CharacterStats) -> void:
 	var pool := load(RELIC_POOL_PATH) as RelicRewardPool
-	_check(pool != null and pool.relics.size() == 75, "reward pool contains seventy-five relics")
+	_check(pool != null and pool.relics.size() == 80, "reward pool contains eighty relics")
 	if not pool:
 		return
 	var found := 0

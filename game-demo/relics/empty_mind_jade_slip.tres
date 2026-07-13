@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DeckSizeStartRelic" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/deck_size_start_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/lotus_mirror.png" id="2"]
+[ext_resource type="Resource" path="res://statuses/spell_ward.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "空明玉简"
+id = "empty_mind_jade_slip"
+type = 1
+character_type = 0
+rarity = 2
+exclusive_group = "deck_shape"
+icon = ExtResource("2")
+tooltip = "战斗开始时，若永久牌组不超过 12 张，获得 2 层法障。"
+minimum_deck_size = 0
+maximum_deck_size = 12
+block_amount = 0
+status = ExtResource("3")
+status_stacks = 2

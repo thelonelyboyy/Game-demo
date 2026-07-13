@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ZeroCostThresholdRelic" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://relics/effects/zero_cost_threshold_relic.gd" id="1"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/jade_abacus.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+relic_name = "轻身算珠"
+id = "light_step_abacus"
+type = 4
+character_type = 0
+rarity = 1
+icon = ExtResource("2")
+tooltip = "每回合打出第 3 张 0 费牌时，抽 1 张牌。"
+card_threshold = 3
+draw_amount = 1
