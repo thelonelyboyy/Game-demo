@@ -34,6 +34,7 @@ CHECKS = [
     {"name": "normal-tactics", "args": ["res://test_data/normal_tactics_smoke.tscn"], "quit": False, "required_marker": "NORMAL_TACTICS_SMOKE_OK"},
     {"name": "status-ward", "args": ["res://test_data/status_ward_smoke.tscn"], "quit": False, "required_marker": "STATUS_WARD_SMOKE_OK"},
     {"name": "combat-debuff", "args": ["res://test_data/combat_debuff_smoke.tscn"], "quit": False, "required_marker": "COMBAT_DEBUFF_SMOKE_OK"},
+    {"name": "battle-interaction-regression", "args": ["res://test_data/battle_interaction_regression_smoke.tscn"], "quit": False, "required_marker": "BATTLE_INTERACTION_REGRESSION_SMOKE_OK"},
     {"name": "debuff-counterplay", "args": ["res://test_data/debuff_counterplay_smoke.tscn"], "quit": False, "required_marker": "DEBUFF_COUNTERPLAY_SMOKE_OK"},
     {"name": "difficulty", "args": ["res://test_data/difficulty_smoke.tscn"], "quit": False, "required_marker": "DIFFICULTY_SMOKE_OK"},
     {"name": "demonic-card-suite", "args": ["res://test_data/demonic_card_suite_smoke.tscn"], "quit": False, "required_marker": "DEMONIC_CARD_SUITE_SMOKE_OK"},

@@ -44,6 +44,21 @@ func get_primary_value(card: CultivationCard) -> int:
 	return get_modified_amount(card)
 
 
+func get_preview_damage_amount(value: int, player_modifiers: ModifierHandler, enemy_modifiers: ModifierHandler) -> int:
+	var result := value
+	if player_modifiers:
+		result = player_modifiers.get_modified_value(result, Modifier.Type.DMG_DEALT)
+	if enemy_modifiers:
+		result = enemy_modifiers.get_modified_value(result, Modifier.Type.DMG_TAKEN)
+	return result
+
+
+func get_preview_block_amount(value: int, player_modifiers: ModifierHandler) -> int:
+	if player_modifiers:
+		return player_modifiers.get_modified_value(value, Modifier.Type.BLOCK_GAIN)
+	return value
+
+
 func upgrade_values() -> void:
 	amount = _upgrade_number(amount)
 	bonus_amount = _upgrade_number(bonus_amount)

@@ -18,9 +18,15 @@ func execute(card: CultivationCard, targets: Array[Node], modifiers: ModifierHan
 
 
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
-	return "造成 %s 点伤害。本回合每因自损失去 1 点生命，额外造成 %d 点伤害（最多 +%d）。" % [
-		get_modified_amount(card, player_modifiers, enemy_modifiers),
-		damage_per_life,
+	var handler := _get_class_mechanic_handler()
+	var self_damage: int = 0
+	if handler and handler.has_method("get_self_damage_this_turn"):
+		self_damage = handler.get_self_damage_this_turn()
+	var raw_total := get_modified_amount(card) + mini(self_damage * damage_per_life, max_bonus)
+	var total := get_preview_damage_amount(raw_total, player_modifiers, enemy_modifiers)
+	return "造成 %s 点伤害。本回合自损已提供 +%d 基础伤害（最多 +%d）。" % [
+		total,
+		mini(self_damage * damage_per_life, max_bonus),
 		max_bonus,
 	]
 

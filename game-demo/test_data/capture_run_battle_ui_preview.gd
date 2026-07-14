@@ -3,6 +3,7 @@ extends Node
 const RUN_SCENE_PATH := "res://scenes/run/run.tscn"
 const OUTPUT_PATH := "res://art/design/run_battle_ui_preview.png"
 const MARKER_PATH := "res://art/design/run_battle_ui_preview_marker.txt"
+const CAPTURE_SIZE := Vector2i(1920, 1080)
 
 var _previous_save: SaveGame
 
@@ -38,6 +39,19 @@ func _capture() -> void:
 	_write_marker("battle ready")
 
 	var image := get_viewport().get_texture().get_image()
+	if image.get_size() != CAPTURE_SIZE:
+		var source_size := image.get_size()
+		var target_aspect := float(CAPTURE_SIZE.x) / float(CAPTURE_SIZE.y)
+		var source_aspect := float(source_size.x) / float(source_size.y)
+		if not is_equal_approx(source_aspect, target_aspect):
+			var crop_size := source_size
+			if source_aspect > target_aspect:
+				crop_size.x = roundi(source_size.y * target_aspect)
+			else:
+				crop_size.y = roundi(source_size.x / target_aspect)
+			var crop_origin := (source_size - crop_size) / 2
+			image = image.get_region(Rect2i(crop_origin, crop_size))
+		image.resize(CAPTURE_SIZE.x, CAPTURE_SIZE.y, Image.INTERPOLATE_LANCZOS)
 	var error := image.save_png(OUTPUT_PATH)
 	if error != OK:
 		_finish(false, "save failed: %s" % error)

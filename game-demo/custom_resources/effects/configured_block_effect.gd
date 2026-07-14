@@ -21,6 +21,7 @@ func execute(card: CultivationCard, targets: Array[Node], _modifiers: ModifierHa
 
 
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
+	var value := get_preview_block_amount(get_modified_amount(card, player_modifiers, enemy_modifiers), player_modifiers)
 	if not description_template.is_empty():
-		return super.get_description(card, player_modifiers, enemy_modifiers)
-	return "获得 %s 点护体。" % get_modified_amount(card, player_modifiers, enemy_modifiers)
+		return description_template.replace("{amount}", str(value)).replace("{bonus}", str(bonus_amount)).replace("{condition}", get_condition_description())
+	return "获得 %s 点护体。" % value

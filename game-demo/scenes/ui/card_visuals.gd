@@ -48,8 +48,7 @@ func set_card(value: Card) -> void:
 	cost.text = "禁" if card.blocks_manual_play() else card.get_cost_text()
 	card_name.text = card.get_display_name()
 	card_name.add_theme_font_size_override("font_size", _get_title_font_size(card_name.text))
-	description.text = "[center]%s[/center]" % style_helper.format_card_text(card, card.get_default_tooltip())
-	description.add_theme_font_size_override("normal_font_size", _get_description_font_size(description.text))
+	_set_description(card.get_default_tooltip())
 	icon.texture = card.icon
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
@@ -64,6 +63,25 @@ func set_card(value: Card) -> void:
 		element_tag.hide()
 
 	_apply_card_style(card, visual_state)
+
+
+func show_runtime_values(player_modifiers: ModifierHandler, enemy_modifiers: ModifierHandler = null) -> void:
+	if not card:
+		return
+	cost.text = "禁" if card.blocks_manual_play() else card.get_cost_text()
+	_set_description(card.get_updated_tooltip(player_modifiers, enemy_modifiers))
+
+
+func show_default_values() -> void:
+	if not card:
+		return
+	cost.text = "禁" if card.blocks_manual_play() else card.get_cost_text()
+	_set_description(card.get_default_tooltip())
+
+
+func _set_description(value: String) -> void:
+	description.text = "[center]%s[/center]" % style_helper.format_card_text(card, value)
+	description.add_theme_font_size_override("normal_font_size", _get_description_font_size(description.text))
 
 
 func apply_normal_style() -> void:
@@ -233,29 +251,51 @@ func _apply_card_style(card_to_style: Card, state: int = VisualState.NORMAL) -> 
 	type_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
 	type_label.add_theme_constant_override("shadow_offset_x", 1)
 	type_label.add_theme_constant_override("shadow_offset_y", 1)
-	element_tag.add_theme_color_override("font_color", highlight)
-	element_tag.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.82))
+	_apply_element_badge_style(card_to_style.element)
+
+
+func _apply_element_badge_style(element: Card.Element) -> void:
+	var element_color := SpiritRootText.element_color(element)
+	var badge_style := StyleBoxFlat.new()
+	badge_style.bg_color = element_color.darkened(0.52)
+	badge_style.border_color = element_color.lightened(0.24)
+	badge_style.border_width_left = 2
+	badge_style.border_width_top = 2
+	badge_style.border_width_right = 2
+	badge_style.border_width_bottom = 2
+	badge_style.corner_radius_top_left = 99
+	badge_style.corner_radius_top_right = 99
+	badge_style.corner_radius_bottom_left = 99
+	badge_style.corner_radius_bottom_right = 99
+	badge_style.shadow_color = Color(element_color.r, element_color.g, element_color.b, 0.34)
+	badge_style.shadow_size = 5
+	badge_style.anti_aliasing = true
+	element_tag.add_theme_stylebox_override("normal", badge_style)
+	element_tag.add_theme_color_override("font_color", Color("fff8dc"))
+	element_tag.add_theme_color_override("font_outline_color", element_color.darkened(0.72))
+	element_tag.add_theme_constant_override("outline_size", 2)
+	element_tag.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.90))
 	element_tag.add_theme_constant_override("shadow_offset_x", 1)
-	element_tag.add_theme_constant_override("shadow_offset_y", 1)
+	element_tag.add_theme_constant_override("shadow_offset_y", 2)
 
 
 func _get_title_font_size(value: String) -> int:
 	if value.length() >= 7:
-		return 14
+		return 17
 	if value.length() >= 5:
-		return 16
-	return 18
+		return 19
+	return 22
 
 
 func _get_description_font_size(value: String) -> int:
 	var plain_text := _strip_bbcode(value).strip_edges()
 	if plain_text.length() >= 62:
-		return 10
-	if plain_text.length() >= 44:
-		return 11
-	if plain_text.length() >= 28:
 		return 12
-	return 13
+	if plain_text.length() >= 44:
+		return 13
+	if plain_text.length() >= 28:
+		return 14
+	return 16
 
 
 func _strip_bbcode(value: String) -> String:

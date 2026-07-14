@@ -10,6 +10,7 @@ const TREASURE_SCENE = preload("res://scenes/treasure/treasure.tscn")
 const WIN_SCREEN_SCENE := preload("res://scenes/win_screen/win_screen.tscn")
 const SPIRIT_ROOT_BADGE_SCENE := preload("res://scenes/ui/spirit_root_badge.tscn")
 const CARD_VISUALS_SCENE := preload("res://scenes/ui/card_visuals.tscn")
+const CARD_CHANGE_FEEDBACK_SCRIPT := preload("res://scenes/ui/card_change_feedback.gd")
 const DEBUG_CONSOLE := preload("res://scenes/debug/debug_console.gd")
 const DEMONIC_HEAD_ICON := preload("res://art/characters/demonic_cultivator_head_icon.png")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
@@ -46,6 +47,7 @@ var save_data: SaveGame
 var spirit_root_badge: SpiritRootBadge
 var potion_bar_panel: PanelContainer
 var legacy_choice_layer: CanvasLayer
+var card_change_feedback: CardChangeFeedback
 var debug_console
 var current_chapter := 1
 var pending_chapter_advance := false
@@ -93,6 +95,7 @@ func _start_run() -> void:
 
 	save_data = SaveGame.new()
 	_save_run(true)
+	_show_starting_spirit_root_card.call_deferred()
 	_show_defeat_legacy_choice_if_available.call_deferred()
 
 
@@ -414,6 +417,7 @@ func _load_run() -> void:
 		character.spirit_root = save_data.spirit_root
 	character.deck = save_data.current_deck
 	character.health = save_data.current_health
+	character.ensure_demonic_card_element_distribution()
 	character.bind_all_card_piles_to_owner()
 	relic_handler.add_relics(save_data.relics)
 	potion_handler.load_potions(save_data.potions)
@@ -477,6 +481,8 @@ func _setup_event_connections() -> void:
 		Events.card_acquired_animation_requested.connect(_on_card_acquired_animation)
 	if not Events.ui_notice_requested.is_connected(_on_ui_notice_requested):
 		Events.ui_notice_requested.connect(_on_ui_notice_requested)
+	if not Events.card_change_feedback_requested.is_connected(_on_card_change_feedback_requested):
+		Events.card_change_feedback_requested.connect(_on_card_change_feedback_requested)
 	if not Events.card_played.is_connected(_on_card_played_for_stats):
 		Events.card_played.connect(_on_card_played_for_stats)
 	if not Events.enemy_died.is_connected(_on_enemy_died_for_stats):
@@ -510,6 +516,34 @@ func _setup_event_connections() -> void:
 
 var _notice_layer: CanvasLayer
 var _notice_box: VBoxContainer
+
+
+func _on_card_change_feedback_requested(title: String, cards: Array[Card], detail: String) -> void:
+	_ensure_card_change_feedback()
+	card_change_feedback.request_feedback(title, cards, detail)
+
+
+func _ensure_card_change_feedback() -> void:
+	if card_change_feedback:
+		return
+	card_change_feedback = CARD_CHANGE_FEEDBACK_SCRIPT.new() as CardChangeFeedback
+	card_change_feedback.name = "CardChangeFeedback"
+	add_child(card_change_feedback)
+
+
+func _show_starting_spirit_root_card() -> void:
+	if not character or not character.deck or not character.has_spirit_root():
+		return
+	var bonus_cards: Array[Card] = []
+	for card: Card in character.deck.cards:
+		if card and card.mechanic_tags.has(CharacterStats.SPIRIT_ROOT_BONUS_TAG):
+			bonus_cards.append(card)
+	if not bonus_cards.is_empty():
+		_on_card_change_feedback_requested(
+			"获得职业牌",
+			bonus_cards,
+			"灵根觉醒，以下职业牌已加入牌组。"
+		)
 
 
 # 随机效果结果播报：居中 toast 逐条堆叠、各自淡入停留后消失。

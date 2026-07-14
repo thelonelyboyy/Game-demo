@@ -11,6 +11,7 @@ func enter() -> void:
 		card_ui.tween.kill()
 
 	card_ui.card_visuals.apply_normal_style()
+	card_ui.reset_runtime_values()
 	card_ui.reparent_requested.emit(card_ui)
 	Events.tooltip_hide_requested.emit()
 

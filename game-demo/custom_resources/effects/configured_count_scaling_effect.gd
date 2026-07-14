@@ -52,6 +52,10 @@ func get_modified_amount(card: CultivationCard, _player_modifiers: ModifierHandl
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
 	var count := maxi(_get_count(card), minimum_count)
 	var total := get_modified_amount(card, player_modifiers, enemy_modifiers)
+	if result == Result.BLOCK:
+		total = get_preview_block_amount(total, player_modifiers)
+	else:
+		total = get_preview_damage_amount(total, player_modifiers, enemy_modifiers)
 	if not description_template.is_empty():
 		return description_template.replace("{amount}", str(amount)).replace("{per}", str(amount_per_count)).replace("{count}", str(count)).replace("{total}", str(total)).replace("{source}", _source_name())
 	var action := "获得护体" if result == Result.BLOCK else "造成伤害"

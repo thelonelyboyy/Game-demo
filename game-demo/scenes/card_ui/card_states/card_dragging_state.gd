@@ -26,6 +26,7 @@ func enter() -> void:
 	card_ui.scale = Vector2.ONE
 	
 	card_ui.card_visuals.apply_drag_style()
+	card_ui.refresh_runtime_values()
 	Events.card_drag_started.emit(card_ui)
 	if single_targeted:
 		card_ui.targets.clear()

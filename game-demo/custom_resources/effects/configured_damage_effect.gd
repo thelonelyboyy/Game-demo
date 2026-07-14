@@ -20,14 +20,13 @@ func execute(card: CultivationCard, targets: Array[Node], modifiers: ModifierHan
 
 
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
+	var value := get_preview_damage_amount(
+		get_modified_amount(card, player_modifiers, enemy_modifiers),
+		player_modifiers,
+		enemy_modifiers
+	)
 	if not description_template.is_empty():
-		return super.get_description(card, player_modifiers, enemy_modifiers)
-
-	var value := get_modified_amount(card, player_modifiers, enemy_modifiers)
-	if player_modifiers:
-		value = player_modifiers.get_modified_value(value, Modifier.Type.DMG_DEALT)
-	if enemy_modifiers:
-		value = enemy_modifiers.get_modified_value(value, Modifier.Type.DMG_TAKEN)
+		return description_template.replace("{amount}", str(value)).replace("{bonus}", str(bonus_amount)).replace("{condition}", get_condition_description())
 
 	if target_mode == TargetMode.ALL_ENEMIES:
 		return "对所有敌人造成 %s 点伤害。" % value

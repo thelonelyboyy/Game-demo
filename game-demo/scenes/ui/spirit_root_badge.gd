@@ -79,28 +79,34 @@ func _refresh() -> void:
 	if not icon_label or not name_label:
 		return
 
-	if character and character.rootless_path:
-		icon_label.text = "无"
-		icon_label.add_theme_color_override("font_color", Color("e0d4ba"))
-		name_label.text = "无相\n之路"
-		tooltip_text = "无相之路\n放弃灵根成长。开局最大生命 +8、获得 80 灵石，并随机突破 1 张初始牌。"
-		return
-
-	if not character or not character.has_spirit_root():
+	if not character:
 		icon_label.text = "灵"
 		icon_label.add_theme_color_override("font_color", Color("b8ad8e"))
-		name_label.text = "未定"
-		tooltip_text = SpiritRootText.status_tooltip(character)
+		name_label.text = "牌组\n无属性"
+		tooltip_text = "牌组中暂无属性牌。"
 		return
 
-	var element := character.spirit_root
+	var element := character.get_dominant_deck_element()
+	if element == Card.Element.NONE:
+		icon_label.text = "无"
+		icon_label.add_theme_color_override("font_color", Color("e0d4ba"))
+		name_label.text = "牌组\n无属性"
+		tooltip_text = "牌组主元素：无属性"
+		if character.rootless_path:
+			tooltip_text += "\n无相之路：开局最大生命 +8、获得 80 灵石，并随机突破 1 张初始牌。"
+		return
+
+	var count := character.get_dominant_deck_element_count()
 	icon_label.text = SpiritRootText.element_name(element)
 	icon_label.add_theme_color_override("font_color", SpiritRootText.element_color(element))
-	name_label.text = "%s\n%s张" % [
-		character.get_spirit_root_stage_name(),
-		character.count_spirit_root_cards(),
+	name_label.text = "主元素\n%s张" % count
+	tooltip_text = "牌组主元素：%s\n%s属性牌：%s 张" % [
+		SpiritRootText.element_name(element),
+		SpiritRootText.element_name(element),
+		count,
 	]
-	tooltip_text = SpiritRootText.status_tooltip(character)
+	if character.has_spirit_root():
+		tooltip_text += "\n\n%s" % SpiritRootText.status_tooltip(character)
 
 
 func _exit_tree() -> void:

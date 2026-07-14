@@ -38,6 +38,7 @@ var victory_resolving := false
 
 
 func _ready() -> void:
+	HitPause.force_restore()
 	_setup_ink_backdrop()
 	_setup_pixel_world()
 	enemy_handler.child_order_changed.connect(_on_enemies_child_order_changed)
@@ -47,6 +48,10 @@ func _ready() -> void:
 	Events.player_turn_ended.connect(player_handler.end_turn)
 	Events.player_hand_discarded.connect(enemy_handler.start_turn)
 	Events.player_died.connect(_on_player_died)
+
+
+func _process(_delta: float) -> void:
+	HitPause.watchdog()
 
 
 func start_battle() -> void:
@@ -139,6 +144,7 @@ func _on_relics_activated(type: Relic.Type) -> void:
 
 
 func _exit_tree() -> void:
+	HitPause.force_restore()
 	battle_active = false
 	victory_resolving = false
 	if enemy_handler and enemy_handler.child_order_changed.is_connected(_on_enemies_child_order_changed):

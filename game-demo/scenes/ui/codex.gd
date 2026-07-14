@@ -1,6 +1,7 @@
 extends Control
 
 const CARD_MENU_UI_SCENE := preload("res://scenes/ui/card_menu_ui.tscn")
+const DEMONIC_CHARACTER_STATS := preload("res://characters/demonic_cultivator/demonic_cultivator.tres")
 
 const BACKGROUND_TEXTURE := preload("res://art/backgrounds/main_menu_background_v2.png")
 const OVERVIEW_PREVIEW_TEXTURE := preload("res://art/backgrounds/main_menu_background_v2.png")
@@ -115,6 +116,7 @@ func _ready() -> void:
 	directory.item_selected.connect(_on_directory_item_selected)
 	get_viewport().size_changed.connect(_apply_layout)
 	_polish_scene()
+	DEMONIC_CHARACTER_STATS.ensure_demonic_card_element_distribution()
 	_collect_all_data()
 	_build_directory()
 	_show_summary("图鉴总览", _format_overview())

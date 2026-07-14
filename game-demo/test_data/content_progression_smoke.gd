@@ -55,6 +55,10 @@ func _run_smoke() -> void:
 	_check_chapter_card_weights()
 	_check_rootless_start()
 	_check_element_supply_counts()
+	_check_demonic_spirit_root_choices()
+	_check_dominant_deck_element()
+	_check_spirit_root_bonus_card()
+	await _check_card_feedback_modal()
 
 	_finish()
 
@@ -100,17 +104,81 @@ func _check_rootless_start() -> void:
 
 func _check_element_supply_counts() -> void:
 	var character := load("res://characters/demonic_cultivator/demonic_cultivator.tres") as CharacterStats
-	var counted_total := 0
-	for element in [Card.Element.METAL, Card.Element.WOOD, Card.Element.WATER, Card.Element.FIRE, Card.Element.EARTH]:
-		var expected := 0
-		for card: Card in character.draftable_cards.cards:
-			if card and card.element == element:
-				expected += 1
-		var actual := character.count_draftable_cards_of_element(element)
-		_check(actual == expected, "spirit root selector reports the exact element supply")
-		counted_total += actual
+	var distribution := character.ensure_demonic_card_element_distribution()
+	for element in [Card.Element.NONE, Card.Element.METAL, Card.Element.WATER, Card.Element.FIRE]:
+		_check(distribution.get(element, 0) == 22, "demonic profession pool has an equal 22-card element share")
+	for element in [Card.Element.METAL, Card.Element.WATER, Card.Element.FIRE]:
+		_check(character.count_draftable_cards_of_element(element) == 22, "spirit root selector reports the exact profession-card supply")
+	_check(character.count_draftable_cards_of_element(Card.Element.WOOD) == 0, "demonic profession pool excludes wood cards")
+	_check(character.count_draftable_cards_of_element(Card.Element.EARTH) == 0, "demonic profession pool excludes earth cards")
 	_check(character.count_draftable_cards_of_element(Card.Element.NONE) == 0, "neutral cards are excluded from spirit root supply")
-	_check(counted_total > 0, "demonic draft pool exposes element supply choices")
+
+	var element_by_name := {}
+	for card: Card in character.draftable_cards.cards:
+		if not card or card.get_profession() != Card.Profession.DEMONIC:
+			continue
+		_check(CharacterStats.DEMONIC_DRAFT_ELEMENTS.has(card.element), "demonic profession card uses an allowed element")
+		var card_name := card.get_display_name()
+		if element_by_name.has(card_name):
+			_check(element_by_name[card_name] == card.element, "same-name weighted cards stay in one element share")
+		else:
+			element_by_name[card_name] = card.element
+
+
+func _check_demonic_spirit_root_choices() -> void:
+	var selector := preload("res://scenes/ui/spirit_root_selector.gd").new()
+	var startup := RunStartup.new()
+	startup.picked_character = load("res://characters/demonic_cultivator/demonic_cultivator.tres") as CharacterStats
+	selector.run_startup = startup
+	selector._roll_spirit_roots()
+	_check(selector.offered_roots == [Card.Element.METAL, Card.Element.WATER, Card.Element.FIRE], "demonic selector always offers metal, water, and fire")
+	selector.free()
+
+
+func _check_dominant_deck_element() -> void:
+	var base_character := load("res://characters/demonic_cultivator/demonic_cultivator.tres") as CharacterStats
+	var character := base_character.create_instance(Card.Element.FIRE) as CharacterStats
+	character.deck = CardPile.new()
+	for element in [Card.Element.WATER, Card.Element.FIRE, Card.Element.WATER, Card.Element.FIRE]:
+		var card := Card.new()
+		card.element = element
+		character.deck.add_card(card)
+	_check(character.get_dominant_deck_element() == Card.Element.FIRE, "selected spirit root wins a tied dominant-element count")
+	for _i in 3:
+		var metal_card := Card.new()
+		metal_card.element = Card.Element.METAL
+		character.deck.add_card(metal_card)
+	_check(character.get_dominant_deck_element() == Card.Element.METAL, "largest deck element becomes the displayed spirit-root attribute")
+	_check(character.get_dominant_deck_element_count() == 3, "dominant deck element reports its exact card count")
+
+
+func _check_spirit_root_bonus_card() -> void:
+	var base_character := load("res://characters/demonic_cultivator/demonic_cultivator.tres") as CharacterStats
+	for element in [Card.Element.METAL, Card.Element.WATER, Card.Element.FIRE]:
+		var character := base_character.create_instance(element) as CharacterStats
+		var bonus_cards: Array[Card] = []
+		for card: Card in character.deck.cards:
+			if card and card.mechanic_tags.has(CharacterStats.SPIRIT_ROOT_BONUS_TAG):
+				bonus_cards.append(card)
+		_check(bonus_cards.size() == 1, "spirit root start grants one marked profession card")
+		if not bonus_cards.is_empty():
+			_check(bonus_cards[0].element == element, "spirit root bonus card matches the selected element")
+
+
+func _check_card_feedback_modal() -> void:
+	var feedback := CardChangeFeedback.new()
+	add_child(feedback)
+	await get_tree().process_frame
+	var source_character := load("res://characters/demonic_cultivator/demonic_cultivator.tres") as CharacterStats
+	var cards: Array[Card] = [source_character.draftable_cards.cards[0]]
+	feedback.request_feedback("获得卡牌", cards, "卡牌已加入牌组。")
+	await get_tree().process_frame
+	_check(feedback.visible, "card-change feedback blocks for player confirmation")
+	_check(feedback.title_label.text == "获得卡牌", "card-change feedback displays the operation title")
+	_check(feedback.cards_row.get_child_count() == 1, "card-change feedback displays the affected card art")
+	feedback._on_confirm_pressed()
+	_check(not feedback.visible, "card-change feedback closes only after confirmation")
+	feedback.queue_free()
 
 
 func _battle_id(battle: BattleStats) -> String:

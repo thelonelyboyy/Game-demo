@@ -24,7 +24,11 @@ func execute(card: CultivationCard, targets: Array[Node], _modifiers: ModifierHa
 
 
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
+	var block_per_card := get_preview_block_amount(
+		get_modified_amount(card, player_modifiers, enemy_modifiers),
+		player_modifiers
+	)
 	return "随机弃置手牌中其它 %s 张牌；每成功弃置 1 张，获得 %s 点护体。" % [
 		maxi(cards_to_discard, 1),
-		get_modified_amount(card, player_modifiers, enemy_modifiers),
+		block_per_card,
 	]

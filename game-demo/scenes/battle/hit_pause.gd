@@ -9,6 +9,9 @@ const DEFAULT_DURATION := 0.08
 const DEFAULT_TIME_SCALE := 0.05
 
 static var _pause_until_msec := 0
+static var _restore_time_scale := 1.0
+static var _generation := 0
+static var _active := false
 
 
 static func trigger(duration := DEFAULT_DURATION, time_scale := DEFAULT_TIME_SCALE) -> void:
@@ -23,18 +26,47 @@ static func trigger(duration := DEFAULT_DURATION, time_scale := DEFAULT_TIME_SCA
 	if tree.paused:
 		return
 
-	var until := Time.get_ticks_msec() + int(duration * 1000.0)
-	if until <= _pause_until_msec:
+	var safe_duration := maxf(duration, 0.01)
+	var until := Time.get_ticks_msec() + int(safe_duration * 1000.0)
+	if not _active:
+		_restore_time_scale = Engine.time_scale
+		_active = true
+	_pause_until_msec = maxi(_pause_until_msec, until)
+	_generation += 1
+
+	Engine.time_scale = minf(Engine.time_scale, clampf(time_scale, 0.01, 1.0))
+	_schedule_restore(tree, _generation, safe_duration)
+
+
+static func _schedule_restore(tree: SceneTree, generation: int, delay: float) -> void:
+	var timer := tree.create_timer(maxf(delay, 0.01), true, false, true)
+	timer.timeout.connect(_restore.bind(generation))
+
+
+static func _restore(generation: int) -> void:
+	if not _active or generation != _generation:
 		return
-	_pause_until_msec = until
-
-	Engine.time_scale = time_scale
-	var timer := tree.create_timer(duration, true, false, true)
-	timer.timeout.connect(_restore)
-
-
-static func _restore() -> void:
-	# 只有最后一个到期的计时器负责恢复（更长的停顿窗口仍在时跳过）。
-	if Time.get_ticks_msec() < _pause_until_msec - 8:
+	var remaining_msec := _pause_until_msec - Time.get_ticks_msec()
+	if remaining_msec > 8:
+		var tree := Engine.get_main_loop() as SceneTree
+		if tree:
+			_schedule_restore(tree, generation, float(remaining_msec) / 1000.0)
 		return
-	Engine.time_scale = 1.0
+	force_restore()
+
+
+## Called from Battle every rendered frame. If a SceneTreeTimer callback is lost
+## during a scene transition, the global game speed still recovers immediately.
+static func watchdog() -> void:
+	if _active and Time.get_ticks_msec() >= _pause_until_msec:
+		force_restore()
+
+
+static func force_restore() -> void:
+	if not _active:
+		return
+	Engine.time_scale = _restore_time_scale
+	_pause_until_msec = 0
+	_restore_time_scale = 1.0
+	_active = false
+	_generation += 1

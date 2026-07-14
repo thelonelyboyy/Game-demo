@@ -5,15 +5,19 @@ enum Kind {PLAYER, ENEMY}
 
 const ICON_ATTACK := preload("res://assets/ui/generated/icons/icon_intent_attack.png")
 const ICON_SHIELD := preload("res://art/tiles/intent_block_shield.png")
+const COMBATANT_PORTRAIT_FRAME := preload("res://assets/ui/generated/cards/character_card_portrait_mask_frame.png")
+const BATTLE_HP_BAR_FRAME := preload("res://assets/ui/generated/battle/battle_hp_bar_frame_9slice.png")
+const BATTLE_INTENT_BADGE := preload("res://assets/ui/generated/battle/battle_intent_badge_attack_9slice.png")
 const DEMONIC_CULTIVATOR_CARD := preload("res://art/ui/battle_cards/demonic_cultivator_card.png")
 const PAPER_SOLDIER_CARD := preload("res://art/ui/battle_cards/paper_soldier_card.png")
 const MIST_WOLF_CARD := preload("res://art/ui/battle_cards/mist_wolf_card.png")
 const BULL_DEMON_CARD := preload("res://art/ui/battle_cards/bull_demon_card.png")
 const ABYSSAL_SWORD_SOUL_CARD := preload("res://art/ui/battle_cards/abyssal_sword_soul_card.png")
 const SHA_QI_STATUS := preload("res://statuses/sha_qi.tres")
-const STATUS_ROW_HEIGHT := 44.0
-const STATUS_ICON_SIZE := 32.0
-const STATUS_CHIP_HEIGHT := 38.0
+const STATUS_ROW_HEIGHT := 112.0
+const STATUS_ICON_SIZE := 36.0
+const STATUS_CHIP_WIDTH := 62.0
+const STATUS_CHIP_HEIGHT := 48.0
 
 var kind := Kind.PLAYER
 var combatant: Node
@@ -23,6 +27,7 @@ var status_handler: StatusHandler
 var _intent_badge: Panel
 var _frame: Panel
 var _portrait: TextureRect
+var _portrait_frame: TextureRect
 var _name_label: Label
 var _intent_label: Label
 var _intent_icon: TextureRect
@@ -30,7 +35,7 @@ var _health_fill: ColorRect
 var _block_fill: ColorRect
 var _health_label: Label
 var _block_label: Label
-var _status_row: HBoxContainer
+var _status_row: HFlowContainer
 var _refresh_elapsed := 0.0
 # 数值条平滑过渡：记录上次数值，只在真正变化时启动 tween（_process 0.12s 轮询会反复进 _refresh）。
 var _last_health := -1
@@ -58,7 +63,7 @@ const SHA_BADGE_TIER_COLORS := [
 
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	_build()
 
 
@@ -67,6 +72,7 @@ func bind_player(player: Player) -> void:
 	combatant = player
 	stats = player.stats if player else null
 	status_handler = player.status_handler if player else null
+	_apply_kind_styles()
 	_reset_animation_tracking()
 	_connect_stats()
 	_layout()
@@ -78,6 +84,7 @@ func bind_enemy(enemy: Enemy) -> void:
 	combatant = enemy
 	stats = enemy.stats if enemy else null
 	status_handler = enemy.status_handler if enemy else null
+	_apply_kind_styles()
 	_reset_animation_tracking()
 	_connect_stats()
 	_layout()
@@ -93,6 +100,23 @@ func _reset_animation_tracking() -> void:
 	_last_sha_stacks = -1
 	if _portrait:
 		_portrait.modulate = Color.WHITE
+
+
+func _apply_kind_styles() -> void:
+	if _frame:
+		_frame.add_theme_stylebox_override("panel", _make_card_style())
+	if _intent_badge:
+		_intent_badge.add_theme_stylebox_override("panel", _make_intent_style())
+	var health_bar: Panel = null
+	if _health_fill:
+		health_bar = _health_fill.get_parent() as Panel
+	if health_bar:
+		health_bar.add_theme_stylebox_override("panel", _make_bar_style(false))
+	var block_bar: Panel = null
+	if _block_fill:
+		block_bar = _block_fill.get_parent() as Panel
+	if block_bar:
+		block_bar.add_theme_stylebox_override("panel", _make_bar_style(true))
 
 
 func _process(delta: float) -> void:
@@ -121,14 +145,27 @@ func _build() -> void:
 
 	_portrait = TextureRect.new()
 	_portrait.name = "Portrait"
-	_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Character identity belongs to the artwork only. PASS keeps combat targeting
+	# working while allowing the portrait to own the name/description tooltip.
+	_portrait.mouse_filter = Control.MOUSE_FILTER_PASS
 	_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	_portrait.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	_frame.add_child(_portrait)
 
+	_portrait_frame = TextureRect.new()
+	_portrait_frame.name = "PortraitFrame"
+	_portrait_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_portrait_frame.texture = COMBATANT_PORTRAIT_FRAME
+	_portrait_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_portrait_frame.stretch_mode = TextureRect.STRETCH_SCALE
+	_portrait_frame.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	_portrait_frame.z_index = 2
+	_frame.add_child(_portrait_frame)
+
 	_name_label = _make_label("Name", 22, Color("f4deb0"))
 	_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_name_label.z_index = 3
 	_frame.add_child(_name_label)
 
 	_intent_icon = TextureRect.new()
@@ -138,25 +175,26 @@ func _build() -> void:
 	_intent_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_intent_badge.add_child(_intent_icon)
 
-	_intent_label = _make_label("IntentLabel", 20, Color("ffc08a"))
+	_intent_label = _make_label("IntentLabel", 24, Color("ffc08a"))
 	_intent_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_intent_badge.add_child(_intent_label)
 
-	var health_back := _make_vertical_bar("HealthBar", Color(0.055, 0.012, 0.010, 0.92), Color("d71928"))
+	var health_back := _make_stat_bar("HealthBar", Color("d71928"), false)
 	_health_fill = health_back.get_node("Fill") as ColorRect
 	_health_label = health_back.get_node("Label") as Label
 	_frame.add_child(health_back)
 
-	var block_back := _make_vertical_bar("BlockBar", Color(0.012, 0.026, 0.050, 0.92), Color("1aa4ff"))
+	var block_back := _make_stat_bar("BlockBar", Color("1aa4ff"), true)
 	_block_fill = block_back.get_node("Fill") as ColorRect
 	_block_label = block_back.get_node("Label") as Label
 	_frame.add_child(block_back)
 
-	_status_row = HBoxContainer.new()
+	_status_row = HFlowContainer.new()
 	_status_row.name = "StatusRow"
 	_status_row.mouse_filter = Control.MOUSE_FILTER_PASS
-	_status_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_status_row.add_theme_constant_override("separation", 10)
+	_status_row.alignment = FlowContainer.ALIGNMENT_CENTER
+	_status_row.add_theme_constant_override("h_separation", 6)
+	_status_row.add_theme_constant_override("v_separation", 6)
 	_frame.add_child(_status_row)
 
 	_sha_badge = Panel.new()
@@ -172,6 +210,7 @@ func _build() -> void:
 	_sha_badge.add_child(_sha_label)
 
 	resized.connect(_layout)
+	_apply_kind_styles()
 	_layout()
 
 
@@ -182,34 +221,46 @@ func _layout() -> void:
 	var w := size.x
 	var h := size.y
 	var intent_top_height := 50.0 if kind == Kind.ENEMY else 0.0
-	var frame_h := maxf(80.0, h - intent_top_height)
-	var pad := 12.0
-	var bar_w := 18.0
-	var bar_top := 48.0
-	var status_y := frame_h - STATUS_ROW_HEIGHT - 8.0
-	var bar_h := maxf(84.0, status_y - bar_top - 28.0)
+	var frame_h := maxf(260.0, h - intent_top_height)
+	var sx := w / 150.0
+	var sy := frame_h / 260.0
+	var portrait_pos := Vector2(17.0 * sx, 16.0 * sy)
+	var bar_x := 24.0 * sx
+	var bar_w := maxf(96.0 * sx, w - 48.0 * sx)
+	var bar_h := maxf(20.0, 11.0 * sy)
+	var status_y := frame_h - STATUS_ROW_HEIGHT - 12.0
+	var health_y := status_y - bar_h * 2.0 - 12.0
+	var block_y := health_y + bar_h + 6.0
+	var portrait_frame_pos := Vector2(9.0 * sx, 8.0 * sy)
+	var portrait_frame_h := maxf(130.0 * sy, health_y - portrait_frame_pos.y - 8.0)
+	var portrait_h := maxf(116.0 * sy, health_y - portrait_pos.y - 8.0)
 
 	_set_rect(_frame, Vector2(0, intent_top_height), Vector2(w, frame_h))
-	# 立绘尽量占满卡窗（左右只留条宽），削弱"黑盒"感。
-	_set_rect(_portrait, Vector2(pad + bar_w + 4.0, 46), Vector2(w - (pad + bar_w + 4.0) * 2.0, maxf(96.0, status_y - 56.0)))
-	_set_rect(_name_label, Vector2(42, 10), Vector2(w - 84, 34))
-	_set_rect(_health_fill.get_parent() as Control, Vector2(pad, bar_top), Vector2(bar_w, bar_h))
-	_set_rect(_block_fill.get_parent() as Control, Vector2(w - pad - bar_w, bar_top), Vector2(bar_w, bar_h))
-	_set_rect(_status_row, Vector2(40, status_y), Vector2(w - 80, STATUS_ROW_HEIGHT))
-	_layout_vertical_bar_label(_health_label, _health_fill.get_parent() as Control, false)
-	_layout_vertical_bar_label(_block_label, _block_fill.get_parent() as Control, true)
+	# 参考角色选择卡框的 150x260 坐标系做等比摆位，战斗中保持三国杀式竖版人物牌。
+	_name_label.hide()
+	_set_rect(_portrait, portrait_pos, Vector2(w - 34.0 * sx, portrait_h))
+	_set_rect(
+		_portrait_frame,
+		portrait_frame_pos,
+		Vector2(w - 18.0 * sx, portrait_frame_h)
+	)
+	_set_rect(_health_fill.get_parent() as Control, Vector2(bar_x, health_y), Vector2(bar_w, bar_h))
+	_set_rect(_block_fill.get_parent() as Control, Vector2(bar_x, block_y), Vector2(bar_w, bar_h))
+	_set_rect(_status_row, Vector2(12.0 * sx, status_y), Vector2(w - 24.0 * sx, STATUS_ROW_HEIGHT))
+	_layout_bar_label(_health_label, _health_fill.get_parent() as Control)
+	_layout_bar_label(_block_label, _block_fill.get_parent() as Control)
 
 	if kind == Kind.ENEMY:
 		_intent_badge.show()
-		_set_rect(_intent_badge, Vector2(w * 0.5 - 112.0, 0.0), Vector2(224.0, 42.0))
+		_set_rect(_intent_badge, Vector2(w * 0.5 - 126.0, 3.0), Vector2(252.0, 52.0))
 		_layout_intent_badge()
 	else:
 		_intent_badge.hide()
 
 	if _sha_badge:
 		# 煞气徽章悬在玩家卡顶部上方，常驻可读。
-		_set_rect(_sha_badge, Vector2(w * 0.5 - 76.0, intent_top_height - 44.0), Vector2(152.0, 40.0))
-		_set_rect(_sha_label, Vector2(0.0, 0.0), Vector2(152.0, 40.0))
+		_set_rect(_sha_badge, Vector2(w * 0.5 - 70.0, intent_top_height - 44.0), Vector2(140.0, 40.0))
+		_set_rect(_sha_label, Vector2(0.0, 0.0), Vector2(140.0, 40.0))
 
 
 func _refresh() -> void:
@@ -218,7 +269,8 @@ func _refresh() -> void:
 		return
 
 	show()
-	_name_label.text = _display_name()
+	tooltip_text = ""
+	_portrait.tooltip_text = _combatant_tooltip()
 	_portrait.texture = _portrait_texture()
 	_refresh_bars()
 	_refresh_intent()
@@ -289,8 +341,8 @@ func _refresh_bars() -> void:
 	var ratio := clampf(float(stats.health) / float(maxi(stats.max_health, 1)), 0.0, 1.0)
 	var block_ratio := clampf(float(stats.block) / float(maxi(stats.max_health, 1)), 0.0, 1.0)
 	_health_label.text = "%s/%s" % [stats.health, stats.max_health]
-	_block_label.text = str(stats.block)
-	_block_label.visible = stats.block > 0
+	_block_label.text = "护 %s" % stats.block
+	_block_label.visible = true
 
 	if _last_health < 0:
 		_set_bar_ratio(ratio, true)
@@ -327,10 +379,10 @@ func _animate_bar_to(is_health: bool, target_ratio: float) -> void:
 func _set_bar_ratio(ratio: float, is_health: bool) -> void:
 	if is_health:
 		_shown_health_ratio = ratio
-		_set_vertical_fill(_health_fill, ratio)
+		_set_horizontal_fill(_health_fill, ratio)
 	else:
 		_shown_block_ratio = ratio
-		_set_vertical_fill(_block_fill, ratio)
+		_set_horizontal_fill(_block_fill, ratio)
 
 
 func _flash_fill(fill: ColorRect, strong: bool) -> void:
@@ -428,7 +480,7 @@ func _status_value(status: Status) -> int:
 func _make_status_chip(status: Status, is_new := false, stacks_changed := false) -> Control:
 	var chip := PanelContainer.new()
 	chip.mouse_filter = Control.MOUSE_FILTER_STOP
-	chip.custom_minimum_size = Vector2(50.0, STATUS_CHIP_HEIGHT)
+	chip.custom_minimum_size = Vector2(STATUS_CHIP_WIDTH, STATUS_CHIP_HEIGHT)
 	chip.tooltip_text = _format_status_tooltip(status)
 	chip.add_theme_stylebox_override("panel", InkTheme.make_style(
 		Color(0.018, 0.014, 0.018, 0.82),
@@ -464,7 +516,7 @@ func _make_status_chip(status: Status, is_new := false, stacks_changed := false)
 
 	var label := _make_label("Value", 18, Color("fff1c9"))
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.custom_minimum_size = Vector2(20, STATUS_ICON_SIZE)
+	label.custom_minimum_size = Vector2(18, STATUS_ICON_SIZE)
 	label.text = str(_status_value(status))
 	content.add_child(label)
 
@@ -500,6 +552,16 @@ func _display_name() -> String:
 	return ""
 
 
+func _combatant_tooltip() -> String:
+	var name := _display_name()
+	var description_text := ""
+	if stats is CharacterStats:
+		description_text = (stats as CharacterStats).description
+	elif stats is EnemyStats:
+		description_text = (stats as EnemyStats).description
+	return name if description_text.is_empty() else "%s\n%s" % [name, description_text]
+
+
 func _portrait_texture() -> Texture2D:
 	if stats is CharacterStats and (stats as CharacterStats).character_name == "魔修":
 		return DEMONIC_CULTIVATOR_CARD
@@ -518,22 +580,24 @@ func _portrait_texture() -> Texture2D:
 	return stats.art if stats else null
 
 
-func _set_vertical_fill(fill: ColorRect, ratio: float) -> void:
+func _set_horizontal_fill(fill: ColorRect, ratio: float) -> void:
+	fill.visible = ratio > 0.001
 	fill.anchor_left = 0.0
-	fill.anchor_right = 1.0
-	fill.anchor_top = 1.0 - ratio
+	fill.anchor_right = maxf(ratio, 0.001)
+	fill.anchor_top = 0.0
 	fill.anchor_bottom = 1.0
-	fill.offset_left = 2.0
-	fill.offset_top = 2.0
-	fill.offset_right = -2.0
-	fill.offset_bottom = -2.0
+	fill.offset_left = 5.0
+	fill.offset_top = 5.0
+	fill.offset_right = -5.0
+	fill.offset_bottom = -5.0
 
 
-func _make_vertical_bar(node_name: String, back_color: Color, fill_color: Color) -> Panel:
+func _make_stat_bar(node_name: String, fill_color: Color, is_block := false) -> Panel:
 	var panel := Panel.new()
 	panel.name = node_name
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_theme_stylebox_override("panel", InkTheme.make_style(back_color, Color(0.55, 0.42, 0.20, 0.72), 1, 4))
+	panel.clip_contents = true
+	panel.add_theme_stylebox_override("panel", _make_bar_style(is_block))
 
 	var fill := ColorRect.new()
 	fill.name = "Fill"
@@ -541,7 +605,7 @@ func _make_vertical_bar(node_name: String, back_color: Color, fill_color: Color)
 	fill.color = fill_color
 	panel.add_child(fill)
 
-	var label := _make_label("Label", 16, Color("fff2d0"))
+	var label := _make_label("Label", 20, Color("fff2d0"))
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.set_anchors_preset(Control.PRESET_TOP_LEFT)
@@ -549,20 +613,15 @@ func _make_vertical_bar(node_name: String, back_color: Color, fill_color: Color)
 	return panel
 
 
-# 数字横排在条底：血条向卡内右伸、护体条向卡内左伸——
-# 向卡外伸会被 frame 的 clip_contents 裁掉（此前"100/100"显示成"00/100"的根因）。
-func _layout_vertical_bar_label(label: Label, bar: Control, align_right := false) -> void:
+func _layout_bar_label(label: Label, bar: Control) -> void:
 	if not label or not bar:
 		return
 
 	label.rotation_degrees = 0.0
-	label.size = Vector2(92.0, 24.0)
-	if align_right:
-		label.position = Vector2(bar.size.x - 2.0 - 92.0, bar.size.y + 3.0)
-		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	else:
-		label.position = Vector2(2.0, bar.size.y + 3.0)
-		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	label.position = Vector2.ZERO
+	label.size = bar.size
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 
 func _format_status_tooltip(status: Status, override_value := -1) -> String:
@@ -584,8 +643,8 @@ func _layout_intent_badge() -> void:
 		return
 
 	var badge_size := _intent_badge.size
-	_set_rect(_intent_icon, Vector2(14.0, badge_size.y * 0.5 - 13.0), Vector2(26.0, 26.0))
-	_set_rect(_intent_label, Vector2(44.0, 0.0), Vector2(maxf(40.0, badge_size.x - 58.0), badge_size.y))
+	_set_rect(_intent_icon, Vector2(16.0, badge_size.y * 0.5 - 16.0), Vector2(32.0, 32.0))
+	_set_rect(_intent_label, Vector2(54.0, 0.0), Vector2(maxf(40.0, badge_size.x - 70.0), badge_size.y))
 
 
 func _make_label(node_name: String, font_size: int, color: Color) -> Label:
@@ -601,31 +660,50 @@ func _make_label(node_name: String, font_size: int, color: Color) -> Label:
 	return label
 
 
-func _make_card_style() -> StyleBoxFlat:
-	var style := InkTheme.make_style(
-		Color(0.006, 0.010, 0.020, 0.84),
-		Color(0.70, 0.50, 0.23, 0.82),
-		2,
-		5,
-		Color(0, 0, 0, 0.58),
-		16
+func _make_card_style() -> StyleBox:
+	# The portrait already has its own frame. Keeping the full-card ornamental frame
+	# around it made large combatant cards feel like two nested cards.
+	return StyleBoxEmpty.new()
+
+
+func _make_intent_style() -> StyleBox:
+	return _make_texture_style(
+		BATTLE_INTENT_BADGE,
+		Vector4(42.0, 18.0, 42.0, 18.0),
+		Vector4(12.0, 6.0, 12.0, 6.0),
+		Color(1.04, 0.92, 0.82, 0.98)
 	)
-	style.content_margin_left = 10
-	style.content_margin_top = 8
-	style.content_margin_right = 10
-	style.content_margin_bottom = 8
+
+
+func _make_bar_style(is_block := false) -> StyleBox:
+	var tint := Color(0.82, 0.92, 1.20, 0.96) if is_block else Color(1.10, 0.82, 0.72, 0.96)
+	return _make_texture_style(
+		BATTLE_HP_BAR_FRAME,
+		Vector4(36.0, 10.0, 36.0, 10.0),
+		Vector4(6.0, 4.0, 6.0, 4.0),
+		tint
+	)
+
+
+func _make_texture_style(
+	texture: Texture2D,
+	texture_margins: Vector4,
+	content_margins: Vector4,
+	modulate_color := Color.WHITE
+) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = texture
+	style.draw_center = true
+	style.modulate_color = modulate_color
+	style.set_texture_margin(SIDE_LEFT, texture_margins.x)
+	style.set_texture_margin(SIDE_TOP, texture_margins.y)
+	style.set_texture_margin(SIDE_RIGHT, texture_margins.z)
+	style.set_texture_margin(SIDE_BOTTOM, texture_margins.w)
+	style.set_content_margin(SIDE_LEFT, content_margins.x)
+	style.set_content_margin(SIDE_TOP, content_margins.y)
+	style.set_content_margin(SIDE_RIGHT, content_margins.z)
+	style.set_content_margin(SIDE_BOTTOM, content_margins.w)
 	return style
-
-
-func _make_intent_style() -> StyleBoxFlat:
-	return InkTheme.make_style(
-		Color(0.030, 0.010, 0.010, 0.86),
-		Color(0.72, 0.34, 0.16, 0.84),
-		2,
-		4,
-		Color(0.32, 0.0, 0.0, 0.38),
-		10
-	)
 
 
 func _set_rect(control: Control, position: Vector2, rect_size: Vector2) -> void:

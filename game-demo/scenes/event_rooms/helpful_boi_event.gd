@@ -12,8 +12,10 @@ func _ready() -> void:
 
 func duplicate_last_card() -> void:
 	var card := character_stats.deck.cards[-1] as Card
-	character_stats.deck.add_card(card.duplicate(true))
-	Events.ui_notice_requested.emit("复制：「%s」" % card.get_display_name())
+	var copied_card := card.duplicate(true) as Card
+	character_stats.deck.add_card(copied_card)
+	var cards: Array[Card] = [copied_card]
+	Events.card_change_feedback_requested.emit("复制卡牌", cards, "以下副本已加入牌组。")
 
 
 func plus_max_hp() -> void:

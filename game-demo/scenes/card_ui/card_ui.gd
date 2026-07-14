@@ -22,6 +22,7 @@ var tween: Tween
 var playable := true : set = _set_playable
 var disabled := true : set = _set_disabled
 var _shake_tween: Tween
+var _runtime_values_visible := false
 
 
 func _ready() -> void:
@@ -99,6 +100,18 @@ func get_active_enemy_modifiers() -> ModifierHandler:
 	return targets[0].modifier_handler
 
 
+func refresh_runtime_values() -> void:
+	_runtime_values_visible = true
+	if card_visuals:
+		card_visuals.show_runtime_values(player_modifiers, get_active_enemy_modifiers())
+
+
+func reset_runtime_values() -> void:
+	_runtime_values_visible = false
+	if card_visuals:
+		card_visuals.show_default_values()
+
+
 # 费用不足点击反馈：摇卡面子节点（不动 CardUI 本体，避免和手牌布局 tween 打架）+ 费用闪红。
 func shake_unplayable() -> void:
 	if _shake_tween and _shake_tween.is_running():
@@ -168,10 +181,12 @@ func _set_char_stats(value: CharacterStats) -> void:
 func _on_drop_point_detector_area_entered(area: Area2D) -> void:
 	if not targets.has(area):
 		targets.append(area)
+	refresh_runtime_values()
 
 
 func _on_drop_point_detector_area_exited(area: Area2D) -> void:
 	targets.erase(area)
+	refresh_runtime_values()
 
 
 func _on_card_drag_or_aiming_started(used_card: CardUI) -> void:
@@ -188,3 +203,5 @@ func _on_card_drag_or_aim_ended(_card: CardUI) -> void:
 
 func _on_char_stats_changed() -> void:
 	playable = char_stats.can_play_card(card)
+	if _runtime_values_visible:
+		refresh_runtime_values()

@@ -32,7 +32,11 @@ func execute(card: CultivationCard, targets: Array[Node], modifiers: ModifierHan
 
 func get_description(card: CultivationCard, player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
 	var limit_text := "所有" if max_cards <= 0 else "至多 %s 张" % max_cards
+	var block_per_card := get_preview_block_amount(
+		get_modified_amount(card, player_modifiers, enemy_modifiers),
+		player_modifiers
+	)
 	return "消耗手牌中%s状态牌或诅咒牌，每张获得 %s 点护体。" % [
 		limit_text,
-		get_modified_amount(card, player_modifiers, enemy_modifiers),
+		block_per_card,
 	]

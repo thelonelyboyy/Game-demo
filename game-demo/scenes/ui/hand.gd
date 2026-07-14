@@ -3,17 +3,17 @@ extends Control
 
 const CARD_UI_SCENE := preload("res://scenes/card_ui/card_ui.tscn")
 const MAX_HAND_SIZE := 10
-const CARD_SIZE := Vector2(224.0, 322.0)
-const MAX_CARD_GAP := 172.0
-const MIN_CARD_GAP := 92.0
+const CARD_SIZE := Vector2(269.0, 386.0)
+const MAX_CARD_GAP := 206.0
+const MIN_CARD_GAP := 104.0
 const SIDE_SAFE_AREA := 720.0
 const FAN_ROTATION := 7.0
 const FAN_DROP := 38.0
 const CENTER_LIFT := 62.0
 # 手牌下沉量：过大时卡底描述会被屏幕边缘裁切。
 const HAND_Y_OFFSET := 26.0
-const HOVER_SCALE := 1.38
-const HOVER_LIFT := 54.0
+const HOVER_SCALE := 1.24
+const HOVER_LIFT := 46.0
 const HOVER_Z_INDEX := 1000
 const LAYOUT_DURATION := 0.24
 # 牌数变化（抽牌/打出/弃牌）引起的补位用弹簧曲线，比 hover 重排慢一点、带回弹。

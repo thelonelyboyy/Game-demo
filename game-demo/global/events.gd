@@ -45,6 +45,8 @@ signal soul_mark_spent(consumed: int, detonated: bool)
 signal card_acquired_animation_requested(card: Card, from_global_center: Vector2)
 # 随机效果结果播报（祝福/事件随机突破、移除、获得了哪张牌等），run 层居中 toast 显示。
 signal ui_notice_requested(text: String)
+# 关键卡牌变更使用完整卡面确认，不与自动消失的文字提示混用。
+signal card_change_feedback_requested(title: String, cards: Array[Card], detail: String)
 
 # Enemy-related events
 signal enemy_action_completed(enemy: Enemy)

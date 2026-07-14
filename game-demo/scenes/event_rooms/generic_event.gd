@@ -146,13 +146,13 @@ func _apply_single_effect(effect: String, amount: int) -> void:
 				var card := RNG.array_pick_random(candidates) as Card
 				if card:
 					card.upgrade()
-					Events.ui_notice_requested.emit("突破：「%s」" % card.get_display_name())
+					_emit_card_feedback("突破卡牌", [card], "卡牌已完成突破。")
 		"remove_random":
 			if character_stats and character_stats.deck and character_stats.deck.cards.size() > 1:
 				var card := RNG.array_pick_random(character_stats.deck.cards) as Card
 				if card:
 					character_stats.deck.remove_card(card)
-					Events.ui_notice_requested.emit("移除：「%s」" % card.get_display_name())
+					_emit_card_feedback("移除卡牌", [card], "卡牌已从本次牌组中移除。")
 		"gain_random_card":
 			_add_random_draftable_cards(maxi(amount, 1), false)
 		"gain_rare_card":
@@ -208,7 +208,7 @@ func _add_random_draftable_cards(count: int, rare_only: bool) -> void:
 	if not character_stats or not character_stats.deck:
 		return
 	var candidates := _get_draftable_candidates(rare_only)
-	var picked_names: Array[String] = []
+	var added_cards: Array[Card] = []
 	for _i in count:
 		if candidates.is_empty():
 			break
@@ -216,9 +216,8 @@ func _add_random_draftable_cards(count: int, rare_only: bool) -> void:
 		if picked:
 			var card_copy := picked.duplicate(true) as Card
 			character_stats.deck.add_card(card_copy)
-			picked_names.append(card_copy.get_display_name())
-	if not picked_names.is_empty():
-		Events.ui_notice_requested.emit("获得卡牌：%s" % "、".join(picked_names))
+			added_cards.append(card_copy)
+	_emit_card_feedback("获得卡牌", added_cards, "以下卡牌已加入牌组。")
 
 
 func _add_random_curses(count: int) -> Array[Card]:
@@ -236,11 +235,17 @@ func _add_random_curses(count: int) -> Array[Card]:
 		added.append(curse)
 
 	if not added.is_empty():
-		var names := PackedStringArray()
-		for curse: Card in added:
-			names.append(curse.get_display_name())
-		Events.ui_notice_requested.emit("获得诅咒：%s" % "、".join(names))
+		_emit_card_feedback("获得诅咒", added, "以下诅咒已加入牌组。")
 	return added
+
+
+func _emit_card_feedback(title: String, cards: Array, detail: String) -> void:
+	var typed_cards: Array[Card] = []
+	for card: Card in cards:
+		if card:
+			typed_cards.append(card)
+	if not typed_cards.is_empty():
+		Events.card_change_feedback_requested.emit(title, typed_cards, detail)
 
 
 func _apply_event_style() -> void:

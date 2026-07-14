@@ -21,6 +21,10 @@ func _ready() -> void:
 
 
 func _roll_spirit_roots() -> void:
+	if _is_demonic_character():
+		run_startup.picked_character.ensure_demonic_card_element_distribution()
+		offered_roots = [Card.Element.METAL, Card.Element.WATER, Card.Element.FIRE]
+		return
 	offered_roots = [
 		Card.Element.METAL,
 		Card.Element.WOOD,
@@ -34,7 +38,11 @@ func _roll_spirit_roots() -> void:
 
 func _setup_buttons() -> void:
 	title.text = "选择灵根"
-	description.text = "选择一种灵根获得元素成长，或放弃灵根踏上无相之路。"
+	description.text = (
+		"魔修可从金、水、火三种灵根中择一，获得对应属性的职业牌。"
+		if _is_demonic_character()
+		else "选择一种灵根获得元素成长，或放弃灵根踏上无相之路。"
+	)
 
 	for child: Node in buttons.get_children():
 		child.queue_free()
@@ -45,10 +53,11 @@ func _setup_buttons() -> void:
 		InkTheme.wire_button_sfx(row)
 		InkTheme.animate_item_entrance(row, 0.12)
 
-	var rootless_row := _create_rootless_row()
-	buttons.add_child(rootless_row)
-	InkTheme.wire_button_sfx(rootless_row)
-	InkTheme.animate_item_entrance(rootless_row, 0.12)
+	if not _is_demonic_character():
+		var rootless_row := _create_rootless_row()
+		buttons.add_child(rootless_row)
+		InkTheme.wire_button_sfx(rootless_row)
+		InkTheme.animate_item_entrance(rootless_row, 0.12)
 
 
 func _on_root_selected(root: Card.Element) -> void:
@@ -191,6 +200,14 @@ func _get_element_supply(root: Card.Element) -> int:
 	if not run_startup or not run_startup.picked_character:
 		return 0
 	return run_startup.picked_character.count_draftable_cards_of_element(root)
+
+
+func _is_demonic_character() -> bool:
+	return (
+		run_startup
+		and run_startup.picked_character
+		and run_startup.picked_character.is_demonic_profession()
+	)
 
 
 func _create_rootless_row() -> Button:

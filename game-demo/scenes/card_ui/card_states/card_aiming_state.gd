@@ -9,6 +9,7 @@ func enter() -> void:
 	offset.x -= card_ui.size.x / 2
 	card_ui.animate_to_position(card_ui.parent.global_position + offset, 0.2)
 	card_ui.drop_point_detector.monitoring = false
+	card_ui.refresh_runtime_values()
 	Events.card_aim_started.emit(card_ui)
 
 

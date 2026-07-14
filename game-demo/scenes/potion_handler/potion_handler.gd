@@ -110,16 +110,17 @@ func _alive_enemies() -> Array[Enemy]:
 
 func _begin_aiming(ui: PotionUI) -> void:
 	_aiming_ui = ui
+	set_process_input(true)
 	Events.ui_notice_requested.emit("点击敌人以使用「%s」（右键取消）" % ui.potion.potion_name)
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not _aiming_ui:
 		return
 
 	# 悬停高亮：借用敌人的四角目标框反馈"会打到谁"。
 	if event is InputEventMouseMotion:
-		var hovered := _enemy_under_mouse()
+		var hovered := _enemy_at_screen_position(event.position)
 		for enemy in _alive_enemies():
 			if enemy.target_highlight:
 				enemy.target_highlight.visible = enemy == hovered
@@ -131,31 +132,38 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	if event.is_action_pressed("left_mouse"):
-		var target := _enemy_under_mouse()
-		if target:
-			_use_on_target(target)
+		if _select_target_at(event.position):
+			get_viewport().set_input_as_handled()
 		else:
 			_cancel_aiming()
-		get_viewport().set_input_as_handled()
+			get_viewport().set_input_as_handled()
 
 
 # 命中测试用敌人信息卡的画布矩形（世界节点已由 battle_ui 对齐到信息卡中心）。
-func _enemy_under_mouse() -> Enemy:
-	var mouse := get_viewport().get_mouse_position()
+func _enemy_at_screen_position(screen_position: Vector2) -> Enemy:
 	for enemy in _alive_enemies():
 		var center: Vector2 = enemy.get_global_transform_with_canvas().origin
 		var extents: Vector2 = enemy.aligned_feedback_extents
 		if extents == Vector2.ZERO:
 			extents = Vector2(160.0, 160.0)
-		if Rect2(center - extents * 0.5, extents).has_point(mouse):
+		if Rect2(center - extents * 0.5, extents).has_point(screen_position):
 			return enemy
 	return null
+
+
+func _select_target_at(screen_position: Vector2) -> bool:
+	var target := _enemy_at_screen_position(screen_position)
+	if not target:
+		return false
+	_use_on_target(target)
+	return true
 
 
 func _use_on_target(target: Enemy) -> void:
 	var ui := _aiming_ui
 	_clear_aim_highlights()
 	_aiming_ui = null
+	set_process_input(false)
 	if not is_instance_valid(ui) or not ui.potion or not is_instance_valid(target):
 		return
 	var player := _player()
@@ -163,9 +171,10 @@ func _use_on_target(target: Enemy) -> void:
 		return
 
 	var potion := ui.potion
+	var targets: Array[Node] = [target]
 	for effect in potion.configured_effects:
 		if effect:
-			effect.execute(null, [target], player.modifier_handler)
+			effect.execute(null, targets, player.modifier_handler)
 	ui.clear_potion()
 	potion_used.emit(potion)
 
@@ -173,6 +182,7 @@ func _use_on_target(target: Enemy) -> void:
 func _cancel_aiming() -> void:
 	_clear_aim_highlights()
 	_aiming_ui = null
+	set_process_input(false)
 
 
 func _clear_aim_highlights() -> void:

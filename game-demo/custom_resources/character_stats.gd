@@ -2,6 +2,19 @@ class_name CharacterStats
 extends Stats
 
 const SPIRIT_ROOT_BONUS_TAG := "spirit_root_bonus"
+const DEMONIC_DRAFT_ELEMENTS := [
+	Card.Element.NONE,
+	Card.Element.METAL,
+	Card.Element.WATER,
+	Card.Element.FIRE,
+]
+const DOMINANT_ELEMENT_ORDER := [
+	Card.Element.METAL,
+	Card.Element.WATER,
+	Card.Element.FIRE,
+	Card.Element.WOOD,
+	Card.Element.EARTH,
+]
 
 @export_group("Visuals")
 @export var character_name: String
@@ -56,6 +69,7 @@ func can_play_card(card: Card) -> bool:
 
 
 func create_instance(selected_spirit_root: Card.Element = Card.Element.NONE) -> Resource:
+	ensure_demonic_card_element_distribution()
 	var instance: CharacterStats = self.duplicate()
 	instance.health = max_health
 	instance.block = 0
@@ -130,22 +144,25 @@ func refresh_spirit_root_bonus_cards() -> void:
 
 
 func count_spirit_root_cards() -> int:
+	if not has_spirit_root():
+		return 0
 	return count_cards_of_element(spirit_root)
 
 
 func count_draftable_cards_of_element(element: Card.Element) -> int:
+	ensure_demonic_card_element_distribution()
 	if element == Card.Element.NONE or not draftable_cards:
 		return 0
 
 	var count := 0
 	for card: Card in draftable_cards.cards:
-		if card and card.element == element:
+		if card and card.get_profession() == _get_character_profession() and card.element == element:
 			count += 1
 	return count
 
 
 func count_cards_of_element(element: Card.Element) -> int:
-	if not has_spirit_root() or not deck:
+	if not deck:
 		return 0
 
 	var count := 0
@@ -153,6 +170,105 @@ func count_cards_of_element(element: Card.Element) -> int:
 		if card and card.element == element:
 			count += 1
 	return count
+
+
+func get_deck_element_counts() -> Dictionary:
+	var counts := {}
+	for element: Card.Element in DOMINANT_ELEMENT_ORDER:
+		counts[element] = count_cards_of_element(element)
+	return counts
+
+
+func get_dominant_deck_element() -> Card.Element:
+	var counts := get_deck_element_counts()
+	var highest_count := 0
+	for element: Card.Element in DOMINANT_ELEMENT_ORDER:
+		highest_count = maxi(highest_count, counts.get(element, 0))
+	if highest_count <= 0:
+		return Card.Element.NONE
+	if has_spirit_root() and counts.get(spirit_root, 0) == highest_count:
+		return spirit_root
+	for element: Card.Element in DOMINANT_ELEMENT_ORDER:
+		if counts.get(element, 0) == highest_count:
+			return element
+	return Card.Element.NONE
+
+
+func get_dominant_deck_element_count() -> int:
+	var element := get_dominant_deck_element()
+	return count_cards_of_element(element) if element != Card.Element.NONE else 0
+
+
+func is_demonic_profession() -> bool:
+	return _get_character_profession() == Card.Profession.DEMONIC
+
+
+# Weighted duplicate entries stay together by display name, then the groups are
+# assigned to the currently smallest bucket. The current demonic pool becomes
+# four exactly equal 22-card shares without splitting same-name cards.
+func ensure_demonic_card_element_distribution() -> Dictionary:
+	var counts := {
+		Card.Element.NONE: 0,
+		Card.Element.METAL: 0,
+		Card.Element.WATER: 0,
+		Card.Element.FIRE: 0,
+	}
+	if not is_demonic_profession() or not draftable_cards:
+		return counts
+
+	var groups := {}
+	for card: Card in draftable_cards.cards:
+		if not card or card.get_profession() != Card.Profession.DEMONIC:
+			continue
+		var group_name := card.get_display_name()
+		if group_name.is_empty():
+			group_name = card.id if not card.id.is_empty() else card.resource_path
+		if not groups.has(group_name):
+			groups[group_name] = []
+		groups[group_name].append(card)
+
+	var group_names: Array[String] = []
+	for group_name: String in groups:
+		group_names.append(group_name)
+	group_names.sort_custom(func(first: String, second: String) -> bool:
+		var first_size: int = groups[first].size()
+		var second_size: int = groups[second].size()
+		if first_size != second_size:
+			return first_size > second_size
+		return first.naturalnocasecmp_to(second) < 0
+	)
+
+	var bucket_sizes := [0, 0, 0, 0]
+	for group_name: String in group_names:
+		var bucket_index := 0
+		for index in range(1, DEMONIC_DRAFT_ELEMENTS.size()):
+			if bucket_sizes[index] < bucket_sizes[bucket_index]:
+				bucket_index = index
+		var element: Card.Element = DEMONIC_DRAFT_ELEMENTS[bucket_index]
+		for card: Card in groups[group_name]:
+			card.element = element
+			bucket_sizes[bucket_index] += 1
+			counts[element] += 1
+
+	var element_by_name := {}
+	for group_name: String in group_names:
+		var grouped_cards: Array = groups[group_name]
+		if not grouped_cards.is_empty():
+			element_by_name[group_name] = (grouped_cards[0] as Card).element
+	for pile: CardPile in [starting_deck, deck, draw_pile, discard, exhaust_pile]:
+		_apply_demonic_elements_to_pile(pile, element_by_name)
+	return counts
+
+
+func _apply_demonic_elements_to_pile(pile: CardPile, element_by_name: Dictionary) -> void:
+	if not pile:
+		return
+	for card: Card in pile.cards:
+		if not card or card.get_profession() != Card.Profession.DEMONIC:
+			continue
+		var card_name := card.get_display_name()
+		if element_by_name.has(card_name):
+			card.element = element_by_name[card_name]
 
 
 func get_spirit_root_stage() -> int:

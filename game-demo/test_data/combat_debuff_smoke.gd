@@ -113,6 +113,8 @@ func _check_real_weak_action(battle: Battle, enemy: Enemy) -> void:
 	await get_tree().process_frame
 
 	var strike := (load(STRIKE_PATH) as CultivationCard).duplicate(true) as CultivationCard
+	var strike_preview := strike.get_updated_tooltip(battle.player.modifier_handler, enemy.modifier_handler)
+	_check(strike_preview.contains("4 点伤害"), "selected attack preview shows the actual weak-modified damage")
 	var enemy_health_before := enemy.stats.health
 	strike.apply_effects([enemy], battle.player.modifier_handler)
 	await get_tree().create_timer(0.25).timeout
@@ -138,6 +140,8 @@ func _check_frail_card_math(battle: Battle) -> void:
 	_check(battle.player.modifier_handler.get_modified_value(20, Modifier.Type.BLOCK_GAIN) == 15, "frail reduces block gain by twenty-five percent")
 
 	var defend := (load(DEFEND_PATH) as CultivationCard).duplicate(true) as CultivationCard
+	var defend_preview := defend.get_updated_tooltip(battle.player.modifier_handler, null)
+	_check(defend_preview.contains("3 点护体"), "selected defense preview shows the actual frail-modified block")
 	battle.char_stats.block = 0
 	defend.apply_effects([battle.player], battle.player.modifier_handler)
 	_check(battle.char_stats.block == 3, "frail modifies real defense card block with floor rounding")

@@ -366,7 +366,7 @@ func _character_class() -> String:
 func _upgrade_random_cards(count: int) -> void:
 	if not character_stats or not character_stats.deck:
 		return
-	var picked_names: Array[String] = []
+	var picked_cards: Array[Card] = []
 	for _i in count:
 		var candidates: Array[Card] = []
 		for card: Card in character_stats.deck.cards:
@@ -375,36 +375,37 @@ func _upgrade_random_cards(count: int) -> void:
 		var picked := RNG.array_pick_random(candidates) as Card
 		if picked:
 			picked.upgrade()
-			picked_names.append(picked.get_display_name())
-	_notify("突破", picked_names)
+			picked_cards.append(picked)
+	_notify_cards("突破卡牌", picked_cards, "卡牌已完成突破。")
 
 
 func _remove_random_cards(count: int) -> void:
 	if not character_stats or not character_stats.deck:
 		return
-	var picked_names: Array[String] = []
+	var picked_cards: Array[Card] = []
 	for _i in count:
 		if character_stats.deck.cards.size() <= 1:
 			break
 		var picked := RNG.array_pick_random(character_stats.deck.cards) as Card
 		if picked:
 			character_stats.deck.remove_card(picked)
-			picked_names.append(picked.get_display_name())
-	_notify("移除", picked_names)
+			picked_cards.append(picked)
+	_notify_cards("移除卡牌", picked_cards, "卡牌已从本次牌组中移除。")
 
 
 func _duplicate_random_cards(count: int) -> void:
 	if not character_stats or not character_stats.deck:
 		return
-	var picked_names: Array[String] = []
+	var copied_cards: Array[Card] = []
 	for _i in count:
 		if character_stats.deck.cards.is_empty():
 			break
 		var picked := RNG.array_pick_random(character_stats.deck.cards) as Card
 		if picked:
-			character_stats.deck.add_card(picked.duplicate(true))
-			picked_names.append(picked.get_display_name())
-	_notify("复制", picked_names)
+			var copied_card := picked.duplicate(true) as Card
+			character_stats.deck.add_card(copied_card)
+			copied_cards.append(copied_card)
+	_notify_cards("复制卡牌", copied_cards, "以下副本已加入牌组。")
 
 
 func _grant_relics(count: int) -> void:
@@ -434,12 +435,17 @@ func _notify(prefix: String, names: Array[String]) -> void:
 	Events.ui_notice_requested.emit("%s：%s" % [prefix, joined])
 
 
+func _notify_cards(title: String, cards: Array[Card], detail: String) -> void:
+	if not cards.is_empty():
+		Events.card_change_feedback_requested.emit(title, cards, detail)
+
+
 # 移除打击/防御类起手牌（id 含 strike/defend，兼容魔修的 demon_strike 等专属版本）。
 # 比"随机移除任意牌"安全——不会吃掉玩家的好牌。
 func _remove_basic_cards(count: int) -> void:
 	if not character_stats or not character_stats.deck:
 		return
-	var picked_names: Array[String] = []
+	var picked_cards: Array[Card] = []
 	for _i in count:
 		if character_stats.deck.cards.size() <= 1:
 			break
@@ -450,8 +456,8 @@ func _remove_basic_cards(count: int) -> void:
 		var picked := RNG.array_pick_random(candidates) as Card
 		if picked:
 			character_stats.deck.remove_card(picked)
-			picked_names.append(picked.get_display_name())
-	_notify("移除", picked_names)
+			picked_cards.append(picked)
+	_notify_cards("移除卡牌", picked_cards, "基础卡已从本次牌组中移除。")
 
 
 # 从职业可抽卡池发随机卡；rare_only 时只发金卡（无金卡则退回全池）。
@@ -461,7 +467,7 @@ func _add_random_draftable_cards(count: int, rare_only: bool) -> void:
 	var pool: Array[Card] = character_stats.draftable_cards.cards
 	if pool.is_empty():
 		return
-	var picked_names: Array[String] = []
+	var added_cards: Array[Card] = []
 	for _i in count:
 		var candidates: Array[Card] = []
 		for card: Card in pool:
@@ -471,9 +477,10 @@ func _add_random_draftable_cards(count: int, rare_only: bool) -> void:
 			candidates = pool.duplicate()
 		var picked := RNG.array_pick_random(candidates) as Card
 		if picked:
-			character_stats.deck.add_card(picked.duplicate(true))
-			picked_names.append(picked.get_display_name())
-	_notify("获得卡牌", picked_names)
+			var copied_card := picked.duplicate(true) as Card
+			character_stats.deck.add_card(copied_card)
+			added_cards.append(copied_card)
+	_notify_cards("获得卡牌", added_cards, "以下卡牌已加入牌组。")
 
 
 # 借用 run 的丹药奖池发放（blessing 是 run 的子场景，经组拿 run 节点）。

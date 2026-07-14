@@ -21,11 +21,17 @@ const DISCARD_PILE_WIDGET := preload("res://art/ui/battle_widgets/battle_discard
 const CARD_VISUALS_SCENE := preload("res://scenes/ui/card_visuals.tscn")
 const CARD_MENU_UI_SCENE := preload("res://scenes/ui/card_menu_ui.tscn")
 const PHASE_B_GUIDES_VISIBLE := false
-const PLAYED_CARD_PREVIEW_SIZE := Vector2(224.0, 322.0)
+const PLAYED_CARD_PREVIEW_SIZE := Vector2(269.0, 386.0)
 const PLAYED_CARD_PREVIEW_SCALE := 1.45
 const PLAYED_CARD_PREVIEW_IN_DURATION := 0.24
 const PLAYED_CARD_PREVIEW_HOLD_DURATION := 0.60
 const PLAYED_CARD_PREVIEW_OUT_DURATION := 0.30
+const PLAYER_COMBATANT_CARD_SIZE := Vector2(327.0, 567.0)
+const ENEMY_COMBATANT_CARD_SIZE := Vector2(327.0, 642.0)
+const COMBATANT_CARD_GAP := 30.0
+const PLAYER_CARD_BOTTOM_OFFSET := Vector2(70.0, 0.0)
+const HERO_SKILL_SIZE := Vector2(158.4, 86.4)
+const END_TURN_SIZE := Vector2(200.0, 104.0)
 
 const PHASE_BANNER_COLOR_PLAYER := Color("f2c94f")
 const PHASE_BANNER_COLOR_ENEMY := Color("e0503c")
@@ -48,6 +54,7 @@ var _player_card: BattleCombatantCard
 var _enemy_cards: Array[BattleCombatantCard] = []
 var _tracked_player: Player
 var _tracked_enemies: Array[Enemy] = []
+var _combatant_layout_generation := 0
 var _discover_overlay: ColorRect
 var _discover_request
 var _discover_selected: Array[Card] = []
@@ -648,7 +655,7 @@ func _polish_ui() -> void:
 	_add_played_card_preview_layer()
 
 	end_turn_button.text = "结束回合"
-	end_turn_button.custom_minimum_size = Vector2(316, 104)
+	end_turn_button.custom_minimum_size = END_TURN_SIZE
 	InkTheme.apply_battle_blue_button(end_turn_button, true)
 	_add_hero_skill_button()
 	_polish_pile_button(draw_pile_button, "抽牌堆", false)
@@ -663,8 +670,8 @@ func _add_hero_skill_button() -> void:
 
 	hero_skill_button = Button.new()
 	hero_skill_button.name = "HeroSkillButton"
-	hero_skill_button.text = "魔焰焚心"
-	hero_skill_button.custom_minimum_size = Vector2(156, 76)
+	hero_skill_button.text = "焚心"
+	hero_skill_button.custom_minimum_size = HERO_SKILL_SIZE
 	hero_skill_button.focus_mode = Control.FOCUS_NONE
 	hero_skill_button.disabled = true
 	hero_skill_button.hide()
@@ -724,13 +731,13 @@ func _rebuild_combatant_cards() -> void:
 	_enemy_cards.clear()
 
 	if _tracked_player:
-		_player_card = _create_combatant_card("PlayerCard", Vector2(318, 236))
+		_player_card = _create_combatant_card("PlayerCard", PLAYER_COMBATANT_CARD_SIZE)
 		_player_card.bind_player(_tracked_player)
 
 	for enemy in _tracked_enemies:
 		if not is_instance_valid(enemy):
 			continue
-		var enemy_card := _create_combatant_card("EnemyCard", Vector2(332, 338))
+		var enemy_card := _create_combatant_card("EnemyCard", ENEMY_COMBATANT_CARD_SIZE)
 		enemy_card.bind_enemy(enemy)
 		_enemy_cards.append(enemy_card)
 
@@ -739,7 +746,7 @@ func _create_combatant_card(card_name: String, base_size: Vector2) -> BattleComb
 	var card := BattleCombatantCard.new()
 	card.name = card_name
 	card.custom_minimum_size = base_size
-	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.mouse_filter = Control.MOUSE_FILTER_PASS
 	_combatant_layer.add_child(card)
 	return card
 
@@ -953,13 +960,18 @@ func _layout_battle_controls() -> void:
 	_place_bottom_left(draw_pile_button, Vector2(48, 40), Vector2(104, 156), scale_factor)
 	_place_bottom_left(discard_pile_button, Vector2(162, 40), Vector2(104, 156), scale_factor)
 	_place_bottom_left(exhaust_pile_button, Vector2(276, 40), Vector2(104, 156), scale_factor)
-	_place_bottom_right(end_turn_button, Vector2(264, 366), Vector2(316, 104), scale_factor)
+	# 结束回合位于人物牌左侧的空隙，避开底部手牌；英雄技能保留在人物牌下方。
+	_place_bottom_right(end_turn_button, Vector2(414, 402), END_TURN_SIZE, scale_factor)
 	if hero_skill_button:
-		# 技能行贴在角色牌正下方：魔焰焚心在左，右侧留白给未来第二技能。
-		_place_bottom_right(hero_skill_button, Vector2(232, 40), Vector2(156, 76), scale_factor)
-	_place_bottom_right(mana_ui, Vector2(56, 362), Vector2(116, 116), scale_factor)
+		var hero_skill_offset := Vector2(
+			PLAYER_CARD_BOTTOM_OFFSET.x + PLAYER_COMBATANT_CARD_SIZE.x - HERO_SKILL_SIZE.x,
+			PLAYER_CARD_BOTTOM_OFFSET.y + PLAYER_COMBATANT_CARD_SIZE.y + 8.0
+		)
+		_place_bottom_right(hero_skill_button, hero_skill_offset, HERO_SKILL_SIZE, scale_factor)
+	# 灵力球放在焰轮右缘和手牌左缘之间，既靠近手牌，也不遮挡卡面。
+	_place_bottom_left(mana_ui, Vector2(328, 380), Vector2(116, 116), scale_factor)
 
-	hand.offset_top = -322.0 * scale_factor
+	hand.offset_top = -386.0 * scale_factor
 	_layout_phase_b_guides(viewport_size, scale_factor)
 	_layout_combatant_cards(viewport_size, scale_factor)
 
@@ -976,9 +988,9 @@ func _layout_battle_controls() -> void:
 		if _turn_label:
 			_turn_label.add_theme_font_size_override("font_size", roundi(35.0 * scale_factor))
 
-	end_turn_button.add_theme_font_size_override("font_size", roundi(36.0 * scale_factor))
+	end_turn_button.add_theme_font_size_override("font_size", roundi(30.0 * scale_factor))
 	if hero_skill_button:
-		hero_skill_button.add_theme_font_size_override("font_size", roundi(28.0 * scale_factor))
+		hero_skill_button.add_theme_font_size_override("font_size", roundi(24.0 * scale_factor))
 		_update_hero_skill_button_state()
 	_update_hand_draw_origin.call_deferred()
 
@@ -1120,8 +1132,8 @@ func _layout_combatant_cards(viewport_size: Vector2, scale_factor: float) -> voi
 
 	var enemy_count := _enemy_cards.size()
 	if enemy_count > 0:
-		var enemy_size := Vector2(332, 388) * scale_factor
-		var gap := 26.0 * scale_factor
+		var enemy_size := ENEMY_COMBATANT_CARD_SIZE * scale_factor
+		var gap := COMBATANT_CARD_GAP * scale_factor
 		var total_width: float = enemy_size.x * enemy_count + gap * max(enemy_count - 1, 0)
 		var start_x: float = viewport_size.x * 0.5 - total_width * 0.5
 		for i in range(enemy_count):
@@ -1135,11 +1147,27 @@ func _layout_combatant_cards(viewport_size: Vector2, scale_factor: float) -> voi
 			)
 
 	if _player_card:
-		_place_bottom_right(_player_card, Vector2(70, 124), Vector2(318, 236), scale_factor)
+		_place_bottom_right(_player_card, PLAYER_CARD_BOTTOM_OFFSET, PLAYER_COMBATANT_CARD_SIZE, scale_factor)
 
 	# 世界立绘已隐藏、战斗单位只显示为信息卡，但瞄准/选中框/飘字仍挂在世界节点上。
 	# 把世界节点对齐到各自信息卡中心，否则选中框和卡的位置对不上（敌人越多偏得越远）。
-	_align_world_combatants.call_deferred()
+	_schedule_world_combatant_alignment()
+
+
+func _schedule_world_combatant_alignment() -> void:
+	_combatant_layout_generation += 1
+	_settle_world_combatants.call_deferred(_combatant_layout_generation)
+
+
+func _settle_world_combatants(generation: int) -> void:
+	# Control sizing and the Area2D broad phase settle on different frames. Reapply
+	# briefly after a death/summon so the visible card, collision and target frame
+	# all follow the surviving enemy's new slot.
+	for _frame in 3:
+		if generation != _combatant_layout_generation or not is_inside_tree():
+			return
+		await get_tree().process_frame
+		_align_world_combatants()
 
 
 func _align_world_combatants() -> void:
@@ -1161,6 +1189,7 @@ func _align_world_combatant(card: BattleCombatantCard) -> void:
 	var center := rect.position + rect.size * 0.5
 	var canvas_xform := combatant.get_viewport().get_canvas_transform()
 	combatant.global_position = canvas_xform.affine_inverse() * center
+	combatant.force_update_transform()
 
 	if combatant is Enemy:
 		(combatant as Enemy).align_feedback_to_card(rect.size)
@@ -1236,9 +1265,9 @@ func _layout_phase_b_guides(viewport_size: Vector2, scale_factor: float) -> void
 			Vector2(viewport_size.x * 0.40, viewport_size.y * 0.26)
 		)
 	if enemy_card:
-		_place_center_top(enemy_card, viewport_size, Vector2(332, 338), 88.0, scale_factor)
+		_place_center_top(enemy_card, viewport_size, ENEMY_COMBATANT_CARD_SIZE, 58.0, scale_factor)
 	if player_card:
-		_place_bottom_right(player_card, Vector2(70, 124), Vector2(318, 236), scale_factor)
+		_place_bottom_right(player_card, PLAYER_CARD_BOTTOM_OFFSET, PLAYER_COMBATANT_CARD_SIZE, scale_factor)
 	if left_dock:
 		_place_bottom_left(left_dock, Vector2(28, 42), Vector2(358, 486), scale_factor)
 
