@@ -11,6 +11,10 @@ const TYPE_STATUS := "状态"
 const TYPE_CURSE := "诅咒"
 const TYPE_DEFAULT := "术法"
 
+const DISPLAY_TYPE_ATTACK := "攻击"
+const DISPLAY_TYPE_SKILL := "技能"
+const DISPLAY_TYPE_POWER := "功法"
+
 const FRAME_ROOT := "res://art/ui/cards/generated/"
 
 const TYPE_COLORS := {
@@ -87,6 +91,11 @@ const KEYWORDS := [
 	"消耗",
 	"保留",
 	"固有",
+	"检索",
+	"取回",
+	"归墟",
+	"永恒",
+	"周天",
 	"虚无",
 	"不可打出",
 	"状态",
@@ -110,6 +119,19 @@ const STATUS_TERM_HINTS := {
 
 
 func get_card_type(card: Card) -> String:
+	if not card:
+		return DISPLAY_TYPE_SKILL
+
+	match card.type:
+		Card.Type.ATTACK:
+			return DISPLAY_TYPE_ATTACK
+		Card.Type.POWER:
+			return DISPLAY_TYPE_POWER
+		_:
+			return DISPLAY_TYPE_SKILL
+
+
+func _get_visual_archetype(card: Card) -> String:
 	if not card:
 		return TYPE_DEFAULT
 
@@ -140,16 +162,16 @@ func get_card_type(card: Card) -> String:
 
 
 func get_card_frame_path(card: Card) -> String:
-	var card_type: String = get_card_type(card)
+	var card_type: String = _get_visual_archetype(card)
 	var colors: Dictionary = TYPE_COLORS.get(card_type, TYPE_COLORS[TYPE_DEFAULT])
 	return colors["frame"]
 
 
 func get_card_style(card: Card) -> Dictionary:
-	var card_type: String = get_card_type(card)
-	var colors: Dictionary = TYPE_COLORS.get(card_type, TYPE_COLORS[TYPE_DEFAULT])
+	var visual_archetype: String = _get_visual_archetype(card)
+	var colors: Dictionary = TYPE_COLORS.get(visual_archetype, TYPE_COLORS[TYPE_DEFAULT])
 	return {
-		"type_name": card_type,
+		"type_name": get_card_type(card),
 		"main": colors["main"],
 		"dark": colors["dark"],
 		"highlight": colors["highlight"],
@@ -237,6 +259,8 @@ func _card_marker(card: Card) -> String:
 	var parts: PackedStringArray = PackedStringArray()
 	parts.append(card.id.to_lower())
 	parts.append(card.get_display_name().to_lower())
+	for keyword: String in card.get_keyword_labels():
+		parts.append(keyword.to_lower())
 	for tag: String in card.mechanic_tags:
 		parts.append(tag.to_lower())
 	return " ".join(parts)

@@ -105,6 +105,12 @@ func _check_rootless_start() -> void:
 func _check_element_supply_counts() -> void:
 	var character := load("res://characters/demonic_cultivator/demonic_cultivator.tres") as CharacterStats
 	var distribution := character.ensure_demonic_card_element_distribution()
+	for card: Card in character.draftable_cards.cards:
+		if card:
+			_check(
+				card.get_profession() in [Card.Profession.COMMON, Card.Profession.DEMONIC],
+				"demonic draft pool contains only common or demonic cards"
+			)
 	for element in [Card.Element.NONE, Card.Element.METAL, Card.Element.WATER, Card.Element.FIRE]:
 		_check(distribution.get(element, 0) == 22, "demonic profession pool has an equal 22-card element share")
 	for element in [Card.Element.METAL, Card.Element.WATER, Card.Element.FIRE]:

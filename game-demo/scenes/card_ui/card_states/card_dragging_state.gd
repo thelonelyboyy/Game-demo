@@ -6,7 +6,7 @@ const TARGETING_PREVIEW_Y := 18.0
 # 拖拽惯性：卡牌跟随鼠标横向速度轻微倾斜，停下后回正。
 const DRAG_TILT_PER_PIXEL := 0.14
 const DRAG_TILT_MAX := 9.0
-const DRAG_TILT_RECOVER_DURATION := 0.40
+const DRAG_TILT_RECOVER_DURATION := 0.22
 
 var minimum_drag_time_elapsed := false
 var single_targeted := false

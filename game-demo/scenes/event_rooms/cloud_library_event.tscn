@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/cloud_library.png" id="3_image"]
 
 [node name="cloud_library_event" type="Control"]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "云中藏书阁"
 event_body = "散落的书页在空中自行翻动。"
+event_illustration = ExtResource("3_image")
 choice_texts = PackedStringArray("读完一卷：随机突破一张牌", "整理书架：获得 50 灵石", "合上书页")
 choice_effects = PackedStringArray("upgrade_random", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 50, 0)

@@ -9,10 +9,11 @@
 class_name PlayerHandler
 extends Node
 
-const HAND_DRAW_INTERVAL := 0.25
-const HAND_DISCARD_INTERVAL := 0.25
+const HAND_DRAW_INTERVAL := 0.14
+const HAND_DISCARD_INTERVAL := 0.14
 const DEMONIC_HERO_SKILL_SELF_DAMAGE := 2
 const DEMONIC_HERO_SKILL_FINAL_SELF_DAMAGE := 1
+const CARD_DISCOVERY_REQUEST := preload("res://custom_resources/card_discovery_request.gd")
 
 @export var relics: RelicHandler
 @export var player: Player
@@ -169,26 +170,30 @@ func discard_cards() -> void:
 	if not _resolve_end_of_turn_hand_triggers():
 		return
 
-	if hand.get_child_count() == 0:
+	var live_cards := _get_live_hand_card_uis()
+	if live_cards.is_empty():
 		character.reset_temporary_card_costs()
 		Events.player_hand_discarded.emit()
 		return
 
 	var cards_to_clean_up := 0
 	discard_tween = create_tween()
-	for card_ui: CardUI in hand.get_children():
+	for card_ui: CardUI in live_cards:
 		var card := card_ui.card
-		if card and card.is_temporary_card():
-			cards_to_clean_up += 1
-			discard_tween.tween_callback(remove_card_from_hand.bind(card_ui))
-		elif card and card.is_ethereal_card():
-			cards_to_clean_up += 1
-			discard_tween.tween_callback(exhaust_card_from_hand.bind(card_ui))
-		elif card and card.is_retained_card():
-			_reset_retained_card_cost(card_ui)
-		else:
-			cards_to_clean_up += 1
-			discard_tween.tween_callback(discard_card_from_hand.bind(card_ui))
+		if not card:
+			continue
+		match card.get_end_turn_destination():
+			Card.EndTurnDestination.REMOVE:
+				cards_to_clean_up += 1
+				discard_tween.tween_callback(remove_card_from_hand.bind(card_ui))
+			Card.EndTurnDestination.EXHAUST:
+				cards_to_clean_up += 1
+				discard_tween.tween_callback(exhaust_card_from_hand.bind(card_ui))
+			Card.EndTurnDestination.RETAIN:
+				_reset_retained_card_cost(card_ui)
+			_:
+				cards_to_clean_up += 1
+				discard_tween.tween_callback(discard_card_from_hand.bind(card_ui))
 		discard_tween.tween_interval(HAND_DISCARD_INTERVAL)
 	
 	if cards_to_clean_up == 0:
@@ -219,15 +224,16 @@ func reshuffle_deck_from_discard() -> void:
 func _on_card_played(card: Card) -> void:
 	if not battle_running or not character or not character.discard or not card:
 		return
-	if card.is_temporary_card():
-		return
-	if card.is_consumable_card() or card.type == Card.Type.POWER:
-		if card.is_consumable_card():
+	match card.get_play_destination():
+		Card.PlayDestination.REMOVE, Card.PlayDestination.NONE:
+			return
+		Card.PlayDestination.EXHAUST:
 			_trigger_card_lifecycle(card, Card.LifecycleTrigger.EXHAUSTED)
 			_add_card_to_exhaust_pile(card)
-		return
-	
-	character.discard.add_card(card)
+		Card.PlayDestination.DRAW_TOP:
+			character.draw_pile.add_card_to_top(card)
+		_:
+			character.discard.add_card(card)
 
 
 func _on_statuses_applied(type: Status.Type) -> void:
@@ -386,29 +392,56 @@ func discard_random_cards_from_hand(amount: int, exclude_card: Card = null) -> A
 	return discarded
 
 
-func move_matching_cards_to_hand(source_pile: int, card_type_filter: int, amount: int, exclude_card: Card = null) -> Array[Card]:
+func choose_cards_from_pile(
+	source_pile: int,
+	amount: int,
+	exclude_card: Card = null,
+	title := "检索",
+	prompt := "",
+	card_type_filter := -1
+) -> Array[Card]:
 	var moved: Array[Card] = []
 	if not _can_use_card_piles() or not hand or amount <= 0:
 		return moved
-	var pile: CardPile
-	match source_pile:
-		ConfiguredPileTutorEffect.SourcePile.DISCARD_PILE:
-			pile = character.discard
-		ConfiguredPileTutorEffect.SourcePile.EXHAUST_PILE:
-			pile = character.exhaust_pile
-		_:
-			pile = character.draw_pile
+	var pile := _get_source_pile(source_pile)
 	if not pile:
 		return moved
 	var candidates: Array[Card] = []
 	for card: Card in pile.cards:
-		if card and card != exclude_card and (card_type_filter < 0 or card.type == card_type_filter):
+		if (
+			card
+			and card != exclude_card
+			and (card_type_filter < 0 or card.type == card_type_filter)
+		):
 			candidates.append(card)
 	if source_pile != ConfiguredPileTutorEffect.SourcePile.DRAW_PILE:
 		candidates.reverse()
-	for card: Card in candidates:
-		if moved.size() >= amount or hand.is_full():
-			break
+	var pending_source_slot := 1 if _hand_contains_card(exclude_card) else 0
+	var pick_count := mini(amount, mini(candidates.size(), hand.available_slots() + pending_source_slot))
+	if pick_count <= 0:
+		_notify_hand_full()
+		return moved
+
+	var request = CARD_DISCOVERY_REQUEST.new()
+	request.source_card = exclude_card
+	request.title = title
+	request.prompt = prompt
+	request.choices = candidates
+	request.picks = pick_count
+	request.allow_skip = false
+	var selected: Array[Card] = []
+	if _should_auto_resolve_pile_selection():
+		selected.assign(candidates.slice(0, pick_count))
+		request.resolve(selected)
+	else:
+		Events.card_discovery_requested.emit(request)
+		if not request.resolved:
+			await request.completed
+		selected.assign(request.selected_cards)
+
+	for card: Card in selected:
+		if moved.size() >= pick_count or not candidates.has(card):
+			continue
 		if not pile.remove_card(card):
 			continue
 		if hand.add_card(card):
@@ -423,6 +456,54 @@ func move_matching_cards_to_hand(source_pile: int, card_type_filter: int, amount
 	if player_actions_enabled and not moved.is_empty():
 		hand.enable_hand()
 	return moved
+
+
+func _should_auto_resolve_pile_selection() -> bool:
+	var connections := Events.card_discovery_requested.get_connections()
+	if connections.is_empty():
+		return true
+	if DisplayServer.get_name() != "headless":
+		return false
+	# Headless autoplay has a BattleUI listener but no player to click it. Only
+	# bypass that passive UI listener; explicit smoke resolvers still receive the
+	# request and exercise the selection path.
+	for connection: Dictionary in connections:
+		var callback: Callable = connection.get("callable", Callable())
+		var receiver := callback.get_object()
+		if is_instance_valid(receiver) and not receiver is BattleUI:
+			return false
+	return true
+
+
+func _get_source_pile(source_pile: int) -> CardPile:
+	match source_pile:
+		ConfiguredPileTutorEffect.SourcePile.DISCARD_PILE:
+			return character.discard
+		ConfiguredPileTutorEffect.SourcePile.EXHAUST_PILE:
+			return character.exhaust_pile
+		_:
+			return character.draw_pile
+
+
+func _hand_contains_card(card: Card) -> bool:
+	if not hand or not card:
+		return false
+	for child: Node in hand.get_children():
+		var card_ui := child as CardUI
+		if card_ui and not card_ui.is_queued_for_deletion() and card_ui.card == card:
+			return true
+	return false
+
+
+func _get_live_hand_card_uis() -> Array[CardUI]:
+	var cards: Array[CardUI] = []
+	if not hand:
+		return cards
+	for child: Node in hand.get_children():
+		var card_ui := child as CardUI
+		if card_ui and is_instance_valid(card_ui) and not card_ui.is_queued_for_deletion():
+			cards.append(card_ui)
+	return cards
 
 
 func exhaust_affliction_cards_from_hand(max_cards := 0, exclude_card: Card = null) -> Array[Card]:
@@ -502,8 +583,7 @@ func _trigger_card_lifecycle(card: Card, trigger: Card.LifecycleTrigger) -> void
 func _resolve_end_of_turn_hand_triggers() -> bool:
 	if not battle_running or not hand:
 		return false
-	for child: Node in hand.get_children():
-		var card_ui := child as CardUI
+	for card_ui: CardUI in _get_live_hand_card_uis():
 		if not card_ui or not card_ui.card:
 			continue
 		_trigger_card_lifecycle(card_ui.card, Card.LifecycleTrigger.TURN_ENDED_IN_HAND)

@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/lotus_pond.png" id="3_image"]
 
 [node name="lotus_pond_event" type="Control"]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "净莲池"
 event_body = "白莲开在污泥中，香气清冷。"
+event_illustration = ExtResource("3_image")
 choice_texts = PackedStringArray("采莲：回复 23 生命", "挖莲藕：获得 40 灵石", "不扰清净")
 choice_effects = PackedStringArray("heal", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(23, 40, 0)

@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/sword_rain.png" id="3_image"]
 
 [node name="sword_rain_event" type="Control"]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "剑雨残阵"
 event_body = "半空悬着密密麻麻的断剑，只待有人踏入。"
+event_illustration = ExtResource("3_image")
 choice_texts = PackedStringArray("闯阵：随机突破一张牌，失去 10 生命", "收集断剑：获得 65 灵石", "退后")
 choice_effects = PackedStringArray("upgrade_random:0|damage:10", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 65, 0)

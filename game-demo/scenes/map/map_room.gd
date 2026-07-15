@@ -29,6 +29,8 @@ var focused := false : set = set_focused
 var room: Room : set = set_room
 var _hover_tween: Tween
 var _boss_pulse := 0.0
+var legend_highlighted := false
+var _legend_highlight_time := 0.0
 
 
 func _ready() -> void:
@@ -39,7 +41,12 @@ func _ready() -> void:
 
 # 仅 Boss 节点开启 _process：红光缓慢脉冲，隔着半张地图也能感到威慑。
 func _process(delta: float) -> void:
-	_boss_pulse += delta
+	if room and room.type == Room.Type.BOSS:
+		_boss_pulse += delta
+	if legend_highlighted:
+		_legend_highlight_time += delta
+		# 使用 Visuals 的局部位移，不干扰地图入场缩放、可选节点呼吸或鼠标 hover。
+		$Visuals.position.y = -absf(sin(_legend_highlight_time * 5.6)) * 4.2
 	queue_redraw()
 
 
@@ -56,6 +63,17 @@ func set_available(new_value: bool) -> void:
 
 func set_focused(new_value: bool) -> void:
 	focused = new_value
+	queue_redraw()
+
+
+func set_legend_highlighted(new_value: bool) -> void:
+	if legend_highlighted == new_value:
+		return
+	legend_highlighted = new_value
+	_legend_highlight_time = 0.0
+	if not legend_highlighted and is_node_ready():
+		$Visuals.position = Vector2.ZERO
+	set_process(legend_highlighted or (room and room.type == Room.Type.BOSS))
 	queue_redraw()
 
 
@@ -106,6 +124,13 @@ func _draw() -> void:
 		var pulse := 0.5 + 0.5 * sin(_boss_pulse * 2.2)
 		draw_circle(Vector2.ZERO, 27.0 + pulse * 3.0, Color(0.80, 0.16, 0.12, 0.08 + 0.08 * pulse))
 		draw_arc(Vector2.ZERO, 24.5 + pulse * 2.0, 0.0, TAU, 72, Color(1.0, 0.34, 0.24, 0.26 + 0.24 * pulse), 1.8, true)
+
+	if legend_highlighted:
+		var legend_pulse := 0.5 + 0.5 * sin(_legend_highlight_time * 7.2)
+		var ring_radius := 26.0 + legend_pulse * 3.0
+		draw_circle(Vector2.ZERO, ring_radius + 2.0, Color(1.0, 0.04, 0.03, 0.13 + 0.09 * legend_pulse))
+		draw_arc(Vector2.ZERO, ring_radius, 0.0, TAU, 96, Color(1.0, 0.12, 0.08, 0.88), 3.0, true)
+		draw_arc(Vector2.ZERO, ring_radius + 4.0, 0.0, TAU, 96, Color(1.0, 0.32, 0.18, 0.30 + 0.24 * legend_pulse), 1.4, true)
 
 	if available:
 		draw_circle(Vector2.ZERO, 22.5, Color(0.74, 0.94, 1.0, 0.20))

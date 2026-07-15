@@ -15,11 +15,11 @@ const HAND_Y_OFFSET := 26.0
 const HOVER_SCALE := 1.24
 const HOVER_LIFT := 46.0
 const HOVER_Z_INDEX := 1000
-const LAYOUT_DURATION := 0.24
+const LAYOUT_DURATION := 0.16
 # 牌数变化（抽牌/打出/弃牌）引起的补位用弹簧曲线，比 hover 重排慢一点、带回弹。
-const REFLOW_DURATION := 0.48
+const REFLOW_DURATION := 0.28
 # 聚焦卡响应要比整体重排更快，配合回弹曲线让 hover 有"跳出来"的手感。
-const FOCUS_DURATION := 0.15
+const FOCUS_DURATION := 0.10
 # 聚焦卡放大后会盖住邻牌，两侧卡牌按与聚焦卡的距离让位。
 const NEIGHBOR_PUSH := 46.0
 const NEIGHBOR_PUSH_FALLOFF := 0.45
@@ -63,11 +63,11 @@ func add_card(card: Card, use_draw_origin := true, origin_global := Vector2.ZERO
 
 
 func is_full() -> bool:
-	return get_child_count() >= MAX_HAND_SIZE
+	return _get_card_uis().size() >= MAX_HAND_SIZE
 
 
 func available_slots() -> int:
-	return maxi(MAX_HAND_SIZE - get_child_count(), 0)
+	return maxi(MAX_HAND_SIZE - _get_card_uis().size(), 0)
 
 
 func discard_card(card: CardUI, play_discard_animation := true) -> void:
@@ -80,7 +80,7 @@ func discard_card(card: CardUI, play_discard_animation := true) -> void:
 
 
 func enable_hand() -> void:
-	for card: CardUI in get_children():
+	for card: CardUI in _get_card_uis():
 		card.disabled = false
 		if card.is_hovered():
 			card.card_state_machine.on_mouse_entered()
@@ -88,7 +88,7 @@ func enable_hand() -> void:
 
 func disable_hand() -> void:
 	focused_card = null
-	for card: CardUI in get_children():
+	for card: CardUI in _get_card_uis():
 		card.disabled = true
 	_layout_cards()
 
@@ -193,6 +193,6 @@ func _layout_cards() -> void:
 func _get_card_uis() -> Array[CardUI]:
 	var cards: Array[CardUI] = []
 	for child in get_children():
-		if child is CardUI:
+		if child is CardUI and is_instance_valid(child) and not child.is_queued_for_deletion():
 			cards.append(child)
 	return cards

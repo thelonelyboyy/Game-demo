@@ -25,8 +25,10 @@ var burst_progress := 0.0
 
 
 func _ready() -> void:
-	InkTheme.animate_screen_entrance(self)
-	_apply_visuals()
+	# 正式流程已直接进入法宝二选一；保留场景仅兼容调试入口，不再播放开箱演出。
+	animation_player.stop()
+	particles.emitting = false
+	treasure_chest.hide()
 
 
 func generate_relic() -> void:
@@ -37,9 +39,10 @@ func generate_relic_choices(count := 2, chapter := 1) -> void:
 	found_relics.clear()
 	if relic_reward_pool:
 		found_relics = relic_reward_pool.get_random_available_choices(
-			char_stats, relic_handler, count, chapter, RelicRewardPool.RewardContext.TREASURE
+		char_stats, relic_handler, count, chapter, RelicRewardPool.RewardContext.TREASURE
 		)
 		found_relic = found_relics[0] if not found_relics.is_empty() else null
+		_on_treasure_opened.call_deferred()
 		return
 
 	var available_relics := treasure_relic_pool.filter(
@@ -51,6 +54,7 @@ func generate_relic_choices(count := 2, chapter := 1) -> void:
 	RNG.array_shuffle(available_relics)
 	found_relics.assign(available_relics.slice(0, mini(count, available_relics.size())))
 	found_relic = found_relics[0] if not found_relics.is_empty() else null
+	_on_treasure_opened.call_deferred()
 
 
 # Called from the AnimationPlayer, at the
@@ -59,16 +63,9 @@ func _on_treasure_opened() -> void:
 	Events.treasure_room_exited.emit(found_relics)
 
 
-func _on_treasure_chest_gui_input(event: InputEvent) -> void:
-	if opening_started or animation_player.current_animation == "open":
-		return
-	
-	if event.is_action_pressed("left_mouse"):
-		opening_started = true
-		GameSfx.play(GameSfx.CHEST_OPEN, -2.0)
-		GameSfx.play(GameSfx.GEM, -4.0)
-		_begin_open_effects()
-		animation_player.play("open")
+func _on_treasure_chest_gui_input(_event: InputEvent) -> void:
+	# 旧场景连接保留以兼容资源加载；宝箱节点已不再等待点击。
+	pass
 
 
 func _apply_visuals() -> void:

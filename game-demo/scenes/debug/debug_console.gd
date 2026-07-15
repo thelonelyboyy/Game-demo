@@ -190,7 +190,7 @@ func _cmd_card(args: PackedStringArray) -> void:
 				var card := _find_deck_card(args[1])
 				if not card:
 					break
-				if character_stats.deck.remove_card(card):
+				if card.can_be_removed_from_deck() and character_stats.deck.remove_card(card):
 					removed += 1
 			_log("已删除卡牌 %s 张。" % removed)
 		"upgrade":

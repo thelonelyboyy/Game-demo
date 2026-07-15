@@ -27,6 +27,8 @@ func perform_action() -> void:
 
 
 func update_intent_text() -> void:
+	if not is_instance_valid(target):
+		return
 	var player := target as Player
 	if not player:
 		return
@@ -38,7 +40,7 @@ func _get_final_damage() -> int:
 	var modified_dmg := damage
 	if enemy and enemy.modifier_handler:
 		modified_dmg = enemy.modifier_handler.get_modified_value(modified_dmg, Modifier.Type.DMG_DEALT)
-	var player := target as Player
+	var player := target as Player if is_instance_valid(target) else null
 	if player and player.modifier_handler:
 		modified_dmg = player.modifier_handler.get_modified_value(modified_dmg, Modifier.Type.DMG_TAKEN)
 	return modified_dmg

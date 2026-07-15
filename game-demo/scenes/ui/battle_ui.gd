@@ -12,6 +12,7 @@ extends CanvasLayer
 @onready var draw_pile_view: CardPileView = %DrawPileView
 @onready var discard_pile_view: CardPileView = %DiscardPileView
 @onready var exhaust_pile_view: CardPileView = %ExhaustPileView
+@onready var player_handler: PlayerHandler = $"../PlayerHandler"
 
 const REFERENCE_SIZE := Vector2(1920.0, 1080.0)
 const DRAW_PILE_ICON := preload("res://assets/ui/generated/icons/icon_card_deck_stack.png")
@@ -23,15 +24,17 @@ const CARD_MENU_UI_SCENE := preload("res://scenes/ui/card_menu_ui.tscn")
 const PHASE_B_GUIDES_VISIBLE := false
 const PLAYED_CARD_PREVIEW_SIZE := Vector2(269.0, 386.0)
 const PLAYED_CARD_PREVIEW_SCALE := 1.45
-const PLAYED_CARD_PREVIEW_IN_DURATION := 0.24
-const PLAYED_CARD_PREVIEW_HOLD_DURATION := 0.60
-const PLAYED_CARD_PREVIEW_OUT_DURATION := 0.30
+const PLAYED_CARD_PREVIEW_IN_DURATION := 0.16
+const PLAYED_CARD_PREVIEW_HOLD_DURATION := 0.34
+const PLAYED_CARD_PREVIEW_OUT_DURATION := 0.18
 const PLAYER_COMBATANT_CARD_SIZE := Vector2(327.0, 567.0)
 const ENEMY_COMBATANT_CARD_SIZE := Vector2(327.0, 642.0)
 const COMBATANT_CARD_GAP := 30.0
 const PLAYER_CARD_BOTTOM_OFFSET := Vector2(70.0, 0.0)
 const HERO_SKILL_SIZE := Vector2(158.4, 86.4)
 const END_TURN_SIZE := Vector2(200.0, 104.0)
+# 手牌悬停层级最高为 1000；操作按钮必须始终在手牌之上，同时低于发现牌弹窗。
+const COMBAT_ACTION_Z_INDEX := 2200
 
 const PHASE_BANNER_COLOR_PLAYER := Color("f2c94f")
 const PHASE_BANNER_COLOR_ENEMY := Color("e0503c")
@@ -58,7 +61,7 @@ var _combatant_layout_generation := 0
 var _discover_overlay: ColorRect
 var _discover_request
 var _discover_selected: Array[Card] = []
-var _discover_cards_box: HBoxContainer
+var _discover_cards_box: GridContainer
 var _discover_confirm_button: Button
 var _discover_count_label: Label
 var hero_skill_button: Button
@@ -185,7 +188,7 @@ func _set_char_stats(value: CharacterStats) -> void:
 
 
 func _on_player_hand_drawn() -> void:
-	end_turn_button.disabled = false
+	_sync_end_turn_button_state()
 	_update_hero_skill_button_state()
 
 
@@ -355,9 +358,9 @@ func _show_discovery_overlay() -> void:
 	panel.anchor_right = 0.5
 	panel.anchor_bottom = 0.5
 	panel.offset_left = -560.0
-	panel.offset_top = -285.0
+	panel.offset_top = -450.0
 	panel.offset_right = 560.0
-	panel.offset_bottom = 285.0
+	panel.offset_bottom = 450.0
 	panel.add_theme_stylebox_override("panel", InkTheme.make_style(
 		Color(0.030, 0.020, 0.032, 0.96),
 		Color(0.72, 0.47, 0.22, 0.92),
@@ -405,14 +408,20 @@ func _show_discovery_overlay() -> void:
 		prompt_label.add_theme_color_override("font_color", Color("cdbf92"))
 		layout.add_child(prompt_label)
 
-	_discover_cards_box = HBoxContainer.new()
-	_discover_cards_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	_discover_cards_box.add_theme_constant_override("separation", 22)
-	layout.add_child(_discover_cards_box)
+	var cards_scroll := ScrollContainer.new()
+	cards_scroll.custom_minimum_size = Vector2(0, 570)
+	cards_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	layout.add_child(cards_scroll)
+
+	_discover_cards_box = GridContainer.new()
+	_discover_cards_box.columns = 5
+	_discover_cards_box.add_theme_constant_override("h_separation", 18)
+	_discover_cards_box.add_theme_constant_override("v_separation", 18)
+	cards_scroll.add_child(_discover_cards_box)
 
 	for card: Card in _discover_request.choices:
 		var menu := CARD_MENU_UI_SCENE.instantiate() as CardMenuUI
-		menu.set_visual_size(Vector2(214, 307))
+		menu.set_visual_size(Vector2(180, 258))
 		menu.card = card
 		menu.tooltip_requested.connect(_on_discover_card_clicked.bind(menu))
 		_discover_cards_box.add_child(menu)
@@ -485,7 +494,7 @@ func _finish_discovery(selected_cards: Array[Card]) -> void:
 
 	if hand:
 		hand.enable_hand()
-	end_turn_button.disabled = false
+	_sync_end_turn_button_state()
 	_update_hero_skill_button_state()
 
 
@@ -656,6 +665,9 @@ func _polish_ui() -> void:
 
 	end_turn_button.text = "结束回合"
 	end_turn_button.custom_minimum_size = END_TURN_SIZE
+	end_turn_button.z_index = COMBAT_ACTION_Z_INDEX
+	end_turn_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	end_turn_button.focus_mode = Control.FOCUS_NONE
 	InkTheme.apply_battle_blue_button(end_turn_button, true)
 	_add_hero_skill_button()
 	_polish_pile_button(draw_pile_button, "抽牌堆", false)
@@ -672,6 +684,8 @@ func _add_hero_skill_button() -> void:
 	hero_skill_button.name = "HeroSkillButton"
 	hero_skill_button.text = "焚心"
 	hero_skill_button.custom_minimum_size = HERO_SKILL_SIZE
+	hero_skill_button.z_index = COMBAT_ACTION_Z_INDEX
+	hero_skill_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	hero_skill_button.focus_mode = Control.FOCUS_NONE
 	hero_skill_button.disabled = true
 	hero_skill_button.hide()
@@ -1005,8 +1019,24 @@ func _process(delta: float) -> void:
 	_breath_check_elapsed += delta
 	if _breath_check_elapsed >= 0.2:
 		_breath_check_elapsed = 0.0
+		_sync_end_turn_button_state()
 		_update_hero_skill_button_state()
 		_update_end_turn_breath()
+
+
+func _sync_end_turn_button_state() -> void:
+	if not end_turn_button or not is_instance_valid(player_handler):
+		return
+	var battle := get_parent() as Battle
+	var can_end_turn := (
+		battle
+		and battle.battle_active
+		and player_handler.battle_running
+		and player_handler.player_actions_enabled
+		and _discover_request == null
+		and not get_tree().paused
+	)
+	end_turn_button.disabled = not can_end_turn
 
 
 # 无牌可打（费用不够或手牌空）时结束回合按钮呼吸发亮，提示玩家该收手了。

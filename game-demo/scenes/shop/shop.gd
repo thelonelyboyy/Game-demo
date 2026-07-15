@@ -355,8 +355,11 @@ func _apply_shop_visuals() -> void:
 	shopkeeper.hide()
 
 	title.text = "坊市"
-	title.offset_top = -460.0
-	title.offset_bottom = -392.0
+	title.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	title.offset_left = -120.0
+	title.offset_top = 32.0
+	title.offset_right = 120.0
+	title.offset_bottom = 100.0
 	InkTheme.apply_screen_title(title, 56)
 
 	_add_subtitle()
@@ -394,11 +397,12 @@ func _add_subtitle() -> void:
 	subtitle.text = "灵石可换符牌法宝，也可请掌柜净化一张旧牌。"
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	subtitle.set_anchors_preset(Control.PRESET_CENTER)
+	# 固定锚到屏幕上沿并留出安全边距，避免较矮分辨率下说明文字顶到窗口外。
+	subtitle.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	subtitle.offset_left = -440.0
-	subtitle.offset_top = -384.0
+	subtitle.offset_top = 108.0
 	subtitle.offset_right = 440.0
-	subtitle.offset_bottom = -342.0
+	subtitle.offset_bottom = 150.0
 	InkTheme.apply_subtitle(subtitle, 23)
 	ui_layer.add_child(subtitle)
 

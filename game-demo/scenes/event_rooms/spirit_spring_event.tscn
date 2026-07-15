@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/spirit_spring.png" id="3_image"]
 
 [node name="spirit_spring_event" type="Control"]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "灵泉"
 event_body = "岩缝间涌出清泉，灵气温润。"
+event_illustration = ExtResource("3_image")
 choice_texts = PackedStringArray("饮泉：回复 18 生命", "炼体：失去 6 生命，生命上限 +3", "装满水囊：获得 30 灵石")
 choice_effects = PackedStringArray("heal", "damage:6|max_hp:3", "gain_gold")
 choice_amounts = PackedInt32Array(18, 0, 30)

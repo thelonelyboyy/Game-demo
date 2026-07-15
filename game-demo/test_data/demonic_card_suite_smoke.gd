@@ -433,6 +433,13 @@ func _check_myriad_marks(battle: Battle, enemies: Array[Enemy]) -> void:
 
 
 func _check_pile_tutors(battle: Battle, enemy: Enemy) -> void:
+	var battle_ui_listener := Callable(battle.battle_ui, "_on_card_discovery_requested")
+	var restore_battle_ui_listener := Events.card_discovery_requested.is_connected(battle_ui_listener)
+	if restore_battle_ui_listener:
+		Events.card_discovery_requested.disconnect(battle_ui_listener)
+	if not Events.card_discovery_requested.is_connected(_auto_resolve_pile_selection):
+		Events.card_discovery_requested.connect(_auto_resolve_pile_selection)
+
 	var character := battle.player_handler.character
 	character.draw_pile.clear()
 	character.draw_pile.add_card((load(STRIKE_PATH) as Card).duplicate(true) as Card)
@@ -440,10 +447,10 @@ func _check_pile_tutors(battle: Battle, enemy: Enemy) -> void:
 	character.draw_pile.add_card((load(BLOOD_WARD_PATH) as Card).duplicate(true) as Card)
 	var hand_before := battle.battle_ui.hand.get_child_count()
 	var shadow_step := (load(SHADOW_STEP_PATH) as Card).duplicate(true) as CultivationCard
-	shadow_step.apply_effects([battle.player], battle.player.modifier_handler)
+	await shadow_step.apply_keyword_effects([battle.player])
 	await get_tree().process_frame
-	_check(battle.battle_ui.hand.get_child_count() == hand_before + 2, "shadow step tutors two skills into hand")
-	_check(character.draw_pile.cards.size() == 1 and character.draw_pile.cards[0].type == Card.Type.ATTACK, "shadow step leaves nonmatching attacks in draw pile")
+	_check(battle.battle_ui.hand.get_child_count() == hand_before + 2, "shadow step opens the draw pile and selects two cards")
+	_check(character.draw_pile.cards.size() == 1, "shadow step leaves unselected cards in the draw pile")
 
 	character.discard.clear()
 	character.discard.add_card((load(DEFEND_PATH) as Card).duplicate(true) as Card)
@@ -456,10 +463,11 @@ func _check_pile_tutors(battle: Battle, enemy: Enemy) -> void:
 	hand_before = battle.battle_ui.hand.get_child_count()
 	var renewal := (load(SOUL_LAMP_RENEWAL_PATH) as Card).duplicate(true) as CultivationCard
 	renewal.apply_effects([enemy], battle.player.modifier_handler)
+	await renewal.apply_keyword_effects([battle.player])
 	await get_tree().process_frame
-	_check(battle.battle_ui.hand.get_child_count() == hand_before + 1, "soul lamp renewal returns one skill to hand")
-	_check(not character.discard.cards.has(recent_skill), "soul lamp renewal takes the most recent matching discard")
-	_check(character.discard.cards.size() == 2, "soul lamp renewal leaves older and nonmatching discards")
+	_check(battle.battle_ui.hand.get_child_count() == hand_before + 1, "soul lamp renewal opens the discard pile and selects one card")
+	_check(not character.discard.cards.has(recent_skill), "soul lamp renewal can select the most recent discard")
+	_check(character.discard.cards.size() == 2, "soul lamp renewal leaves unselected discards")
 
 	character.exhaust_pile.clear()
 	var older_exhaust := (load(STRIKE_PATH) as Card).duplicate(true) as Card
@@ -473,12 +481,25 @@ func _check_pile_tutors(battle: Battle, enemy: Enemy) -> void:
 	var health_before := maxi(battle.player.stats.max_health - 12, 1)
 	battle.player.stats.health = health_before
 	rebirth.apply_effects([battle.player], battle.player.modifier_handler)
+	await rebirth.apply_keyword_effects([battle.player])
 	await get_tree().process_frame
 	_check(battle.battle_ui.hand.get_child_count() == hand_before + 1, "flesh rebirth retrieves one exhausted card")
 	_check(not character.exhaust_pile.cards.has(recent_exhaust), "flesh rebirth retrieves the most recent prior exhaust")
 	_check(character.exhaust_pile.cards.has(rebirth), "flesh rebirth excludes itself from exhaust retrieval")
 	_check(character.exhaust_pile.cards.has(older_exhaust), "flesh rebirth leaves older exhausted cards in place")
 	_check(battle.player.stats.health == mini(health_before + 8, battle.player.stats.max_health), "flesh rebirth still heals for eight")
+
+	if Events.card_discovery_requested.is_connected(_auto_resolve_pile_selection):
+		Events.card_discovery_requested.disconnect(_auto_resolve_pile_selection)
+	if restore_battle_ui_listener and is_instance_valid(battle.battle_ui):
+		Events.card_discovery_requested.connect(battle_ui_listener)
+
+
+func _auto_resolve_pile_selection(request: CardDiscoveryRequest) -> void:
+	var selected: Array[Card] = []
+	for index in range(mini(request.picks, request.choices.size())):
+		selected.append(request.choices[index])
+	request.resolve(selected)
 
 
 func _check_exhaust_guard_engine(battle: Battle) -> void:

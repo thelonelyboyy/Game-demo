@@ -332,7 +332,7 @@ func _check_hero_skill_growth() -> void:
 func _check_hand_size_limit() -> void:
 	var full_hand := Hand.new()
 	for _i in Hand.MAX_HAND_SIZE:
-		full_hand.add_child(Node.new())
+		full_hand.add_child(CardUI.new())
 	_check(full_hand.is_full() and full_hand.available_slots() == 0, "hand caps at ten cards")
 
 	var handler := PlayerHandler.new()

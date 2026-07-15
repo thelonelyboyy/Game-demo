@@ -8,6 +8,8 @@ enum UpgradeType {NONE, STAT_BOOST, COST_REDUCTION}
 enum Element {NONE, METAL, WOOD, WATER, FIRE, EARTH}
 enum Profession {COMMON, BODY, SWORD, DEMONIC, BEASTMASTER}
 enum LifecycleTrigger {PLAYED, DISCARDED, EXHAUSTED, DRAWN, TURN_ENDED_IN_HAND}
+enum PlayDestination {REMOVE, EXHAUST, DRAW_TOP, DISCARD, NONE}
+enum EndTurnDestination {REMOVE, EXHAUST, RETAIN, DISCARD}
 
 const RARITY_COLORS := {
 	Card.Rarity.COMMON: Color("e8e1cc"),
@@ -46,7 +48,9 @@ const TEMPORARY_MECHANIC_TAG := "临时"
 const CONSUMABLE_MECHANIC_TAG := "消耗"
 const RETAIN_MECHANIC_TAG := "保留"
 const INNATE_MECHANIC_TAG := "固有"
+const ETERNAL_MECHANIC_TAG := "永恒"
 const ETHEREAL_MECHANIC_TAG := "虚无"
+const CYCLIC_MECHANIC_TAG := "周天"
 const UNPLAYABLE_MECHANIC_TAG := "不可打出"
 const STATUS_MECHANIC_TAG := "状态"
 const CURSE_MECHANIC_TAG := "诅咒"
@@ -59,7 +63,9 @@ const TEMPORARY_MECHANIC_TAGS := [TEMPORARY_MECHANIC_TAG, "临时牌", "temporar
 const CONSUMABLE_MECHANIC_TAGS := [CONSUMABLE_MECHANIC_TAG, "消耗牌", "exhaust", "exhausts", "consume"]
 const RETAIN_MECHANIC_TAGS := [RETAIN_MECHANIC_TAG, "保留牌", "retain", "retained"]
 const INNATE_MECHANIC_TAGS := [INNATE_MECHANIC_TAG, "固有牌", "innate"]
+const ETERNAL_MECHANIC_TAGS := [ETERNAL_MECHANIC_TAG, "永恒牌", "eternal"]
 const ETHEREAL_MECHANIC_TAGS := [ETHEREAL_MECHANIC_TAG, "虚无牌", "ethereal"]
+const CYCLIC_MECHANIC_TAGS := [CYCLIC_MECHANIC_TAG, "循环", "循环牌", "cyclic"]
 const UNPLAYABLE_MECHANIC_TAGS := [UNPLAYABLE_MECHANIC_TAG, "不能打出", "无法打出", "unplayable"]
 const STATUS_MECHANIC_TAGS := [STATUS_MECHANIC_TAG, "状态牌", "status"]
 const CURSE_MECHANIC_TAGS := [CURSE_MECHANIC_TAG, "诅咒牌", "curse", "cursed"]
@@ -78,6 +84,18 @@ const PLAYABLE_MECHANIC_TAGS := ["可打出", "可使用", "playable"]
 @export var target: Target
 @export var cost: int
 @export var exhausts: bool = false
+@export var retains: bool = false
+@export var innate: bool = false
+@export var eternal: bool = false
+@export var ethereal: bool = false
+@export var temporary_keyword: bool = false
+@export var cyclic: bool = false
+@export var unplayable: bool = false
+@export var status_card: bool = false
+@export var curse_card: bool = false
+@export_range(0, 10) var search_count := 0
+@export_range(0, 10) var retrieve_count := 0
+@export_range(0, 10) var reclaim_count := 0
 @export var upgrade_type: UpgradeType = UpgradeType.NONE
 @export var upgraded := false
 @export var element: Element = Element.NONE
@@ -123,16 +141,21 @@ func _get_targets(targets: Array[Node]) -> Array[Node]:
 
 
 func play(targets: Array[Node], char_stats: CharacterStats, modifiers: ModifierHandler) -> void:
-	Events.card_played.emit(self)
 	last_x_paid = 0
+	var resolved_targets := targets if is_single_targeted() else _get_targets(targets)
+	# 火灵根圆满选择必须先于出牌信号完成。攻击动画由 card_played 启动；
+	# 若先启动动画再等待玩家选择，动画结束信号会在下面开始 await 前丢失，
+	# 导致整张牌永远停在结算前。
+	var fire_choice = _create_spirit_root_fire_choice(resolved_targets, modifiers, char_stats)
+	if not fire_choice:
+		Events.card_played.emit(self)
+
 	var mana_cost := cost
 	if is_x_cost():
 		mana_cost = maxi(char_stats.mana, 0)
 		last_x_paid = mana_cost
 	char_stats.mana = maxi(char_stats.mana - mana_cost, 0)
 
-	var resolved_targets := targets if is_single_targeted() else _get_targets(targets)
-	var fire_choice = _create_spirit_root_fire_choice(resolved_targets, modifiers, char_stats)
 	if fire_choice:
 		Events.spirit_root_fire_choice_requested.emit(fire_choice)
 		if not fire_choice.resolved:
@@ -140,6 +163,7 @@ func play(targets: Array[Node], char_stats: CharacterStats, modifiers: ModifierH
 		if fire_choice.selected_choice != SPIRIT_ROOT_FIRE_CHOICE.CHOICE_NONE:
 			set_meta(META_SPIRIT_ROOT_FIRE_CHOICE, fire_choice.selected_choice)
 			set_meta(META_SPIRIT_ROOT_FIRE_CHOICE_USED, false)
+		Events.card_played.emit(self)
 
 	# Attack cards wait for the player's attack animation to finish before
 	# dealing damage, so the hit lands at the end of the swing. The player
@@ -148,12 +172,52 @@ func play(targets: Array[Node], char_stats: CharacterStats, modifiers: ModifierH
 		await Events.attack_animation_finished
 
 	apply_effects(resolved_targets, modifiers)
+	await apply_keyword_effects(resolved_targets)
 	handle_lifecycle_trigger(LifecycleTrigger.PLAYED, resolved_targets, modifiers)
 	_clear_spirit_root_fire_choice()
 
 
 func apply_effects(_targets: Array[Node], _modifiers: ModifierHandler) -> void:
 	pass
+
+
+func apply_keyword_effects(targets: Array[Node]) -> void:
+	if search_count <= 0 and retrieve_count <= 0 and reclaim_count <= 0:
+		return
+	var tree := _get_keyword_tree(targets)
+	var player_handler := tree.get_first_node_in_group("player_handler") as PlayerHandler if tree else null
+	if not player_handler:
+		return
+	if search_count > 0:
+		await player_handler.choose_cards_from_pile(
+			ConfiguredPileTutorEffect.SourcePile.DRAW_PILE,
+			search_count,
+			self,
+			"检索",
+			"从抽牌堆选择 %s 张牌加入手牌。" % search_count
+		)
+	if retrieve_count > 0:
+		await player_handler.choose_cards_from_pile(
+			ConfiguredPileTutorEffect.SourcePile.DISCARD_PILE,
+			retrieve_count,
+			self,
+			"取回",
+			"从弃牌堆选择 %s 张牌加入手牌。" % retrieve_count
+		)
+	if reclaim_count > 0:
+		await player_handler.choose_cards_from_pile(
+			ConfiguredPileTutorEffect.SourcePile.EXHAUST_PILE,
+			reclaim_count,
+			self,
+			"归墟",
+			"从消耗堆选择 %s 张牌加入手牌。" % reclaim_count
+		)
+
+
+func _get_keyword_tree(targets: Array[Node]) -> SceneTree:
+	if not targets.is_empty() and targets[0]:
+		return targets[0].get_tree()
+	return Engine.get_main_loop() as SceneTree
 
 
 func get_display_name() -> String:
@@ -214,7 +278,7 @@ func get_updated_tooltip(_player_modifiers: ModifierHandler, _enemy_modifiers: M
 
 
 func is_temporary_card() -> bool:
-	return temporary or has_any_mechanic_tag(TEMPORARY_MECHANIC_TAGS)
+	return temporary or temporary_keyword or has_any_mechanic_tag(TEMPORARY_MECHANIC_TAGS)
 
 
 func is_consumable_card() -> bool:
@@ -222,27 +286,35 @@ func is_consumable_card() -> bool:
 
 
 func is_retained_card() -> bool:
-	return has_any_mechanic_tag(RETAIN_MECHANIC_TAGS)
+	return retains or has_any_mechanic_tag(RETAIN_MECHANIC_TAGS)
 
 
 func is_innate_card() -> bool:
-	return has_any_mechanic_tag(INNATE_MECHANIC_TAGS)
+	return innate or has_any_mechanic_tag(INNATE_MECHANIC_TAGS)
+
+
+func is_eternal_card() -> bool:
+	return eternal or has_any_mechanic_tag(ETERNAL_MECHANIC_TAGS)
 
 
 func is_ethereal_card() -> bool:
-	return has_any_mechanic_tag(ETHEREAL_MECHANIC_TAGS)
+	return ethereal or has_any_mechanic_tag(ETHEREAL_MECHANIC_TAGS)
+
+
+func is_cyclic_card() -> bool:
+	return cyclic or has_any_mechanic_tag(CYCLIC_MECHANIC_TAGS)
 
 
 func is_unplayable_card() -> bool:
-	return has_any_mechanic_tag(UNPLAYABLE_MECHANIC_TAGS)
+	return unplayable or has_any_mechanic_tag(UNPLAYABLE_MECHANIC_TAGS)
 
 
 func is_status_card() -> bool:
-	return has_any_mechanic_tag(STATUS_MECHANIC_TAGS)
+	return status_card or has_any_mechanic_tag(STATUS_MECHANIC_TAGS)
 
 
 func is_curse_card() -> bool:
-	return has_any_mechanic_tag(CURSE_MECHANIC_TAGS)
+	return curse_card or has_any_mechanic_tag(CURSE_MECHANIC_TAGS)
 
 
 func has_discard_trigger() -> bool:
@@ -266,9 +338,87 @@ func has_end_turn_trigger() -> bool:
 
 
 func blocks_manual_play() -> bool:
-	if is_unplayable_card():
+	if is_eternal_card() or is_unplayable_card():
 		return true
 	return (is_status_card() or is_curse_card()) and not has_any_mechanic_tag(PLAYABLE_MECHANIC_TAGS)
+
+
+func can_be_removed_from_deck() -> bool:
+	return not is_eternal_card()
+
+
+func can_be_transformed() -> bool:
+	return not is_eternal_card()
+
+
+func can_be_fused() -> bool:
+	return not is_eternal_card()
+
+
+func get_keyword_labels() -> PackedStringArray:
+	var labels := PackedStringArray()
+	if is_consumable_card():
+		labels.append("消耗")
+	if is_retained_card():
+		labels.append("保留")
+	if is_innate_card():
+		labels.append("固有")
+	if search_count > 0:
+		labels.append("检索%s" % search_count)
+	if retrieve_count > 0:
+		labels.append("取回%s" % retrieve_count)
+	if reclaim_count > 0:
+		labels.append("归墟%s" % reclaim_count)
+	if is_eternal_card():
+		labels.append("永恒")
+	if is_ethereal_card():
+		labels.append("虚无")
+	if is_temporary_card():
+		labels.append("临时")
+	if is_cyclic_card():
+		labels.append("周天")
+	if is_unplayable_card():
+		labels.append("不可打出")
+	if is_status_card():
+		labels.append("状态牌")
+	if is_curse_card():
+		labels.append("诅咒牌")
+	return labels
+
+
+func get_play_destination() -> PlayDestination:
+	if is_temporary_card():
+		return PlayDestination.REMOVE
+	if is_consumable_card():
+		return PlayDestination.EXHAUST
+	if type == Type.POWER:
+		return PlayDestination.NONE
+	if is_cyclic_card():
+		return PlayDestination.DRAW_TOP
+	return PlayDestination.DISCARD
+
+
+func get_end_turn_destination() -> EndTurnDestination:
+	if is_temporary_card():
+		return EndTurnDestination.REMOVE
+	if is_ethereal_card():
+		return EndTurnDestination.EXHAUST
+	if is_retained_card():
+		return EndTurnDestination.RETAIN
+	return EndTurnDestination.DISCARD
+
+
+func get_keyword_conflict_notes() -> PackedStringArray:
+	var notes := PackedStringArray()
+	if is_temporary_card() and (is_consumable_card() or is_cyclic_card() or is_retained_card() or is_ethereal_card()):
+		notes.append("临时优先：打出或回合结束时直接移除。")
+	elif is_consumable_card() and is_cyclic_card():
+		notes.append("消耗优先：打出后进入消耗堆，不触发周天。")
+	if is_ethereal_card() and is_retained_card() and not is_temporary_card():
+		notes.append("虚无优先：回合结束时进入消耗堆，不会保留。")
+	if is_eternal_card():
+		notes.append("永恒优先：不可打出，也不能被移除、变化或合炼。")
+	return notes
 
 
 func handle_lifecycle_trigger(_trigger: LifecycleTrigger, _targets: Array[Node], _modifiers: ModifierHandler) -> void:
@@ -316,12 +466,22 @@ func with_runtime_tooltip(text: String) -> String:
 		runtime_notes.append("保留：回合结束时不会弃置，留到下回合。")
 	if is_innate_card():
 		runtime_notes.append("固有：战斗开始时优先进入起手。")
+	if search_count > 0:
+		runtime_notes.append("检索%s：打出时打开抽牌堆，选择 %s 张牌加入手牌。" % [search_count, search_count])
+	if retrieve_count > 0:
+		runtime_notes.append("取回%s：打出时打开弃牌堆，选择 %s 张牌加入手牌。" % [retrieve_count, retrieve_count])
+	if reclaim_count > 0:
+		runtime_notes.append("归墟%s：打出时打开消耗堆，选择 %s 张牌加入手牌。" % [reclaim_count, reclaim_count])
+	if is_eternal_card():
+		runtime_notes.append("永恒：不可打出，不能从牌组中移除、变化或合炼。")
 	if is_temporary_card():
 		runtime_notes.append("临时：打出后移除；回合结束留在手牌也会移除，不进入抽牌堆或弃牌堆。")
 	if is_consumable_card():
-		runtime_notes.append("消耗：打出后移除，不进入抽牌堆或弃牌堆；未打出时正常弃置。")
+		runtime_notes.append("消耗：打出后进入消耗堆；未打出时正常弃置。")
 	if is_ethereal_card():
-		runtime_notes.append("虚无：回合结束若仍在手牌中，则移除。")
+		runtime_notes.append("虚无：回合结束若仍在手牌中，则进入消耗堆。")
+	if is_cyclic_card():
+		runtime_notes.append("周天：打出后置于抽牌堆顶，不进入弃牌堆。")
 	if blocks_manual_play():
 		runtime_notes.append("不可打出：不能主动使用这张牌。")
 	if is_status_card():
@@ -338,6 +498,8 @@ func with_runtime_tooltip(text: String) -> String:
 		runtime_notes.append("抽牌触发：从抽牌堆进入手牌时触发额外效果。")
 	if has_end_turn_trigger():
 		runtime_notes.append("滞留触发：回合结束时若仍在手牌中，先触发额外效果再结算弃牌、保留或消耗。")
+	for conflict_note: String in get_keyword_conflict_notes():
+		runtime_notes.append("规则优先级：%s" % conflict_note)
 
 	if runtime_notes.is_empty():
 		return text

@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/silent_dojo.png" id="3_image"]
 
 [node name="silent_dojo_event" type="Control"]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "无声道场"
 event_body = "空旷道场里摆着蒲团，似乎仍有人讲法。"
+event_illustration = ExtResource("3_image")
 choice_texts = PackedStringArray("坐下听法：随机突破一张牌", "调息：回复 22 生命", "继续赶路")
 choice_effects = PackedStringArray("upgrade_random", "heal", "skip")
 choice_amounts = PackedInt32Array(0, 22, 0)

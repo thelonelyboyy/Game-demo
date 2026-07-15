@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/demonic_whisper.png" id="3_image"]
 
 [node name="demonic_whisper_event" type="Control"]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "魔念低语"
 event_body = "耳边的低语许诺力量，也索要代价。"
+event_illustration = ExtResource("3_image")
 choice_texts = PackedStringArray("接受：生命上限 +6，失去 13 生命", "以剑斩念：随机突破一张牌", "静心离开")
 choice_effects = PackedStringArray("max_hp:6|damage:13", "upgrade_random", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)

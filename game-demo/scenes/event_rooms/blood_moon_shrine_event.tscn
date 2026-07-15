@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/blood_moon_shrine.png" id="3_image"]
 
 [node name="blood_moon_shrine_event" type="Control"]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "血月小庙"
 event_body = "庙中供奉的神像在血月下睁开一只眼。"
+event_illustration = ExtResource("3_image")
 choice_texts = PackedStringArray("献祭：失去 14 生命，生命上限 +7", "偷香火钱：获得 110 灵石", "退出庙门")
 choice_effects = PackedStringArray("damage:14|max_hp:7", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 110, 0)

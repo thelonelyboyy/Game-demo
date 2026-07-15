@@ -36,6 +36,7 @@ websocket_server.gd.backup
 **/tmp_*/
 **/*backup*/
 /tmp/
+/outputs/
 # Python
 __pycache__/
 *.pyc

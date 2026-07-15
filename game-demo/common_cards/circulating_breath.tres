@@ -21,6 +21,7 @@ configured_effects = Array[Resource]([SubResource("Block"), SubResource("Draw")]
 id = "circulating_breath"
 type = 1
 cost = 1
+cyclic = true
 upgrade_type = 1
 mechanic_tags = PackedStringArray("通用", "过牌")
 display_name = "周天吐纳"

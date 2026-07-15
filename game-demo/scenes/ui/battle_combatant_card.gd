@@ -45,6 +45,11 @@ var _shown_health_ratio := 1.0
 var _shown_block_ratio := 0.0
 var _health_bar_tween: Tween
 var _block_bar_tween: Tween
+var _bar_sequence_tween: Tween
+var _bar_animation_queue: Array[Dictionary] = []
+var _displayed_health := -1
+var _displayed_max_health := -1
+var _displayed_block := -1
 var _status_signature := ""
 var _last_intent_text := ""
 var _intent_pop_tween: Tween
@@ -92,9 +97,15 @@ func bind_enemy(enemy: Enemy) -> void:
 
 
 func _reset_animation_tracking() -> void:
+	if _bar_sequence_tween and _bar_sequence_tween.is_running():
+		_bar_sequence_tween.kill()
+	_bar_animation_queue.clear()
 	_last_health = -1
 	_last_max_health = -1
 	_last_block = -1
+	_displayed_health = -1
+	_displayed_max_health = -1
+	_displayed_block = -1
 	_status_signature = ""
 	_last_intent_text = ""
 	_last_sha_stacks = -1
@@ -340,26 +351,64 @@ func set_aura_tint(color: Color) -> void:
 func _refresh_bars() -> void:
 	var ratio := clampf(float(stats.health) / float(maxi(stats.max_health, 1)), 0.0, 1.0)
 	var block_ratio := clampf(float(stats.block) / float(maxi(stats.max_health, 1)), 0.0, 1.0)
-	_health_label.text = "%s/%s" % [stats.health, stats.max_health]
-	_block_label.text = "护 %s" % stats.block
 	_block_label.visible = true
 
 	if _last_health < 0:
+		_health_label.text = "%s/%s" % [stats.health, stats.max_health]
+		_block_label.text = "护 %s" % stats.block
 		_set_bar_ratio(ratio, true)
 		_set_bar_ratio(block_ratio, false)
+		_displayed_health = stats.health
+		_displayed_max_health = stats.max_health
+		_displayed_block = stats.block
 	else:
-		if stats.health != _last_health or stats.max_health != _last_max_health:
-			_animate_bar_to(true, ratio)
-			_flash_fill(_health_fill, stats.health < _last_health)
-			_punch_label(_health_label)
-		if stats.block != _last_block:
-			_animate_bar_to(false, block_ratio)
-			_flash_fill(_block_fill, stats.block > _last_block)
-			_punch_label(_block_label)
+		if stats.health != _last_health or stats.max_health != _last_max_health or stats.block != _last_block:
+			_bar_animation_queue.append({
+				"health": stats.health,
+				"max_health": stats.max_health,
+				"block": stats.block,
+			})
+			_start_next_bar_animation()
 
 	_last_health = stats.health
 	_last_max_health = stats.max_health
 	_last_block = stats.block
+
+
+func _start_next_bar_animation() -> void:
+	if (_bar_sequence_tween and _bar_sequence_tween.is_running()) or _bar_animation_queue.is_empty():
+		return
+	var snapshot: Dictionary = _bar_animation_queue.pop_front()
+	var next_health := int(snapshot["health"])
+	var next_max_health := int(snapshot["max_health"])
+	var next_block := int(snapshot["block"])
+	var health_changed := next_health != _displayed_health or next_max_health != _displayed_max_health
+	var block_changed := next_block != _displayed_block or next_max_health != _displayed_max_health
+
+	_health_label.text = "%s/%s" % [next_health, next_max_health]
+	_block_label.text = "护 %s" % next_block
+	if health_changed:
+		var health_ratio := clampf(float(next_health) / float(maxi(next_max_health, 1)), 0.0, 1.0)
+		_animate_bar_to(true, health_ratio)
+		_flash_fill(_health_fill, next_health < _displayed_health)
+		_punch_label(_health_label)
+	if block_changed:
+		var block_ratio := clampf(float(next_block) / float(maxi(next_max_health, 1)), 0.0, 1.0)
+		_animate_bar_to(false, block_ratio)
+		_flash_fill(_block_fill, next_block > _displayed_block)
+		_punch_label(_block_label)
+
+	_displayed_health = next_health
+	_displayed_max_health = next_max_health
+	_displayed_block = next_block
+	_bar_sequence_tween = create_tween()
+	_bar_sequence_tween.tween_interval(0.34)
+	_bar_sequence_tween.tween_callback(_on_bar_animation_stage_finished)
+
+
+func _on_bar_animation_stage_finished() -> void:
+	_bar_sequence_tween = null
+	_start_next_bar_animation()
 
 
 func _animate_bar_to(is_health: bool, target_ratio: float) -> void:

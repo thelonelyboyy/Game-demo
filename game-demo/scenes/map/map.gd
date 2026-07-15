@@ -6,10 +6,16 @@ const SCROLL_SPEED := 15
 # 卷轴按 20 层节点的高度绘制，FLOORS 拉到 20 以内都放得下。
 const SCROLL_FLOOR_CAPACITY := 20
 const SCROLL_SIDE_PADDING := 74.0
-const SCROLL_VERTICAL_PADDING := 64.0
+# 卷轴上下留白以楼层间距为单位，修改 Y_DIST 时卷轴会同比例增减。
+const SCROLL_VERTICAL_PADDING_FLOORS := 1.6
+# 顶部需要额外覆盖顶栏安全位；只向上延长，不改变节点层距和卷轴底部位置。
+const SCROLL_TOP_EXTRA_PADDING_FLOORS := 0.8
 const SCROLL_VIEWPORT_WIDTH_RATIO := 1.02
 const TOOLTIP_MARGIN := 24.0
 const TOOLTIP_TOP_SAFE_Y := 92.0
+# 最高节点中心的屏幕安全线。节点在 3.35 倍缩放下点击半径约 74px，
+# 该值可让整个点击圈落在约 208px 高的运行顶栏下方。
+const TOP_ROOM_SAFE_CENTER_Y := 296.0
 const MAP_ROOM = preload("res://scenes/map/map_room.tscn")
 const MAP_LINE = preload("res://scenes/map/map_line.tscn")
 
@@ -37,6 +43,8 @@ var tooltip_target: MapRoom
 var focused_map_room: MapRoom
 var player_marker: PlayerMarker
 var legend_panel: PanelContainer
+var legend_rows: Dictionary = {}
+var _legend_highlighted_type := Room.Type.NOT_ASSIGNED
 # 平滑滚动：滚轮改目标值，_process 里插值逼近
 var _scroll_target_y := 0.0
 # 可选路径连线脉冲
@@ -45,6 +53,8 @@ var _pulse_time := 0.0
 # 顶部章节/层数进度
 var progress_panel: PanelContainer
 var progress_label: Label
+var progress_chapter_label: Label
+var progress_remaining_label: Label
 
 
 # 「当前位置」标记：金色脉冲光环，落在最后走过的节点上；选新节点时滑过去。
@@ -103,7 +113,10 @@ func _process(delta: float) -> void:
 		var map_room := child as MapRoom
 		if not map_room or not map_room.room:
 			continue
-		if map_room.available:
+		if map_room.legend_highlighted:
+			# 图例筛选优先于不可达支线的整体变暗，保证红圈始终足够醒目。
+			map_room.modulate = Color.WHITE
+		elif map_room.available:
 			var glow := 1.0 + 0.14 * pulse
 			map_room.modulate = Color(glow, glow, glow * 0.97, 1.0)
 		elif not map_room.room.selected and map_room.room.row < floors_climbed:
@@ -164,6 +177,7 @@ func load_map(map: Array[Array], floors_completed: int, last_room_climbed: Room)
 
 
 func create_map() -> void:
+	_reflow_room_vertical_positions()
 	_clear_map_visuals()
 
 	for current_floor: Array in map_data:
@@ -183,6 +197,24 @@ func create_map() -> void:
 	_animate_map_entrance()
 	_update_progress_label()
 	_sync_map_overlay_visibility()
+
+
+# Room.position 会随存档持久化。层距常量更新后，旧存档仍保留旧 Y 坐标，
+# 因而出现“卷轴变高但节点没拉开”的错位。每次建图都按当前层距重排，且保持 X 抖动不变。
+func _reflow_room_vertical_positions() -> void:
+	if map_data.is_empty():
+		return
+
+	var last_row := map_data.size() - 1
+	for row: Array in map_data:
+		for room: Room in row:
+			if not room:
+				continue
+			var visual_row := room.row
+			# 生成器会把 Boss 放在末层之外的额外一个纵向槽位，继续保留这段终战间隔。
+			if room.type == Room.Type.BOSS and room.row == last_row:
+				visual_row += 1
+			room.position.y = MapGenerator.get_row_y(visual_row)
 
 
 # 开图演出：节点自下而上按层错落浮现，连线整体淡入。
@@ -289,6 +321,7 @@ func hide_map() -> void:
 	camera_2d.enabled = false
 	_hide_tooltip()
 	_set_focused_map_room(null)
+	_clear_legend_room_highlight()
 	_sync_map_overlay_visibility()
 
 
@@ -299,32 +332,78 @@ func _sync_map_overlay_visibility() -> void:
 		legend_panel.visible = visible
 
 
-# 顶部「第X章 · 已登 Y / Z 层」进度牌（挂在 tooltip 同一 CanvasLayer，随地图显隐）。
+# 左侧登仙进度牌，与右侧图例共用现有暗金九宫格素材。
 func _create_progress_panel() -> void:
 	progress_panel = PanelContainer.new()
 	progress_panel.name = "MapProgressPanel"
 	progress_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	progress_panel.add_theme_stylebox_override("panel", _make_tooltip_style())
-	progress_panel.anchor_left = 0.5
-	progress_panel.anchor_right = 0.5
-	progress_panel.offset_left = -130.0
-	progress_panel.offset_right = 130.0
-	progress_panel.offset_top = 100.0
-	progress_panel.offset_bottom = 142.0
+	# SIDE_PANEL 原图四周带约 42~49px 的透明装饰留白。面板过窄时，
+	# 文字虽在 Control 内，却会跑到肉眼可见的金色边框外；加宽并按可见边框留边。
+	progress_panel.custom_minimum_size = Vector2(260, 300)
+	progress_panel.anchor_left = 0.0
+	progress_panel.anchor_right = 0.0
+	progress_panel.anchor_top = 0.60
+	progress_panel.anchor_bottom = 0.60
+	progress_panel.offset_left = 24.0
+	progress_panel.offset_right = 284.0
+	progress_panel.offset_top = -234.0
+	progress_panel.offset_bottom = 66.0
+	progress_panel.add_theme_stylebox_override("panel", _make_map_side_panel_style())
 	progress_panel.hide()
 	tooltip_layer.add_child(progress_panel)
+
+	var margin := MarginContainer.new()
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_theme_constant_override("margin_left", 4)
+	margin.add_theme_constant_override("margin_top", 4)
+	margin.add_theme_constant_override("margin_right", 4)
+	margin.add_theme_constant_override("margin_bottom", 4)
+	progress_panel.add_child(margin)
+
+	var content := VBoxContainer.new()
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_theme_constant_override("separation", 8)
+	margin.add_child(content)
+	content.add_child(_make_map_panel_title("登仙路"))
+
+	progress_chapter_label = Label.new()
+	progress_chapter_label.name = "ChapterLabel"
+	progress_chapter_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_chapter_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	progress_chapter_label.add_theme_font_size_override("font_size", 24)
+	progress_chapter_label.add_theme_color_override("font_color", Color("f8df9b"))
+	progress_chapter_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.90))
+	progress_chapter_label.add_theme_constant_override("shadow_offset_x", 2)
+	progress_chapter_label.add_theme_constant_override("shadow_offset_y", 2)
+	content.add_child(progress_chapter_label)
+
+	var caption := Label.new()
+	caption.text = "当前进度"
+	caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	caption.add_theme_font_size_override("font_size", 14)
+	caption.add_theme_color_override("font_color", Color("a99a80"))
+	content.add_child(caption)
 
 	progress_label = Label.new()
 	progress_label.name = "ProgressLabel"
 	progress_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	progress_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	progress_label.add_theme_font_size_override("font_size", 21)
-	progress_label.add_theme_color_override("font_color", Color("f2dfae"))
+	progress_label.add_theme_font_size_override("font_size", 30)
+	progress_label.add_theme_color_override("font_color", Color("fff0c2"))
 	progress_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
 	progress_label.add_theme_constant_override("shadow_offset_x", 2)
 	progress_label.add_theme_constant_override("shadow_offset_y", 2)
-	progress_panel.add_child(progress_label)
+	content.add_child(progress_label)
+
+	progress_remaining_label = Label.new()
+	progress_remaining_label.name = "RemainingLabel"
+	progress_remaining_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_remaining_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	progress_remaining_label.add_theme_font_size_override("font_size", 13)
+	progress_remaining_label.add_theme_color_override("font_color", Color("c4ad82"))
+	content.add_child(progress_remaining_label)
 
 
 func _update_progress_label() -> void:
@@ -333,50 +412,43 @@ func _update_progress_label() -> void:
 
 	var chapter_names := ["一", "二", "三"]
 	var chapter: int = clampi(map_generator.current_chapter, 1, chapter_names.size())
-	progress_label.text = "第%s章 · 已登 %d / %d 层" % [
-		chapter_names[chapter - 1],
-		clampi(floors_climbed, 0, get_floor_count()),
-		get_floor_count(),
-	]
+	var current_floor := clampi(floors_climbed, 0, get_floor_count())
+	var floor_count := get_floor_count()
+	progress_chapter_label.text = "第%s章" % chapter_names[chapter - 1]
+	progress_label.text = "%d / %d 层" % [current_floor, floor_count]
+	progress_remaining_label.text = "距本章终点 %d 层" % maxi(floor_count - current_floor, 0)
 
 
 func _create_legend_panel() -> void:
 	legend_panel = PanelContainer.new()
 	legend_panel.name = "MapLegend"
-	legend_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	legend_panel.custom_minimum_size = Vector2(184, 278)
+	legend_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	legend_panel.custom_minimum_size = Vector2(260, 520)
 	legend_panel.anchor_left = 1.0
 	legend_panel.anchor_right = 1.0
-	legend_panel.anchor_top = 0.5
-	legend_panel.anchor_bottom = 0.5
-	legend_panel.offset_left = -214.0
+	legend_panel.anchor_top = 0.60
+	legend_panel.anchor_bottom = 0.60
+	legend_panel.offset_left = -284.0
 	legend_panel.offset_right = -24.0
-	legend_panel.offset_top = -142.0
-	legend_panel.offset_bottom = 142.0
-	legend_panel.add_theme_stylebox_override("panel", _make_tooltip_style())
+	legend_panel.offset_top = -260.0
+	legend_panel.offset_bottom = 260.0
+	legend_panel.add_theme_stylebox_override("panel", _make_map_side_panel_style())
 	legend_panel.hide()
 	tooltip_layer.add_child(legend_panel)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 12)
-	margin.add_theme_constant_override("margin_top", 10)
-	margin.add_theme_constant_override("margin_right", 12)
-	margin.add_theme_constant_override("margin_bottom", 10)
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_theme_constant_override("margin_left", 4)
+	margin.add_theme_constant_override("margin_top", 4)
+	margin.add_theme_constant_override("margin_right", 4)
+	margin.add_theme_constant_override("margin_bottom", 4)
 	legend_panel.add_child(margin)
 
 	var content := VBoxContainer.new()
 	content.add_theme_constant_override("separation", 7)
 	margin.add_child(content)
 
-	var title := Label.new()
-	title.text = "图例"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 20)
-	title.add_theme_color_override("font_color", Color("fff0c8"))
-	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.86))
-	title.add_theme_constant_override("shadow_offset_x", 2)
-	title.add_theme_constant_override("shadow_offset_y", 2)
-	content.add_child(title)
+	content.add_child(_make_map_panel_title("天路图例"))
 
 	var entries := [
 		[Room.Type.BLESSING, "赐福", "开局强化"],
@@ -389,16 +461,25 @@ func _create_legend_panel() -> void:
 		[Room.Type.BOSS, "首领", "章节终战"],
 	]
 	for entry in entries:
-		content.add_child(_make_legend_row(entry[0], entry[1], entry[2]))
+		var row := _make_legend_row(entry[0], entry[1], entry[2])
+		legend_rows[entry[0]] = row
+		content.add_child(row)
 
 
 func _make_legend_row(room_type: int, title: String, description: String) -> Control:
 	var row := HBoxContainer.new()
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.name = "LegendRow_%s" % room_type
+	row.mouse_filter = Control.MOUSE_FILTER_STOP
+	row.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.custom_minimum_size = Vector2(0, 35)
 	row.add_theme_constant_override("separation", 8)
+	row.set_meta("room_type", room_type)
+	row.mouse_entered.connect(_on_legend_row_mouse_entered.bind(room_type, row))
+	row.mouse_exited.connect(_on_legend_row_mouse_exited.bind(room_type, row))
 
 	var icon := TextureRect.new()
-	icon.custom_minimum_size = Vector2(24, 24)
+	icon.custom_minimum_size = Vector2(28, 28)
 	icon.texture = MapRoom.ICONS.get(room_type, MapRoom.ICONS[Room.Type.NOT_ASSIGNED])
 	icon.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -413,6 +494,7 @@ func _make_legend_row(room_type: int, title: String, description: String) -> Con
 
 	var title_label := Label.new()
 	title_label.text = title
+	title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	title_label.add_theme_font_size_override("font_size", 16)
 	title_label.add_theme_color_override("font_color", Color("f6dfaa"))
 	title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.78))
@@ -422,6 +504,7 @@ func _make_legend_row(room_type: int, title: String, description: String) -> Con
 
 	var desc_label := Label.new()
 	desc_label.text = description
+	desc_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	desc_label.add_theme_font_size_override("font_size", 12)
 	desc_label.add_theme_color_override("font_color", Color(0.77, 0.70, 0.58, 0.90))
 	desc_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.70))
@@ -430,6 +513,82 @@ func _make_legend_row(room_type: int, title: String, description: String) -> Con
 	text_box.add_child(desc_label)
 
 	return row
+
+
+func _on_legend_row_mouse_entered(room_type: int, row: Control) -> void:
+	if is_instance_valid(row):
+		row.modulate = Color(1.24, 0.84, 0.78, 1.0)
+	_set_legend_room_highlight(room_type)
+
+
+func _on_legend_row_mouse_exited(room_type: int, row: Control) -> void:
+	if is_instance_valid(row):
+		row.modulate = Color.WHITE
+	if _legend_highlighted_type == room_type:
+		_clear_legend_room_highlight()
+
+
+func _set_legend_room_highlight(room_type: int) -> void:
+	_legend_highlighted_type = room_type
+	for child: Node in rooms.get_children():
+		var map_room := child as MapRoom
+		if map_room and map_room.room:
+			map_room.set_legend_highlighted(map_room.room.type == room_type)
+
+
+func _clear_legend_room_highlight() -> void:
+	_legend_highlighted_type = Room.Type.NOT_ASSIGNED
+	for child: Node in rooms.get_children():
+		var map_room := child as MapRoom
+		if map_room:
+			map_room.set_legend_highlighted(false)
+	for row in legend_rows.values():
+		if is_instance_valid(row):
+			(row as Control).modulate = Color.WHITE
+
+
+func _make_map_side_panel_style() -> StyleBoxTexture:
+	var style := InkTheme.make_texture_style(
+		InkTheme.SIDE_PANEL,
+		48,
+		48,
+		Color(0.98, 0.90, 0.80, 0.98)
+	)
+	# 该素材的有效金框从原图约 x=42/y=49 才开始，内容边距必须跟随
+	# 可见边框，而不是沿用通用九宫格的 14/8，否则两侧文字会越框。
+	style.content_margin_left = 44
+	style.content_margin_top = 48
+	style.content_margin_right = 44
+	style.content_margin_bottom = 48
+	return style
+
+
+func _make_map_panel_title(text: String) -> PanelContainer:
+	var title_panel := PanelContainer.new()
+	title_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_panel.custom_minimum_size = Vector2(0, 42)
+	title_panel.add_theme_stylebox_override(
+		"panel",
+		InkTheme.make_texture_style(
+			InkTheme.SECTION_TITLE_PLATE,
+			48,
+			18,
+			Color(1.0, 0.92, 0.76, 0.98)
+		)
+	)
+
+	var title_label := Label.new()
+	title_label.text = text
+	title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title_label.add_theme_font_size_override("font_size", 19)
+	title_label.add_theme_color_override("font_color", Color("ffe8ad"))
+	title_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.92))
+	title_label.add_theme_constant_override("shadow_offset_x", 2)
+	title_label.add_theme_constant_override("shadow_offset_y", 2)
+	title_panel.add_child(title_label)
+	return title_panel
 
 
 func _spawn_room(room: Room) -> void:
@@ -547,6 +706,7 @@ func get_floor_count() -> int:
 func _clear_map_visuals() -> void:
 	_hide_tooltip()
 	_set_focused_map_room(null)
+	_clear_legend_room_highlight()
 	for child: Node in rooms.get_children():
 		child.free()
 	for child: Node in lines.get_children():
@@ -570,6 +730,20 @@ func _update_camera_limits() -> void:
 		var next_camera_max_y := minf(0.0, scroll_bottom - viewport_height)
 		camera_min_y = minf(next_camera_max_y, scroll_top)
 		camera_max_y = next_camera_max_y
+
+	# 不允许最高层节点的点击圈滚入运行顶栏下面。
+	var has_room := false
+	var top_room_world_y := 0.0
+	for child: Node in rooms.get_children():
+		var map_room := child as MapRoom
+		if not map_room:
+			continue
+		var room_world_y := visuals.position.y + (rooms.position.y + map_room.position.y) * visuals.scale.y
+		if not has_room or room_world_y < top_room_world_y:
+			has_room = true
+			top_room_world_y = room_world_y
+	if has_room:
+		camera_min_y = minf(camera_min_y, top_room_world_y - TOP_ROOM_SAFE_CENTER_Y)
 
 	camera_edge_y = -camera_min_y
 
@@ -618,9 +792,12 @@ func _layout_scroll_board(content_width: float, content_height: float, viewport_
 	var content_scroll_width := content_width + SCROLL_SIDE_PADDING * 2.0
 	var viewport_scroll_width := viewport_size.x * SCROLL_VIEWPORT_WIDTH_RATIO / MAP_VISUAL_SCALE
 	var scroll_width := maxf(content_scroll_width, viewport_scroll_width)
-	var scroll_height := content_height + SCROLL_VERTICAL_PADDING * 2.0
+	var scroll_vertical_padding := MapGenerator.Y_DIST * SCROLL_VERTICAL_PADDING_FLOORS
+	var scroll_top_extra := MapGenerator.Y_DIST * SCROLL_TOP_EXTRA_PADDING_FLOORS
+	var scroll_height := content_height + scroll_vertical_padding * 2.0 + scroll_top_extra
 	scroll_board.centered = true
-	scroll_board.position = Vector2(content_width * 0.5, content_height * -0.5)
+	# 高度增量全部放到顶部：底部卷轴和起点位置不动，最高处不再露出后备灰纸背景。
+	scroll_board.position = Vector2(content_width * 0.5, content_height * -0.5 - scroll_top_extra * 0.5)
 	scroll_board.scale = Vector2(scroll_width / texture_size.x, scroll_height / texture_size.y)
 
 

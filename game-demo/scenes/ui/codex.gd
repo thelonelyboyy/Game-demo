@@ -2,6 +2,7 @@ extends Control
 
 const CARD_MENU_UI_SCENE := preload("res://scenes/ui/card_menu_ui.tscn")
 const DEMONIC_CHARACTER_STATS := preload("res://characters/demonic_cultivator/demonic_cultivator.tres")
+const CODEX_GLOSSARY := preload("res://scenes/ui/codex_glossary.gd")
 
 const BACKGROUND_TEXTURE := preload("res://art/backgrounds/main_menu_background_v2.png")
 const OVERVIEW_PREVIEW_TEXTURE := preload("res://art/backgrounds/main_menu_background_v2.png")
@@ -66,7 +67,7 @@ const CARD_SCAN_ROOTS := {
 	"fusion": ["res://fusion_cards/"],
 }
 
-enum EntryKind {SUMMARY, CARD, RELIC, ENEMY, STATUS, POTION}
+enum EntryKind {SUMMARY, CARD, RELIC, ENEMY, STATUS, POTION, TERM}
 
 @onready var title: Label = %Title
 @onready var background: TextureRect = $Background
@@ -103,6 +104,8 @@ var all_relics: Array = []
 var all_enemies: Array = []
 var all_statuses: Array = []
 var all_potions: Array = []
+var glossary_groups: Array = []
+var all_terms: Array = []
 var display_font: SystemFont
 
 
@@ -363,7 +366,7 @@ func _build_overview_stats() -> void:
 		{"label": "卡牌", "count": all_cards.size(), "unit": "张", "icon": ICON_CARDS},
 		{"label": "法宝", "count": all_relics.size(), "unit": "件", "icon": ICON_RELICS},
 		{"label": "怪物", "count": all_enemies.size(), "unit": "个", "icon": ICON_ENEMIES},
-		{"label": "词条", "count": all_statuses.size(), "unit": "条", "icon": ICON_STATUS},
+		{"label": "词条", "count": all_terms.size(), "unit": "条", "icon": ICON_STATUS},
 		{"label": "符箓丹药", "count": all_potions.size(), "unit": "个", "icon": ICON_POTIONS},
 	]
 	var scale := _ui_scale(get_viewport_rect().size)
@@ -568,6 +571,8 @@ func _collect_all_data() -> void:
 	all_enemies = _collect_resources_of_type(["res://enemies/"], EnemyStats)
 	all_statuses = _collect_resources_of_type(["res://statuses/"], Status)
 	all_potions = _collect_resources_of_type(["res://potions/"], Potion)
+	glossary_groups = CODEX_GLOSSARY.groups()
+	all_terms = CODEX_GLOSSARY.terms()
 
 
 func _collect_cards() -> void:
@@ -669,9 +674,21 @@ func _build_directory() -> void:
 	for enemy: EnemyStats in all_enemies:
 		_add_resource_node(enemies_root, _enemy_display_name(enemy), EntryKind.ENEMY, enemy)
 
-	var statuses_root := _add_summary_node(root, "词条（%s）" % all_statuses.size(), "词条", _format_status_summary())
-	for status: Status in all_statuses:
-		_add_resource_node(statuses_root, _status_display_name(status), EntryKind.STATUS, status)
+	var statuses_root := _add_summary_node(root, "词条（%s）" % all_terms.size(), "词条", _format_status_summary())
+	for group_data: Dictionary in glossary_groups:
+		var group_terms: Array = group_data.get("terms", [])
+		var group_name := str(group_data.get("name", "其他词条"))
+		var group_item := _add_summary_node(
+			statuses_root,
+			"%s（%s）" % [group_name, group_terms.size()],
+			group_name,
+			"[b]%s[/b]\n%s\n\n选择下方名词查看完整释义与实战提示。" % [group_name, str(group_data.get("description", ""))]
+		)
+		group_item.collapsed = true
+		for source_term: Dictionary in group_terms:
+			var term := source_term.duplicate(true)
+			term["category"] = group_name
+			_add_term_node(group_item, term)
 
 	var potions_root := _add_summary_node(root, "符箓丹药（%s）" % all_potions.size(), "符箓丹药", _format_potion_summary())
 	var talismans := all_potions.filter(func(p: Potion): return p.category == Potion.Category.TALISMAN)
@@ -747,6 +764,16 @@ func _add_resource_node(parent: TreeItem, label: String, kind: EntryKind, resour
 	return item
 
 
+func _add_term_node(parent: TreeItem, term: Dictionary) -> TreeItem:
+	var item := directory.create_item(parent)
+	item.set_text(0, str(term.get("name", "未命名词条")))
+	item.set_icon(0, _term_icon(term))
+	item.set_icon_max_width(0, int(round(22.0 * _ui_scale(get_viewport_rect().size))))
+	item.set_metadata(0, {"kind": EntryKind.TERM, "term": term})
+	item.set_custom_color(0, Color("d9c99e"))
+	return item
+
+
 func _icon_for_summary(title_text: String) -> Texture2D:
 	match title_text:
 		"图鉴总览":
@@ -777,6 +804,8 @@ func _icon_for_entry_kind(kind: EntryKind) -> Texture2D:
 			return ICON_STATUS
 		EntryKind.POTION:
 			return ICON_POTIONS
+		EntryKind.TERM:
+			return ICON_STATUS
 		_:
 			return null
 
@@ -805,6 +834,8 @@ func _on_directory_item_selected() -> void:
 			_show_status_detail(data.resource as Status)
 		EntryKind.POTION:
 			_show_potion_detail(data.resource as Potion)
+		EntryKind.TERM:
+			_show_term_detail(data.get("term", {}) as Dictionary)
 		_:
 			_show_summary(str(data.get("title", "图鉴")), str(data.get("text", "")))
 
@@ -908,6 +939,52 @@ func _show_status_detail(status: Status) -> void:
 	]
 
 
+func _show_term_detail(term: Dictionary) -> void:
+	if term.is_empty():
+		return
+
+	_set_overview_mode(false)
+	var icon := _term_icon(term)
+	_show_texture_preview(icon, Vector2(130, 130))
+	detail_icon.show()
+	detail_icon.texture = icon
+	detail_title.text = str(term.get("name", "词条"))
+	detail_meta.text = "词条释义 / %s" % str(term.get("category", "通用"))
+	var lines := PackedStringArray([
+		"[b]释义[/b]",
+		str(term.get("summary", "暂无说明。")),
+	])
+	var tip := str(term.get("tip", ""))
+	if not tip.is_empty():
+		lines.append("")
+		lines.append("[b]实战提示[/b]")
+		lines.append(tip)
+	detail_text.text = "\n".join(lines)
+
+
+func _term_icon(term: Dictionary) -> Texture2D:
+	var status_id := str(term.get("status_id", ""))
+	if not status_id.is_empty():
+		for status: Status in all_statuses:
+			if status and status.id == status_id and status.icon:
+				return status.icon
+	return ICON_STATUS
+
+
+func find_glossary_term(term_name: String) -> Dictionary:
+	for term: Dictionary in all_terms:
+		if str(term.get("name", "")) == term_name:
+			return term
+	return {}
+
+
+func find_glossary_term_for_status(status_id: String) -> Dictionary:
+	for term: Dictionary in all_terms:
+		if str(term.get("status_id", "")) == status_id:
+			return term
+	return {}
+
+
 func _show_potion_detail(potion: Potion) -> void:
 	if not potion:
 		return
@@ -966,7 +1043,7 @@ func _format_overview() -> String:
 		all_cards.size(),
 		all_relics.size(),
 		all_enemies.size(),
-		all_statuses.size(),
+		all_terms.size(),
 		all_potions.size(),
 	]
 
@@ -991,7 +1068,7 @@ func _format_enemy_summary() -> String:
 
 
 func _format_status_summary() -> String:
-	return "[b]词条总览[/b]\n已扫描 `res://statuses/` 下全部状态词条，共 %s 条。\n\n选择词条可查看触发时机、叠加方式和说明。" % all_statuses.size()
+	return "[b]词条释义[/b]\n共收录 %s 个玩家常用名词，按基础战斗、卡牌关键词和职业机制分类。\n\n这里展示固定规则说明，不会把当前层数或示例数值误当成规则上限。" % all_terms.size()
 
 
 func _format_potion_summary() -> String:
@@ -1068,23 +1145,7 @@ func _format_card_detail(card: Card) -> String:
 	lines.append("目标：%s" % _card_target_name(card.target))
 	lines.append("元素：%s" % _card_element_name(card.element))
 	lines.append("费用：%s" % ("不可打出" if card.blocks_manual_play() else card.get_cost_text()))
-	var traits := PackedStringArray()
-	if card.is_status_card():
-		traits.append("状态牌")
-	if card.is_curse_card():
-		traits.append("诅咒牌")
-	if card.is_retained_card():
-		traits.append("保留")
-	if card.is_innate_card():
-		traits.append("固有")
-	if card.is_temporary_card():
-		traits.append("临时")
-	if card.is_consumable_card():
-		traits.append("消耗")
-	if card.is_ethereal_card():
-		traits.append("虚无")
-	if card.is_unplayable_card():
-		traits.append("不可打出")
+	var traits := card.get_keyword_labels()
 	if card.has_discard_trigger():
 		traits.append("弃牌触发")
 	if card.has_exhaust_trigger():

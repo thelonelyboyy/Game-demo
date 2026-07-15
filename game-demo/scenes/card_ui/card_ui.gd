@@ -94,10 +94,25 @@ func prepare_auto_release_targets() -> bool:
 
 
 func get_active_enemy_modifiers() -> ModifierHandler:
-	if targets.is_empty() or targets.size() > 1 or not targets[0] is Enemy:
-		return null
-	
-	return targets[0].modifier_handler
+	if targets.size() == 1:
+		var targeted_enemy := targets[0] as Enemy
+		if is_instance_valid(targeted_enemy) and not targeted_enemy.is_queued_for_deletion():
+			return targeted_enemy.modifier_handler
+
+	# 悬停阶段还没有进入瞄准状态；场上只有一个存活敌人时直接使用它的修正，
+	# 这样卡面显示的是本次实际会造成/获得的数值，而不只是玩家侧修正值。
+	var live_enemy: Enemy
+	for node in get_tree().get_nodes_in_group("enemies"):
+		var enemy := node as Enemy
+		if not is_instance_valid(enemy) or enemy.is_queued_for_deletion():
+			continue
+		if enemy.stats and enemy.stats.health <= 0:
+			continue
+		if live_enemy:
+			return null
+		live_enemy = enemy
+
+	return live_enemy.modifier_handler if live_enemy else null
 
 
 func refresh_runtime_values() -> void:

@@ -65,6 +65,59 @@ func handle_lifecycle_trigger(trigger: LifecycleTrigger, targets: Array[Node], m
 	_maybe_grow(trigger)
 
 
+func has_discard_trigger() -> bool:
+	return not discard_trigger_effects.is_empty() or super.has_discard_trigger()
+
+
+func has_exhaust_trigger() -> bool:
+	return not exhaust_trigger_effects.is_empty() or super.has_exhaust_trigger()
+
+
+func has_draw_trigger() -> bool:
+	return not draw_trigger_effects.is_empty() or super.has_draw_trigger()
+
+
+func has_end_turn_trigger() -> bool:
+	return not end_turn_trigger_effects.is_empty() or super.has_end_turn_trigger()
+
+
+func is_growth_card() -> bool:
+	return growth_trigger != GrowthTrigger.NONE or super.is_growth_card()
+
+
+func get_standard_effect_count() -> int:
+	return (
+		configured_effects.size()
+		+ discard_trigger_effects.size()
+		+ exhaust_trigger_effects.size()
+		+ draw_trigger_effects.size()
+		+ end_turn_trigger_effects.size()
+		+ int(search_count > 0)
+		+ int(retrieve_count > 0)
+		+ int(reclaim_count > 0)
+	)
+
+
+func validate_standard_effects() -> PackedStringArray:
+	var errors := PackedStringArray()
+	for entry in [
+		["打出时", configured_effects],
+		["弃牌时", discard_trigger_effects],
+		["消耗时", exhaust_trigger_effects],
+		["抽到时", draw_trigger_effects],
+		["回合结束时", end_turn_trigger_effects],
+	]:
+		var label: String = entry[0]
+		var effects: Array = entry[1]
+		for index in effects.size():
+			var effect: Resource = effects[index]
+			if not effect:
+				errors.append("%s效果%s为空" % [label, index + 1])
+			elif not effect.has_method("execute"):
+				errors.append("%s效果%s不是标准效果组件" % [label, index + 1])
+	return errors
+
+
 func _build_configured_tooltip(player_modifiers: ModifierHandler = null, enemy_modifiers: ModifierHandler = null) -> String:
 	var lines: PackedStringArray = []
 	for effect in configured_effects:

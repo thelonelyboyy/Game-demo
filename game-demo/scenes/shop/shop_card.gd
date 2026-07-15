@@ -17,6 +17,8 @@ const PRICE_BY_RARITY := {
 	Card.Rarity.RARE: 210,
 	Card.Rarity.MYTHIC: 320,
 }
+const CARD_PRICE_VARIANCE := 0.10
+const CARD_SALE_MULTIPLIER := 0.50
 
 var gold_cost := 0
 var base_gold_cost := 0
@@ -27,7 +29,10 @@ var current_card_ui: CardMenuUI
 
 func _roll_card_price(rarity: Card.Rarity) -> int:
 	var base: int = PRICE_BY_RARITY.get(rarity, 140)
-	return RNG.instance.randi_range(roundi(base * 0.9), roundi(base * 1.1))
+	return RNG.instance.randi_range(
+		roundi(base * (1.0 - CARD_PRICE_VARIANCE)),
+		roundi(base * (1.0 + CARD_PRICE_VARIANCE))
+	)
 
 
 func _ready() -> void:
@@ -79,7 +84,7 @@ func set_card(new_card: Card) -> void:
 
 func set_on_sale(value: bool) -> void:
 	is_on_sale = value
-	sale_multiplier = 0.5 if value else 1.0
+	sale_multiplier = CARD_SALE_MULTIPLIER if value else 1.0
 	tooltip_text = "本店特惠：最终价格减半。" if value else ""
 	if buy_button:
 		buy_button.text = "半价购买" if value else "购买"

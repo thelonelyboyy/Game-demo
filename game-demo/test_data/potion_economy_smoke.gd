@@ -39,6 +39,11 @@ func _run_smoke() -> void:
 	_check(rarity_counts[Card.Rarity.UNCOMMON] == 13, "catalog has thirteen uncommon consumables")
 	_check(rarity_counts[Card.Rarity.RARE] == 8, "catalog has eight rare consumables")
 	_check(not available.is_empty(), "demonic character has available consumables")
+	var gold_body_pill := load("res://potions/gold_body_pill.tres") as Potion
+	_check(gold_body_pill != null and not gold_body_pill.can_appear_as_reward(character), "body-only gold body pill is excluded from demonic rewards")
+	for path: String in ["res://potions/demon_blood_pill.tres", "res://potions/soul_burst_talisman.tres"]:
+		var demonic_potion := load(path) as Potion
+		_check(demonic_potion != null and demonic_potion.can_appear_as_reward(character), "%s remains available to the demonic character" % path)
 
 	for _i in 80:
 		var boss_drop := PotionRewardPool.pick(available, 3, PotionRewardPool.RewardContext.BOSS)

@@ -22,4 +22,4 @@ usable_out_of_combat = false
 icon = ExtResource("2")
 tooltip = "获得 2 层金身。"
 configured_effects = Array[Resource]([SubResource("E1")])
-character_type = 0
+character_type = 1

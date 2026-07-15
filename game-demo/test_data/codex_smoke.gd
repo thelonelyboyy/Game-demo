@@ -33,6 +33,12 @@ func _run_smoke() -> void:
 	_check(codex.all_relics.size() == _count_resources_of_type("res://relics/", Relic), "codex scans all relics")
 	_check(codex.all_enemies.size() == _count_resources_of_type("res://enemies/", EnemyStats), "codex scans all enemies")
 	_check(codex.all_statuses.size() == _count_resources_of_type("res://statuses/", Status), "codex scans all statuses")
+	_check(codex.all_terms.size() >= 45, "codex exposes a comprehensive player glossary")
+	for term_name: String in ["灵息", "劲气", "金身", "煞气", "魂印", "魔焰", "保留", "虚无", "合炼"]:
+		var term: Dictionary = codex.find_glossary_term(term_name)
+		_check(not term.is_empty() and not str(term.get("summary", "")).is_empty(), "%s has a glossary explanation" % term_name)
+	for status: Status in codex.all_statuses:
+		_check(not codex.find_glossary_term_for_status(status.id).is_empty(), "%s status has a player-facing glossary entry" % status.id)
 	_check(codex.cards_by_scope.get("全部", []).size() == codex.all_cards.size(), "all card scope matches all cards")
 
 	for scope_name: String in CARD_ROOTS.keys():
@@ -55,6 +61,13 @@ func _run_smoke() -> void:
 	var detail_text := codex.get_node("%DetailText") as RichTextLabel
 	_check(not detail_title.text.is_empty(), "card detail title renders")
 	_check(not detail_text.text.is_empty(), "card detail text renders")
+
+	var qi_flow_term: Dictionary = codex.find_glossary_term("灵息")
+	codex._show_term_detail(qi_flow_term)
+	await get_tree().process_frame
+	_check(detail_title.text == "灵息", "glossary detail renders the selected term name")
+	_check(detail_text.text.contains("劲气"), "glossary detail explains the relationship between spirit flow and muscle")
+	_check(not detail_text.text.contains("%s"), "glossary explanations do not expose runtime format placeholders")
 
 	_finish()
 

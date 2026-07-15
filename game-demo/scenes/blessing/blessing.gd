@@ -400,7 +400,11 @@ func _duplicate_random_cards(count: int) -> void:
 	for _i in count:
 		if character_stats.deck.cards.is_empty():
 			break
-		var picked := RNG.array_pick_random(character_stats.deck.cards) as Card
+		var candidates: Array[Card] = []
+		for card: Card in character_stats.deck.cards:
+			if card and card.can_be_removed_from_deck():
+				candidates.append(card)
+		var picked := RNG.array_pick_random(candidates) as Card
 		if picked:
 			var copied_card := picked.duplicate(true) as Card
 			character_stats.deck.add_card(copied_card)
@@ -451,7 +455,7 @@ func _remove_basic_cards(count: int) -> void:
 			break
 		var candidates: Array[Card] = []
 		for card: Card in character_stats.deck.cards:
-			if card and (card.id.contains("strike") or card.id.contains("defend")):
+			if card and card.can_be_transformed() and (card.id.contains("strike") or card.id.contains("defend")):
 				candidates.append(card)
 		var picked := RNG.array_pick_random(candidates) as Card
 		if picked:

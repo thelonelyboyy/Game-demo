@@ -1,9 +1,8 @@
-"""Shared helpers for the card data <-> Excel round trip.
+"""Shared helpers for the base-card sheet of the game-data workbook.
 
-The Excel sheet is the editing surface for card *numbers* (cost, name, type,
-target, rarity, exhaust, element and each effect's amount). Effect *types* and
-status references are exported for reference only and are NOT written back —
-those structural changes stay in the Godot editor.
+Base identity and presentation fields live here.  Detailed effect numbers are
+handled by card_effect_table.py so complex and lifecycle-triggered effects are
+editable without flattening them into a few generic amount columns.
 """
 
 from __future__ import annotations
@@ -18,10 +17,12 @@ TYPE = {0: "攻击", 1: "技能", 2: "功法"}
 TARGET = {0: "自身", 1: "单体", 2: "全体敌", 3: "所有"}
 RARITY = {0: "白", 1: "蓝", 2: "金", 3: "暗金"}
 ELEMENT = {0: "无", 1: "金", 2: "木", 3: "水", 4: "火", 5: "土"}
+UPGRADE = {0: "不可突破", 1: "数值提高50%", 2: "费用减少1"}
 TYPE_R = {v: k for k, v in TYPE.items()}
 TARGET_R = {v: k for k, v in TARGET.items()}
 RARITY_R = {v: k for k, v in RARITY.items()}
 ELEMENT_R = {v: k for k, v in ELEMENT.items()}
+UPGRADE_R = {v: k for k, v in UPGRADE.items()}
 
 EFFECT_LABEL = {
     "configured_damage_effect": "伤害",
@@ -124,6 +125,33 @@ def parse_card(path: Path) -> dict:
         if key in rel:
             profession = name
             break
+    keyword_values = {
+        "exhausts": _get_bool(text, "exhausts"),
+        "retains": _get_bool(text, "retains"),
+        "innate": _get_bool(text, "innate"),
+        "eternal": _get_bool(text, "eternal"),
+        "ethereal": _get_bool(text, "ethereal"),
+        "temporary_keyword": _get_bool(text, "temporary_keyword"),
+        "cyclic": _get_bool(text, "cyclic"),
+        "unplayable": _get_bool(text, "unplayable"),
+        "status_card": _get_bool(text, "status_card"),
+        "curse_card": _get_bool(text, "curse_card"),
+        "search_count": _get_int(text, "search_count"),
+        "retrieve_count": _get_int(text, "retrieve_count"),
+        "reclaim_count": _get_int(text, "reclaim_count"),
+    }
+    keyword_labels = []
+    for key, label in (
+        ("exhausts", "消耗"), ("retains", "保留"), ("innate", "固有"),
+        ("eternal", "永恒"), ("ethereal", "虚无"), ("temporary_keyword", "临时"),
+        ("cyclic", "周天"), ("unplayable", "不可打出"), ("status_card", "状态牌"),
+        ("curse_card", "诅咒牌"),
+    ):
+        if keyword_values[key]:
+            keyword_labels.append(label)
+    for key, label in (("search_count", "检索"), ("retrieve_count", "取回"), ("reclaim_count", "归墟")):
+        if keyword_values[key] > 0:
+            keyword_labels.append(f"{label}{keyword_values[key]}")
     return {
         "file": rel,
         "id": _get_str(text, "id"),
@@ -133,8 +161,10 @@ def parse_card(path: Path) -> dict:
         "type": TYPE.get(_get_int(text, "type"), "攻击"),
         "target": TARGET.get(_get_int(text, "target"), "自身"),
         "rarity": RARITY.get(_get_int(text, "rarity"), "白"),
-        "exhausts": _get_bool(text, "exhausts"),
+        **keyword_values,
+        "keyword_summary": "、".join(keyword_labels),
         "element": ELEMENT.get(_get_int(text, "element"), "无"),
+        "upgrade": UPGRADE.get(_get_int(text, "upgrade_type"), "不可突破"),
         "effects": effects,
     }
 
@@ -192,7 +222,14 @@ def update_card_file(path: Path, row: dict) -> bool:
     text = _set_res_field(text, "target", str(TARGET_R[row["target"]]), TARGET_R[row["target"]] == 0)
     text = _set_res_field(text, "rarity", str(RARITY_R[row["rarity"]]), RARITY_R[row["rarity"]] == 0)
     text = _set_res_field(text, "element", str(ELEMENT_R[row["element"]]), ELEMENT_R[row["element"]] == 0)
-    text = _set_res_field(text, "exhausts", "true" if row["exhausts"] else "false", not row["exhausts"])
+    text = _set_res_field(text, "upgrade_type", str(UPGRADE_R[row["upgrade"]]), UPGRADE_R[row["upgrade"]] == 0)
+    for key in (
+        "exhausts", "retains", "innate", "eternal", "ethereal", "temporary_keyword",
+        "cyclic", "unplayable", "status_card", "curse_card",
+    ):
+        text = _set_res_field(text, key, "true" if row[key] else "false", not row[key])
+    for key in ("search_count", "retrieve_count", "reclaim_count"):
+        text = _set_res_field(text, key, str(int(row[key])), int(row[key]) == 0)
     text = _set_effect_amounts(text, row["effect_amounts"])
 
     if text != original:

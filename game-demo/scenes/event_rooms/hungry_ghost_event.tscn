@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/hungry_ghost.png" id="3_image"]
 
 [node name="hungry_ghost_event" type="Control"]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "饿鬼叩门"
 event_body = "一只饿鬼捧着空碗，眼神可怜。"
+event_illustration = ExtResource("3_image")
 choice_texts = PackedStringArray("施舍灵石：失去 30 灵石，回复 14 生命", "驱散它：失去 10 生命，获得 60 灵石", "不理会")
 choice_effects = PackedStringArray("lose_gold:30|heal:14", "damage:10|gain_gold:60", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)

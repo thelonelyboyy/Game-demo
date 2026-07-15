@@ -710,6 +710,8 @@ func _polish_top_bar() -> void:
 
 	var bar_items := $TopBar/BarItems as VBoxContainer
 	if bar_items:
+		# 顶栏容器只负责排版，空白区域不能挡住其后的地图节点；实际按钮/图标仍自行接收输入。
+		bar_items.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		bar_items.custom_minimum_size = Vector2(0, 0)
 		bar_items.offset_left = 14.0
 		bar_items.offset_top = 0.0
@@ -719,11 +721,13 @@ func _polish_top_bar() -> void:
 
 	var top_row := $TopBar/BarItems/TopRow as HBoxContainer
 	if top_row:
+		top_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		top_row.custom_minimum_size = Vector2(0, 88)
 		top_row.add_theme_constant_override("separation", 18)
 
 	var left_info := health_ui.get_parent() as HBoxContainer
 	if left_info:
+		left_info.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		left_info.add_theme_constant_override("separation", 10)
 		if not left_info.has_node("TopInfoSpacer"):
 			var spacer := Control.new()
@@ -1021,6 +1025,7 @@ func _polish_relic_row() -> void:
 			relic_bar.queue_free()
 
 	relic_row.visible = true
+	relic_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	relic_row.custom_minimum_size = Vector2(0, 120)
 	relic_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	relic_row.add_theme_constant_override("separation", 10)
@@ -1040,6 +1045,7 @@ func _polish_relic_row() -> void:
 
 	if relic_handler.get_parent() != relic_row:
 		relic_handler.reparent(relic_row)
+	relic_handler.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	relic_handler.custom_minimum_size = Vector2(0, 120)
 	relic_handler.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	relic_handler.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
@@ -1116,10 +1122,15 @@ func _on_battle_room_entered(room: Room) -> void:
 
 func _on_treasure_room_entered() -> void:
 	_play_exploration_music()
-	var treasure_scene := _change_view(TREASURE_SCENE) as Treasure
-	treasure_scene.relic_handler = relic_handler
-	treasure_scene.char_stats = character
-	treasure_scene.generate_relic_choices(2, current_chapter)
+	# 宝箱节点不再停留播放开箱动画，进入后直接展示两件法宝供选择。
+	var relic_choices := RELIC_REWARD_POOL.get_random_available_choices(
+		character,
+		relic_handler,
+		2,
+		current_chapter,
+		RelicRewardPool.RewardContext.TREASURE
+	)
+	_on_treasure_room_exited(relic_choices)
 
 
 func _on_treasure_room_exited(relic_choices: Array[Relic]) -> void:

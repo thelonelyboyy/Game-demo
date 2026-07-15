@@ -69,13 +69,16 @@ func _update_selection(card: Card) -> void:
 
 
 func _can_remove_selected_card() -> bool:
-	return card_pile and selected_card and card_pile.cards.size() > 1
+	return card_pile and selected_card and selected_card.can_be_removed_from_deck() and card_pile.cards.size() > 1
 
 
 func _get_selected_card_text(card: Card) -> String:
 	var lines: PackedStringArray = []
 	lines.append("[center][b]%s[/b][/center]" % card.get_display_name())
 	lines.append("[center]将此牌从本局牌组中永久移除。[/center]")
+	if card.is_eternal_card():
+		lines.append("")
+		lines.append("[center][color=#c9564f]永恒牌无法被移除。[/color][/center]")
 	if card_pile and card_pile.cards.size() <= 1:
 		lines.append("")
 		lines.append("[center][color=#c9564f]牌组至少需要保留一张牌。[/color][/center]")

@@ -11,7 +11,7 @@ var failures: PackedStringArray = []
 
 
 func _ready() -> void:
-	get_tree().create_timer(20.0, true).timeout.connect(_on_watchdog_timeout)
+	get_tree().create_timer(35.0, true).timeout.connect(_on_watchdog_timeout)
 	call_deferred("_run_smoke")
 
 
@@ -49,6 +49,24 @@ func _run_smoke() -> void:
 	var enemies := battle.enemy_handler.get_live_enemies()
 	_check(enemies.size() == 3, "three-enemy regression battle spawns three targets")
 	_check(battle.battle_ui._enemy_cards.size() == 3, "three enemy combatant cards are visible")
+	_check(
+		battle.battle_ui.end_turn_button.z_index > Hand.HOVER_Z_INDEX,
+		"end-turn button stays above every hovered or crowded hand card"
+	)
+	_check(
+		battle.battle_ui.end_turn_button.mouse_filter == Control.MOUSE_FILTER_STOP,
+		"end-turn button keeps an explicit clickable input surface"
+	)
+	_check(PlayerHandler.HAND_DRAW_INTERVAL <= 0.15, "opening hand draw pacing stays responsive")
+	_check(Hand.REFLOW_DURATION <= 0.30, "hand reflow completes within the interaction budget")
+	_check(BattleUI.PLAYED_CARD_PREVIEW_HOLD_DURATION <= 0.35, "played-card preview does not linger over rapid input")
+	if battle.battle_ui.hand.get_child_count() > 0:
+		var hovered_card := battle.battle_ui.hand.get_child(0) as CardUI
+		if hovered_card:
+			hovered_card.card_state_machine.on_mouse_entered()
+			_check(hovered_card._runtime_values_visible, "card hover shows runtime-adjusted values before dragging")
+			hovered_card.card_state_machine.on_mouse_exited()
+			_check(not hovered_card._runtime_values_visible, "card hover exit restores printed values")
 	_check_all_combatants_aligned(battle)
 	_check_combatant_card_information(battle)
 
@@ -84,6 +102,7 @@ func _run_smoke() -> void:
 		_check_all_combatants_aligned(battle)
 
 	_check_hit_pause_watchdog()
+	await _check_rapid_end_turn_after_queued_card(battle)
 
 	get_tree().paused = false
 	Engine.time_scale = 1.0
@@ -156,6 +175,38 @@ func _check_hit_pause_watchdog() -> void:
 	HitPause.watchdog()
 	_check(is_equal_approx(Engine.time_scale, 1.0), "hit-pause watchdog restores normal animation speed after a lost timer")
 	_check(not HitPause._active, "hit-pause watchdog clears the active pause state")
+
+
+func _check_rapid_end_turn_after_queued_card(battle: Battle) -> void:
+	var handler := battle.player_handler
+	var battle_ui := battle.battle_ui
+	_check(handler.player_actions_enabled, "rapid end-turn regression starts during the player action window")
+
+	# Simulate an accidentally stale disabled flag. The authoritative player
+	# action state must restore the button without requiring another draw signal.
+	battle_ui.end_turn_button.disabled = true
+	battle_ui._sync_end_turn_button_state()
+	_check(not battle_ui.end_turn_button.disabled, "end-turn button self-heals when player actions are already enabled")
+
+	var live_cards := handler._get_live_hand_card_uis()
+	_check(not live_cards.is_empty(), "rapid end-turn regression has a hand card to release")
+	if live_cards.is_empty():
+		return
+
+	# CardUI.play() queues the used node for deletion. Pressing end turn in that
+	# same frame used to bind the dying node into the discard tween and could
+	# leave the button disabled forever.
+	live_cards[0].queue_free()
+	battle_ui.end_turn_button.pressed.emit()
+	_check(battle_ui.end_turn_button.disabled and not handler.player_actions_enabled, "end-turn press closes the current player action window")
+
+	var wait_started := Time.get_ticks_msec()
+	while not handler.player_actions_enabled and Time.get_ticks_msec() - wait_started < 12000:
+		await get_tree().process_frame
+	await get_tree().process_frame
+	battle_ui._sync_end_turn_button_state()
+	_check(handler.player_actions_enabled, "same-frame played-card cleanup reaches the next player turn")
+	_check(not battle_ui.end_turn_button.disabled, "end-turn button is clickable again on the next player turn")
 
 
 func _check(condition: bool, message: String) -> void:

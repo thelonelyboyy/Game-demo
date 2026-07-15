@@ -40,6 +40,18 @@ func create_result(card_a: Card, card_b: Card) -> Card:
 	result.type = Card.Type.ATTACK if first.type == Card.Type.ATTACK or second.type == Card.Type.ATTACK else Card.Type.SKILL
 	result.target = _merge_target(first.target, second.target)
 	result.exhausts = first.exhausts and second.exhausts
+	result.retains = first.retains or second.retains
+	result.innate = first.innate or second.innate
+	result.eternal = false
+	result.ethereal = first.ethereal or second.ethereal
+	result.temporary_keyword = first.temporary_keyword or second.temporary_keyword
+	result.cyclic = first.cyclic or second.cyclic
+	result.unplayable = first.unplayable or second.unplayable
+	result.status_card = first.status_card or second.status_card
+	result.curse_card = first.curse_card or second.curse_card
+	result.search_count = mini(first.search_count + second.search_count, 10)
+	result.retrieve_count = mini(first.retrieve_count + second.retrieve_count, 10)
+	result.reclaim_count = mini(first.reclaim_count + second.reclaim_count, 10)
 	result.upgrade_type = Card.UpgradeType.STAT_BOOST
 	result.upgraded = first.upgraded and second.upgraded
 	result.fusion_level = 0

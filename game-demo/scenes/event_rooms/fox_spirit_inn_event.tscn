@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/fox_spirit_inn.png" id="3_image"]
 
 [node name="fox_spirit_inn_event" type="Control"]
 layout_mode = 3
@@ -13,6 +14,7 @@ grow_vertical = 2
 script = ExtResource("1_script")
 event_title = "狐仙客栈"
 event_body = "客栈门口灯火温柔，掌柜笑得过分好看。"
+event_illustration = ExtResource("3_image")
 choice_texts = PackedStringArray("住一晚：失去 40 灵石，回复 29 生命", "讲故事抵账：获得 35 灵石", "不进门")
 choice_effects = PackedStringArray("lose_gold:40|heal:29", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 35, 0)

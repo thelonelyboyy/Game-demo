@@ -148,7 +148,9 @@ def has_configured_effects(properties: dict[str, str]) -> bool:
         "draw_trigger_effects",
         "end_turn_trigger_effects",
     )
-    return any("SubResource(" in properties.get(field, "") for field in effect_fields)
+    if any("SubResource(" in properties.get(field, "") for field in effect_fields):
+        return True
+    return any(parse_int(properties.get(field, "0"), 0) > 0 for field in ("search_count", "retrieve_count", "reclaim_count"))
 
 
 def has_nonzero_legacy_field(properties: dict[str, str]) -> bool:

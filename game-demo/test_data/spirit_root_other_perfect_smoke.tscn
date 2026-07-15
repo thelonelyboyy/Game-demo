@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://test_data/spirit_root_other_perfect_smoke.gd" id="1"]
+
+[node name="SpiritRootOtherPerfectSmoke" type="Node"]
+script = ExtResource("1")

@@ -35,6 +35,7 @@ func _run_smoke() -> void:
 	_check(run.character != null, "new run has character")
 	_check(run.stats != null, "new run has run stats")
 	_check(run.map != null and not run.map.map_data.is_empty(), "new run generates map")
+	_check_map_top_input_safety(run)
 	await _check_map_potion_discard_persists(run)
 	_check(SaveGame.load_data() != null, "new run save can be loaded")
 
@@ -74,6 +75,43 @@ func _run_smoke() -> void:
 	_restore_previous_save()
 
 	_finish()
+
+
+func _check_map_top_input_safety(run: Run) -> void:
+	var bar_items := run.get_node_or_null("TopBar/BarItems") as Control
+	_check(
+		bar_items != null and bar_items.mouse_filter == Control.MOUSE_FILTER_IGNORE,
+		"map-facing top-bar whitespace passes pointer input through"
+	)
+	if not run.map:
+		return
+
+	var has_room := false
+	var top_room_world_y := 0.0
+	var rows_use_current_spacing := true
+	for child: Node in run.map.rooms.get_children():
+		var map_room := child as MapRoom
+		if not map_room:
+			continue
+		var visual_row := map_room.room.row
+		if map_room.room.type == Room.Type.BOSS and visual_row == run.map.map_data.size() - 1:
+			visual_row += 1
+		if not is_equal_approx(map_room.position.y, MapGenerator.get_row_y(visual_row)):
+			rows_use_current_spacing = false
+		var room_world_y := run.map.visuals.position.y + (
+			run.map.rooms.position.y + map_room.position.y
+		) * run.map.visuals.scale.y
+		if not has_room or room_world_y < top_room_world_y:
+			has_room = true
+			top_room_world_y = room_world_y
+	_check(has_room, "generated map exposes a highest room for top-safe layout")
+	_check(rows_use_current_spacing, "loaded map rooms are reflowed to the current vertical spacing")
+	if has_room:
+		var top_room_screen_y := top_room_world_y - run.map.camera_min_y
+		_check(
+			top_room_screen_y >= Map.TOP_ROOM_SAFE_CENTER_Y - 1.0,
+			"highest map node remains fully selectable below the top bar"
+		)
 
 
 func _check_map_potion_discard_persists(run: Run) -> void:
@@ -372,27 +410,18 @@ func _check_treasure_entry(run: Run, _room: Room) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 
-	var treasure := _current_view_child(run) as Treasure
-	_check(treasure != null, "treasure view opens")
-	if not treasure:
-		return
-
-	_check(treasure.found_relics.size() == 2, "treasure generates two relic choices")
-	if treasure.found_relics.size() == 2:
-		_check(treasure.found_relics[0] != treasure.found_relics[1], "treasure relic choices are different")
-
 	var relic_count_before := run.relic_handler.get_all_relics().size()
-	treasure._on_treasure_opened()
-	await get_tree().process_frame
-	await get_tree().process_frame
-
 	var reward := _current_view_child(run) as BattleReward
-	_check(reward != null, "treasure opens relic choice reward view")
+	_check(reward != null, "treasure opens relic choice reward view directly")
 	if not reward:
 		return
 
 	_check(reward.rewards.get_child_count() == 2, "treasure reward view shows two relic choices")
 	_check(reward.back_button.disabled, "treasure reward requires choosing a relic")
+	if reward.rewards.get_child_count() == 2:
+		var first := reward.rewards.get_child(0) as RewardButton
+		var second := reward.rewards.get_child(1) as RewardButton
+		_check(first and second and first.reward_text != second.reward_text, "treasure relic choices are different")
 	var choice := reward.rewards.get_child(0) as RewardButton if reward.rewards.get_child_count() > 0 else null
 	_check(choice != null, "treasure relic choice button exists")
 	if choice:

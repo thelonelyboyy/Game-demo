@@ -5,10 +5,11 @@
 
 [resource]
 script = ExtResource("1")
+unplayable = true
+status_card = true
 effect_text = "阴司判牒占据一张手牌，留在本场战斗的抽弃循环中。"
 id = "underworld_writ"
 type = 1
 target = 0
-mechanic_tags = PackedStringArray("状态", "不可打出")
 display_name = "判牒"
 icon = ExtResource("2")

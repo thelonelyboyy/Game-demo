@@ -4,8 +4,8 @@ extends Node
 enum MapMode {TEST_LINEAR, ROGUELIKE, TEST_ELITE_LINEAR}
 
 const X_DIST := 45
-const Y_DIST := 40
-const FIRST_SECOND_FLOOR_EXTRA_Y_GAP := 10
+const Y_DIST := 60
+const FIRST_SECOND_FLOOR_EXTRA_Y_GAP := 12
 const PLACEMENT_RANDOMNESS := 4
 # ROGUELIKE 地图生成层数不含额外插入的起始赐福层；插入后总可见节点层为 20。
 const FLOORS := 19

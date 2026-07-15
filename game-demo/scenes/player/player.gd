@@ -178,8 +178,8 @@ func update_stats() -> void:
 	stats_ui.update_stats(stats)
 	# 血量回升 = 战斗内治疗（丹药/摄魂续元/灵根木被动等），绿色 +N 飘字 + 治疗音。
 	if _last_seen_health >= 0 and stats.health > _last_seen_health and is_inside_tree():
-		FloatingCombatText.spawn_heal(self, stats.health - _last_seen_health, _damage_text_offset())
-		GameSfx.play(GameSfx.HEAL, -4.0)
+		var delay := FloatingCombatText.spawn_heal(self, stats.health - _last_seen_health, _damage_text_offset())
+		_play_feedback_sound_after(delay, GameSfx.HEAL, -4.0)
 	_last_seen_health = stats.health
 
 
@@ -274,27 +274,42 @@ func _spawn_damage_feedback(amount: int) -> void:
 	var blocked := mini(stats.block, amount)
 	var lost := amount - blocked
 	var offset := _damage_text_offset()
-	if lost > 0:
-		FloatingCombatText.spawn_damage(self, lost, offset)
-		HitEffect.spawn(self, _feedback_radius(), Color(1.0, 0.42, 0.36, 0.95))
-		# 玩家挨打比敌人挨打更重：停顿略长 + 自身震动 + 战场微震 + 重击音。
-		GameSfx.play(GameSfx.HEAVY_HIT, -2.0)
-		HitPause.trigger(0.12)
-		Shaker.shake(self, 10, 0.24)
-		var battle_root := get_parent() as Node2D
-		if battle_root:
-			Shaker.shake(battle_root, 3, 0.30)
 	if blocked > 0:
-		FloatingCombatText.spawn_block(self, blocked, offset + Vector2(44.0, 20.0))
-		GameSfx.play(GameSfx.BLOCK, -6.0)
+		var block_delay := FloatingCombatText.spawn_block(self, blocked, offset + Vector2(44.0, 20.0))
+		_play_feedback_sound_after(block_delay, GameSfx.BLOCK, -6.0)
+	if lost > 0:
+		var damage_delay := FloatingCombatText.spawn_damage(self, lost, offset)
+		_play_player_hit_feedback_after(damage_delay)
+
+
+func _play_player_hit_feedback_after(delay: float) -> void:
+	if delay > 0.0:
+		await get_tree().create_timer(delay).timeout
+	if not is_instance_valid(self) or not is_inside_tree():
+		return
+	HitEffect.spawn(self, _feedback_radius(), Color(1.0, 0.42, 0.36, 0.95))
+	# 玩家挨打比敌人挨打更重：停顿略长 + 自身震动 + 战场微震 + 重击音。
+	GameSfx.play(GameSfx.HEAVY_HIT, -2.0)
+	HitPause.trigger(0.12)
+	Shaker.shake(self, 10, 0.24)
+	var battle_root := get_parent() as Node2D
+	if battle_root:
+		Shaker.shake(battle_root, 3, 0.30)
 
 
 # 自损（血祭/献祭类效果直接扣血、不走 take_damage），用暗红飘字区分敌方伤害。
 func _on_self_damaged(amount: int) -> void:
 	if amount <= 0 or not is_inside_tree() or _suppress_self_damage_feedback:
 		return
-	GameSfx.play(GameSfx.HIT, -8.0)
-	FloatingCombatText.spawn_self_damage(self, amount, _damage_text_offset())
+	var delay := FloatingCombatText.spawn_self_damage(self, amount, _damage_text_offset())
+	_play_feedback_sound_after(delay, GameSfx.HIT, -8.0)
+
+
+func _play_feedback_sound_after(delay: float, stream: Variant, volume_db: float) -> void:
+	if delay > 0.0:
+		await get_tree().create_timer(delay).timeout
+	if is_instance_valid(self) and is_inside_tree():
+		GameSfx.play(stream, volume_db)
 
 
 func _damage_text_offset() -> Vector2:

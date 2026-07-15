@@ -7,6 +7,14 @@ const PACT_PATHS := [
 	"res://relics/demon_flame_pact_wheel.tres",
 	"res://relics/demon_ash_pact_scripture.tres",
 ]
+const FOREIGN_PROFESSION_RELIC_PATHS := [
+	"res://relics/beast_jade_whistle.tres",
+	"res://relics/pack_banner.tres",
+	"res://relics/sword_grindstone.tres",
+	"res://relics/wind_sword_tassel.tres",
+	"res://relics/blood_jade.tres",
+	"res://relics/golden_bone_bead.tres",
+]
 
 var failures: PackedStringArray = []
 
@@ -36,6 +44,7 @@ func _run_smoke() -> void:
 	_check_context(pool, character, RelicRewardPool.RewardContext.STANDARD, false, true)
 	_check_context(pool, character, RelicRewardPool.RewardContext.SHOP, false, true)
 	_check_context(pool, character, RelicRewardPool.RewardContext.BOSS, true, false)
+	_check_demonic_profession_filter(character)
 	await _check_three_chapter_boss_choices(pool, character)
 	await _check_pact_exclusivity(pool, character)
 
@@ -52,6 +61,17 @@ func _run_smoke() -> void:
 	_check(stats.current_chapter == 3, "run stats retain current chapter")
 	_check_price_ladder()
 	_finish()
+
+
+func _check_demonic_profession_filter(character: CharacterStats) -> void:
+	for path: String in FOREIGN_PROFESSION_RELIC_PATHS:
+		var relic := load(path) as Relic
+		_check(relic != null, "%s loads for profession filtering" % path)
+		if relic:
+			_check(not relic.can_appear_as_reward(character), "%s is excluded from the demonic relic pool" % relic.id)
+	for path: String in ["res://relics/ghost_contract.tres", "res://relics/sacrifice_blade.tres"]:
+		var relic := load(path) as Relic
+		_check(relic != null and relic.can_appear_as_reward(character), "%s remains in the demonic relic pool" % path)
 
 
 func _check_context(

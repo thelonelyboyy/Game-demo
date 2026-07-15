@@ -333,14 +333,29 @@ func _spawn_damage_feedback(amount: int) -> void:
 	var blocked := mini(stats.block, amount)
 	var lost := amount - blocked
 	var offset := _damage_text_offset()
-	if lost > 0:
-		FloatingCombatText.spawn_damage(self, lost, offset)
-		HitEffect.spawn(self, _feedback_radius())
-		HitPause.trigger()
-		GameSfx.play(GameSfx.HIT, -2.0)
 	if blocked > 0:
-		FloatingCombatText.spawn_block(self, blocked, offset + Vector2(44.0, 20.0))
-		GameSfx.play(GameSfx.BLOCK, -6.0)
+		var block_delay := FloatingCombatText.spawn_block(self, blocked, offset + Vector2(44.0, 20.0))
+		_play_feedback_sound_after(block_delay, GameSfx.BLOCK, -6.0)
+	if lost > 0:
+		var damage_delay := FloatingCombatText.spawn_damage(self, lost, offset)
+		_play_enemy_hit_feedback_after(damage_delay)
+
+
+func _play_enemy_hit_feedback_after(delay: float) -> void:
+	if delay > 0.0:
+		await get_tree().create_timer(delay).timeout
+	if not is_instance_valid(self) or not is_inside_tree() or _dying:
+		return
+	HitEffect.spawn(self, _feedback_radius())
+	HitPause.trigger()
+	GameSfx.play(GameSfx.HIT, -2.0)
+
+
+func _play_feedback_sound_after(delay: float, stream: Variant, volume_db: float) -> void:
+	if delay > 0.0:
+		await get_tree().create_timer(delay).timeout
+	if is_instance_valid(self) and is_inside_tree() and not _dying:
+		GameSfx.play(stream, volume_db)
 
 
 func _damage_text_offset() -> Vector2:

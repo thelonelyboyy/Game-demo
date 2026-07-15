@@ -9,7 +9,7 @@ func can_fuse(card_a: Card, card_b: Card) -> bool:
 
 
 func get_fusion_preview(card_a: Card, card_b: Card) -> Card:
-	if not card_a or not card_b or card_a == card_b:
+	if not card_a or not card_b or card_a == card_b or not card_a.can_be_fused() or not card_b.can_be_fused():
 		return null
 
 	if card_a.id == card_b.id:
@@ -31,6 +31,9 @@ func get_fusion_message(card_a: Card, card_b: Card) -> String:
 
 	if card_a == card_b:
 		return "不能选择同一张卡牌本体。"
+
+	if not card_a.can_be_fused() or not card_b.can_be_fused():
+		return "永恒牌无法参与合炼。"
 
 	if card_a.id == card_b.id:
 		return "同名卡合炼：消耗两张同名卡，生成一张费用不变、主要数值提高 50% 的合炼卡。"

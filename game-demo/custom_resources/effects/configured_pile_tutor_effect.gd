@@ -17,11 +17,13 @@ func execute(card: CultivationCard, targets: Array[Node], _modifiers: ModifierHa
 	var player_handler := final_targets[0].get_tree().get_first_node_in_group("player_handler") as PlayerHandler
 	if not player_handler:
 		return
-	player_handler.move_matching_cards_to_hand(
+	player_handler.choose_cards_from_pile(
 		source_pile,
-		_get_card_type_filter(),
 		get_modified_amount(card),
-		card
+		card,
+		_get_title(),
+		get_description(card),
+		_get_card_type_filter()
 	)
 
 
@@ -49,6 +51,16 @@ func _get_card_type_filter() -> int:
 			return Card.Type.POWER
 		_:
 			return -1
+
+
+func _get_title() -> String:
+	match source_pile:
+		SourcePile.DISCARD_PILE:
+			return "取回"
+		SourcePile.EXHAUST_PILE:
+			return "归墟取回"
+		_:
+			return "检索"
 
 
 func _get_filter_name() -> String:

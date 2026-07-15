@@ -33,6 +33,8 @@ func on_gui_input(event: InputEvent) -> void:
 
 func on_mouse_entered() -> void:
 	mouse_over_card = true
+	# 悬停时也展示经过玩家/敌人修正后的实际数值，和拖拽、瞄准阶段保持一致。
+	card_ui.refresh_runtime_values()
 	
 	if not card_ui.playable or card_ui.disabled:
 		return
@@ -44,6 +46,7 @@ func on_mouse_entered() -> void:
 
 func on_mouse_exited() -> void:
 	mouse_over_card = false
+	card_ui.reset_runtime_values()
 	
 	if not card_ui.playable or card_ui.disabled:
 		return

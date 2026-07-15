@@ -4,6 +4,7 @@ extends EventRoom
 const HEART_DEMON := preload("res://common_cards/status/heart_demon.tres")
 const BLOOD_DEBT_CURSE := preload("res://common_cards/status/blood_debt_curse.tres")
 const KARMIC_FIRE_CURSE := preload("res://common_cards/status/karmic_fire_curse.tres")
+const DEFAULT_EVENT_ILLUSTRATION := preload("res://art/event_illustrations/silent_demon_sutra.png")
 const CURSE_POOL: Array[Card] = [HEART_DEMON, BLOOD_DEBT_CURSE, KARMIC_FIRE_CURSE]
 
 @export var event_title := ""
@@ -105,6 +106,10 @@ func _can_apply_single_effect(effect: String, amount: int) -> bool:
 	match effect:
 		"lose_gold":
 			return run_stats and run_stats.gold >= amount
+		"gamble_even", "gamble_risky":
+			return run_stats and run_stats.gold >= 50
+		"duplicate_last":
+			return character_stats and character_stats.deck and not character_stats.deck.cards.is_empty()
 		"remove_random":
 			return character_stats and character_stats.deck and character_stats.deck.cards.size() > 1
 		"upgrade_random":
@@ -149,7 +154,11 @@ func _apply_single_effect(effect: String, amount: int) -> void:
 					_emit_card_feedback("突破卡牌", [card], "卡牌已完成突破。")
 		"remove_random":
 			if character_stats and character_stats.deck and character_stats.deck.cards.size() > 1:
-				var card := RNG.array_pick_random(character_stats.deck.cards) as Card
+				var removable: Array[Card] = []
+				for candidate: Card in character_stats.deck.cards:
+					if candidate and candidate.can_be_removed_from_deck():
+						removable.append(candidate)
+				var card := RNG.array_pick_random(removable) as Card
 				if card:
 					character_stats.deck.remove_card(card)
 					_emit_card_feedback("移除卡牌", [card], "卡牌已从本次牌组中移除。")
@@ -159,8 +168,36 @@ func _apply_single_effect(effect: String, amount: int) -> void:
 			_add_random_draftable_cards(maxi(amount, 1), true)
 		"gain_curse":
 			_add_random_curses(maxi(amount, 1))
+		"duplicate_last":
+			_duplicate_last_card()
+		"gamble_even":
+			_resolve_gamble(0.5, 100)
+		"gamble_risky":
+			_resolve_gamble(0.3, 200)
 		_:
 			pass
+
+
+func _duplicate_last_card() -> void:
+	if not character_stats or not character_stats.deck or character_stats.deck.cards.is_empty():
+		return
+	var source := character_stats.deck.cards[-1] as Card
+	if not source:
+		return
+	var copied_card := source.duplicate(true) as Card
+	character_stats.deck.add_card(copied_card)
+	_emit_card_feedback("复制卡牌", [copied_card], "以下副本已加入牌组。")
+
+
+func _resolve_gamble(success_chance: float, payout: int) -> void:
+	if not run_stats or run_stats.gold < 50:
+		return
+	run_stats.gold -= 50
+	if RNG.instance.randf() < success_chance:
+		run_stats.gold += payout
+		Events.ui_notice_requested.emit("赌局得胜：获得 %d 灵石" % payout)
+	else:
+		Events.ui_notice_requested.emit("赌局落败：失去 50 灵石")
 
 
 func _get_effect_parts(effect: String, amount: int) -> PackedStringArray:
@@ -298,10 +335,11 @@ func _apply_event_style() -> void:
 
 
 func _refresh_illustration() -> void:
-	if not event_illustration or not content_box or not body_label:
+	if not content_box or not body_label:
 		if illustration_panel:
 			illustration_panel.hide()
 		return
+	var resolved_illustration := event_illustration if event_illustration else DEFAULT_EVENT_ILLUSTRATION
 
 	if not illustration_panel:
 		illustration_panel = PanelContainer.new()
@@ -319,7 +357,7 @@ func _refresh_illustration() -> void:
 		illustration_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		illustration_panel.add_child(illustration_rect)
 
-	illustration_rect.texture = event_illustration
+	illustration_rect.texture = resolved_illustration
 	illustration_panel.show()
 
 
