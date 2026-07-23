@@ -12,11 +12,27 @@ const BADGE_FRAME := preload("res://assets/ui/generated/battle/battle_intent_bad
 const ICON_SWORD := preload("res://assets/ui/generated/icons/icon_intent_attack.png")
 const ICON_SHIELD := preload("res://art/tiles/intent_block_shield.png")
 const ICON_BUFF := preload("res://art/tiles/intent_buff_self.png")
+const ICON_ATTACK_DEFEND := preload("res://art/ui/icons/intent_attack_defend_v2.png")
+const ICON_DEBUFF := preload("res://art/ui/icons/intent_debuff_v2.png")
+const ICON_CHARGE := preload("res://art/ui/icons/intent_charge_v2.png")
+const ICON_UNKNOWN := preload("res://art/ui/icons/intent_unknown_v2.png")
+const ICON_SUMMON := preload("res://art/ui/icons/intent_summon_v2.png")
+const ICON_HEAL := preload("res://art/ui/icons/intent_heal_v2.png")
+const ICON_ESCAPE := preload("res://art/ui/icons/intent_escape_v2.png")
+const ICON_SLEEP := preload("res://art/ui/icons/intent_sleep_v2.png")
 const CATEGORY_ICONS := {
 	Intent.Category.ATTACK: ICON_SWORD,
 	Intent.Category.MULTI_ATTACK: ICON_SWORD,
 	Intent.Category.DEFEND: ICON_SHIELD,
+	Intent.Category.ATTACK_DEFEND: ICON_ATTACK_DEFEND,
 	Intent.Category.BUFF: ICON_BUFF,
+	Intent.Category.DEBUFF: ICON_DEBUFF,
+	Intent.Category.CHARGE: ICON_CHARGE,
+	Intent.Category.UNKNOWN: ICON_UNKNOWN,
+	Intent.Category.SUMMON: ICON_SUMMON,
+	Intent.Category.HEAL: ICON_HEAL,
+	Intent.Category.ESCAPE: ICON_ESCAPE,
+	Intent.Category.SLEEP: ICON_SLEEP,
 }
 
 @onready var label: Label = $Label

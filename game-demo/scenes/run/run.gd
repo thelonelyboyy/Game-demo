@@ -697,7 +697,7 @@ func _setup_debug_console() -> void:
 	if not debug_console:
 		debug_console = DEBUG_CONSOLE.new()
 		add_child(debug_console)
-	debug_console.setup(character, stats, relic_handler, potion_handler)
+	debug_console.setup(character, stats, relic_handler, potion_handler, self)
 
 
 func _polish_top_bar() -> void:

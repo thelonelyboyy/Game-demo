@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/forbidden_mantra.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_forbidden_archive_v2.png" id="2"]
 [ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="3"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_discover_effect.gd" id="4"]
 [ext_resource type="Resource" path="res://characters/demonic_cultivator/demonic_forbidden_discovery_pool.tres" id="5"]
@@ -26,7 +26,7 @@ exhausts = true
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("发现", "禁术")
+mechanic_tags = PackedStringArray("发现", "禁术", "煞气")
 display_name = "窥心魔典"
 icon = ExtResource("2")
 sound = ExtResource("3")

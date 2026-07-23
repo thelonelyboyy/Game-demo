@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "古剑冢"
 event_body = "半截剑碑从云土里露出，剑意仍在低鸣。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("参悟剑痕：随机突破一张牌", "取走残铁：获得 65 灵石", "离开")
-choice_effects = PackedStringArray("upgrade_random", "gain_gold", "skip")
+choice_texts = PackedStringArray("以旧剑重铸一式：随机重铸一张牌，再突破它", "取走残铁：获得 65 灵石", "离开")
+choice_effects = PackedStringArray("transform_random|upgrade_random:1", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 65, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

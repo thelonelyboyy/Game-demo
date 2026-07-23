@@ -98,7 +98,7 @@ func _check_end_turn_hand_relics(battle: Battle, relic_handler: RelicHandler) ->
 	_check(retained_ui != null and affliction_ui != null, "end turn hand relic UIs are available")
 	battle.char_stats.block = 0
 	retained_ui.relic.activate_relic(retained_ui)
-	_check(battle.char_stats.block == 6, "retained edge tassel grants three block per retained card")
+	_check(battle.char_stats.block == 8, "retained edge tassel grants four block per retained card")
 	battle.char_stats.block = 0
 	affliction_ui.relic.activate_relic(affliction_ui)
 	_check(battle.char_stats.block == 8, "affliction binding clip counts status and curse cards")
@@ -121,7 +121,7 @@ func _check_zero_mana_relic(battle: Battle, relic_handler: RelicHandler) -> void
 	_check(battle.char_stats.block == 0, "empty breath seal stays dormant with unspent mana")
 	battle.char_stats.mana = 0
 	relic_ui.relic.activate_relic(relic_ui)
-	_check(battle.char_stats.block == 5, "empty breath seal rewards spending all mana")
+	_check(battle.char_stats.block == 7, "empty breath seal rewards spending all mana")
 
 
 func _check_affliction_draw_relic(battle: Battle) -> void:

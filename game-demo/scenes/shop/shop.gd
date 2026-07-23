@@ -5,10 +5,12 @@ const SHOP_CARD = preload("res://scenes/shop/shop_card.tscn")
 const SHOP_RELIC = preload("res://scenes/shop/shop_relic.tscn")
 const SHOP_POTION = preload("res://scenes/shop/shop_potion.tscn")
 const SHOP_POTION_PATHS := PotionRewardPool.POTION_PATHS
-const SHOP_POTION_COUNT := 2
+const SHOP_POTION_COUNT := 4
 const CARD_REMOVE_SCENE := preload("res://scenes/card_remove/card_remove.tscn")
 const RELIC_REWARD_POOL := preload("res://relics/relic_reward_pool.tres")
 const SHOP_BACKGROUND := preload("res://art/backgrounds/shop_market_bg.png")
+const SHOP_SECTION_FRAME := preload("res://assets/ui/generated/panels/codex_main_content_panel_9slice.png")
+const SHOP_SECTION_TITLE_PLATE := preload("res://assets/ui/generated/panels/codex_section_title_backplate_9slice.png")
 const COMMON_SHOP_CARDS := [
 	preload("res://common_cards/strike.tres"),
 	preload("res://common_cards/defend.tres"),
@@ -45,6 +47,11 @@ const MYTHIC_SHOP_CHANCE := 0.04
 var active_card_remove: CardRemove
 var active_remove_cost := 0
 var remove_service_used := false
+var cards_section: PanelContainer
+var relics_section: PanelContainer
+var potions_section: PanelContainer
+var remove_section: PanelContainer
+var lower_sections: HBoxContainer
 
 
 func _ready() -> void:
@@ -264,7 +271,14 @@ func _update_remove_card_service() -> void:
 
 	var cost := _get_remove_card_cost()
 	var can_remove := char_stats.deck and char_stats.deck.cards.size() > 1
-	remove_card_button.text = "净化术法 %s 灵石" % cost
+	if remove_service_used:
+		remove_card_button.text = "本次坊市已完成净化"
+	elif active_card_remove:
+		remove_card_button.text = "正在选择要净化的卡牌…"
+	elif not can_remove:
+		remove_card_button.text = "牌组至少保留一张卡牌"
+	else:
+		remove_card_button.text = "净化一张卡牌\n%s 灵石" % cost
 	remove_card_button.disabled = (
 		remove_service_used
 		or active_card_remove != null
@@ -357,34 +371,41 @@ func _apply_shop_visuals() -> void:
 	title.text = "坊市"
 	title.set_anchors_preset(Control.PRESET_CENTER_TOP)
 	title.offset_left = -120.0
-	title.offset_top = 32.0
+	title.offset_top = 76.0
 	title.offset_right = 120.0
-	title.offset_bottom = 100.0
-	InkTheme.apply_screen_title(title, 56)
+	title.offset_bottom = 126.0
+	InkTheme.apply_screen_title(title, 50)
 
 	_add_subtitle()
 	_add_market_panel()
-	_add_section_labels()
+	_build_shop_sections()
 
-	shop_content.offset_left = -620.0
-	shop_content.offset_top = -214.0
-	shop_content.offset_right = 620.0
-	shop_content.offset_bottom = 346.0
-	shop_content.add_theme_constant_override("separation", 10)
+	shop_content.offset_left = -790.0
+	shop_content.offset_top = -335.0
+	shop_content.offset_right = 790.0
+	shop_content.offset_bottom = 415.0
+	shop_content.add_theme_constant_override("separation", 18)
 
 	cards.alignment = BoxContainer.ALIGNMENT_CENTER
-	cards.add_theme_constant_override("separation", 14)
+	cards.add_theme_constant_override("separation", 18)
 	relics.alignment = BoxContainer.ALIGNMENT_CENTER
-	relics.add_theme_constant_override("separation", 42)
+	relics.add_theme_constant_override("separation", 12)
+	potions.alignment = BoxContainer.ALIGNMENT_CENTER
+	potions.add_theme_constant_override("separation", 12)
 
-	back_button.offset_left = -612.0
-	back_button.offset_top = 272.0
-	back_button.offset_right = -430.0
-	back_button.offset_bottom = 326.0
+	back_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	back_button.offset_left = 38.0
+	back_button.offset_top = -112.0
+	back_button.offset_right = 270.0
+	back_button.offset_bottom = -30.0
+	back_button.custom_minimum_size = Vector2(232, 82)
 	back_button.text = "离开"
 	_style_button(back_button)
+	back_button.add_theme_font_size_override("font_size", 27)
 
-	remove_card_button.custom_minimum_size = Vector2(320, 54)
+	remove_card_button.custom_minimum_size = Vector2(350, 104)
+	remove_card_button.add_theme_font_size_override("font_size", 27)
+	remove_card_button.tooltip_text = "每次进入坊市只能净化一张卡牌；净化费用会随使用次数逐步提高。"
 	_style_button(remove_card_button)
 
 
@@ -399,11 +420,11 @@ func _add_subtitle() -> void:
 	subtitle.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	# 固定锚到屏幕上沿并留出安全边距，避免较矮分辨率下说明文字顶到窗口外。
 	subtitle.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	subtitle.offset_left = -440.0
-	subtitle.offset_top = 108.0
-	subtitle.offset_right = 440.0
-	subtitle.offset_bottom = 150.0
-	InkTheme.apply_subtitle(subtitle, 23)
+	subtitle.offset_left = -520.0
+	subtitle.offset_top = 124.0
+	subtitle.offset_right = 520.0
+	subtitle.offset_bottom = 152.0
+	InkTheme.apply_subtitle(subtitle, 19)
 	ui_layer.add_child(subtitle)
 
 
@@ -415,61 +436,158 @@ func _add_market_panel() -> void:
 	panel.name = "MarketPanel"
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.offset_left = -660.0
-	panel.offset_top = -238.0
-	panel.offset_right = 660.0
-	panel.offset_bottom = 354.0
+	panel.offset_left = -820.0
+	panel.offset_top = -350.0
+	panel.offset_right = 820.0
+	panel.offset_bottom = 430.0
 	InkTheme.apply_screen_panel(panel)
 	ui_layer.add_child(panel)
 	ui_layer.move_child(panel, shop_content.get_index())
 
 
-func _add_section_labels() -> void:
-	var cards_title := shop_content.get_node_or_null("CardsTitle")
-	if cards_title:
-		cards_title.queue_free()
+func _build_shop_sections() -> void:
+	if cards_section:
+		return
 
-	if not shop_content.has_node("RelicsTitle"):
-		var relics_title := _make_section_label("法宝")
-		relics_title.name = "RelicsTitle"
-		shop_content.add_child(relics_title)
-		shop_content.move_child(relics_title, relics.get_index())
+	for child in shop_content.get_children():
+		shop_content.remove_child(child)
+
+	var cards_data := _create_shop_section(
+		"CardsSection",
+		"卡牌",
+		"扩充牌组 · 每次坊市必有一张稀有卡与一张半价卡",
+		Vector2(0, 478),
+		Color("d2a34b")
+	)
+	cards_section = cards_data["panel"] as PanelContainer
+	shop_content.add_child(cards_section)
+	(cards_data["body"] as VBoxContainer).add_child(cards)
+
+	lower_sections = HBoxContainer.new()
+	lower_sections.name = "LowerSections"
+	lower_sections.custom_minimum_size = Vector2(0, 254)
+	lower_sections.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	lower_sections.add_theme_constant_override("separation", 18)
+	shop_content.add_child(lower_sections)
+
+	var relics_data := _create_shop_section(
+		"RelicsSection",
+		"法宝",
+		"永久强化本轮构筑",
+		Vector2(630, 254),
+		Color("a879d8")
+	)
+	relics_section = relics_data["panel"] as PanelContainer
+	lower_sections.add_child(relics_section)
+	(relics_data["body"] as VBoxContainer).add_child(relics)
+
+	var potions_data := _create_shop_section(
+		"PotionsSection",
+		"符箓丹药",
+		"一次性战斗补给",
+		Vector2(520, 254),
+		Color("61b9ad")
+	)
+	potions_section = potions_data["panel"] as PanelContainer
+	lower_sections.add_child(potions_section)
+	(potions_data["body"] as VBoxContainer).add_child(potions)
+
+	var remove_data := _create_shop_section(
+		"RemoveSection",
+		"删牌",
+		"净化旧牌 · 每次坊市限一次",
+		Vector2(394, 254),
+		Color("d06a55")
+	)
+	remove_section = remove_data["panel"] as PanelContainer
+	lower_sections.add_child(remove_section)
+	var remove_body := remove_data["body"] as VBoxContainer
+	remove_body.alignment = BoxContainer.ALIGNMENT_CENTER
+	remove_body.add_child(remove_card_button)
 
 
-func _make_section_label(text: String) -> Label:
-	var label := Label.new()
-	label.text = text
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_color_override("font_color", Color("f2c94f"))
-	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.78))
-	label.add_theme_constant_override("shadow_offset_x", 2)
-	label.add_theme_constant_override("shadow_offset_y", 2)
-	label.add_theme_font_size_override("font_size", 20)
-	label.custom_minimum_size = Vector2(0.0, 24.0)
-	return label
+func _create_shop_section(
+	section_name: String,
+	heading: String,
+	description: String,
+	minimum_size: Vector2,
+	accent: Color
+) -> Dictionary:
+	var panel := PanelContainer.new()
+	panel.name = section_name
+	panel.custom_minimum_size = minimum_size
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_theme_stylebox_override("panel", _make_shop_section_style(accent))
+
+	var body := VBoxContainer.new()
+	body.name = "Body"
+	body.add_theme_constant_override("separation", 4)
+	panel.add_child(body)
+
+	var heading_plate := PanelContainer.new()
+	heading_plate.name = "HeadingPlate"
+	heading_plate.custom_minimum_size = Vector2(0, 32)
+	heading_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	heading_plate.add_theme_stylebox_override("panel", _make_shop_heading_style(accent))
+	body.add_child(heading_plate)
+
+	var heading_label := Label.new()
+	heading_label.name = "Heading"
+	heading_label.text = heading
+	heading_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	heading_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	heading_label.custom_minimum_size = Vector2(0, 28)
+	heading_label.add_theme_font_size_override("font_size", 24)
+	heading_label.add_theme_color_override("font_color", accent.lightened(0.28))
+	heading_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.88))
+	heading_label.add_theme_constant_override("shadow_offset_x", 2)
+	heading_label.add_theme_constant_override("shadow_offset_y", 2)
+	heading_plate.add_child(heading_label)
+
+	var description_label := Label.new()
+	description_label.name = "Description"
+	description_label.text = description
+	description_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	description_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	description_label.custom_minimum_size = Vector2(0, 20)
+	description_label.add_theme_font_size_override("font_size", 17)
+	description_label.add_theme_color_override("font_color", Color(0.87, 0.81, 0.70, 0.88))
+	body.add_child(description_label)
+
+	return {"panel": panel, "body": body}
 
 
-func _style_button(button: Button) -> void:
-	InkTheme.apply_screen_button(button)
-
-
-func _make_panel_style(bg: Color, border: Color, border_width := 1, radius := 8, shadow := Color(0, 0, 0, 0.34), shadow_size := 8) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = bg
-	style.border_color = border
-	style.border_width_left = border_width
-	style.border_width_top = border_width
-	style.border_width_right = border_width
-	style.border_width_bottom = border_width
-	style.corner_radius_top_left = radius
-	style.corner_radius_top_right = radius
-	style.corner_radius_bottom_left = radius
-	style.corner_radius_bottom_right = radius
+func _make_shop_section_style(accent: Color) -> StyleBoxTexture:
+	# 复用图鉴主面板的九宫格美术边框；轻微染色只用于区分商店分区。
+	var tint := Color(
+		lerpf(1.0, accent.r, 0.14),
+		lerpf(1.0, accent.g, 0.14),
+		lerpf(1.0, accent.b, 0.14),
+		0.96
+	)
+	var style := InkTheme.make_texture_style(SHOP_SECTION_FRAME, 56, 56, tint)
 	style.content_margin_left = 16
 	style.content_margin_top = 10
 	style.content_margin_right = 16
 	style.content_margin_bottom = 10
-	style.shadow_color = shadow
-	style.shadow_size = shadow_size
 	return style
+
+
+func _make_shop_heading_style(accent: Color) -> StyleBoxTexture:
+	var tint := Color(
+		lerpf(0.92, accent.r, 0.22),
+		lerpf(0.86, accent.g, 0.22),
+		lerpf(0.72, accent.b, 0.22),
+		0.98
+	)
+	var style := InkTheme.make_texture_style(SHOP_SECTION_TITLE_PLATE, 44, 14, tint)
+	style.content_margin_left = 16
+	style.content_margin_top = 0
+	style.content_margin_right = 16
+	style.content_margin_bottom = 0
+	return style
+
+
+func _style_button(button: Button) -> void:
+	InkTheme.apply_screen_button(button)

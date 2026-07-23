@@ -18,6 +18,10 @@ amount = 1
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_block"), SubResource("AutoEffect_2_status")])
 effect_text = "获得 {block} 点护体和 {beast_pack} 层兽群。"
 id = "beast_pack_guard"
@@ -26,7 +30,7 @@ cost = 1
 upgrade_type = 1
 element = 5
 profession = 4
-mechanic_tags = PackedStringArray("兽群", "兽系")
+mechanic_tags = PackedStringArray("兽群", "兽系", "召唤", "蓄势")
 display_name = "兽群护阵"
 icon = ExtResource("2")
 sound = ExtResource("3")

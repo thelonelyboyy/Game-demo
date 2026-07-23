@@ -5,9 +5,9 @@ const PIXEL_WORLD_SCALE := 5.0
 const SPIRIT_ROOT_HANDLER := preload("res://scenes/battle/spirit_root_handler.gd")
 const CLASS_MECHANIC_HANDLER := preload("res://scenes/battle/class_mechanic_handler.gd")
 const DEFEAT_LEGACY := preload("res://custom_resources/defeat_legacy.gd")
-const BATTLE_BACKGROUND := preload("res://test2.png")
-const BATTLE_BACKDROP_TINT := Color(0.32, 0.44, 0.70, 1.0)
-const BATTLE_NIGHT_WASH := Color(0.015, 0.035, 0.085, 0.36)
+const BATTLE_BACKGROUND := preload("res://art/backgrounds/dark_xianxia_battle_arena_v2.png")
+const BATTLE_BACKDROP_TINT := Color(0.82, 0.86, 0.92, 1.0)
+const BATTLE_NIGHT_WASH := Color(0.015, 0.025, 0.055, 0.14)
 const BATTLE_BOTTOM_SHADE := Color(0.0, 0.0, 0.0, 0.22)
 const PLAYER_SCREEN_ANCHOR := Vector2(0.83, 0.78)
 # 战斗 BGM（CC0，来源见 art/audio/collected_dark_roguelike/THIRD_PARTY_AUDIO.md）：

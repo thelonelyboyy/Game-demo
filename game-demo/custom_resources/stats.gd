@@ -5,6 +5,7 @@ signal stats_changed
 
 @export var max_health := 1 : set = set_max_health
 @export var art: Texture
+@export var battle_art: Texture2D
 
 var health: int : set = set_health
 var block: int : set = set_block

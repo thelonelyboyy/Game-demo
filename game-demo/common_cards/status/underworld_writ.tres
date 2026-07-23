@@ -1,10 +1,11 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/forbidden_mantra.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/underworld_writ_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")
+mechanic_tags = PackedStringArray("通用术式")
 unplayable = true
 status_card = true
 effect_text = "阴司判牒占据一张手牌，留在本场战斗的抽弃循环中。"

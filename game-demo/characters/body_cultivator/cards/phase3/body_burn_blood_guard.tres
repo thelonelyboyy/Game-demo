@@ -17,6 +17,10 @@ affected_by_spirit_root = false
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_block"), SubResource("AutoEffect_2_self_damage")])
 effect_text = "失去 {self_damage} 点生命，获得 {block} 点护体。"
 id = "body_burn_blood_guard"
@@ -25,7 +29,7 @@ cost = 1
 upgrade_type = 1
 element = 4
 profession = 1
-mechanic_tags = PackedStringArray("血炼")
+mechanic_tags = PackedStringArray("血炼", "金身", "蓄势")
 display_name = "燃血护体"
 icon = ExtResource("2")
 sound = ExtResource("3")

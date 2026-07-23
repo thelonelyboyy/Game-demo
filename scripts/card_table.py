@@ -8,6 +8,7 @@ editable without flattening them into a few generic amount columns.
 from __future__ import annotations
 
 import re
+import json
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1] / "game-demo"
@@ -18,11 +19,13 @@ TARGET = {0: "自身", 1: "单体", 2: "全体敌", 3: "所有"}
 RARITY = {0: "白", 1: "蓝", 2: "金", 3: "暗金"}
 ELEMENT = {0: "无", 1: "金", 2: "木", 3: "水", 4: "火", 5: "土"}
 UPGRADE = {0: "不可突破", 1: "数值提高50%", 2: "费用减少1"}
+GROWTH = {0: "无", 1: "打出后", 2: "弃牌时", 3: "消耗时", 4: "蓄势后"}
 TYPE_R = {v: k for k, v in TYPE.items()}
 TARGET_R = {v: k for k, v in TARGET.items()}
 RARITY_R = {v: k for k, v in RARITY.items()}
 ELEMENT_R = {v: k for k, v in ELEMENT.items()}
 UPGRADE_R = {v: k for k, v in UPGRADE.items()}
+GROWTH_R = {v: k for k, v in GROWTH.items()}
 
 EFFECT_LABEL = {
     "configured_damage_effect": "伤害",
@@ -79,6 +82,13 @@ def _get_str(text: str, key: str, default: str = "") -> str:
 
 def _get_bool(text: str, key: str) -> bool:
     return re.search(rf"^{key} = true", _res_section(text), re.M) is not None
+
+
+def _get_tags(text: str) -> list[str]:
+    match = re.search(r'^mechanic_tags = PackedStringArray\((.*)\)$', _res_section(text), re.M)
+    if not match or not match.group(1).strip():
+        return []
+    return json.loads("[" + match.group(1) + "]")
 
 
 def _ext_maps(text: str) -> tuple[dict, dict]:
@@ -156,6 +166,7 @@ def parse_card(path: Path) -> dict:
         "file": rel,
         "id": _get_str(text, "id"),
         "profession": profession,
+        "mechanic_tags": "、".join(_get_tags(text)),
         "name": _get_str(text, "display_name"),
         "cost": _get_int(text, "cost"),
         "type": TYPE.get(_get_int(text, "type"), "攻击"),
@@ -165,6 +176,9 @@ def parse_card(path: Path) -> dict:
         "keyword_summary": "、".join(keyword_labels),
         "element": ELEMENT.get(_get_int(text, "element"), "无"),
         "upgrade": UPGRADE.get(_get_int(text, "upgrade_type"), "不可突破"),
+        "growth_trigger": GROWTH.get(_get_int(text, "growth_trigger"), "无"),
+        "growth_amount": _get_int(text, "growth_amount", 1),
+        "growth_limit": _get_int(text, "growth_limit"),
         "effects": effects,
     }
 
@@ -223,6 +237,9 @@ def update_card_file(path: Path, row: dict) -> bool:
     text = _set_res_field(text, "rarity", str(RARITY_R[row["rarity"]]), RARITY_R[row["rarity"]] == 0)
     text = _set_res_field(text, "element", str(ELEMENT_R[row["element"]]), ELEMENT_R[row["element"]] == 0)
     text = _set_res_field(text, "upgrade_type", str(UPGRADE_R[row["upgrade"]]), UPGRADE_R[row["upgrade"]] == 0)
+    text = _set_res_field(text, "growth_trigger", str(GROWTH_R[row["growth_trigger"]]), GROWTH_R[row["growth_trigger"]] == 0)
+    text = _set_res_field(text, "growth_amount", str(int(row["growth_amount"])), int(row["growth_amount"]) == 1)
+    text = _set_res_field(text, "growth_limit", str(int(row["growth_limit"])), int(row["growth_limit"]) == 0)
     for key in (
         "exhausts", "retains", "innate", "eternal", "ethereal", "temporary_keyword",
         "cyclic", "unplayable", "status_card", "curse_card",

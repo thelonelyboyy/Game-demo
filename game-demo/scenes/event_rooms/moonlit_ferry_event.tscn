@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "月下渡船"
 event_body = "无桨小舟停在云河边，船夫没有影子。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("付船钱：失去 25 灵石，回复 18 生命", "讲价：获得 35 灵石", "不渡")
-choice_effects = PackedStringArray("lose_gold:25|heal:18", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(0, 35, 0)
+choice_texts = PackedStringArray("付船钱：失去 25 灵石，回复 18 生命", "替船家讲经：按牌组每张牌获得 2 灵石", "不渡")
+choice_effects = PackedStringArray("lose_gold:25|heal:18", "gain_gold_per_card", "skip")
+choice_amounts = PackedInt32Array(0, 2, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

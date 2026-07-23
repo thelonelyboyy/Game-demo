@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "血玉莲"
 event_body = "黑池中央开着一朵血色玉莲，香气像甜酒，也像刀锋。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("采下血莲：失去 13 生命，生命上限 +5", "以灵石封存：失去 40 灵石，回复 29 生命", "不染莲香")
-choice_effects = PackedStringArray("damage:13|max_hp:5", "lose_gold:40|heal:29", "skip")
+choice_texts = PackedStringArray("吞莲换血：失去 15% 最大生命，最大生命 +6", "以灵石封存：失去 40 灵石，回复 29 生命", "不染莲香")
+choice_effects = PackedStringArray("damage_percent:15|max_hp:6", "lose_gold:40|heal:29", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

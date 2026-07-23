@@ -17,6 +17,7 @@ import enemy_table as ent
 import level_table as lt
 import potion_table as pt
 import shop_price_table as st
+import relic_table as rt
 
 
 def main() -> None:
@@ -71,7 +72,9 @@ def main() -> None:
     keyword_standards = [
         {"keyword": "消耗", "switch": "消耗", "count": "", "rule": "打出后进入消耗堆；未打出时正常弃置。", "priority": "打出：临时 > 消耗 > 功法移出 > 周天 > 弃牌"},
         {"keyword": "保留", "switch": "保留", "count": "", "rule": "回合结束不会进入弃牌堆；使用后按其他关键词结算。", "priority": "回合末：临时 > 虚无 > 保留 > 弃牌"},
+        {"keyword": "蓄势", "switch": "成长触发=蓄势后", "count": "每次成长值/成长上限", "rule": "保留牌在回合结束仍在手中时，本场主要数值成长。", "priority": "先触发滞留效果，再成长，最后保留"},
         {"keyword": "固有", "switch": "固有", "count": "", "rule": "战斗第一回合优先进入起手。", "priority": "先移动全部固有牌到抽牌堆顶，再抽起手牌"},
+        {"keyword": "连携", "switch": "效果条件", "count": "条件满足额外值", "rule": "上一张牌的类型或元素满足条件时，效果获得牌面注明的额外值。", "priority": "只读取本回合上一张已打出的牌"},
         {"keyword": "检索X", "switch": "检索", "count": "检索张数", "rule": "打开抽牌堆，选择 X 张牌加入手牌。", "priority": "多个选牌关键词按检索→取回→归墟依次结算"},
         {"keyword": "取回X", "switch": "取回", "count": "取回张数", "rule": "打开弃牌堆，选择 X 张牌加入手牌。", "priority": "多个选牌关键词按检索→取回→归墟依次结算"},
         {"keyword": "归墟X", "switch": "归墟", "count": "归墟张数", "rule": "打开消耗堆，选择 X 张牌加入手牌。", "priority": "多个选牌关键词按检索→取回→归墟依次结算"},
@@ -93,6 +96,8 @@ def main() -> None:
         "blessings": blessings,
         "events": events,
         "potions": potions,
+        "relics": rt.parse_all(),
+        "relic_params": rt.parse_parameters(),
         "enemies": ent.parse_all(),
         "ai": ai,
         "levels": lt.parse_all(),

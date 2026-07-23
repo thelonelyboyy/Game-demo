@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="EnemyStats" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/shadow_reaper.png" id="2"]
 [ext_resource type="PackedScene" path="res://enemies/heartpiercer_shade/heartpiercer_shade_ai.tscn" id="3"]
 [ext_resource type="Resource" path="res://statuses/spell_ward.tres" id="4"]
+[ext_resource type="Texture2D" path="res://art/combatants/enemies/heartpiercer_shade_card_portrait_v3.png" id="5_battle"]
 
 [resource]
 script = ExtResource("1")
@@ -14,3 +15,4 @@ ai = ExtResource("3")
 starting_statuses = Array[Resource("res://custom_resources/status.gd")]([ExtResource("4")])
 max_health = 88
 art = ExtResource("2")
+battle_art = ExtResource("5_battle")

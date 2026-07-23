@@ -6,10 +6,14 @@ extends Label
 ## 换算成画布坐标，飘字挂在 BattleUI（组 "ui_layer"）上，字号不受世界缩放影响。
 
 const FLOAT_DISTANCE := 72.0
-const POP_IN_DURATION := 0.45
-const HOLD_DURATION := 1.30
-const FADE_DURATION := 1.20
-const FEEDBACK_STAGGER := 0.34
+const POP_IN_DURATION := 0.22
+const HOLD_DURATION := 0.32
+const FADE_DURATION := 0.36
+const FEEDBACK_GAP := 0.03
+# 弹入并行段取较长的透明度动画（0.6），随后依次回落、停留、淡出。
+# 队列按完整生命周期预留，保证下一条飘字在上一条 queue_free 后才开始。
+const FEEDBACK_ANIMATION_DURATION := POP_IN_DURATION * 0.6 + POP_IN_DURATION * 0.45 + HOLD_DURATION + FADE_DURATION
+const FEEDBACK_SEQUENCE_INTERVAL := FEEDBACK_ANIMATION_DURATION + FEEDBACK_GAP
 
 const COLOR_DAMAGE := Color("ff5a4a")
 const COLOR_BLOCK := Color("6fc3ff")
@@ -43,13 +47,14 @@ static func _spawn(world_node: Node2D, text_value: String, color: Color, font_si
 	if not ui_layer:
 		return 0.0
 
-	# 同一角色的护体、生命、自损、治疗反馈共用一条短队列。数值结算仍然立即
-	# 完成，只有表现按触发先后错开，避免多层飘字同帧叠在一起看不清。
+	# 同一角色的护体、生命、自损、治疗反馈共用一条严格串行队列。数值结算
+	# 仍然立即完成；只有飘字、音效和命中特效按触发顺序播放。不同角色各自
+	# 使用独立队列，因此群攻时多个目标仍能同时反馈，不会拖慢战斗节奏。
 	var instance_id := world_node.get_instance_id()
 	var now_msec := Time.get_ticks_msec()
 	var reserved_msec := maxi(now_msec, int(_next_feedback_start_msec.get(instance_id, now_msec)))
 	var delay := float(reserved_msec - now_msec) / 1000.0
-	_next_feedback_start_msec[instance_id] = reserved_msec + int(FEEDBACK_STAGGER * 1000.0)
+	_next_feedback_start_msec[instance_id] = reserved_msec + ceili(FEEDBACK_SEQUENCE_INTERVAL * 1000.0)
 
 	var canvas_pos := world_node.get_global_transform_with_canvas().origin + canvas_offset
 	canvas_pos.x += randf_range(-14.0, 14.0)
@@ -82,18 +87,14 @@ static func _spawn(world_node: Node2D, text_value: String, color: Color, font_si
 	var tween := label.create_tween()
 	if delay > 0.0:
 		tween.tween_interval(delay)
-	tween.set_parallel(true)
 	tween.tween_property(label, "scale", Vector2.ONE * 1.25, POP_IN_DURATION * 0.55) \
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "modulate:a", 1.0, POP_IN_DURATION * 0.6)
-	tween.set_parallel(false)
+	tween.parallel().tween_property(label, "modulate:a", 1.0, POP_IN_DURATION * 0.6)
 	tween.tween_property(label, "scale", Vector2.ONE, POP_IN_DURATION * 0.45) \
 			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_interval(HOLD_DURATION)
-	tween.set_parallel(true)
 	tween.tween_property(label, "position:y", label.position.y - FLOAT_DISTANCE, FADE_DURATION) \
 			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.tween_property(label, "modulate:a", 0.0, FADE_DURATION)
-	tween.set_parallel(false)
+	tween.parallel().tween_property(label, "modulate:a", 0.0, FADE_DURATION)
 	tween.tween_callback(label.queue_free)
 	return delay

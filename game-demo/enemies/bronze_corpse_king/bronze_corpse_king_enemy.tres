@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/iron_golem.png" id="2"]
 [ext_resource type="PackedScene" path="res://enemies/bronze_corpse_king/bronze_corpse_king_ai.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://art/combatants/enemies/bronze_corpse_king_card_portrait_v3.png" id="4_battle"]
 
 [resource]
 script = ExtResource("1")
@@ -17,3 +18,4 @@ phase_two_damage_bonus = 0.20
 phase_two_sequence = Array[int]([2, 0, 2, 1])
 max_health = 210
 art = ExtResource("2")
+battle_art = ExtResource("4_battle")

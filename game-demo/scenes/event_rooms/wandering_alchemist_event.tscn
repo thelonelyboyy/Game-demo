@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "游方丹师"
 event_body = "丹师摆着三只玉瓶，笑说有缘者自取。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("买回春丹：花 40 灵石，回复 22 生命", "试药：失去 8 生命，生命上限 +4", "谢绝")
-choice_effects = PackedStringArray("lose_gold:40|heal:22", "damage:8|max_hp:4", "skip")
+choice_texts = PackedStringArray("买回春丹：花 40 灵石，回复 22 生命", "试吞洗髓丹：失去 12% 最大生命，最大生命 +5", "谢绝")
+choice_effects = PackedStringArray("lose_gold:40|heal:22", "damage_percent:12|max_hp:5", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

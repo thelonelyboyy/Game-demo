@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="SoulMarkSpentRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/soul_mark_spent_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/pack_banner.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/demon_wraith_banner_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")

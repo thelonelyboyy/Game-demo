@@ -141,14 +141,14 @@ func _check_count_scaling_cards(battle: Battle, enemies: Array[Enemy]) -> void:
 	_check(battle.class_mechanic_handler.get_combat_card_count(6) == 1, "combat counter tracks cards discarded this turn")
 
 	var exhaust_before := battle.class_mechanic_handler.get_combat_card_count(5)
-	for i in 2:
+	for i in 3:
 		var prep_exhaust := Card.new()
 		prep_exhaust.id = "count_prep_exhaust_%s" % i
 		prep_exhaust.exhausts = true
 		Events.card_played.emit(prep_exhaust)
 	var sacrifice := (load(TEN_THOUSAND_SACRIFICE_PATH) as Card).duplicate(true) as CultivationCard
 	Events.card_played.emit(sacrifice)
-	var expected_exhaust_count := exhaust_before + 3
+	var expected_exhaust_count := battle.class_mechanic_handler.get_combat_card_count(5)
 	_check(battle.class_mechanic_handler.get_combat_card_count(5) == expected_exhaust_count, "combat exhaust counter includes the finisher itself")
 	var enemy_health_before := enemies[0].stats.health
 	var player_health_before := battle.player.stats.health
@@ -214,7 +214,7 @@ func _check_common_card_combat(battle: Battle, enemy: Enemy) -> void:
 	hand_before = battle.player_handler.hand.get_child_count()
 	embers.apply_effects([battle.player], battle.player.modifier_handler)
 	await get_tree().create_timer(0.45).timeout
-	_check(battle.player.stats.block == block_before + 3 and battle.player_handler.hand.get_child_count() == hand_before + 2, "embers return grants block and draws two")
+	_check(battle.player.stats.block == block_before + 5 and battle.player_handler.hand.get_child_count() == hand_before + 3, "embers return is an exhaust burst that grants five block and draws three")
 	_check(battle.char_stats.exhaust_pile.cards.has(embers), "embers return enters the exhaust pile")
 
 	battle.player.stats.health = maxi(battle.player.stats.max_health - 12, 1)

@@ -1,0 +1,6 @@
+﻿demon_burn_impurity: PASS dims=1024x1536 import=True binding=True
+demon_shadow_reenactment: PASS dims=1024x1536 import=True binding=True
+demon_lurking_soul_curse: PASS dims=1024x1536 import=True binding=True
+demon_flame_white: PASS dims=1024x1536 import=True binding=True
+demon_flame_yellow: PASS dims=1024x1536 import=True binding=True
+demon_seven_flame_cycle: PASS dims=1024x1536 import=True binding=True

@@ -66,7 +66,7 @@ func _on_buy_button_pressed() -> void:
 
 
 func _apply_visuals() -> void:
-	custom_minimum_size = Vector2(132, 150)
+	custom_minimum_size = Vector2(112, 150)
 	add_theme_constant_override("separation", 8)
 	price.add_theme_constant_override("separation", 6)
 	price_label.add_theme_color_override("font_color", Color("f2c94f"))
@@ -75,7 +75,7 @@ func _apply_visuals() -> void:
 	price_label.add_theme_constant_override("shadow_offset_y", 2)
 	price_label.add_theme_font_size_override("font_size", 20)
 	buy_button.text = "购买"
-	buy_button.custom_minimum_size = Vector2(108, 40)
+	buy_button.custom_minimum_size = Vector2(96, 40)
 	InkTheme.apply_screen_button(buy_button)
 	buy_button.add_theme_font_size_override("font_size", 19)
 	queue_redraw()

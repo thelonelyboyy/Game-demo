@@ -57,6 +57,18 @@ func _run_smoke() -> void:
 		battle.battle_ui.end_turn_button.mouse_filter == Control.MOUSE_FILTER_STOP,
 		"end-turn button keeps an explicit clickable input surface"
 	)
+	var flame_wheel := battle.battle_ui.get_node_or_null("FlameWheelUI") as Control
+	if flame_wheel:
+		var end_turn_rect := battle.battle_ui.end_turn_button.get_global_rect()
+		var flame_wheel_rect := flame_wheel.get_global_rect()
+		_check(
+			end_turn_rect.end.y <= flame_wheel_rect.position.y + 1.5,
+			"end-turn button stays above the flame wheel"
+		)
+		_check(
+			absf(end_turn_rect.get_center().x - flame_wheel_rect.get_center().x) <= 1.5,
+			"end-turn button is horizontally centered over the flame wheel"
+		)
 	_check(PlayerHandler.HAND_DRAW_INTERVAL <= 0.15, "opening hand draw pacing stays responsive")
 	_check(Hand.REFLOW_DURATION <= 0.30, "hand reflow completes within the interaction budget")
 	_check(BattleUI.PLAYED_CARD_PREVIEW_HOLD_DURATION <= 0.35, "played-card preview does not linger over rapid input")

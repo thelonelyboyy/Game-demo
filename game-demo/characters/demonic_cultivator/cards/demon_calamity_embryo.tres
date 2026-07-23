@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://custom_resources/effects/configured_delayed_effect.gd" id="3"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="4"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_mana_effect.gd" id="5"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_black_contract.png" id="6"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_calamity_embryo_v2.png" id="6"]
 [ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="7"]
 
 [sub_resource type="Resource" id="SelfDamage"]
@@ -41,7 +41,7 @@ exhausts = true
 upgrade_type = 2
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("献祭", "延迟", "过牌")
+mechanic_tags = PackedStringArray("献祭", "延迟", "过牌", "煞气")
 display_name = "劫火魔胎"
 icon = ExtResource("6")
 sound = ExtResource("7")

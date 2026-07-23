@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "红线仙"
 event_body = "老妪捻着红线，说能替你剪去一段因果。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("剪因果：移除随机一张牌", "买红线：失去 35 灵石，生命上限 +4", "婉拒")
-choice_effects = PackedStringArray("remove_random", "lose_gold:35|max_hp:4", "skip")
-choice_amounts = PackedInt32Array(0, 0, 0)
+choice_texts = PackedStringArray("剪断恶缘：优先净化一张污染牌", "买红线：失去 35 灵石，生命上限 +4", "婉拒")
+choice_effects = PackedStringArray("purify_affliction", "lose_gold:35|max_hp:4", "skip")
+choice_amounts = PackedInt32Array(1, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

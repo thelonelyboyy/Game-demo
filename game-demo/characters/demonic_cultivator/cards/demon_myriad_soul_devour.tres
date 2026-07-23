@@ -10,13 +10,13 @@
 [sub_resource type="Resource" id="E1"]
 script = ExtResource("auto_dmg")
 target_mode = 2
-amount = 8
+amount = 11
 
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("auto_status")
 status = ExtResource("auto_soul_mark")
 target_mode = 2
-amount = 2
+amount = 3
 
 [resource]
 script = ExtResource("1")
@@ -30,7 +30,7 @@ exhausts = true
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("魂印")
+mechanic_tags = PackedStringArray("魂印", "爆发")
 display_name = "万魂噬天"
 icon = ExtResource("2")
 sound = ExtResource("3")

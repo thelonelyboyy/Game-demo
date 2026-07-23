@@ -18,6 +18,10 @@ affected_by_spirit_root = false
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_low_health_damage"), SubResource("AutoEffect_2_self_damage")])
 effect_text = "失去 {self_damage} 点生命，造成 {damage} 点伤害。若生命不高于一半，额外造成 {blood_bonus} 点伤害。"
 id = "body_blood_punch"
@@ -26,7 +30,7 @@ cost = 1
 upgrade_type = 1
 element = 4
 profession = 1
-mechanic_tags = PackedStringArray("血炼")
+mechanic_tags = PackedStringArray("血炼", "承伤转化", "蓄势")
 display_name = "血炼拳"
 icon = ExtResource("2")
 sound = ExtResource("3")

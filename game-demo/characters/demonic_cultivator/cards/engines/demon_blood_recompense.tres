@@ -12,6 +12,10 @@ threshold = 7
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("E1")])
 id = "demon_blood_recompense"
 type = 2
@@ -19,7 +23,7 @@ rarity = 2
 cost = 2
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("功法", "献祭")
+mechanic_tags = PackedStringArray("功法", "献祭", "血炼", "蓄势")
 display_name = "血偿万道"
 icon = ExtResource("2")
 sound = ExtResource("3")

@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "墨石碑"
 event_body = "石碑上的墨迹像活物一样游动。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("临摹碑文：随机突破一张牌", "剥落墨玉：获得 55 灵石", "作揖离开")
-choice_effects = PackedStringArray("upgrade_random", "gain_gold", "skip")
+choice_texts = PackedStringArray("以墨洗识海：净化一张污染牌并回复 8 生命", "剥落墨玉：获得 55 灵石", "作揖离开")
+choice_effects = PackedStringArray("purify_affliction:1|heal:8", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 55, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

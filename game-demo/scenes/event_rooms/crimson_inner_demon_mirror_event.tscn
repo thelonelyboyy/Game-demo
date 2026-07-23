@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "赤镜心魔"
 event_body = "镜中之人比你先笑，紫黑魔气沿着镜裂渗出。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("直视心魔：失去 14 生命，随机突破一张牌", "碎镜断念：移除随机一张牌", "闭目离开")
-choice_effects = PackedStringArray("damage:14|upgrade_random:0", "remove_random", "skip")
+choice_texts = PackedStringArray("直视心魔：失去 14% 最大生命，重铸并突破一张牌", "碎镜断念：移除随机一张牌", "闭目离开")
+choice_effects = PackedStringArray("damage_percent:14|transform_random:1|upgrade_random:1", "remove_random", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

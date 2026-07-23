@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "云上小市"
 event_body = "几位散修在云桥旁支起摊位。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("出售杂物：获得 55 灵石", "买护身符：花 35 灵石，生命上限 +3", "看看就走")
-choice_effects = PackedStringArray("gain_gold", "lose_gold:35|max_hp:3", "skip")
-choice_amounts = PackedInt32Array(55, 0, 0)
+choice_texts = PackedStringArray("按牌组规模出售见闻：每张永久牌换 3 灵石", "买护身符：花 35 灵石，生命上限 +3", "看看就走")
+choice_effects = PackedStringArray("gain_gold_per_card", "lose_gold:35|max_hp:3", "skip")
+choice_amounts = PackedInt32Array(3, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

@@ -19,6 +19,10 @@ amount = 2
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_status"), SubResource("AutoEffect_2_status")])
 effect_text = "获得 {beast_pack} 层兽群和 {qi} 层灵息。"
 id = "beast_alpha_order"
@@ -28,7 +32,7 @@ cost = 2
 upgrade_type = 1
 element = 2
 profession = 4
-mechanic_tags = PackedStringArray("兽群", "兽系")
+mechanic_tags = PackedStringArray("兽群", "兽系", "召唤", "蓄势")
 display_name = "兽王号令"
 icon = ExtResource("2")
 sound = ExtResource("3")

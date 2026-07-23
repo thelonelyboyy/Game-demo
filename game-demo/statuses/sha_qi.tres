@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ShaQiStatus" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://statuses/sha_qi.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/ui/icons/attack_negative.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/ui/icons/status_sha_qi_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")

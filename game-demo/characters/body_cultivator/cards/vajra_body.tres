@@ -19,6 +19,7 @@ amount = 1
 
 [resource]
 script = ExtResource("1")
+cyclic = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_status"), SubResource("AutoEffect_2_status")])
 effect_text = "获得 {qi} 层灵息和 {gold_body} 层金身。"
 id = "vajra_body"
@@ -27,7 +28,7 @@ rarity = 2
 cost = 1
 upgrade_type = 1
 element = 5
-mechanic_tags = PackedStringArray("金身")
+mechanic_tags = PackedStringArray("金身", "承伤转化", "循环术式")
 display_name = "金刚不坏"
 icon = ExtResource("2")
 sound = ExtResource("3")

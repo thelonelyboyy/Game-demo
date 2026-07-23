@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "裂纹玉简"
 event_body = "玉简里记录的功法只剩半卷。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("强行参悟：随机突破一张牌，失去 10 生命", "转手卖掉：获得 60 灵石", "收好以后再看")
-choice_effects = PackedStringArray("upgrade_random:0|damage:10", "gain_gold", "skip")
+choice_texts = PackedStringArray("碎简重悟：随机重铸一张牌并突破一张牌", "转手卖掉：获得 60 灵石", "收好以后再看")
+choice_effects = PackedStringArray("transform_random:1|upgrade_random:1", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 60, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

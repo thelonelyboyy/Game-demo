@@ -33,6 +33,9 @@ const COMBATANT_CARD_GAP := 30.0
 const PLAYER_CARD_BOTTOM_OFFSET := Vector2(70.0, 0.0)
 const HERO_SKILL_SIZE := Vector2(158.4, 86.4)
 const END_TURN_SIZE := Vector2(200.0, 104.0)
+const FLAME_WHEEL_BOTTOM_LEFT := Vector2(34.0, 208.0)
+const FLAME_WHEEL_LAYOUT_SIZE := Vector2(220.0, 172.0)
+const END_TURN_FLAME_GAP := 12.0
 # 手牌悬停层级最高为 1000；操作按钮必须始终在手牌之上，同时低于发现牌弹窗。
 const COMBAT_ACTION_Z_INDEX := 2200
 
@@ -970,12 +973,13 @@ func _layout_battle_controls() -> void:
 		_played_card_preview_layer.offset_right = 0.0
 		_played_card_preview_layer.offset_bottom = 0.0
 
-	_place_bottom_left($FlameWheelUI as Control, Vector2(34, 208), Vector2(220, 172), scale_factor)
+	var flame_wheel := $FlameWheelUI as Control
+	_place_bottom_left(flame_wheel, FLAME_WHEEL_BOTTOM_LEFT, FLAME_WHEEL_LAYOUT_SIZE, scale_factor)
 	_place_bottom_left(draw_pile_button, Vector2(48, 40), Vector2(104, 156), scale_factor)
 	_place_bottom_left(discard_pile_button, Vector2(162, 40), Vector2(104, 156), scale_factor)
 	_place_bottom_left(exhaust_pile_button, Vector2(276, 40), Vector2(104, 156), scale_factor)
-	# 结束回合位于人物牌左侧的空隙，避开底部手牌；英雄技能保留在人物牌下方。
-	_place_bottom_right(end_turn_button, Vector2(414, 402), END_TURN_SIZE, scale_factor)
+	# 结束回合居中放在焰轮正上方，形成左侧机制操作区，并避开底部牌堆与手牌。
+	_place_end_turn_above_flame_wheel(flame_wheel, scale_factor)
 	if hero_skill_button:
 		var hero_skill_offset := Vector2(
 			PLAYER_CARD_BOTTOM_OFFSET.x + PLAYER_COMBATANT_CARD_SIZE.x - HERO_SKILL_SIZE.x,
@@ -1260,6 +1264,35 @@ func _place_bottom_left(control: Control, position_from_bottom: Vector2, rect_si
 	control.offset_top = -(position_from_bottom.y + rect_size.y) * scale_factor
 	control.offset_right = control.offset_left + rect_size.x * scale_factor
 	control.offset_bottom = -position_from_bottom.y * scale_factor
+
+
+func _place_end_turn_above_flame_wheel(flame_wheel: Control, scale_factor: float) -> void:
+	if not flame_wheel or not end_turn_button:
+		return
+	# 焰轮脚本的最小尺寸大于旧布局框；按真实最小尺寸计算，避免不同分辨率下
+	# 按钮与焰轮重叠或横向偏离。
+	var flame_minimum := flame_wheel.get_combined_minimum_size()
+	var flame_size := Vector2(
+		maxf(FLAME_WHEEL_LAYOUT_SIZE.x * scale_factor, flame_minimum.x),
+		maxf(FLAME_WHEEL_LAYOUT_SIZE.y * scale_factor, flame_minimum.y)
+	)
+	var button_minimum := end_turn_button.get_combined_minimum_size()
+	var button_size := Vector2(
+		maxf(END_TURN_SIZE.x * scale_factor, button_minimum.x),
+		maxf(END_TURN_SIZE.y * scale_factor, button_minimum.y)
+	)
+	var flame_left := FLAME_WHEEL_BOTTOM_LEFT.x * scale_factor
+	var flame_bottom := FLAME_WHEEL_BOTTOM_LEFT.y * scale_factor
+	var gap := END_TURN_FLAME_GAP * scale_factor
+
+	end_turn_button.anchor_left = 0.0
+	end_turn_button.anchor_top = 1.0
+	end_turn_button.anchor_right = 0.0
+	end_turn_button.anchor_bottom = 1.0
+	end_turn_button.offset_left = flame_left + (flame_size.x - button_size.x) * 0.5
+	end_turn_button.offset_right = end_turn_button.offset_left + button_size.x
+	end_turn_button.offset_bottom = -(flame_bottom + flame_size.y + gap)
+	end_turn_button.offset_top = end_turn_button.offset_bottom - button_size.y
 
 
 func _place_bottom_right(control: Control, position_from_bottom: Vector2, rect_size: Vector2, scale_factor: float) -> void:

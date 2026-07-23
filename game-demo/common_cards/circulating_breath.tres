@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_block_effect.gd" id="2"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="3"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_life_for_mana.png" id="4"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/circulating_breath_v2.png" id="4"]
 [ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="5"]
 
 [sub_resource type="Resource" id="Block"]
@@ -17,13 +17,17 @@ affected_by_spirit_root = false
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("Block"), SubResource("Draw")])
 id = "circulating_breath"
 type = 1
 cost = 1
 cyclic = true
 upgrade_type = 1
-mechanic_tags = PackedStringArray("通用", "过牌")
+mechanic_tags = PackedStringArray("通用", "过牌", "通用术式", "蓄势")
 display_name = "周天吐纳"
 icon = ExtResource("4")
 sound = ExtResource("5")

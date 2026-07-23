@@ -1,0 +1,6 @@
+﻿muscle_resonance_strike: PASS dims=1024x1536 import=True binding=True
+returning_light: PASS dims=1024x1536 import=True binding=True
+strike: PASS dims=1024x1536 import=True binding=True
+eclipse_scar: PASS dims=1024x1536 import=True binding=True
+karmic_fire_curse: PASS dims=1024x1536 import=True binding=True
+spirit_lock_seal: PASS dims=1024x1536 import=True binding=True

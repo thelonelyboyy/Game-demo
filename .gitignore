@@ -18,6 +18,7 @@ mono_crash.*.json
 
 #codex environment
 .codex
+/.codex_tmp/
 
 #mcp
 mcp-server-dist
@@ -37,6 +38,8 @@ websocket_server.gd.backup
 **/*backup*/
 /tmp/
 /outputs/
+/game-demo/tmp/
+/game-demo/test_data/_capture_*_temp.gd*
 # Python
 __pycache__/
 *.pyc

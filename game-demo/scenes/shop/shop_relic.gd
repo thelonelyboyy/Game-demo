@@ -80,7 +80,7 @@ func _on_buy_button_pressed() -> void:
 
 
 func _apply_visuals() -> void:
-	custom_minimum_size = Vector2(160, 174)
+	custom_minimum_size = Vector2(140, 174)
 	add_theme_constant_override("separation", 8)
 	relic_container.custom_minimum_size = Vector2(80, 66)
 	price.add_theme_constant_override("separation", 6)
@@ -90,7 +90,7 @@ func _apply_visuals() -> void:
 	price_label.add_theme_constant_override("shadow_offset_y", 2)
 	price_label.add_theme_font_size_override("font_size", 22)
 	buy_button.text = "购买"
-	buy_button.custom_minimum_size = Vector2(124, 42)
+	buy_button.custom_minimum_size = Vector2(112, 42)
 	_style_button(buy_button)
 	queue_redraw()
 

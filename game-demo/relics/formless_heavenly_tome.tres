@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CursedDrawBossRelic" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/cursed_draw_boss_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/star_compass.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/formless_heavenly_tome_v2.png" id="2"]
 [ext_resource type="Resource" path="res://common_cards/status/eclipse_scar.tres" id="3"]
 
 [resource]

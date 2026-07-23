@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "坠星坑"
 event_body = "一块星铁砸穿山体，周围还烫着。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("拾取星屑：获得 90 灵石，失去 11 生命", "借火炼牌：随机突破一张牌", "离开热坑")
-choice_effects = PackedStringArray("gain_gold:90|damage:11", "upgrade_random", "skip")
+choice_texts = PackedStringArray("以伤换星屑：失去 10% 最大生命，每点已损生命换 2 灵石", "借火炼牌：随机突破一张牌", "离开热坑")
+choice_effects = PackedStringArray("damage_percent:10|gain_gold_per_missing_hp:2", "upgrade_random", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

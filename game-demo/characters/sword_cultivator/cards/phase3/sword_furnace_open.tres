@@ -19,6 +19,7 @@ amount = 3
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_status"), SubResource("AutoEffect_2_status")])
 effect_text = "获得 {forge} 层铸剑和 {muscle} 层劲气。"
 id = "sword_furnace_open"
@@ -28,7 +29,7 @@ cost = 2
 upgrade_type = 1
 element = 4
 profession = 2
-mechanic_tags = PackedStringArray("铸剑")
+mechanic_tags = PackedStringArray("铸剑", "剑式连携", "先手")
 display_name = "剑炉大开"
 icon = ExtResource("2")
 sound = ExtResource("3")

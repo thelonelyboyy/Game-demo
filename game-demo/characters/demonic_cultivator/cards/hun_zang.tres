@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3 uid="uid://cuhgjrmi2k5w3"]
 
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://civrsdnd0770k" path="res://art/ui/icons/status_soul_mark.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/hun_zang_v2.png" id="2"]
 [ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/audio/slash.ogg" id="3"]
 [ext_resource type="Script" uid="uid://bnx0yul2vtmmn" path="res://custom_resources/effects/configured_soul_mark_detonate_effect.gd" id="e1"]
 
@@ -17,7 +17,7 @@ id = "hun_zang"
 rarity = 2
 target = 1
 cost = 3
-mechanic_tags = null
+mechanic_tags = PackedStringArray("煞气")
 display_name = "魂葬"
 icon = ExtResource("2")
 sound = ExtResource("3")

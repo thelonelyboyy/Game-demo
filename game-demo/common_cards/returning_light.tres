@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_heal_effect.gd" id="2"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_soul_siphon.png" id="3"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/returning_light_v2.png" id="3"]
 [ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="4"]
 
 [sub_resource type="Resource" id="Heal"]
@@ -12,6 +12,7 @@ affected_by_spirit_root = false
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("Heal")])
 id = "returning_light"
 type = 1
@@ -19,7 +20,7 @@ rarity = 1
 cost = 1
 exhausts = true
 upgrade_type = 1
-mechanic_tags = PackedStringArray("通用", "治疗")
+mechanic_tags = PackedStringArray("通用", "治疗", "通用术式", "先手")
 display_name = "回光返照"
 icon = ExtResource("3")
 sound = ExtResource("4")

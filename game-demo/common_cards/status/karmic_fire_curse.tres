@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1_card"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_sacrificial_flame.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/karmic_fire_curse_v2.png" id="2_icon"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="3_self_damage"]
 
 [sub_resource type="Resource" id="BurnAway"]
@@ -19,6 +19,6 @@ target = 0
 cost = 1
 exhausts = true
 curse_card = true
-mechanic_tags = PackedStringArray("可打出")
+mechanic_tags = PackedStringArray("可打出", "通用术式")
 display_name = "业火"
 icon = ExtResource("2_icon")

@@ -12,6 +12,7 @@ character_type = 0
 rarity = 2
 starter_relic = false
 icon = ExtResource("2")
-tooltip = "雷纹印\n每回合开始时，对所有敌人造成 3 点伤害。"
+tooltip = "雷纹印
+每回合开始时对所有敌人造成 4 点伤害，擅长清理召唤物。"
 damage_amount = 3
 target_mode = 0

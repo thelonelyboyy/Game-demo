@@ -1,0 +1,57 @@
+﻿ROWS=50
+UNIQUE_NEW=50
+CHARACTER_Q=25
+CONCEPT_Q=25
+VERIFIED=50
+IMPORT_EXIT=0
+RUNTIME_EXIT=0
+demon_ash_barrier: PASS status=verified dims=1024x1536 import=True binding=True
+demon_ash_recollection: PASS status=verified dims=1024x1536 import=True binding=True
+demon_blood_castoff: PASS status=verified dims=1024x1536 import=True binding=True
+demon_blood_debt: PASS status=verified dims=1024x1536 import=True binding=True
+demon_blood_forge_armor: PASS status=verified dims=1024x1536 import=True binding=True
+demon_blood_reversal: PASS status=verified dims=1024x1536 import=True binding=True
+demon_burn_impurity: PASS status=verified dims=1024x1536 import=True binding=True
+demon_shadow_reenactment: PASS status=verified dims=1024x1536 import=True binding=True
+demon_lurking_soul_curse: PASS status=verified dims=1024x1536 import=True binding=True
+demon_mind_sieve: PASS status=verified dims=1024x1536 import=True binding=True
+demon_soul_lamp_renewal: PASS status=verified dims=1024x1536 import=True binding=True
+hun_kai: PASS status=verified dims=1024x1536 import=True binding=True
+ju_sha: PASS status=verified dims=1024x1536 import=True binding=True
+she_hun_xu_yuan: PASS status=verified dims=1024x1536 import=True binding=True
+yin_sha_jue: PASS status=verified dims=1024x1536 import=True binding=True
+demon_calamity_embryo: PASS status=verified dims=1024x1536 import=True binding=True
+demon_flame_black: PASS status=verified dims=1024x1536 import=True binding=True
+demon_flame_blue: PASS status=verified dims=1024x1536 import=True binding=True
+demon_flame_green: PASS status=verified dims=1024x1536 import=True binding=True
+demon_flame_purple: PASS status=verified dims=1024x1536 import=True binding=True
+demon_flame_red: PASS status=verified dims=1024x1536 import=True binding=True
+demon_flame_white: PASS status=verified dims=1024x1536 import=True binding=True
+demon_flame_yellow: PASS status=verified dims=1024x1536 import=True binding=True
+demon_seven_flame_cycle: PASS status=verified dims=1024x1536 import=True binding=True
+demon_sha_blade: PASS status=verified dims=1024x1536 import=True binding=True
+demon_forbidden_archive: PASS status=verified dims=1024x1536 import=True binding=True
+demon_myriad_marks_return: PASS status=verified dims=1024x1536 import=True binding=True
+hun_zang: PASS status=verified dims=1024x1536 import=True binding=True
+lie_hun: PASS status=verified dims=1024x1536 import=True binding=True
+san_hun_tong_fen: PASS status=verified dims=1024x1536 import=True binding=True
+common_ash_heart_guard: PASS status=verified dims=1024x1536 import=True binding=True
+common_circulating_breath: PASS status=verified dims=1024x1536 import=True binding=True
+common_defend: PASS status=verified dims=1024x1536 import=True binding=True
+common_flowing_cloud_guard: PASS status=verified dims=1024x1536 import=True binding=True
+common_ink_flow_slash: PASS status=verified dims=1024x1536 import=True binding=True
+common_momentum_pursuit: PASS status=verified dims=1024x1536 import=True binding=True
+common_muscle_resonance_strike: PASS status=verified dims=1024x1536 import=True binding=True
+common_returning_light: PASS status=verified dims=1024x1536 import=True binding=True
+common_strike: PASS status=verified dims=1024x1536 import=True binding=True
+common_heart_demon: PASS status=verified dims=1024x1536 import=True binding=True
+common_discard_aegis: PASS status=verified dims=1024x1536 import=True binding=True
+common_embers_return: PASS status=verified dims=1024x1536 import=True binding=True
+common_spirit_stone_needle: PASS status=verified dims=1024x1536 import=True binding=True
+common_toxin: PASS status=verified dims=1024x1536 import=True binding=True
+common_blood_debt_curse: PASS status=verified dims=1024x1536 import=True binding=True
+common_calamity_ember_brand: PASS status=verified dims=1024x1536 import=True binding=True
+common_eclipse_scar: PASS status=verified dims=1024x1536 import=True binding=True
+common_karmic_fire_curse: PASS status=verified dims=1024x1536 import=True binding=True
+common_spirit_lock_seal: PASS status=verified dims=1024x1536 import=True binding=True
+common_underworld_writ: PASS status=verified dims=1024x1536 import=True binding=True

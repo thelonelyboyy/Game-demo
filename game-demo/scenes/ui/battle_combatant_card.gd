@@ -612,6 +612,8 @@ func _combatant_tooltip() -> String:
 
 
 func _portrait_texture() -> Texture2D:
+	if stats and stats.battle_art:
+		return stats.battle_art
 	if stats is CharacterStats and (stats as CharacterStats).character_name == "魔修":
 		return DEMONIC_CULTIVATOR_CARD
 	if stats is EnemyStats:

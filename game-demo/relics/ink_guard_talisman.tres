@@ -11,5 +11,6 @@ type = 1
 character_type = 0
 starter_relic = false
 icon = ExtResource("2")
-tooltip = "墨甲符\n战斗开始时，获得 6 点护体。"
-block_amount = 6
+tooltip = "墨甲符
+战斗开始时获得 8 点护体：稳定抵挡第一轮攻势。"
+block_amount = 8

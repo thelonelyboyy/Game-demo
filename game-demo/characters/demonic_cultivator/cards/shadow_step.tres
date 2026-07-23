@@ -14,6 +14,6 @@ exhausts = false
 search_count = 2
 upgrade_type = 1
 element = 4
-mechanic_tags = PackedStringArray("检索")
+mechanic_tags = PackedStringArray("检索", "煞气")
 display_name = "影遁"
 icon = ExtResource("2")

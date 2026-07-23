@@ -18,6 +18,7 @@ amount = 2
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_block"), SubResource("AutoEffect_2_status")])
 effect_text = "获得 {block} 点护体和 {gold_body} 层金身。"
 id = "body_immovable_king"
@@ -27,7 +28,7 @@ cost = 2
 upgrade_type = 1
 element = 5
 profession = 1
-mechanic_tags = PackedStringArray("金身")
+mechanic_tags = PackedStringArray("金身", "承伤转化", "先手")
 display_name = "不动明王"
 icon = ExtResource("2")
 sound = ExtResource("3")

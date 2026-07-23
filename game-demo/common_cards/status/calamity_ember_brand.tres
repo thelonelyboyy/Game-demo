@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1_card"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_sacrificial_flame.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/calamity_ember_brand_v2.png" id="2_icon"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_self_damage_effect.gd" id="3_self_damage"]
 
 [sub_resource type="Resource" id="EndTurnBurn"]
@@ -12,6 +12,7 @@ affected_by_card_growth = false
 
 [resource]
 script = ExtResource("1_card")
+mechanic_tags = PackedStringArray("通用术式")
 end_turn_trigger_effects = Array[Resource]([SubResource("EndTurnBurn")])
 effect_text = "劫火附着心脉；若回合结束仍在手中便反噬，并继续进入抽弃循环。"
 id = "calamity_ember_brand"

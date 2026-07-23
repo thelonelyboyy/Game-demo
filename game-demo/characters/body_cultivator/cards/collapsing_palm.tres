@@ -20,6 +20,7 @@ amount = 1
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_status")])
 effect_text = "造成 {damage} 点伤害，并施加 {exposed} 回合破绽。"
 id = "collapsing_palm"
@@ -28,7 +29,7 @@ target = 1
 cost = 2
 upgrade_type = 2
 element = 5
-mechanic_tags = PackedStringArray("金身")
+mechanic_tags = PackedStringArray("金身", "承伤转化", "先手")
 display_name = "崩山掌"
 icon = ExtResource("2")
 sound = ExtResource("3")

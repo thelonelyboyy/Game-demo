@@ -83,6 +83,18 @@ func _check_new_event_effects(character_resource: CharacterStats) -> void:
 	event._apply_single_effect("gain_curse", 1)
 	_check(character.deck.cards.size() == deck_size + 2, "event can add a curse")
 	_check(character.deck.cards.back().is_curse_card(), "event curse is marked as a curse")
+	var health_before := character.health
+	character.health = maxi(1, character.max_health - 20)
+	event._apply_single_effect("heal_percent", 10)
+	_check(character.health == mini(character.max_health - 20 + ceili(character.max_health * 0.1), character.max_health), "event percentage healing uses max health")
+	var gold_before := event.run_stats.gold
+	event._apply_single_effect("gain_gold_per_card", 2)
+	_check(event.run_stats.gold == gold_before + character.deck.cards.size() * 2, "event can reward deck-size economy")
+	var upgrade_before := character.deck.cards.filter(func(card: Card): return card.upgraded).size()
+	event._apply_single_effect("upgrade_random", 2)
+	var upgrade_after := character.deck.cards.filter(func(card: Card): return card.upgraded).size()
+	_check(upgrade_after >= upgrade_before + 2, "event amount can upgrade multiple cards")
+	character.health = health_before
 	event.free()
 
 

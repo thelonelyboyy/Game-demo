@@ -1,0 +1,6 @@
+﻿ash_heart_guard: PASS dims=1024x1536 import=True binding=True
+circulating_breath: PASS dims=1024x1536 import=True binding=True
+defend: PASS dims=1024x1536 import=True binding=True
+discard_aegis: PASS dims=1024x1536 import=True binding=True
+embers_return: PASS dims=1024x1536 import=True binding=True
+spirit_stone_needle: PASS dims=1024x1536 import=True binding=True

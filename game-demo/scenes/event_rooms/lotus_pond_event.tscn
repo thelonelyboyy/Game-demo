@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "净莲池"
 event_body = "白莲开在污泥中，香气清冷。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("采莲：回复 23 生命", "挖莲藕：获得 40 灵石", "不扰清净")
-choice_effects = PackedStringArray("heal", "gain_gold", "skip")
-choice_amounts = PackedInt32Array(23, 40, 0)
+choice_texts = PackedStringArray("入池净念：回复 18% 最大生命并净化一张污染牌", "挖莲藕：获得 40 灵石", "不扰清净")
+choice_effects = PackedStringArray("heal_percent:18|purify_affliction:1", "gain_gold", "skip")
+choice_amounts = PackedInt32Array(0, 40, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

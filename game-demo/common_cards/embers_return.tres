@@ -3,16 +3,16 @@
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_block_effect.gd" id="2"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_draw_effect.gd" id="3"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_burn_self_heaven.png" id="4"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/embers_return_v2.png" id="4"]
 [ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="5"]
 
 [sub_resource type="Resource" id="Block"]
 script = ExtResource("2")
-amount = 3
+amount = 5
 
 [sub_resource type="Resource" id="Draw"]
 script = ExtResource("3")
-amount = 2
+amount = 3
 affected_by_spirit_root = false
 
 [resource]
@@ -24,7 +24,7 @@ rarity = 1
 cost = 1
 exhausts = true
 upgrade_type = 1
-mechanic_tags = PackedStringArray("通用", "过牌")
+mechanic_tags = PackedStringArray("通用", "过牌", "通用术式", "爆发")
 display_name = "烬归灵台"
 icon = ExtResource("4")
 sound = ExtResource("5")

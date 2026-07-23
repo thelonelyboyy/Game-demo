@@ -23,7 +23,14 @@ TRIGGERS = {
 STRUCTURAL_FIELDS = {
     "target_mode", "condition_type", "condition_card_type", "result", "count_source",
     "source_pile", "card_filter", "engine", "color", "bonus", "rider", "growth_trigger",
+    "condition_element",
     "convert_to", "type", "target", "rarity", "element", "profession", "upgrade_type",
+}
+
+CONDITION_NAMES = {
+    0: "无条件", 1: "所选灵根一致", 2: "拥有机制标签", 3: "本牌类型匹配",
+    4: "玩家拥有指定状态", 5: "焰轮颜色数达标", 6: "连携上一张牌类型",
+    7: "连携上一张牌元素", 8: "本回合出牌数达标", 9: "低生命",
 }
 
 
@@ -86,6 +93,9 @@ def parse_file(path: Path) -> list[dict]:
         if not script:
             continue
         params = _script_defaults(script_paths[ext_id])
+        condition_match = re.search(r'^condition_type = (\d+)$', body, re.M)
+        condition_type = int(condition_match.group(1)) if condition_match else 0
+        condition = CONDITION_NAMES.get(condition_type, "特殊条件")
         for pm in re.finditer(r'^([a-z_][a-z_0-9]*) = (-?\d+(?:\.\d+)?)$', body, re.M):
             if pm.group(1) not in STRUCTURAL_FIELDS:
                 params[pm.group(1)] = _number(pm.group(2))
@@ -96,6 +106,7 @@ def parse_file(path: Path) -> list[dict]:
                 "file": card["file"], "card_id": card["id"], "card_name": card["name"],
                 "trigger": triggers.get(sub_id, "嵌套效果"), "effect_id": sub_id,
                 "effect": labels.CARD_EFFECT_LABELS.get(script, "未命名效果"),
+                "condition": condition,
                 "script_path": script_paths[ext_id], "param": labels.PARAM_LABELS[raw_name],
                 "value": value,
             })

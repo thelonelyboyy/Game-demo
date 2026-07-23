@@ -18,6 +18,7 @@ affected_by_spirit_root = false
 
 [resource]
 script = ExtResource("1")
+cyclic = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_self_damage")])
 effect_text = "失去 {self_damage} 点生命，对所有敌人造成 {damage} 点伤害。"
 id = "demon_flame"
@@ -26,7 +27,7 @@ target = 2
 cost = 2
 upgrade_type = 2
 element = 4
-mechanic_tags = PackedStringArray("献祭")
+mechanic_tags = PackedStringArray("献祭", "魔焰", "循环术式")
 display_name = "魔焰燎原"
 icon = ExtResource("2")
 sound = ExtResource("3")

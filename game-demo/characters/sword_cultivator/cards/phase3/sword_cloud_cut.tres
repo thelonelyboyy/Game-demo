@@ -8,14 +8,15 @@
 
 [sub_resource type="Resource" id="AutoEffect_1_damage"]
 script = ExtResource("auto_effect_damage")
-amount = 4
+amount = 6
 
 [sub_resource type="Resource" id="AutoEffect_2_draw"]
 script = ExtResource("auto_effect_draw")
-amount = 1
+amount = 2
 
 [resource]
 script = ExtResource("1")
+exhausts = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_draw")])
 effect_text = "造成 {damage} 点伤害，抽 {draw} 张牌。"
 id = "sword_cloud_cut"
@@ -24,7 +25,7 @@ cost = 1
 upgrade_type = 1
 element = 1
 profession = 2
-mechanic_tags = PackedStringArray("过牌")
+mechanic_tags = PackedStringArray("过牌", "剑式连携", "爆发")
 display_name = "云隙递剑"
 icon = ExtResource("2")
 sound = ExtResource("3")

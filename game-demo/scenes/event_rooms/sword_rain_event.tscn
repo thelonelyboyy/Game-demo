@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "剑雨残阵"
 event_body = "半空悬着密密麻麻的断剑，只待有人踏入。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("闯阵：随机突破一张牌，失去 10 生命", "收集断剑：获得 65 灵石", "退后")
-choice_effects = PackedStringArray("upgrade_random:0|damage:10", "gain_gold", "skip")
+choice_texts = PackedStringArray("闯阵悟剑：失去 12% 最大生命，突破两张牌", "收集断剑：获得 65 灵石", "退后")
+choice_effects = PackedStringArray("damage_percent:12|upgrade_random:2", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 65, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

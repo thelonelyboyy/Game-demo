@@ -24,6 +24,7 @@ import level_table as lt
 import event_table as et
 import potion_table as pt
 import shop_price_table as st
+import relic_table as rt
 
 OUT = Path(__file__).resolve().parents[1] / "game_data.xlsx"
 
@@ -73,13 +74,14 @@ def _widths(ws, widths):
 
 def build_cards(ws):
     headers = [
-        "文件", "ID", "职业", "名称", "费用", "类型", "目标", "稀有度", "元素",
+        "文件", "ID", "职业", "流派标签", "名称", "费用", "类型", "目标", "稀有度", "元素",
         "突破方向",
+        "成长触发", "每次成长值", "成长上限",
         "消耗", "保留", "固有", "永恒", "虚无", "临时", "周天", "不可打出", "状态牌", "诅咒牌",
         "检索", "检索张数", "取回", "取回张数", "归墟", "归墟张数", "关键词汇总", "效果概览",
     ]
     ws.append(headers)
-    readonly = {1, 2, 3, 27, 28}
+    readonly = {1, 2, 3, 4, 31, 32}
     overview: dict[str, list[str]] = {}
     for effect in cet.parse_all():
         label = f'{effect["trigger"]}：{effect["effect"]}'
@@ -88,9 +90,10 @@ def build_cards(ws):
     for card in (ct.parse_card(p) for p in ct.find_card_files()):
         yn = lambda value: "是" if value else "否"
         row = [
-            card["file"], card["id"], card["profession"], card["name"], card["cost"],
+            card["file"], card["id"], card["profession"], card["mechanic_tags"], card["name"], card["cost"],
             card["type"], card["target"], card["rarity"], card["element"],
             card["upgrade"],
+            card["growth_trigger"], card["growth_amount"], card["growth_limit"],
             yn(card["exhausts"]), yn(card["retains"]), yn(card["innate"]), yn(card["eternal"]),
             yn(card["ethereal"]), yn(card["temporary_keyword"]), yn(card["cyclic"]),
             yn(card["unplayable"]), yn(card["status_card"]), yn(card["curse_card"]),
@@ -103,26 +106,27 @@ def build_cards(ws):
     _style_header(ws, len(headers))
     _style_body(ws, len(headers), readonly)
     last = ws.max_row
-    _dv(ws, list(ct.TYPE.values()), 6, last)
-    _dv(ws, list(ct.TARGET.values()), 7, last)
-    _dv(ws, list(ct.RARITY.values()), 8, last)
-    _dv(ws, list(ct.ELEMENT.values()), 9, last)
-    _dv(ws, list(ct.UPGRADE.values()), 10, last)
-    for col in (11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 25):
+    _dv(ws, list(ct.TYPE.values()), 7, last)
+    _dv(ws, list(ct.TARGET.values()), 8, last)
+    _dv(ws, list(ct.RARITY.values()), 9, last)
+    _dv(ws, list(ct.ELEMENT.values()), 10, last)
+    _dv(ws, list(ct.UPGRADE.values()), 11, last)
+    _dv(ws, list(ct.GROWTH.values()), 12, last)
+    for col in (15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 29):
         _dv(ws, ["是", "否"], col, last)
-    _widths(ws, [42, 24, 6, 12, 5, 6, 7, 7, 5, 16] + [7] * 16 + [30, 42])
+    _widths(ws, [42, 24, 6, 28, 12, 5, 6, 7, 7, 5, 16, 12, 11, 10] + [7] * 16 + [30, 42])
     ws.freeze_panes = "D2"
 
 
 def build_card_effects(ws):
-    headers = ["文件", "卡牌ID", "卡牌名称", "触发时机", "效果ID", "效果名称", "效果脚本文件", "参数名称", "参数值"]
+    headers = ["文件", "卡牌ID", "卡牌名称", "触发时机", "效果ID", "效果名称", "效果条件", "效果脚本文件", "参数名称", "参数值"]
     ws.append(headers)
     for effect in cet.parse_all():
         ws.append([effect["file"], effect["card_id"], effect["card_name"], effect["trigger"], effect["effect_id"],
-                   effect["effect"], effect["script_path"], effect["param"], effect["value"]])
+                   effect["effect"], effect["condition"], effect["script_path"], effect["param"], effect["value"]])
     _style_header(ws, len(headers))
-    _style_body(ws, len(headers), set(range(1, 9)))
-    _widths(ws, [42, 22, 15, 12, 28, 22, 52, 21, 11])
+    _style_body(ws, len(headers), set(range(1, 10)))
+    _widths(ws, [42, 22, 15, 12, 28, 22, 22, 52, 21, 11])
     ws.freeze_panes = "D2"
 
 
@@ -132,7 +136,9 @@ def build_keyword_standards(ws):
     rows = [
         ["消耗", "消耗", "", "打出后进入消耗堆；未打出时正常弃置。", "打出：临时 > 消耗 > 功法移出 > 周天 > 弃牌"],
         ["保留", "保留", "", "回合结束不会进入弃牌堆；使用后按其他关键词结算。", "回合末：临时 > 虚无 > 保留 > 弃牌"],
+        ["蓄势", "成长触发=蓄势后", "每次成长值/成长上限", "保留在手中一回合后，本场主要数值成长。", "滞留效果→成长→保留"],
         ["固有", "固有", "", "战斗第一回合优先进入起手。", "全部固有牌先移动到抽牌堆顶"],
+        ["连携", "效果条件", "条件满足额外值", "上一张牌类型或元素满足条件时获得额外效果。", "只读取本回合上一张已打出的牌"],
         ["检索X", "检索", "检索张数", "打开抽牌堆选择 X 张牌。", "检索→取回→归墟"],
         ["取回X", "取回", "取回张数", "打开弃牌堆选择 X 张牌。", "检索→取回→归墟"],
         ["归墟X", "归墟", "归墟张数", "打开消耗堆选择 X 张牌。", "检索→取回→归墟"],
@@ -349,6 +355,30 @@ def build_potions(ws):
     ws.freeze_panes = "C2"
 
 
+def build_relics(ws):
+    headers = ["文件", "ID", "名称", "职业", "稀有度", "触发时机", "初始法宝", "互斥组", "效果类型", "说明", "效果脚本文件"]
+    ws.append(headers)
+    for relic in rt.parse_all():
+        ws.append([relic["file"], relic["id"], relic["name"], relic["character"], relic["rarity"], relic["type"],
+                   "是" if relic["starter"] else "否", relic["exclusive_group"], relic["effect"], relic["tooltip"], relic["script_path"]])
+    _style_header(ws, len(headers))
+    _style_body(ws, len(headers), set(range(1, len(headers) + 1)))
+    _widths(ws, [48, 28, 18, 9, 9, 11, 10, 18, 25, 62, 58])
+    ws.freeze_panes = "C2"
+
+
+def build_relic_params(ws):
+    headers = ["文件", "法宝ID", "法宝名称", "参数名称", "参数值", "参数定位键"]
+    ws.append(headers)
+    for param in rt.parse_parameters():
+        value = "是" if param["value"] is True else "否" if param["value"] is False else param["value"]
+        ws.append([param["file"], param["id"], param["name"], param["param"], value, param["raw_param"]])
+    _style_header(ws, len(headers))
+    _style_body(ws, len(headers), {1, 2, 3, 4, 6})
+    _widths(ws, [48, 28, 18, 24, 12, 30])
+    ws.freeze_panes = "D2"
+
+
 def build_shop_prices(ws):
     headers = ["类别", "档位", "基价", "最低价", "最高价", "比例", "定位键", "说明"]
     ws.append(headers)
@@ -371,6 +401,7 @@ def build_legend(ws):
         "3. 然后让游戏编辑器导入一次资源（打开项目即可）。",
         "",
         "【卡牌】可调基础信息与全部关键词开关；检索/取回/归墟还需填写 1~10 张。",
+        "【卡牌】成长触发可选择打出、弃牌、消耗或蓄势；蓄势需同时启用保留。",
         "【卡牌效果】每行只对应一个可复用效果组件的一个数值参数，可分别调整自损、伤害、抽牌等效果。",
         "【关键词标准】列出关键词语义与冲突优先级；【效果标准】汇总实际效果组件。",
         "【卡牌】突破方向可选择不可突破、数值提高50%或费用减少1。",
@@ -380,6 +411,7 @@ def build_legend(ws):
         "【事件】可改标题、正文、三个选项文案、效果和数值；组合效果写成 失去生命:8|获得灵石:50。",
         "【事件灵根】只列出 3 个带五行专属分支的事件；覆盖选项填 1/2/3。",
         "【符箓丹药】可改基础信息、说明和现有效果参数值；效果类型/参数名为只读结构。",
+        "【法宝】列出全部法宝定位与说明；【法宝参数】浅黄色参数值可直接调整，‘是/否’用于次数限制。",
         "【怪物】覆盖全部 39 个怪物，可调名称、介绍、生命与二阶段参数；行动配置文件和初始状态只读。",
         "【怪物行动】覆盖全部 27 套配置；使用怪物列会标明共享者，修改共享配置会影响所有列出的怪物。",
         "   出招序列: 子节点下标(从0)按回合循环，如 0,1,2 = 第1回合行动0 → 第2回合行动1 → ...",
@@ -407,6 +439,8 @@ def main() -> None:
     build_events(wb.create_sheet("事件"))
     build_event_roots(wb.create_sheet("事件灵根"))
     build_potions(wb.create_sheet("符箓丹药"))
+    build_relics(wb.create_sheet("法宝"))
+    build_relic_params(wb.create_sheet("法宝参数"))
     build_enemies(wb.create_sheet("怪物"))
     build_ai(wb.create_sheet("怪物行动"))
     build_levels(wb.create_sheet("关卡设计"))

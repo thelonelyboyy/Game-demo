@@ -12,5 +12,6 @@ character_type = 0
 rarity = 2
 starter_relic = false
 icon = ExtResource("2")
-tooltip = "玉算盘\n战斗结束后，额外获得 12 灵石。"
-gold_amount = 12
+tooltip = "玉算盘
+战斗结束后额外获得 15 灵石，专注长期经济。"
+gold_amount = 15

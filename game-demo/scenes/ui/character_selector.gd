@@ -5,7 +5,7 @@ const BODY_CULTIVATOR_STATS := preload("res://characters/body_cultivator/body_cu
 const SWORD_CULTIVATOR_STATS := preload("res://characters/sword_cultivator/sword_cultivator.tres")
 const DEMONIC_CULTIVATOR_STATS := preload("res://characters/demonic_cultivator/demonic_cultivator.tres")
 const BEASTMASTER_STATS := preload("res://characters/beastmaster/beastmaster.tres")
-const SELECTOR_BACKGROUND := preload("res://test1.png")
+const SELECTOR_BACKGROUND := preload("res://art/backgrounds/character_selector_common_v2.png")
 const INFO_PANEL_FRAME := preload("res://assets/ui/generated/panels/character_select_info_panel_9slice.png")
 const STAT_ROW_FRAME := preload("res://assets/ui/generated/panels/character_select_stat_row_9slice.png")
 const SKILL_ROW_FRAME := preload("res://assets/ui/generated/panels/character_select_skill_row_9slice.png")
@@ -222,6 +222,7 @@ func _build_character_entries() -> void:
 			"stats": BODY_CULTIVATOR_STATS,
 			"button": $CharacterButtons/BodyCultivatorButton,
 			"enabled": false,
+			"background": "res://art/backgrounds/body_cultivator_selector_v2.png",
 			"name": "体修",
 			"subtitle": "金身炼体 · 稳扎稳打",
 			"description": "以血肉为炉，拳掌破山。擅长护体、回血与承伤反击，越战越硬。",
@@ -266,6 +267,7 @@ func _build_character_entries() -> void:
 			"stats": BEASTMASTER_STATS,
 			"button": $CharacterButtons/BeastmasterButton,
 			"enabled": false,
+			"background": "res://art/backgrounds/beastmaster_selector_v2.png",
 			"name": "驭兽师",
 			"subtitle": "百兽同心 · 召唤协同",
 			"description": "灵兽相伴，攻守轮转。依靠兽群、召唤与连携压制敌人。",

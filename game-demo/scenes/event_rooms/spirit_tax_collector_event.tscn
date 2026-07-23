@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "灵税小吏"
 event_body = "一个纸面小吏拦路，认真摊开账册。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("缴税：失去 30 灵石", "辩经：随机突破一张牌", "绕开它")
-choice_effects = PackedStringArray("lose_gold", "upgrade_random", "skip")
-choice_amounts = PackedInt32Array(30, 0, 0)
+choice_texts = PackedStringArray("缴税：失去 30 灵石", "以万法辩经：随机重铸一张牌", "绕开它")
+choice_effects = PackedStringArray("lose_gold", "transform_random", "skip")
+choice_amounts = PackedInt32Array(30, 1, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

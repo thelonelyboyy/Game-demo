@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "白骨桥"
 event_body = "桥下云海翻涌，桥面由巨兽白骨搭成。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("快步通过：失去 6 生命", "拆一截骨材：获得 60 灵石，失去 13 生命", "绕远路")
-choice_effects = PackedStringArray("damage", "gain_gold:60|damage:13", "skip")
-choice_amounts = PackedInt32Array(6, 0, 0)
+choice_texts = PackedStringArray("踏骨借阴气疗伤：失去 5 最大生命，回复 35% 最大生命", "拆一截骨材：获得 60 灵石，失去 13 生命", "绕远路")
+choice_effects = PackedStringArray("max_hp:-5|heal_percent:35", "gain_gold:60|damage:13", "skip")
+choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

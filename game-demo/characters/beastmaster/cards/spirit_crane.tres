@@ -10,6 +10,10 @@ amount = 2
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_draw")])
 effect_text = "抽 {draw} 张牌。"
 id = "spirit_crane"
@@ -17,6 +21,6 @@ type = 1
 cost = 1
 upgrade_type = 1
 element = 2
-mechanic_tags = PackedStringArray("灵兽")
+mechanic_tags = PackedStringArray("灵兽", "兽群", "蓄势")
 display_name = "灵鹤引"
 icon = ExtResource("2")

@@ -1,16 +1,18 @@
-[gd_resource type="Resource" script_class="CharacterStats" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="CharacterStats" load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/character_stats.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/characters_redesign/body_cultivator_portrait.png" id="2"]
 [ext_resource type="Resource" path="res://characters/body_cultivator/body_cultivator_starting_deck.tres" id="3"]
 [ext_resource type="Resource" path="res://characters/body_cultivator/body_cultivator_draftable_cards.tres" id="4"]
 [ext_resource type="Resource" path="res://relics/xuangu_talisman.tres" id="5"]
+[ext_resource type="Texture2D" path="res://art/combatants/players/body_cultivator_card_portrait_v3.png" id="6_battle"]
 
 [resource]
 script = ExtResource("1")
 character_name = "体修"
 description = "以血肉为炉，拳掌破山。擅长金身与血炼，越战越强。"
 portrait = ExtResource("2")
+battle_art = ExtResource("6_battle")
 starting_deck = ExtResource("3")
 draftable_cards = ExtResource("4")
 cards_per_turn = 5

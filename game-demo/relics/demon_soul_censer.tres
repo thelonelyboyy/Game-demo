@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="SoulMarkSpentRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/soul_mark_spent_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/soul_lantern.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/demon_soul_censer_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -11,7 +11,7 @@ type = 4
 character_type = 3
 rarity = 1
 icon = ExtResource("2")
-tooltip = "魔修专属。每回合第一次一次性引爆或消耗至少 3 层魂印时，获得 6 点护体。"
+tooltip = "魔修专属。每回合第一次一次消耗至少 3 层魂印时，获得 8 点护体。"
 reward_mode = 1
 amount = 6
 minimum_consumed = 3

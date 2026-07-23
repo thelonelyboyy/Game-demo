@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/river_serpent.png" id="2_art"]
 [ext_resource type="PackedScene" path="res://enemies/crab/crab_enemy_ai.tscn" id="3_ai"]
+[ext_resource type="Texture2D" path="res://art/combatants/enemies/river_serpent_card_portrait_v3.png" id="4_battle"]
 
 [resource]
 script = ExtResource("1_stats")
@@ -12,3 +13,4 @@ description = "蛰伏在灵潭里的长蛇，攻守转换狡猾。"
 ai = ExtResource("3_ai")
 max_health = 70
 art = ExtResource("2_art")
+battle_art = ExtResource("4_battle")

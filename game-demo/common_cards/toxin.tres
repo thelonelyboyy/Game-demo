@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/generated_icons/tile_replacements/common_cards/toxin.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/toxin_v2.png" id="2"]
 [ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="3"]
 
 [resource]
@@ -15,7 +15,7 @@ cost = 1
 element = 0
 exhausts = true
 status_card = true
-mechanic_tags = PackedStringArray("可打出")
+mechanic_tags = PackedStringArray("可打出", "通用术式")
 display_name = "浊气"
 icon = ExtResource("2")
 sound = ExtResource("3")

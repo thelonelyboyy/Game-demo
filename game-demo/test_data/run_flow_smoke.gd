@@ -322,9 +322,13 @@ func _check_shop_entry(run: Run, _room: Room) -> void:
 	_check(shop != null, "shop view opens")
 	_check(shop != null and shop.cards.get_child_count() > 0, "shop generates cards")
 	_check(shop != null and shop.relics.get_child_count() > 0, "shop generates relics")
-	_check(shop != null and shop.potions.get_child_count() > 0, "shop generates consumables")
+	_check(
+		shop != null and shop.potions.get_child_count() == Shop.SHOP_POTION_COUNT,
+		"shop generates four consumables"
+	)
 	if not shop:
 		return
+	_check_shop_layout(shop)
 	_check_shop_pricing(shop, run.stats)
 
 	run.stats.gold = 10000
@@ -355,6 +359,53 @@ func _check_shop_entry(run: Run, _room: Room) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	_check_returned_to_map(run, "shop")
+
+
+func _check_shop_layout(shop: Shop) -> void:
+	_check(shop.cards_section != null, "shop has a distinct card section")
+	_check(shop.relics_section != null, "shop has a distinct relic section")
+	_check(shop.potions_section != null, "shop has a distinct consumable section")
+	_check(shop.remove_section != null, "shop has a distinct card-removal section")
+	if not shop.cards_section or not shop.relics_section or not shop.potions_section or not shop.remove_section:
+		return
+
+	var card_rect := shop.cards_section.get_global_rect()
+	var relic_rect := shop.relics_section.get_global_rect()
+	var potion_rect := shop.potions_section.get_global_rect()
+	var remove_rect := shop.remove_section.get_global_rect()
+	var subtitle := shop.get_node_or_null("UILayer/Subtitle") as Label
+	var card_heading := shop.cards_section.get_node_or_null("Body/HeadingPlate/Heading") as Label
+	_check(subtitle != null and card_heading != null, "shop title copy and card heading exist")
+	if subtitle and card_heading:
+		_check(subtitle.get_global_rect().end.y <= card_heading.get_global_rect().position.y + 1.5, "shop intro copy does not overlap the card heading")
+	_check(card_rect.end.y <= relic_rect.position.y + 1.5, "card section is separated above the service row")
+	_check(relic_rect.end.x <= potion_rect.position.x + 1.5, "relic and consumable sections do not overlap")
+	_check(potion_rect.end.x <= remove_rect.position.x + 1.5, "consumable and removal sections do not overlap")
+	_check(shop.cards.is_ancestor_of(shop.cards.get_child(0)), "card products remain inside the card section")
+	_check(shop.cards_section.is_ancestor_of(shop.cards), "card row belongs to the card section")
+	_check(shop.relics_section.is_ancestor_of(shop.relics), "relic row belongs to the relic section")
+	_check(shop.potions_section.is_ancestor_of(shop.potions), "consumable row belongs to the consumable section")
+	_check(shop.remove_section.is_ancestor_of(shop.remove_card_button), "remove action belongs to the removal section")
+	for section: PanelContainer in [shop.cards_section, shop.relics_section, shop.potions_section, shop.remove_section]:
+		_check(section.get_theme_stylebox("panel") is StyleBoxTexture, "shop section uses an art-texture frame")
+	for shop_card: ShopCard in shop.cards.get_children():
+		_check(card_rect.grow(2.0).encloses(shop_card.get_global_rect()), "every shop card fits inside the card section")
+	for shop_relic: ShopRelic in shop.relics.get_children():
+		_check(relic_rect.grow(2.0).encloses(shop_relic.get_global_rect()), "every shop relic fits inside the relic section")
+	for shop_potion: ShopPotion in shop.potions.get_children():
+		_check(potion_rect.grow(2.0).encloses(shop_potion.get_global_rect()), "every shop consumable fits inside its section")
+	_check(remove_rect.grow(2.0).encloses(shop.remove_card_button.get_global_rect()), "large remove button fits inside its section")
+	var viewport_rect := shop.get_viewport().get_visible_rect()
+	_check(viewport_rect.grow(2.0).encloses(card_rect), "card section remains inside the viewport")
+	_check(viewport_rect.grow(2.0).encloses(remove_rect), "service row remains inside the viewport")
+	_check(
+		shop.remove_card_button.size.x >= 340.0 and shop.remove_card_button.size.y >= 96.0,
+		"card-removal button has a large primary-action hit area"
+	)
+	_check(
+		shop.back_button.size.x >= 220.0 and shop.back_button.size.y >= 76.0,
+		"shop leave button has an enlarged hit area"
+	)
 
 
 func _check_shop_pricing(shop: Shop, stats: RunStats) -> void:

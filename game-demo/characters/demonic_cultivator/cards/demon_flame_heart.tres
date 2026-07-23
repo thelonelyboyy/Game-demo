@@ -9,17 +9,18 @@
 
 [sub_resource type="Resource" id="E1"]
 script = ExtResource("auto_dmg")
-amount = 11
+amount = 15
 
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("auto_status")
 status = ExtResource("auto_exposed")
 target_mode = 0
 use_duration = true
-amount = 2
+amount = 3
 
 [resource]
 script = ExtResource("1")
+exhausts = true
 configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
 effect_text = "造成 11 点伤害，施加 2 回合破绽。"
 id = "demon_flame_heart"
@@ -29,7 +30,7 @@ cost = 2
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = null
+mechanic_tags = PackedStringArray("魔焰", "爆发")
 display_name = "魔焰焚心"
 icon = ExtResource("2")
 sound = ExtResource("3")

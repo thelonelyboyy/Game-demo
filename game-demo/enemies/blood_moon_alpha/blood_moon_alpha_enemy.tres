@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/blood_tiger.png" id="2"]
 [ext_resource type="PackedScene" path="res://enemies/blood_moon_alpha/blood_moon_alpha_ai.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://art/combatants/enemies/blood_moon_alpha_card_portrait_v3.png" id="4_battle"]
 
 [resource]
 script = ExtResource("1")
@@ -12,3 +13,4 @@ description = "以长啸激发群狼凶性，拖延会让整支兽群越来越�
 ai = ExtResource("3")
 max_health = 112
 art = ExtResource("2")
+battle_art = ExtResource("4_battle")

@@ -18,6 +18,7 @@ affected_by_spirit_root = false
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_low_health_damage"), SubResource("AutoEffect_2_self_damage")])
 effect_text = "失去 {self_damage} 点生命，造成 {damage} 点伤害。若生命不高于一半，额外造成 {blood_bonus} 点伤害。"
 id = "demon_cut_soul"
@@ -26,7 +27,7 @@ cost = 1
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("献祭")
+mechanic_tags = PackedStringArray("献祭", "魂印", "先手")
 display_name = "割魂刃"
 icon = ExtResource("2")
 sound = ExtResource("3")

@@ -7,10 +7,11 @@
 
 [sub_resource type="Resource" id="AutoEffect_1_draw"]
 script = ExtResource("auto_effect_draw")
-amount = 2
+amount = 3
 
 [resource]
 script = ExtResource("1")
+exhausts = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_draw")])
 effect_text = "抽 {draw} 张牌。"
 id = "sword_wash_blade"
@@ -19,7 +20,7 @@ cost = 1
 upgrade_type = 1
 element = 3
 profession = 2
-mechanic_tags = PackedStringArray("过牌")
+mechanic_tags = PackedStringArray("过牌", "剑式连携", "爆发")
 display_name = "洗剑诀"
 icon = ExtResource("2")
 sound = ExtResource("3")

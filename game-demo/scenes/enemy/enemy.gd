@@ -117,9 +117,15 @@ func _apply_starting_statuses() -> void:
 
 
 func update_intent() -> void:
-	if current_action:
-		current_action.update_intent_text()
-		intent_ui.update_intent(current_action.intent)
+	if not is_instance_valid(current_action):
+		return
+	# Global hand/deck signals can arrive during a battle scene transition after
+	# the old player has already been freed. Do not ask an action to cast its
+	# stale target while the remaining battle nodes are leaving the tree.
+	if not is_instance_valid(current_action.target):
+		return
+	current_action.update_intent_text()
+	intent_ui.update_intent(current_action.intent)
 
 
 func _fit_sprite_and_overlays() -> void:

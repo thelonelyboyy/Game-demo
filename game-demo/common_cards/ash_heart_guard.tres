@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_count_scaling_effect.gd" id="2"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_flesh_rebirth.png" id="3"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/ash_heart_guard_v2.png" id="3"]
 [ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="4"]
 
 [sub_resource type="Resource" id="ExhaustBlock"]
@@ -17,13 +17,17 @@ description_template = "获得 {amount} 点护体；本场每消耗 1 张牌，�
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("ExhaustBlock")])
 id = "ash_heart_guard"
 type = 1
 rarity = 1
 cost = 1
 upgrade_type = 1
-mechanic_tags = PackedStringArray("通用", "消耗联动", "护体")
+mechanic_tags = PackedStringArray("通用", "消耗联动", "护体", "通用术式", "蓄势")
 display_name = "灰烬护心"
 icon = ExtResource("3")
 sound = ExtResource("4")

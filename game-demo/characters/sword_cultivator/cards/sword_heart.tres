@@ -10,15 +10,16 @@
 [sub_resource type="Resource" id="AutoEffect_1_status"]
 script = ExtResource("auto_effect_status")
 status = ExtResource("auto_status_muscle")
-amount = 1
+amount = 2
 
 [sub_resource type="Resource" id="AutoEffect_2_status"]
 script = ExtResource("auto_effect_status")
 status = ExtResource("auto_status_qi_flow")
-amount = 1
+amount = 2
 
 [resource]
 script = ExtResource("1")
+exhausts = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_status"), SubResource("AutoEffect_2_status")])
 effect_text = "获得 {qi} 层灵息和 {muscle} 层劲气。"
 id = "sword_heart"
@@ -27,7 +28,7 @@ rarity = 2
 cost = 1
 upgrade_type = 1
 element = 1
-mechanic_tags = null
+mechanic_tags = PackedStringArray("剑式连携", "爆发")
 display_name = "剑心通明"
 icon = ExtResource("2")
 sound = ExtResource("3")

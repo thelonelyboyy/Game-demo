@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/event_rooms/generic_event.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/event_rooms/event_room_button.tscn" id="2_button"]
-[ext_resource type="Texture2D" path="res://art/event_illustrations/starfall_pillar.png" id="3_image"]
+[ext_resource type="Texture2D" path="res://art/event_illustrations/heaven_flame_eye_v2.png" id="3_image"]
 
 [node name="heaven_flame_eye_event" type="Control"]
 layout_mode = 3
@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "天焰魔眼"
 event_body = "劫云裂开一只燃烧的巨眼。它看穿你的牌组，也看穿你尚未承认的心魔。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("承受天焰：失去 16 生命，随机突破两张牌", "吞下魔瞳：最大生命 +6，获得一张随机诅咒", "避开注视")
-choice_effects = PackedStringArray("damage:16|upgrade_random:0|upgrade_random:0", "max_hp:6|gain_curse:1", "skip")
+choice_texts = PackedStringArray("承受天焰：失去 18% 最大生命，突破两张牌", "吞下魔瞳：最大生命 +6，获得一张随机诅咒", "避开注视")
+choice_effects = PackedStringArray("damage_percent:18|upgrade_random:2", "max_hp:6|gain_curse:1", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

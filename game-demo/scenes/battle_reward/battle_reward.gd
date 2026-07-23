@@ -51,6 +51,7 @@ var active_card_rewards: CardRewards
 var active_card_fusion: CardFusion
 var relic_choice_locked := false
 var card_reward_tier := CardRewardTier.NORMAL
+var _archetype_cache := {}
 var card_rarity_weights := {
 	Card.Rarity.COMMON: 0.0,
 	Card.Rarity.UNCOMMON: 0.0,
@@ -360,6 +361,11 @@ func _get_card_archetypes(card: Card) -> PackedStringArray:
 	var archetypes := PackedStringArray()
 	if not card:
 		return archetypes
+	var cache_key := card.resource_path
+	if cache_key.is_empty():
+		cache_key = "%s|%s" % [card.id, ",".join(card.mechanic_tags)]
+	if _archetype_cache.has(cache_key):
+		return _archetype_cache[cache_key]
 	var searchable := (" ".join(card.mechanic_tags) + " " + card.get_default_tooltip() + " " + card.id).to_lower()
 	if searchable.contains("献祭") or searchable.contains("失去") or searchable.contains("self_damage") or searchable.contains("blood"):
 		archetypes.append("blood")
@@ -369,6 +375,7 @@ func _get_card_archetypes(card: Card) -> PackedStringArray:
 		archetypes.append("soul")
 	if searchable.contains("消耗") or searchable.contains("净化") or searchable.contains("exhaust"):
 		archetypes.append("exhaust")
+	_archetype_cache[cache_key] = archetypes
 	return archetypes
 
 

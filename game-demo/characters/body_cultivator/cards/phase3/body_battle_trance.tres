@@ -25,6 +25,10 @@ amount = 1
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_self_damage"), SubResource("AutoEffect_2_status"), SubResource("AutoEffect_3_status")])
 effect_text = "失去 {self_damage} 点生命，获得 {muscle} 层劲气和 {gold_body} 层金身。"
 id = "body_battle_trance"
@@ -34,7 +38,7 @@ cost = 2
 upgrade_type = 1
 element = 4
 profession = 1
-mechanic_tags = PackedStringArray("血炼")
+mechanic_tags = PackedStringArray("血炼", "承伤转化", "蓄势")
 display_name = "浴血战狂"
 icon = ExtResource("2")
 sound = ExtResource("3")

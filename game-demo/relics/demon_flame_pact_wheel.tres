@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="DemonicPactRelic" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/demonic_pact_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/fire_spark_pearl.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/demon_flame_pact_wheel_v2.png" id="2"]
 [ext_resource type="Resource" path="res://statuses/exposed.tres" id="3"]
 
 [resource]

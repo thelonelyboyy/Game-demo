@@ -25,17 +25,43 @@ func _test_floating_text_order() -> void:
 	var damage_delay := FloatingCombatText.spawn_damage(world_node, 5)
 	var heal_delay := FloatingCombatText.spawn_heal(world_node, 3)
 	_check(block_delay < 0.05, "first feedback starts immediately")
-	_check(damage_delay >= FloatingCombatText.FEEDBACK_STAGGER - 0.03, "damage waits behind block")
-	_check(heal_delay >= FloatingCombatText.FEEDBACK_STAGGER * 2.0 - 0.05, "heal waits behind damage")
+	_check(damage_delay >= FloatingCombatText.FEEDBACK_ANIMATION_DURATION, "damage waits until block animation finishes")
+	_check(heal_delay >= FloatingCombatText.FEEDBACK_SEQUENCE_INTERVAL * 2.0 - 0.03, "heal waits until damage animation finishes")
+	_check(
+		heal_delay - damage_delay >= FloatingCombatText.FEEDBACK_ANIMATION_DURATION,
+		"each queued number receives a complete animation window"
+	)
 	_check(ui_layer.get_child_count() == 3, "three feedback labels are queued")
 	if ui_layer.get_child_count() == 3:
 		_check(ui_layer.get_child(0).text == "护体 -8", "block text is explicit")
 		_check(float(ui_layer.get_child(1).get_meta("feedback_delay", 0.0)) > 0.0, "damage label stores delay")
 		_check(float(ui_layer.get_child(2).get_meta("feedback_delay", 0.0)) > damage_delay, "heal label is third")
 
+	# 不只校验预约时间：实际跑过两个动画窗口，确认上一条已经释放后下一条才出现。
+	await get_tree().create_timer(FloatingCombatText.FEEDBACK_SEQUENCE_INTERVAL + 0.08).timeout
+	await get_tree().process_frame
+	var damage_label := _find_feedback_label(ui_layer, "-5")
+	var heal_label := _find_feedback_label(ui_layer, "+3")
+	_check(_find_feedback_label(ui_layer, "护体 -8") == null, "block label finishes before damage starts")
+	_check(damage_label != null and damage_label.modulate.a > 0.0, "damage animation starts second")
+	_check(heal_label != null and heal_label.modulate.a <= 0.01, "heal animation is still waiting")
+
+	await get_tree().create_timer(FloatingCombatText.FEEDBACK_SEQUENCE_INTERVAL).timeout
+	await get_tree().process_frame
+	heal_label = _find_feedback_label(ui_layer, "+3")
+	_check(_find_feedback_label(ui_layer, "-5") == null, "damage label finishes before heal starts")
+	_check(heal_label != null and heal_label.modulate.a > 0.0, "heal animation starts third")
+
 	world_node.queue_free()
 	ui_layer.queue_free()
 	await get_tree().process_frame
+
+
+func _find_feedback_label(parent: Node, text_value: String) -> FloatingCombatText:
+	for child in parent.get_children():
+		if child is FloatingCombatText and child.text == text_value:
+			return child
+	return null
 
 
 func _test_combatant_bar_order() -> void:

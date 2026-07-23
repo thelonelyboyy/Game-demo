@@ -11,8 +11,9 @@ type = 4
 character_type = 3
 starter_relic = false
 icon = ExtResource("2")
-tooltip = "祭血刃\n打出献祭牌时，对所有敌人造成 2 点伤害。"
+tooltip = "祭血刃
+每次打出献祭牌时，对所有敌人造成 3 点伤害；以牌组代价换群伤。"
 match_tags = PackedStringArray("献祭")
-damage_amount = 2
+damage_amount = 3
 target_mode = 0
 once_per_turn = false

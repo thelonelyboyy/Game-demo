@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "云中藏书阁"
 event_body = "散落的书页在空中自行翻动。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("读完一卷：随机突破一张牌", "整理书架：获得 50 灵石", "合上书页")
-choice_effects = PackedStringArray("upgrade_random", "gain_gold", "skip")
+choice_texts = PackedStringArray("以旧换新：随机重铸一张牌并获得一张随机牌", "整理书架：获得 50 灵石", "合上书页")
+choice_effects = PackedStringArray("transform_random:1|gain_random_card:1", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 50, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

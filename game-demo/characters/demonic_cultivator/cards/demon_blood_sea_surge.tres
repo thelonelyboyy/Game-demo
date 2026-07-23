@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="E1"]
 script = ExtResource("auto_dmg")
 target_mode = 2
-amount = 7
+amount = 10
 
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("auto_self")
@@ -18,6 +18,7 @@ affected_by_spirit_root = false
 
 [resource]
 script = ExtResource("1")
+exhausts = true
 configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
 effect_text = "对所有敌人造成 7 点伤害，失去 3 点生命。"
 id = "demon_blood_sea_surge"
@@ -27,7 +28,7 @@ cost = 2
 upgrade_type = 1
 element = 3
 profession = 3
-mechanic_tags = PackedStringArray("献祭")
+mechanic_tags = PackedStringArray("献祭", "血炼", "爆发")
 display_name = "血海滔天"
 icon = ExtResource("2")
 sound = ExtResource("3")

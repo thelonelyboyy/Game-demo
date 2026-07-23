@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_discard_random_block_effect.gd" id="2"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_blood_repay.png" id="3"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_blood_castoff_v2.png" id="3"]
 [ext_resource type="AudioStream" path="res://art/audio/block.ogg" id="4"]
 
 [sub_resource type="Resource" id="DiscardBlock"]
@@ -21,7 +21,7 @@ cost = 0
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("弃牌", "护体", "血契")
+mechanic_tags = PackedStringArray("弃牌", "护体", "血契", "血炼")
 display_name = "弃念护脉"
 icon = ExtResource("3")
 sound = ExtResource("4")

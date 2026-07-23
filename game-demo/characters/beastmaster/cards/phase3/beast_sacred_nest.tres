@@ -18,6 +18,10 @@ amount = 2
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_block"), SubResource("AutoEffect_2_status")])
 effect_text = "获得 {block} 点护体和 {spirit_beast} 层灵兽。"
 id = "beast_sacred_nest"
@@ -27,7 +31,7 @@ cost = 2
 upgrade_type = 1
 element = 2
 profession = 4
-mechanic_tags = PackedStringArray("灵兽", "兽系")
+mechanic_tags = PackedStringArray("灵兽", "兽系", "召唤", "蓄势")
 display_name = "灵巢护主"
 icon = ExtResource("2")
 sound = ExtResource("3")

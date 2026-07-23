@@ -11,6 +11,10 @@ amount = 10
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage")])
 effect_text = "造成 {damage} 点伤害。"
 id = "beast_fang_chain"
@@ -20,7 +24,7 @@ cost = 1
 upgrade_type = 1
 element = 1
 profession = 4
-mechanic_tags = PackedStringArray("兽群", "兽系")
+mechanic_tags = PackedStringArray("兽群", "兽系", "召唤", "蓄势")
 display_name = "连牙"
 icon = ExtResource("2")
 sound = ExtResource("3")

@@ -1,0 +1,513 @@
+git : warning: in the working copy of 'DEMONIC_BALANCE.md', CRLF will be replaced by LF the next time Git touches it
+At line:2 char:1550
++ ... LASTEXITCODE;git diff --check *>'art\qa\final_diff_check.log';$diff=$ ...
++                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: in the... Git touches it:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+warning: in the working copy of 'game-demo/characters/beastmaster/beastmaster.tres', CRLF will be replaced by LF the ne
+xt time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/beast_bond.tres', CRLF will be replaced by LF t
+he next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_all_king.tres', CRLF will be repla
+ced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_alpha_order.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_ancestor_arrives.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_call_fox.tres', CRLF will be repla
+ced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_crane_wing.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_double_summon.tres', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_fang_chain.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_feed_spirit.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_horn_line.tres', CRLF will be repl
+aced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_moon_swarm.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_mount_charge.tres', CRLF will be r
+eplaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_pack_guard.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_pack_howl.tres', CRLF will be repl
+aced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_pack_pounce.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_sacred_nest.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_spirit_tide.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_ten_thousand_charge.tres', CRLF wi
+ll be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_track_hunt.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_turtle_guard.tres', CRLF will be r
+eplaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/phase3/beast_wolf_call.tres', CRLF will be repl
+aced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/spirit_crane.tres', CRLF will be replaced by LF
+ the next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/tiger_claw.tres', CRLF will be replaced by LF t
+he next time Git touches it
+warning: in the working copy of 'game-demo/characters/beastmaster/cards/turtle_shell.tres', CRLF will be replaced by LF
+ the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/body_cultivator.tres', CRLF will be replaced by L
+F the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/bone_tempering.tres', CRLF will be replaced
+ by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/collapsing_palm.tres', CRLF will be replace
+d by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/iron_bone_fist.tres', CRLF will be replaced
+ by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/mountain_breath.tres', CRLF will be replace
+d by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_arhat_form.tres', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_battle_trance.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_blood_collapse.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_blood_god_body.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_blood_punch.tres', CRLF will be
+ replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_blood_roar.tres', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_bone_resonance.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_burn_blood_guard.tres', CRLF wi
+ll be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_copper_skin.tres', CRLF will be
+ replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_crimson_rebirth.tres', CRLF wil
+l be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_golden_bell_step.tres', CRLF wi
+ll be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_guard_meridian.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_immovable_king.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_iron_bone.tres', CRLF will be r
+eplaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_life_furnace.tres', CRLF will b
+e replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_mountain_stance.tres', CRLF wil
+l be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_rebound_guard.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_red_marrow.tres', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/phase3/body_wound_power.tres', CRLF will be
+ replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/body_cultivator/cards/vajra_body.tres', CRLF will be replaced by
+LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/blood_blade.tres', CRLF will be replaced
+ by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_ash_barrier.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_ash_recollection.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_blood_castoff.tres', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_blood_debt.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_blood_forge_armor.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_blood_repay.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_blood_reversal.tres', CRLF will be
+ replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_blood_rite_slash.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_blood_sea_surge.tres', CRLF will b
+e replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_blood_ward.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_burn_impurity.tres', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_calamity_embryo.tres', CRLF will b
+e replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_defend.tres', CRLF will be replace
+d by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_desperate_burst.tres', CRLF will b
+e replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flame.tres', CRLF will be replaced
+ by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flame_black.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flame_blue.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flame_green.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flame_heart.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flame_purple.tres', CRLF will be r
+eplaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flame_red.tres', CRLF will be repl
+aced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flame_white.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flame_yellow.tres', CRLF will be r
+eplaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_flesh_rebirth.tres', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_forbidden_archive.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_mind_sieve.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_myriad_marks_return.tres', CRLF wi
+ll be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_myriad_soul_devour.tres', CRLF wil
+l be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_seven_flame_cycle.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_shadow_reenactment.tres', CRLF wil
+l be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_shatter_soul_seal.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_soul_devour_claw.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_soul_lamp_renewal.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/demon_strike.tres', CRLF will be replace
+d by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_blood_membrane.tres', CRLF
+ will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_blood_qi_guard.tres', CRLF
+ will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_blood_recompense.tres', CR
+LF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_blood_sea_boundless.tres',
+ CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_bloodthirst.tres', CRLF wi
+ll be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_flame_continuity.tres', CR
+LF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_flame_refining.tres', CRLF
+ will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_myriad_soul_burn_sky.tres'
+, CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_sha_nurture.tres', CRLF wi
+ll be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_sha_return.tres', CRLF wil
+l be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_soul_echo.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_soul_flame_cycle.tres', CR
+LF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_soul_mark_sense.tres', CRL
+F will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/engines/demon_soul_rite.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/forbidden_mantra.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/hun_kai.tres', CRLF will be replaced by
+LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/hun_zang.tres', CRLF will be replaced by
+ LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/ju_sha.tres', CRLF will be replaced by L
+F the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/lie_hun.tres', CRLF will be replaced by
+LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_black_contract.tres', CRLF
+will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_blood_oath.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_blood_sea.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_burn_self_heaven.tres', CRL
+F will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_cut_soul.tres', CRLF will b
+e replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_forbidden_power.tres', CRLF
+ will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_ghost_hook.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_hell_soul_seal.tres', CRLF
+will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_lantern_shadow.tres', CRLF
+will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_life_for_mana.tres', CRLF w
+ill be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_sacrificial_flame.tres', CR
+LF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_soul_armor.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_soul_price.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_soul_siphon.tres', CRLF wil
+l be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_soul_stamp.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_spirit_net.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/phase3/demon_ten_thousand_sacrifice.tres
+', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/san_hun_tong_fen.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/shadow_step.tres', CRLF will be replaced
+ by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/she_hun_xu_yuan.tres', CRLF will be repl
+aced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/soul_drain.tres', CRLF will be replaced
+by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/cards/yin_sha_jue.tres', CRLF will be replaced
+ by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/demonic_cultivator/demonic_cultivator.tres', CRLF will be replace
+d by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/flying_sword.tres', CRLF will be replaced
+by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/guard_sword.tres', CRLF will be replaced b
+y LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_blade_embryo.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_breath_return.tres', CRLF wil
+l be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_cloud_cut.tres', CRLF will be
+ replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_cloud_scroll.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_flow_shift.tres', CRLF will b
+e replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_forge_spark.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_furnace_open.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_hidden_edge.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_hundred_forge.tres', CRLF wil
+l be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_iron_cleave.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_light_step.tres', CRLF will b
+e replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_marrow_forge.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_probe_meridian.tres', CRLF wi
+ll be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_ring_sheath.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_sky_river.tres', CRLF will be
+ replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_split_heaven.tres', CRLF will
+ be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_temper_edge.tres', CRLF will
+be replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_trial_edge.tres', CRLF will b
+e replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_void_roam.tres', CRLF will be
+ replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/phase3/sword_wash_blade.tres', CRLF will b
+e replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/piercing_light.tres', CRLF will be replace
+d by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_blood_curse.tres', CRLF will be repl
+aced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_energy_charge.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_guard_formation.tres', CRLF will be
+replaced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_heart.tres', CRLF will be replaced b
+y LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_nurture.tres', CRLF will be replaced
+ by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_qi_draw.tres', CRLF will be replaced
+ by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_rain.tres', CRLF will be replaced by
+ LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_shadow_strike.tres', CRLF will be re
+placed by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_star_shatter.tres', CRLF will be rep
+laced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_wanjian.tres', CRLF will be replaced
+ by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_water_break.tres', CRLF will be repl
+aced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/cards/sword_wind_return.tres', CRLF will be repl
+aced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/characters/sword_cultivator/sword_cultivator.tres', CRLF will be replaced by
+ LF the next time Git touches it
+warning: in the working copy of 'game-demo/common_cards/ash_heart_guard.tres', CRLF will be replaced by LF the next tim
+e Git touches it
+warning: in the working copy of 'game-demo/common_cards/circulating_breath.tres', CRLF will be replaced by LF the next
+time Git touches it
+warning: in the working copy of 'game-demo/common_cards/defend.tres', CRLF will be replaced by LF the next time Git tou
+ches it
+warning: in the working copy of 'game-demo/common_cards/discard_aegis.tres', CRLF will be replaced by LF the next time
+Git touches it
+warning: in the working copy of 'game-demo/common_cards/embers_return.tres', CRLF will be replaced by LF the next time
+Git touches it
+warning: in the working copy of 'game-demo/common_cards/flowing_cloud_guard.tres', CRLF will be replaced by LF the next
+ time Git touches it
+warning: in the working copy of 'game-demo/common_cards/ink_flow_slash.tres', CRLF will be replaced by LF the next time
+ Git touches it
+warning: in the working copy of 'game-demo/common_cards/momentum_pursuit.tres', CRLF will be replaced by LF the next ti
+me Git touches it
+warning: in the working copy of 'game-demo/common_cards/muscle_resonance_strike.tres', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/common_cards/returning_light.tres', CRLF will be replaced by LF the next tim
+e Git touches it
+warning: in the working copy of 'game-demo/common_cards/spirit_stone_needle.tres', CRLF will be replaced by LF the next
+ time Git touches it
+warning: in the working copy of 'game-demo/common_cards/status/blood_debt_curse.tres', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/common_cards/status/calamity_ember_brand.tres', CRLF will be replaced by LF
+the next time Git touches it
+warning: in the working copy of 'game-demo/common_cards/status/eclipse_scar.tres', CRLF will be replaced by LF the next
+ time Git touches it
+warning: in the working copy of 'game-demo/common_cards/status/heart_demon.tres', CRLF will be replaced by LF the next
+time Git touches it
+warning: in the working copy of 'game-demo/common_cards/status/karmic_fire_curse.tres', CRLF will be replaced by LF the
+ next time Git touches it
+warning: in the working copy of 'game-demo/common_cards/status/spirit_lock_seal.tres', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/common_cards/status/underworld_writ.tres', CRLF will be replaced by LF the n
+ext time Git touches it
+warning: in the working copy of 'game-demo/common_cards/strike.tres', CRLF will be replaced by LF the next time Git tou
+ches it
+warning: in the working copy of 'game-demo/common_cards/toxin.tres', CRLF will be replaced by LF the next time Git touc
+hes it
+warning: in the working copy of 'game-demo/custom_resources/effects/card_effect.gd', CRLF will be replaced by LF the ne
+xt time Git touches it
+warning: in the working copy of 'game-demo/custom_resources/stats.gd', CRLF will be replaced by LF the next time Git to
+uches it
+warning: in the working copy of 'game-demo/fusion_cards/attack_guard_unity.tres', CRLF will be replaced by LF the next
+time Git touches it
+warning: in the working copy of 'game-demo/fusion_cards/blood_beast_rend.tres', CRLF will be replaced by LF the next ti
+me Git touches it
+warning: in the working copy of 'game-demo/fusion_cards/demon_rain_swordfire.tres', CRLF will be replaced by LF the nex
+t time Git touches it
+warning: in the working copy of 'game-demo/fusion_cards/sword_shield_chime.tres', CRLF will be replaced by LF the next
+time Git touches it
+warning: in the working copy of 'game-demo/relics/body_marrow_drum.tres', CRLF will be replaced by LF the next time Git
+ touches it
+warning: in the working copy of 'game-demo/relics/demon_blood_crucible.tres', CRLF will be replaced by LF the next time
+ Git touches it
+warning: in the working copy of 'game-demo/relics/demon_sacrifice_dagger.tres', CRLF will be replaced by LF the next ti
+me Git touches it
+warning: in the working copy of 'game-demo/relics/demon_soul_censer.tres', CRLF will be replaced by LF the next time Gi
+t touches it
+warning: in the working copy of 'game-demo/relics/empty_breath_seal.tres', CRLF will be replaced by LF the next time Gi
+t touches it
+warning: in the working copy of 'game-demo/relics/ink_guard_talisman.tres', CRLF will be replaced by LF the next time G
+it touches it
+warning: in the working copy of 'game-demo/relics/jade_abacus.tres', CRLF will be replaced by LF the next time Git touc
+hes it
+warning: in the working copy of 'game-demo/relics/lotus_mirror.tres', CRLF will be replaced by LF the next time Git tou
+ches it
+warning: in the working copy of 'game-demo/relics/retained_edge_tassel.tres', CRLF will be replaced by LF the next time
+ Git touches it
+warning: in the working copy of 'game-demo/relics/sacrifice_blade.tres', CRLF will be replaced by LF the next time Git
+touches it
+warning: in the working copy of 'game-demo/relics/stone_heart_bell.tres', CRLF will be replaced by LF the next time Git
+ touches it
+warning: in the working copy of 'game-demo/relics/stored_breath_furnace.tres', CRLF will be replaced by LF the next tim
+e Git touches it
+warning: in the working copy of 'game-demo/relics/tempered_scripture_seal.tres', CRLF will be replaced by LF the next t
+ime Git touches it
+warning: in the working copy of 'game-demo/relics/thunder_seal.tres', CRLF will be replaced by LF the next time Git tou
+ches it
+warning: in the working copy of 'game-demo/relics/war_pattern_bracer.tres', CRLF will be replaced by LF the next time G
+it touches it
+warning: in the working copy of 'game-demo/scenes/battle/battle.gd', CRLF will be replaced by LF the next time Git touc
+hes it
+warning: in the working copy of 'game-demo/scenes/battle_reward/battle_reward.gd', CRLF will be replaced by LF the next
+ time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/ancient_sword_tomb_event.tscn', CRLF will be replaced by
+LF the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/ashen_sword_furnace_event.tscn', CRLF will be replaced by
+ LF the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/blood_jade_lotus_event.tscn', CRLF will be replaced by LF
+ the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/blood_moon_shrine_event.tscn', CRLF will be replaced by L
+F the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/blood_script_wall_event.tscn', CRLF will be replaced by L
+F the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/bone_bridge_event.tscn', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/broken_fate_abacus_event.tscn', CRLF will be replaced by
+LF the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/broken_seal_event.tscn', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/cloud_library_event.tscn', CRLF will be replaced by LF th
+e next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/cracked_jade_slip_event.tscn', CRLF will be replaced by L
+F the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/crimson_inner_demon_mirror_event.tscn', CRLF will be repl
+aced by LF the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/cursed_bell_event.tscn', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/demon_market_dusk_event.tscn', CRLF will be replaced by L
+F the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/demonic_whisper_event.tscn', CRLF will be replaced by LF
+the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/fallen_star_event.tscn', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/fox_spirit_inn_event.tscn', CRLF will be replaced by LF t
+he next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/ghost_contract_pavilion_event.tscn', CRLF will be replace
+d by LF the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/heaven_flame_eye_event.tscn', CRLF will be replaced by LF
+ the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/helpful_boi_event.tscn', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/hungry_ghost_event.tscn', CRLF will be replaced by LF the
+ next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/ink_monolith_event.tscn', CRLF will be replaced by LF the
+ next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/jade_mirror_event.tscn', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/lost_disciple_event.tscn', CRLF will be replaced by LF th
+e next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/lotus_pond_event.tscn', CRLF will be replaced by LF the n
+ext time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/market_in_clouds_event.tscn', CRLF will be replaced by LF
+ the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/merchant_debt_event.tscn', CRLF will be replaced by LF th
+e next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/moon_bone_bridge_event.tscn', CRLF will be replaced by LF
+ the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/moonlit_ferry_event.tscn', CRLF will be replaced by LF th
+e next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/old_battlefield_event.tscn', CRLF will be replaced by LF
+the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/red_thread_event.tscn', CRLF will be replaced by LF the n
+ext time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/rusty_cauldron_event.tscn', CRLF will be replaced by LF t
+he next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/silent_demon_sutra_event.tscn', CRLF will be replaced by
+LF the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/silent_dojo_event.tscn', CRLF will be replaced by LF the
+next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/sleeping_beast_event.tscn', CRLF will be replaced by LF t
+he next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/soul_auction_event.tscn', CRLF will be replaced by LF the
+ next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/soul_lantern_cave_event.tscn', CRLF will be replaced by L
+F the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/spirit_beast_tracks_event.tscn', CRLF will be replaced by
+ LF the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/spirit_spring_event.tscn', CRLF will be replaced by LF th
+e next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/spirit_tax_collector_event.tscn', CRLF will be replaced b
+y LF the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/starfall_pillar_event.tscn', CRLF will be replaced by LF
+the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/sword_rain_event.tscn', CRLF will be replaced by LF the n
+ext time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/thunder_tree_event.tscn', CRLF will be replaced by LF the
+ next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/tribulation_cloud_event.tscn', CRLF will be replaced by L
+F the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/event_rooms/wandering_alchemist_event.tscn', CRLF will be replaced by
+ LF the next time Git touches it
+warning: in the working copy of 'game-demo/scenes/ui/card_visuals.gd', CRLF will be replaced by LF the next time Git to
+uches it
+warning: in the working copy of 'game-demo/statuses/bleed.tres', CRLF will be replaced by LF the next time Git touches
+it
+warning: in the working copy of 'game-demo/statuses/exposed.tres', CRLF will be replaced by LF the next time Git touche
+s it

@@ -9,8 +9,12 @@
 
 [sub_resource type="Resource" id="Resource_block"]
 script = ExtResource("2")
+require_condition = true
+condition_type = 6
+condition_card_type = 0
+bonus_amount = 2
 amount = 4
-description_template = "获得 {amount} 点护体。"
+description_template = "获得 {amount} 点护体。 连携（{condition}）：额外获得 {bonus} 点效果。"
 
 [sub_resource type="Resource" id="Resource_energy_charge"]
 script = ExtResource("3")
@@ -26,7 +30,7 @@ type = 1
 cost = 1
 upgrade_type = 1
 element = 1
-mechanic_tags = null
+mechanic_tags = PackedStringArray("剑式连携", "异式连携")
 display_name = "凝气术"
 icon = ExtResource("5")
 sound = ExtResource("6")

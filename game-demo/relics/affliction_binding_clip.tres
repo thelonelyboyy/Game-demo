@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EndTurnHandBlockRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/end_turn_hand_block_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/ink_guard_talisman.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/affliction_binding_clip_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")

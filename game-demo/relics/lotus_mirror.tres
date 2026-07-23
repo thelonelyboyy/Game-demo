@@ -12,5 +12,6 @@ character_type = 0
 rarity = 2
 starter_relic = false
 icon = ExtResource("2")
-tooltip = "莲华镜\n战斗结束后，回复 4 点生命。"
-heal_amount = 4
+tooltip = "莲华镜
+战斗结束后回复 5 点生命，稳定抹平小伤。"
+heal_amount = 5

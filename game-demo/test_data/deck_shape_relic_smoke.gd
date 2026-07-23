@@ -150,12 +150,12 @@ func _check_upgraded_card_relic(battle: Battle) -> void:
 	var upgraded := _make_card("upgraded_first", Card.Type.SKILL, 1)
 	upgraded.upgraded = true
 	Events.card_played.emit(upgraded)
-	_check(battle.char_stats.block == 5, "tempered scripture seal grants five block for an upgraded card")
+	_check(battle.char_stats.block == 6, "tempered scripture seal grants six block for an upgraded card")
 	Events.card_played.emit(upgraded)
-	_check(battle.char_stats.block == 5, "tempered scripture seal triggers once per turn")
+	_check(battle.char_stats.block == 6, "tempered scripture seal triggers once per turn")
 	Events.player_turn_started.emit()
 	Events.card_played.emit(upgraded)
-	_check(battle.char_stats.block == 10, "tempered scripture seal resets next turn")
+	_check(battle.char_stats.block == 12, "tempered scripture seal resets next turn")
 
 
 func _make_card(id: String, type: Card.Type, cost: int) -> Card:

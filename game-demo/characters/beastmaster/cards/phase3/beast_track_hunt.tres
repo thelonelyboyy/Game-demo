@@ -16,6 +16,10 @@ amount = 1
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_draw")])
 effect_text = "造成 {damage} 点伤害，抽 {draw} 张牌。"
 id = "beast_track_hunt"
@@ -24,7 +28,7 @@ cost = 1
 upgrade_type = 1
 element = 2
 profession = 4
-mechanic_tags = PackedStringArray("兽群", "兽系")
+mechanic_tags = PackedStringArray("兽群", "兽系", "召唤", "蓄势")
 display_name = "寻迹猎杀"
 icon = ExtResource("2")
 sound = ExtResource("3")

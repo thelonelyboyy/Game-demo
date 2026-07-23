@@ -25,6 +25,7 @@ amount = 1
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_self_damage"), SubResource("AutoEffect_2_status"), SubResource("AutoEffect_3_status")])
 effect_text = "失去 {self_damage} 点生命，获得 {muscle} 层劲气和 {qi} 层灵息。"
 id = "demon_soul_price"
@@ -34,7 +35,7 @@ cost = 2
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("献祭")
+mechanic_tags = PackedStringArray("献祭", "魂印", "先手")
 display_name = "以魂为价"
 icon = ExtResource("2")
 sound = ExtResource("3")

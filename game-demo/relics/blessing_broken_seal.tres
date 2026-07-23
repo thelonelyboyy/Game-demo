@@ -1,6 +1,6 @@
 [gd_resource type="Resource" load_steps=3 format=3]
 
-[ext_resource type="Texture2D" path="res://art/relics/icons/campfire_ember_seal.png" id="1_icon"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/blessing_broken_seal_v2.png" id="1_icon"]
 [ext_resource type="Script" path="res://relics/blessing_broken_seal.gd" id="2_script"]
 
 [resource]

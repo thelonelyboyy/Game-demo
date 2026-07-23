@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="SelfDamageRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/self_damage_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/spirit_spring_gourd.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/demon_crimson_gourd_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")

@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="LowHealthManaRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/low_health_mana_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/blood_jade.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/waning_moon_ring_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")

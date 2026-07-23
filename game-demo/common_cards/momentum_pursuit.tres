@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_count_scaling_effect.gd" id="2"]
-[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/demon_cut_soul.png" id="3"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/momentum_pursuit_v2.png" id="3"]
 [ext_resource type="AudioStream" path="res://art/audio/slash.ogg" id="4"]
 
 [sub_resource type="Resource" id="CountDamage"]
@@ -21,7 +21,7 @@ target = 1
 cost = 1
 rarity = 1
 upgrade_type = 1
-mechanic_tags = PackedStringArray("通用", "连锁")
+mechanic_tags = PackedStringArray("通用", "连锁", "通用术式")
 display_name = "乘势追击"
 icon = ExtResource("3")
 sound = ExtResource("4")

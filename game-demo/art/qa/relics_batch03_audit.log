@@ -1,0 +1,6 @@
+﻿demon_flame_pact_wheel: PASS dims=512x512 import=True binding=True
+demon_flame_wheel_core: PASS dims=512x512 import=True binding=True
+demon_sha_urn: PASS dims=512x512 import=True binding=True
+demon_soul_bell: PASS dims=512x512 import=True binding=True
+demon_soul_censer: PASS dims=512x512 import=True binding=True
+demon_wraith_banner: PASS dims=512x512 import=True binding=True

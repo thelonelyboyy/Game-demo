@@ -12,12 +12,14 @@ value = 2
 
 [resource]
 script = ExtResource("1")
+exhausts = true
+search_count = 1
 configured_effects = Array[Resource]([SubResource("E1")])
 id = "demon_soul_mark_sense"
 type = 2
 cost = 1
 profession = 3
-mechanic_tags = PackedStringArray("功法", "魂印")
+mechanic_tags = PackedStringArray("功法", "魂印", "定向检索")
 display_name = "魂印感应"
 icon = ExtResource("2")
 sound = ExtResource("3")

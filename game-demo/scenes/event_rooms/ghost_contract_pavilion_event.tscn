@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "鬼契水榭"
 event_body = "水榭中无人落座，契纸却已摊开，等你按下指印。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("签下鬼契：获得 110 灵石，失去 19 生命", "撕毁旧契：移除随机一张牌，失去 25 灵石", "不理契约")
-choice_effects = PackedStringArray("gain_gold:110|damage:19", "remove_random:0|lose_gold:25", "skip")
+choice_texts = PackedStringArray("签下鬼契：获得 125 灵石与两张污染牌", "撕毁旧契：移除随机一张牌，失去 25 灵石", "不理契约")
+choice_effects = PackedStringArray("gain_gold:125|gain_curse:2", "remove_random:0|lose_gold:25", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

@@ -11,6 +11,7 @@ engine = 8
 
 [resource]
 script = ExtResource("1")
+cyclic = true
 configured_effects = Array[Resource]([SubResource("E1")])
 id = "demon_flame_refining"
 type = 2
@@ -18,7 +19,7 @@ rarity = 2
 cost = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("功法", "魔焰")
+mechanic_tags = PackedStringArray("功法", "魔焰", "循环术式")
 display_name = "炼焰术"
 icon = ExtResource("2")
 sound = ExtResource("3")

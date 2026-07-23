@@ -15,10 +15,11 @@ affected_by_spirit_root = false
 [sub_resource type="Resource" id="AutoEffect_2_status"]
 script = ExtResource("auto_effect_status")
 status = ExtResource("auto_status_qi_flow")
-amount = 2
+amount = 3
 
 [resource]
 script = ExtResource("1")
+exhausts = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_self_damage"), SubResource("AutoEffect_2_status")])
 effect_text = "失去 {self_damage} 点生命，获得 {qi} 层灵息。"
 id = "forbidden_mantra"
@@ -27,7 +28,7 @@ rarity = 2
 cost = 1
 upgrade_type = 1
 element = 4
-mechanic_tags = null
+mechanic_tags = PackedStringArray("煞气", "爆发")
 display_name = "禁咒入魔"
 icon = ExtResource("2")
 sound = ExtResource("3")

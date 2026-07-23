@@ -38,6 +38,7 @@ CHECKS = [
     {"name": "combat-debuff", "args": ["res://test_data/combat_debuff_smoke.tscn"], "quit": False, "required_marker": "COMBAT_DEBUFF_SMOKE_OK"},
     {"name": "battle-interaction-regression", "args": ["res://test_data/battle_interaction_regression_smoke.tscn"], "quit": False, "required_marker": "BATTLE_INTERACTION_REGRESSION_SMOKE_OK"},
     {"name": "combat-feedback-sequence", "args": ["res://test_data/combat_feedback_sequence_smoke.tscn"], "quit": False, "required_marker": "COMBAT_FEEDBACK_SEQUENCE_SMOKE_OK"},
+    {"name": "debug-console", "args": ["res://test_data/debug_console_smoke.tscn"], "quit": False, "required_marker": "DEBUG_CONSOLE_SMOKE_OK"},
     {"name": "spirit-root-fire-choice", "args": ["res://test_data/spirit_root_fire_choice_smoke.tscn"], "quit": False, "required_marker": "SPIRIT_ROOT_FIRE_CHOICE_SMOKE_OK"},
     {"name": "spirit-root-other-perfect", "args": ["res://test_data/spirit_root_other_perfect_smoke.tscn"], "quit": False, "required_marker": "SPIRIT_ROOT_OTHER_PERFECT_SMOKE_OK"},
     {"name": "debuff-counterplay", "args": ["res://test_data/debuff_counterplay_smoke.tscn"], "quit": False, "required_marker": "DEBUFF_COUNTERPLAY_SMOKE_OK"},

@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "摄魂铜铃"
 event_body = "铜铃无风自响，声声敲在识海。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("镇压铜铃：随机突破一张牌，失去 8 生命", "卖给黑市：获得 100 灵石", "堵住耳朵")
-choice_effects = PackedStringArray("upgrade_random:0|damage:8", "gain_gold", "skip")
+choice_texts = PackedStringArray("镇铃净魂：净化一张污染牌，再随机突破一张牌", "卖给黑市：获得 100 灵石", "堵住耳朵")
+choice_effects = PackedStringArray("purify_affliction:1|upgrade_random:1", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 100, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

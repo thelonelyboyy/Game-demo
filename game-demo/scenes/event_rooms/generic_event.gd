@@ -110,10 +110,16 @@ func _can_apply_single_effect(effect: String, amount: int) -> bool:
 			return run_stats and run_stats.gold >= 50
 		"duplicate_last":
 			return character_stats and character_stats.deck and not character_stats.deck.cards.is_empty()
+		"duplicate_random":
+			return not _get_removable_cards().is_empty()
 		"remove_random":
-			return character_stats and character_stats.deck and character_stats.deck.cards.size() > 1
+			return _get_removable_cards().size() >= maxi(amount, 1)
+		"purify_affliction":
+			return _get_affliction_cards().size() >= maxi(amount, 1)
+		"transform_random":
+			return not _get_removable_cards().is_empty() and not _get_draftable_candidates(false).is_empty()
 		"upgrade_random":
-			return _get_upgrade_candidates().size() > 0
+			return _get_upgrade_candidates().size() >= maxi(amount, 1)
 		"gain_random_card":
 			return not _get_draftable_candidates(false).is_empty()
 		"gain_rare_card":
@@ -139,29 +145,33 @@ func _apply_single_effect(effect: String, amount: int) -> void:
 		"heal":
 			if character_stats:
 				character_stats.heal(amount)
+		"heal_percent":
+			if character_stats:
+				character_stats.heal(ceili(character_stats.max_health * amount / 100.0))
 		"damage":
 			if character_stats:
 				character_stats.health = maxi(1, character_stats.health - amount)
+		"damage_percent":
+			if character_stats:
+				character_stats.health = maxi(1, character_stats.health - ceili(character_stats.max_health * amount / 100.0))
 		"max_hp":
 			if character_stats:
-				character_stats.max_health += amount
+				character_stats.max_health = maxi(1, character_stats.max_health + amount)
+				character_stats.health = mini(character_stats.health, character_stats.max_health)
+		"gain_gold_per_missing_hp":
+			if character_stats and run_stats:
+				run_stats.gold += maxi(character_stats.max_health - character_stats.health, 0) * amount
+		"gain_gold_per_card":
+			if character_stats and character_stats.deck and run_stats:
+				run_stats.gold += character_stats.deck.cards.size() * amount
 		"upgrade_random":
-			var candidates := _get_upgrade_candidates()
-			if not candidates.is_empty():
-				var card := RNG.array_pick_random(candidates) as Card
-				if card:
-					card.upgrade()
-					_emit_card_feedback("突破卡牌", [card], "卡牌已完成突破。")
+			_upgrade_random_cards(maxi(amount, 1))
 		"remove_random":
-			if character_stats and character_stats.deck and character_stats.deck.cards.size() > 1:
-				var removable: Array[Card] = []
-				for candidate: Card in character_stats.deck.cards:
-					if candidate and candidate.can_be_removed_from_deck():
-						removable.append(candidate)
-				var card := RNG.array_pick_random(removable) as Card
-				if card:
-					character_stats.deck.remove_card(card)
-					_emit_card_feedback("移除卡牌", [card], "卡牌已从本次牌组中移除。")
+			_remove_random_cards(maxi(amount, 1))
+		"purify_affliction":
+			_remove_random_cards(maxi(amount, 1), true)
+		"transform_random":
+			_transform_random_card()
 		"gain_random_card":
 			_add_random_draftable_cards(maxi(amount, 1), false)
 		"gain_rare_card":
@@ -170,6 +180,8 @@ func _apply_single_effect(effect: String, amount: int) -> void:
 			_add_random_curses(maxi(amount, 1))
 		"duplicate_last":
 			_duplicate_last_card()
+		"duplicate_random":
+			_duplicate_random_card()
 		"gamble_even":
 			_resolve_gamble(0.5, 100)
 		"gamble_risky":
@@ -187,6 +199,84 @@ func _duplicate_last_card() -> void:
 	var copied_card := source.duplicate(true) as Card
 	character_stats.deck.add_card(copied_card)
 	_emit_card_feedback("复制卡牌", [copied_card], "以下副本已加入牌组。")
+
+
+func _duplicate_random_card() -> void:
+	var candidates := _get_removable_cards()
+	if candidates.is_empty() or not character_stats or not character_stats.deck:
+		return
+	var source := RNG.array_pick_random(candidates) as Card
+	var copied_card := source.duplicate(true) as Card if source else null
+	if copied_card:
+		character_stats.deck.add_card(copied_card)
+		_emit_card_feedback("拓印卡牌", [copied_card], "随机选中的卡牌已被拓印。")
+
+
+func _upgrade_random_cards(count: int) -> void:
+	var candidates := _get_upgrade_candidates()
+	RNG.array_shuffle(candidates)
+	var upgraded_cards: Array[Card] = []
+	for _i in mini(count, candidates.size()):
+		var card := candidates.pop_back() as Card
+		if card:
+			card.upgrade()
+			upgraded_cards.append(card)
+	_emit_card_feedback("突破卡牌", upgraded_cards, "卡牌已完成突破。")
+
+
+func _get_removable_cards() -> Array[Card]:
+	var result: Array[Card] = []
+	if not character_stats or not character_stats.deck:
+		return result
+	for card: Card in character_stats.deck.cards:
+		if card and card.can_be_removed_from_deck():
+			result.append(card)
+	return result
+
+
+func _get_affliction_cards() -> Array[Card]:
+	var result: Array[Card] = []
+	for card: Card in _get_removable_cards():
+		if card.is_status_card() or card.is_curse_card():
+			result.append(card)
+	return result
+
+
+func _remove_random_cards(count: int, affliction_only := false) -> void:
+	if not character_stats or not character_stats.deck:
+		return
+	var candidates := _get_affliction_cards() if affliction_only else _get_removable_cards()
+	RNG.array_shuffle(candidates)
+	var removed: Array[Card] = []
+	for _i in mini(count, candidates.size()):
+		var card := candidates.pop_back() as Card
+		if card:
+			character_stats.deck.remove_card(card)
+			removed.append(card)
+	_emit_card_feedback("净化牌组" if affliction_only else "移除卡牌", removed, "这些卡牌已从本次牌组中移除。")
+
+
+func _transform_random_card() -> void:
+	if not character_stats or not character_stats.deck:
+		return
+	var removable := _get_removable_cards()
+	if removable.is_empty():
+		return
+	var source := RNG.array_pick_random(removable) as Card
+	var candidates := _get_draftable_candidates(false)
+	if source:
+		var same_rarity: Array[Card] = []
+		for card: Card in candidates:
+			if card and card.id != source.id and card.rarity == source.rarity:
+				same_rarity.append(card)
+		if not same_rarity.is_empty():
+			candidates = same_rarity
+	if not source or candidates.is_empty():
+		return
+	var replacement := (RNG.array_pick_random(candidates) as Card).duplicate(true) as Card
+	character_stats.deck.remove_card(source)
+	character_stats.deck.add_card(replacement)
+	_emit_card_feedback("重铸卡牌", [source, replacement], "第一张牌已重铸为第二张牌。")
 
 
 func _resolve_gamble(success_chance: float, payout: int) -> void:

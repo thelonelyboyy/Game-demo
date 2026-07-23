@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="SelfDamageRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/self_damage_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/blood_jade.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/demon_blood_crucible_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -11,7 +11,7 @@ type = 4
 character_type = 3
 rarity = 2
 icon = ExtResource("2")
-tooltip = "魔修专属。每次因自己的卡牌失去生命后，获得 3 点护体。"
+tooltip = "魔修专属。每次因自己的卡牌失去生命后获得 4 点护体，将血债转为防御。"
 reward_mode = 0
 amount = 3
 minimum_damage = 1

@@ -78,10 +78,10 @@ func _check_card_type_relics(battle: Battle) -> void:
 	attack.type = Card.Type.ATTACK
 	Events.card_played.emit(attack)
 	await get_tree().process_frame
-	_check(battle.player.stats.block == 4, "war pattern bracer grants four block on the first attack")
+	_check(battle.player.stats.block == 5, "war pattern bracer grants five block on the first attack")
 	Events.card_played.emit(attack)
 	await get_tree().process_frame
-	_check(battle.player.stats.block == 4, "war pattern bracer triggers once per turn")
+	_check(battle.player.stats.block == 5, "war pattern bracer triggers once per turn")
 
 	var hand_before := battle.player_handler.hand.get_child_count()
 	var skill := Card.new()
@@ -105,12 +105,12 @@ func _check_timing_relics(battle: Battle, relic_handler: RelicHandler) -> void:
 	battle.player.stats.block = 0
 	battle.char_stats.mana = 2
 	furnace_ui.relic.activate_relic(furnace_ui)
-	_check(battle.player.stats.block == 6, "stored breath furnace converts unspent mana to block")
+	_check(battle.player.stats.block == 8, "stored breath furnace converts unspent mana to block")
 	_check(battle.char_stats.mana == 2, "stored breath furnace does not consume retained mana before turn end")
 	battle.player.stats.block = 0
 	battle.char_stats.mana = 5
 	furnace_ui.relic.activate_relic(furnace_ui)
-	_check(battle.player.stats.block == 9, "stored breath furnace caps block at three mana")
+	_check(battle.player.stats.block == 12, "stored breath furnace caps block at three mana")
 
 	battle.char_stats.mana = 0
 	battle.char_stats.health = battle.char_stats.max_health

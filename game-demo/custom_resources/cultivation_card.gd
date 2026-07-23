@@ -1,7 +1,7 @@
 class_name CultivationCard
 extends Card
 
-enum GrowthTrigger {NONE, PLAYED, DISCARDED, EXHAUSTED}
+enum GrowthTrigger {NONE, PLAYED, DISCARDED, EXHAUSTED, RETAINED}
 
 @export_group("Configured Effects")
 @export var configured_effects: Array[Resource] = []
@@ -204,6 +204,8 @@ func _growth_trigger_matches(trigger: LifecycleTrigger) -> bool:
 			return trigger == Card.LifecycleTrigger.DISCARDED
 		GrowthTrigger.EXHAUSTED:
 			return trigger == Card.LifecycleTrigger.EXHAUSTED
+		GrowthTrigger.RETAINED:
+			return trigger == Card.LifecycleTrigger.TURN_ENDED_IN_HAND and is_retained_card()
 		_:
 			return false
 
@@ -239,6 +241,8 @@ func _get_growth_tooltip() -> String:
 			trigger_name = "弃牌时"
 		GrowthTrigger.EXHAUSTED:
 			trigger_name = "消耗时"
+		GrowthTrigger.RETAINED:
+			trigger_name = "蓄势后"
 	var suffix := ""
 	if growth_limit > 0:
 		suffix = "，最多成长 %s 点" % growth_limit

@@ -49,6 +49,7 @@ func _ready() -> void:
 
 func _run_smoke() -> void:
 	_check_growth_card()
+	_check_distinctive_keywords()
 	_check_lifecycle_trigger_cards()
 	_check_discover_card()
 	_check_discovery_request()
@@ -78,6 +79,44 @@ func _check_growth_card() -> void:
 	for i in range(4):
 		card.handle_lifecycle_trigger(Card.LifecycleTrigger.PLAYED, [], null)
 	_check(damage.amount == 13 and card.growth_accumulated == 6, "growth respects combat cap")
+
+
+func _check_distinctive_keywords() -> void:
+	var retained := CultivationCard.new()
+	retained.retains = true
+	retained.growth_trigger = CultivationCard.GrowthTrigger.RETAINED
+	retained.growth_amount = 2
+	retained.growth_limit = 4
+	var block := ConfiguredBlockEffect.new()
+	block.amount = 5
+	retained.configured_effects = [block]
+	retained.handle_lifecycle_trigger(Card.LifecycleTrigger.TURN_ENDED_IN_HAND, [], null)
+	_check(block.amount == 7 and retained.growth_accumulated == 2, "蓄势牌在保留时成长")
+	retained.retains = false
+	retained.handle_lifecycle_trigger(Card.LifecycleTrigger.TURN_ENDED_IN_HAND, [], null)
+	_check(block.amount == 7, "不再保留时不会误触发蓄势")
+
+	var handler := ClassMechanicHandler.new()
+	add_child(handler)
+	handler.add_to_group("class_mechanic")
+	var previous := CultivationCard.new()
+	previous.type = Card.Type.SKILL
+	previous.element = Card.Element.WATER
+	var current := CultivationCard.new()
+	current.type = Card.Type.ATTACK
+	current.element = Card.Element.FIRE
+	handler._cards_played_this_turn_history = [previous, current]
+	var combo := ConfiguredBlockEffect.new()
+	combo.amount = 4
+	combo.require_condition = true
+	combo.condition_type = CardEffect.ConditionType.PREVIOUS_CARD_TYPE
+	combo.condition_card_type = Card.Type.SKILL
+	combo.bonus_amount = 3
+	_check(combo.get_modified_amount(current) == 7, "连携读取上一张牌类型并增加效果")
+	combo.condition_type = CardEffect.ConditionType.PREVIOUS_CARD_ELEMENT
+	combo.condition_element = Card.Element.WATER
+	_check(combo.get_modified_amount(current) == 7, "连携读取上一张牌五行并增加效果")
+	handler.queue_free()
 
 
 func _check_lifecycle_trigger_cards() -> void:

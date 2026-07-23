@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/ui/icons/status_soul_mark.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_seven_flame_cycle_v2.png" id="2"]
 [ext_resource type="AudioStream" path="res://art/audio/true_strength.ogg" id="3"]
 [ext_resource type="Script" path="res://custom_resources/effects/configured_flame_effect.gd" id="4"]
 
@@ -14,6 +14,7 @@ bonus_flat = 1
 
 [resource]
 script = ExtResource("1")
+exhausts = true
 configured_effects = Array[Resource]([SubResource("Flame")])
 id = "demon_seven_flame_cycle"
 type = 1
@@ -22,7 +23,7 @@ cost = 1
 upgrade_type = 2
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("魔焰", "过牌")
+mechanic_tags = PackedStringArray("魔焰", "过牌", "爆发")
 display_name = "七焰回环"
 icon = ExtResource("2")
 sound = ExtResource("3")

@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_stats"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/sky_palace_guardian.png" id="2_art"]
 [ext_resource type="PackedScene" path="res://enemies/sky_palace_guardian/sky_palace_guardian_ai.tscn" id="3_ai"]
+[ext_resource type="Texture2D" path="res://art/combatants/enemies/sky_palace_guardian_card_portrait_v3.png" id="4_battle"]
 
 [resource]
 script = ExtResource("1_stats")
@@ -17,3 +18,4 @@ phase_two_damage_bonus = 0.25
 phase_two_sequence = Array[int]([2, 1, 2, 0])
 max_health = 265
 art = ExtResource("2_art")
+battle_art = ExtResource("4_battle")

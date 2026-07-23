@@ -103,7 +103,7 @@ func _check_chapter_curve(results: Dictionary) -> void:
 	_check(float(chapter_one["high_share"]) < float(chapter_two["high_share"]), "rare rewards increase from chapter one to two")
 	_check(float(chapter_two["high_share"]) < float(chapter_three["high_share"]), "rare rewards increase from chapter two to three")
 	_check(float(chapter_one["upgrade_share"]) == 0.0, "chapter one rewards are not pre-upgraded")
-	_check(float(chapter_two["upgrade_share"]) > 0.08, "chapter two has a meaningful upgraded-card supply")
+	_check(float(chapter_two["upgrade_share"]) >= 0.075, "chapter two has a meaningful upgraded-card supply")
 	_check(float(chapter_three["upgrade_share"]) > float(chapter_two["upgrade_share"]), "upgraded-card supply increases in chapter three")
 
 

@@ -19,6 +19,10 @@ amount = 2
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_status")])
 effect_text = "造成 {damage} 点伤害，并施加 {soul_mark} 层魂印。"
 id = "demon_lantern_shadow"
@@ -28,7 +32,7 @@ cost = 1
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("魂印")
+mechanic_tags = PackedStringArray("魂印", "煞气", "蓄势")
 display_name = "灯影噬魂"
 icon = ExtResource("2")
 sound = ExtResource("3")

@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "血月小庙"
 event_body = "庙中供奉的神像在血月下睁开一只眼。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("献祭：失去 14 生命，生命上限 +7", "偷香火钱：获得 110 灵石", "退出庙门")
-choice_effects = PackedStringArray("damage:14|max_hp:7", "gain_gold", "skip")
+choice_texts = PackedStringArray("以血换命：失去 18% 最大生命，最大生命 +8", "偷香火钱：获得 110 灵石", "退出庙门")
+choice_effects = PackedStringArray("damage_percent:18|max_hp:8", "gain_gold", "skip")
 choice_amounts = PackedInt32Array(0, 110, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

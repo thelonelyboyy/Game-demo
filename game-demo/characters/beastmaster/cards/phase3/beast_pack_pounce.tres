@@ -18,6 +18,10 @@ amount = 1
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_status")])
 effect_text = "造成 {damage} 点伤害，获得 {beast_pack} 层兽群。"
 id = "beast_pack_pounce"
@@ -26,7 +30,7 @@ cost = 1
 upgrade_type = 1
 element = 2
 profession = 4
-mechanic_tags = PackedStringArray("兽群", "兽系")
+mechanic_tags = PackedStringArray("兽群", "兽系", "召唤", "蓄势")
 display_name = "群兽扑击"
 icon = ExtResource("2")
 sound = ExtResource("3")

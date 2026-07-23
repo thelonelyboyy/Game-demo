@@ -9,16 +9,17 @@
 
 [sub_resource type="Resource" id="E1"]
 script = ExtResource("auto_dmg")
-amount = 6
+amount = 9
 
 [sub_resource type="Resource" id="E2"]
 script = ExtResource("auto_status")
 status = ExtResource("auto_soul_mark")
 target_mode = 0
-amount = 1
+amount = 2
 
 [resource]
 script = ExtResource("1")
+exhausts = true
 configured_effects = Array[Resource]([SubResource("E1"), SubResource("E2")])
 effect_text = "造成 6 点伤害，施加 1 层魂印。"
 id = "demon_soul_devour_claw"
@@ -27,7 +28,7 @@ cost = 1
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("魂印")
+mechanic_tags = PackedStringArray("魂印", "爆发")
 display_name = "噬魂爪"
 icon = ExtResource("2")
 sound = ExtResource("3")

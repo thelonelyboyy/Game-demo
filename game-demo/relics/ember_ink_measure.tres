@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CardLifecycleBlockRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/card_lifecycle_block_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/stone_heart_bell.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/ember_ink_measure_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")

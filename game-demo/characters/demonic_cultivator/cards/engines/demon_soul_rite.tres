@@ -11,13 +11,14 @@ engine = 4
 
 [resource]
 script = ExtResource("1")
+retrieve_count = 1
 configured_effects = Array[Resource]([SubResource("E1")])
 id = "demon_soul_rite"
 type = 2
 rarity = 1
 cost = 1
 profession = 3
-mechanic_tags = PackedStringArray("功法", "魂印")
+mechanic_tags = PackedStringArray("功法", "魂印", "弃牌回收")
 display_name = "夺魂仪"
 icon = ExtResource("2")
 sound = ExtResource("3")

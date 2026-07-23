@@ -20,6 +20,7 @@ amount = 3
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_status")])
 effect_text = "对所有敌人造成 {damage} 点伤害，并施加 {soul_mark} 层魂印。"
 id = "demon_hell_soul_seal"
@@ -29,7 +30,7 @@ cost = 3
 upgrade_type = 1
 element = 4
 profession = 3
-mechanic_tags = PackedStringArray("魂印")
+mechanic_tags = PackedStringArray("魂印", "先手")
 display_name = "幽冥万魂印"
 icon = ExtResource("2")
 sound = ExtResource("3")

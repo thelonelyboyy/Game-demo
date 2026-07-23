@@ -15,6 +15,8 @@ EFFECT_TYPES = [
     "skip", "gain_gold", "lose_gold", "heal", "damage", "max_hp",
     "upgrade_random", "remove_random", "gain_random_card", "gain_rare_card",
     "gain_curse", "duplicate_last", "gamble_even", "gamble_risky",
+    "duplicate_random", "purify_affliction", "transform_random",
+    "heal_percent", "damage_percent", "gain_gold_per_missing_hp", "gain_gold_per_card",
 ]
 
 

@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EnemyStats" load_steps=4 format=3 uid="uid://crmyty52i10xd"]
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=5 format=3 uid="uid://crmyty52i10xd"]
 
 [ext_resource type="PackedScene" path="res://enemies/toxic_ghost/bone_dragon_ai.tscn" id="1_3lheq"]
 [ext_resource type="Script" path="res://custom_resources/enemy_stats.gd" id="1_dyv27"]
 [ext_resource type="Texture2D" path="res://art/enemies_redesign/bone_dragon.png" id="1_frmvf"]
+[ext_resource type="Texture2D" path="res://art/combatants/enemies/bone_dragon_card_portrait_v3.png" id="2_battle"]
 
 [resource]
 script = ExtResource("1_dyv27")
@@ -17,3 +18,4 @@ phase_two_damage_bonus = 0.20
 phase_two_sequence = Array[int]([1, 0, 1, 2])
 max_health = 210
 art = ExtResource("1_frmvf")
+battle_art = ExtResource("2_battle")

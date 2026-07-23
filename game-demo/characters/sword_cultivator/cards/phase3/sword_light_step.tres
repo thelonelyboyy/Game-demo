@@ -16,6 +16,7 @@ amount = 1
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_block"), SubResource("AutoEffect_2_draw")])
 effect_text = "抽 {draw} 张牌，获得 {block} 点护体。"
 id = "sword_light_step"
@@ -23,7 +24,7 @@ type = 1
 upgrade_type = 1
 element = 3
 profession = 2
-mechanic_tags = PackedStringArray("过牌")
+mechanic_tags = PackedStringArray("过牌", "剑式连携", "先手")
 display_name = "剑步轻灵"
 icon = ExtResource("2")
 sound = ExtResource("3")

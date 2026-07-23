@@ -15,8 +15,8 @@ script = ExtResource("1_script")
 event_title = "暮色魔市"
 event_body = "面具商人掀开匣盖，里面的宝光没有影子。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("买下秘匣：失去 65 灵石，随机突破一张牌", "卖出杂物：移除随机一张牌，获得 50 灵石", "离开摊位")
-choice_effects = PackedStringArray("lose_gold:65|upgrade_random:0", "remove_random:0|gain_gold:50", "skip")
+choice_texts = PackedStringArray("买下秘匣：支付 65 灵石，随机重铸一张牌并突破它", "卖出杂物：移除随机一张牌，获得 50 灵石", "离开摊位")
+choice_effects = PackedStringArray("lose_gold:65|transform_random:1|upgrade_random:1", "remove_random:0|gain_gold:50", "skip")
 choice_amounts = PackedInt32Array(0, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]

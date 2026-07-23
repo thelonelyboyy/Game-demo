@@ -43,7 +43,7 @@ func complete_action_after_delay(delay: float) -> void:
 
 
 func _complete_after_pending_damage() -> void:
-	var player := target as Player
+	var player := target as Player if is_instance_valid(target) else null
 	if is_instance_valid(player) and player.has_pending_damage():
 		await player.all_damage_resolved
 	_emit_completed_for_stored_enemy()

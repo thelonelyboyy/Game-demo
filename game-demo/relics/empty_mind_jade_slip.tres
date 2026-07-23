@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="DeckSizeStartRelic" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/deck_size_start_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/lotus_mirror.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/empty_mind_jade_slip_v2.png" id="2"]
 [ext_resource type="Resource" path="res://statuses/spell_ward.tres" id="3"]
 
 [resource]

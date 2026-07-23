@@ -11,6 +11,10 @@ amount = 4
 
 [resource]
 script = ExtResource("1")
+growth_limit = 3
+growth_amount = 1
+growth_trigger = 4
+retains = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_block")])
 effect_text = "获得 {block} 点护体。"
 id = "body_golden_bell_step"
@@ -18,7 +22,7 @@ type = 1
 upgrade_type = 1
 element = 1
 profession = 1
-mechanic_tags = PackedStringArray("金身")
+mechanic_tags = PackedStringArray("金身", "蓄势")
 display_name = "金钟步"
 icon = ExtResource("2")
 sound = ExtResource("3")

@@ -21,6 +21,7 @@ import level_table as lt
 import event_table as et
 import potion_table as pt
 import shop_price_table as st
+import relic_table as rt
 
 XLSX = Path(__file__).resolve().parents[1] / "game_data.xlsx"
 
@@ -57,6 +58,9 @@ def import_cards(ws, errors) -> int:
                 "exhausts": str(gv("消耗")).strip() == "是",
                 "element": str(gv("元素")).strip(),
                 "upgrade": str(gv("突破方向")).strip(),
+                "growth_trigger": str(gv("成长触发", "无")).strip(),
+                "growth_amount": int(gv("每次成长值", 1)),
+                "growth_limit": int(gv("成长上限", 0)),
                 "effect_amounts": [],
             }
             for key, column in (
@@ -78,7 +82,7 @@ def import_cards(ws, errors) -> int:
                 row[key] = max(count, 1) if enabled else 0
             for key, table in (("type", ct.TYPE_R), ("target", ct.TARGET_R),
                                ("rarity", ct.RARITY_R), ("element", ct.ELEMENT_R),
-                               ("upgrade", ct.UPGRADE_R)):
+                               ("upgrade", ct.UPGRADE_R), ("growth_trigger", ct.GROWTH_R)):
                 if row[key] not in table:
                     raise ValueError(f"非法{key}值 '{row[key]}'")
         except (ValueError, TypeError) as e:
@@ -87,6 +91,29 @@ def import_cards(ws, errors) -> int:
 
         if ct.update_card_file(path, row):
             changed += 1
+    return changed
+
+
+def import_relic_params(ws, errors) -> int:
+    by_file: dict[str, list[dict]] = {}
+    for idx, vals in _rowvals(ws):
+        if not vals or not vals[idx["文件"]]:
+            continue
+        rel = str(vals[idx["文件"]]).strip()
+        raw_param = str(vals[idx["参数定位键"]]).strip()
+        value = vals[idx["参数值"]]
+        if isinstance(value, str) and value.strip() in ("是", "否"):
+            value = value.strip() == "是"
+        elif value is None:
+            errors.append(f"[法宝参数] {rel} {raw_param}: 参数值不可留空")
+            continue
+        by_file.setdefault(rel, []).append({"raw_param": raw_param, "value": value})
+    changed = 0
+    for rel, edits in by_file.items():
+        try:
+            changed += int(rt.write_parameters(rel, edits))
+        except (ValueError, OSError) as error:
+            errors.append(f"[法宝参数] {rel}: {error}")
     return changed
 
 
@@ -372,6 +399,7 @@ def main() -> None:
     n_events = import_events(wb["事件"], errors)
     n_event_roots = import_event_roots(wb["事件灵根"], errors)
     n_potions = import_potions(wb["符箓丹药"], errors)
+    n_relic_params = import_relic_params(wb["法宝参数"], errors) if "法宝参数" in wb.sheetnames else 0
     n_enemies = import_enemies(wb["怪物"], errors)
     n_ai = import_ai(wb["怪物行动"], errors)
     n_levels = import_levels(wb["关卡设计"], errors)
@@ -384,6 +412,7 @@ def main() -> None:
     print(f"事件: 更新 {n_events} 个文件")
     print(f"事件灵根: 更新 {n_event_roots} 个文件")
     print(f"符箓丹药: 更新 {n_potions} 个文件")
+    print(f"法宝参数: 更新 {n_relic_params} 个文件")
     print(f"怪物: 更新 {n_enemies} 个文件")
     print(f"怪物行动: 更新 {n_ai} 个文件")
     print(f"关卡设计: 更新 {n_levels} 个资源/场景")

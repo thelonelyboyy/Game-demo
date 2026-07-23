@@ -16,6 +16,7 @@ amount = 1
 
 [resource]
 script = ExtResource("1")
+cyclic = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_block"), SubResource("AutoEffect_2_draw")])
 effect_text = "获得 {block} 点护体，抽 {draw} 张牌。"
 id = "guard_sword"
@@ -23,7 +24,7 @@ type = 1
 cost = 1
 upgrade_type = 1
 element = 1
-mechanic_tags = null
+mechanic_tags = PackedStringArray("剑式连携", "循环术式")
 display_name = "御剑守心"
 icon = ExtResource("2")
 sound = ExtResource("3")

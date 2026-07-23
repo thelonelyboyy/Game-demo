@@ -124,6 +124,11 @@ EVENT_EFFECT_LABELS = {
     "upgrade_random": "随机突破卡牌", "remove_random": "随机移除卡牌",
     "gain_random_card": "获得随机卡牌", "gain_rare_card": "获得稀有卡牌",
     "gain_curse": "获得污染牌", "duplicate_last": "复制最后一张牌",
+    "duplicate_random": "随机拓印卡牌", "purify_affliction": "净化污染牌",
+    "transform_random": "随机重铸卡牌", "heal_percent": "按最大生命百分比回复",
+    "damage_percent": "按最大生命百分比失去生命",
+    "gain_gold_per_missing_hp": "每点已损生命获得灵石",
+    "gain_gold_per_card": "每张永久卡牌获得灵石",
     "gamble_even": "均衡赌局", "gamble_risky": "冒险赌局",
 }
 EVENT_EFFECT_LABELS_R = {value: key for key, value in EVENT_EFFECT_LABELS.items()}

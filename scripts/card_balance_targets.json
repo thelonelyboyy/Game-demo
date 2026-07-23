@@ -1,0 +1,471 @@
+[
+  {
+    "file": "characters/beastmaster/cards/phase3/beast_double_summon.tres",
+    "effect_id": "AutoEffect_1_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/beastmaster/cards/phase3/beast_turtle_guard.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 6,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/beastmaster/cards/phase3/beast_wolf_call.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 5,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/body_cultivator/cards/collapsing_palm.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 9,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/body_cultivator/cards/mountain_breath.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 6,
+    "identity": "循环"
+  },
+  {
+    "file": "characters/body_cultivator/cards/phase3/body_copper_skin.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 7,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/body_cultivator/cards/phase3/body_copper_skin.tres",
+    "effect_id": "AutoEffect_2_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/body_cultivator/cards/phase3/body_guard_meridian.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 5,
+    "identity": "循环"
+  },
+  {
+    "file": "characters/body_cultivator/cards/phase3/body_immovable_king.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 12,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/body_cultivator/cards/phase3/body_immovable_king.tres",
+    "effect_id": "AutoEffect_2_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/body_cultivator/cards/phase3/body_iron_bone.tres",
+    "effect_id": "AutoEffect_1_status",
+    "field": "amount",
+    "value": 3,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/body_cultivator/cards/vajra_body.tres",
+    "effect_id": "AutoEffect_1_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "循环"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_ash_barrier.tres",
+    "effect_id": "Block",
+    "field": "amount",
+    "value": 4,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_blood_forge_armor.tres",
+    "effect_id": "Block",
+    "field": "amount",
+    "value": 11,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_blood_sea_surge.tres",
+    "effect_id": "E1",
+    "field": "amount",
+    "value": 10,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_blood_ward.tres",
+    "effect_id": "E2",
+    "field": "amount",
+    "value": 11,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_defend.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 7,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_flame.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 6,
+    "identity": "循环"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_flame_heart.tres",
+    "effect_id": "E1",
+    "field": "amount",
+    "value": 15,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_flame_heart.tres",
+    "effect_id": "E2",
+    "field": "amount",
+    "value": 3,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_myriad_soul_devour.tres",
+    "effect_id": "E1",
+    "field": "amount",
+    "value": 11,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_myriad_soul_devour.tres",
+    "effect_id": "E2",
+    "field": "amount",
+    "value": 3,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_shatter_soul_seal.tres",
+    "effect_id": "E1",
+    "field": "amount",
+    "value": 4,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_shatter_soul_seal.tres",
+    "effect_id": "E2",
+    "field": "amount",
+    "value": 2,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_soul_devour_claw.tres",
+    "effect_id": "E1",
+    "field": "amount",
+    "value": 9,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_soul_devour_claw.tres",
+    "effect_id": "E2",
+    "field": "amount",
+    "value": 2,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/demon_strike.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 6,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/engines/demon_soul_echo.tres",
+    "effect_id": "E1",
+    "field": "value",
+    "value": 2,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/engines/demon_soul_mark_sense.tres",
+    "effect_id": "E1",
+    "field": "value",
+    "value": 2,
+    "identity": "定向检索"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/forbidden_mantra.tres",
+    "effect_id": "AutoEffect_2_status",
+    "field": "amount",
+    "value": 3,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/phase3/demon_blood_oath.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 7,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/phase3/demon_blood_sea.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 8,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/phase3/demon_cut_soul.tres",
+    "effect_id": "AutoEffect_1_low_health_damage",
+    "field": "amount",
+    "value": 6,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/phase3/demon_cut_soul.tres",
+    "effect_id": "AutoEffect_1_low_health_damage",
+    "field": "bonus_amount",
+    "value": 4,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/phase3/demon_hell_soul_seal.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 10,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/phase3/demon_hell_soul_seal.tres",
+    "effect_id": "AutoEffect_2_status",
+    "field": "amount",
+    "value": 3,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/phase3/demon_soul_armor.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 6,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/phase3/demon_soul_price.tres",
+    "effect_id": "AutoEffect_2_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/phase3/demon_soul_stamp.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 5,
+    "identity": "循环"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/soul_drain.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 5,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/demonic_cultivator/cards/soul_drain.tres",
+    "effect_id": "AutoEffect_2_block",
+    "field": "amount",
+    "value": 3,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/flying_sword.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 9,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/guard_sword.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 4,
+    "identity": "循环"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_cloud_cut.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 6,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_cloud_cut.tres",
+    "effect_id": "AutoEffect_2_draw",
+    "field": "amount",
+    "value": 2,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_cloud_scroll.tres",
+    "effect_id": "AutoEffect_1_draw",
+    "field": "amount",
+    "value": 2,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_furnace_open.tres",
+    "effect_id": "AutoEffect_2_status",
+    "field": "amount",
+    "value": 3,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_hidden_edge.tres",
+    "effect_id": "AutoEffect_1_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "循环"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_light_step.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 3,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_marrow_forge.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 6,
+    "identity": "定向检索"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_probe_meridian.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 3,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_ring_sheath.tres",
+    "effect_id": "AutoEffect_1_draw",
+    "field": "amount",
+    "value": 2,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_ring_sheath.tres",
+    "effect_id": "AutoEffect_2_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/phase3/sword_wash_blade.tres",
+    "effect_id": "AutoEffect_1_draw",
+    "field": "amount",
+    "value": 3,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/piercing_light.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 9,
+    "identity": "循环"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/piercing_light.tres",
+    "effect_id": "AutoEffect_2_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "循环"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/sword_heart.tres",
+    "effect_id": "AutoEffect_1_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/sword_heart.tres",
+    "effect_id": "AutoEffect_2_status",
+    "field": "amount",
+    "value": 2,
+    "identity": "爆发"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/sword_wind_return.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 4,
+    "identity": "先手"
+  },
+  {
+    "file": "characters/sword_cultivator/cards/sword_wind_return.tres",
+    "effect_id": "AutoEffect_2_block",
+    "field": "amount",
+    "value": 3,
+    "identity": "先手"
+  },
+  {
+    "file": "common_cards/defend.tres",
+    "effect_id": "AutoEffect_1_block",
+    "field": "amount",
+    "value": 5,
+    "identity": "先手"
+  },
+  {
+    "file": "common_cards/discard_aegis.tres",
+    "effect_id": "DiscardBlock",
+    "field": "amount",
+    "value": 4,
+    "identity": "先手"
+  },
+  {
+    "file": "common_cards/embers_return.tres",
+    "effect_id": "Block",
+    "field": "amount",
+    "value": 5,
+    "identity": "爆发"
+  },
+  {
+    "file": "common_cards/embers_return.tres",
+    "effect_id": "Draw",
+    "field": "amount",
+    "value": 3,
+    "identity": "爆发"
+  },
+  {
+    "file": "common_cards/ink_flow_slash.tres",
+    "effect_id": "Resource_damage",
+    "field": "amount",
+    "value": 5,
+    "identity": "先手"
+  },
+  {
+    "file": "common_cards/returning_light.tres",
+    "effect_id": "Heal",
+    "field": "amount",
+    "value": 5,
+    "identity": "先手"
+  },
+  {
+    "file": "common_cards/strike.tres",
+    "effect_id": "AutoEffect_1_damage",
+    "field": "amount",
+    "value": 6,
+    "identity": "循环"
+  }
+]

@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="UnspentManaBlockRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/unspent_mana_block_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/mana_potion.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/stored_breath_furnace_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -11,6 +11,6 @@ type = 2
 character_type = 0
 rarity = 1
 icon = ExtResource("2")
-tooltip = "回合结束时，每有 1 点未使用的灵力便获得 3 点护体，最多计算 3 点灵力。"
-block_per_mana = 3
+tooltip = "回合结束时，每剩余 1 点灵气获得 4 点护体，最多计算 3 点；与空息流形成相反构筑。"
+block_per_mana = 4
 maximum_mana_counted = 3

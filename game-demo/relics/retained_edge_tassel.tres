@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EndTurnHandBlockRelic" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://relics/effects/end_turn_hand_block_relic.gd" id="1"]
-[ext_resource type="Texture2D" path="res://art/relics/icons/wind_sword_tassel.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/relics/icons/retained_edge_tassel_v2.png" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -11,7 +11,7 @@ type = 2
 character_type = 0
 rarity = 1
 icon = ExtResource("2")
-tooltip = "回合结束时，每有 1 张保留牌便获得 3 点护体，最多计算 3 张。"
+tooltip = "回合结束时，每有 1 张保留牌便获得 4 点护体，最多计算 3 张。"
 card_filter = 0
-block_per_card = 3
+block_per_card = 4
 maximum_cards_counted = 3

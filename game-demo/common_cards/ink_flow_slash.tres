@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
 [ext_resource type="Script" uid="uid://bfbtae55pt1yq" path="res://custom_resources/effects/configured_damage_effect.gd" id="2"]
 [ext_resource type="Script" uid="uid://37ewyomluh2u" path="res://custom_resources/effects/configured_draw_effect.gd" id="3"]
-[ext_resource type="Texture2D" uid="uid://cd7agculraxhr" path="res://art/generated_icons/tile_replacements/common_cards/ink_flow_slash.png" id="4"]
+[ext_resource type="Texture2D" path="res://art/cards/common/ai/ink_flow_slash_v2.png" id="4"]
 [ext_resource type="AudioStream" uid="uid://dixklg6g4jnsq" path="res://art/audio/slash.ogg" id="5"]
 
 [sub_resource type="Resource" id="Resource_damage"]
@@ -19,12 +19,13 @@ description_template = "抽 {amount} 张牌。"
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("Resource_damage"), SubResource("Resource_draw")])
 id = "ink_flow_slash"
 target = 1
 cost = 1
 upgrade_type = 1
-mechanic_tags = PackedStringArray("示例")
+mechanic_tags = PackedStringArray("示例", "通用术式", "先手")
 display_name = "墨流斩"
 icon = ExtResource("4")
 sound = ExtResource("5")

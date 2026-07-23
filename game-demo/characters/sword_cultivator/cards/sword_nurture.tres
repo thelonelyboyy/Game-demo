@@ -8,9 +8,13 @@
 
 [sub_resource type="Resource" id="Resource_sword_intent"]
 script = ExtResource("2")
+require_condition = true
+condition_type = 7
+condition_element = 5
+bonus_amount = 1
 status = ExtResource("3")
 amount = 2
-description_template = "获得 {amount} 层剑意。"
+description_template = "获得 {amount} 层剑意。 连携（{condition}）：额外获得 {bonus} 点效果。"
 
 [resource]
 script = ExtResource("1")
@@ -20,7 +24,7 @@ type = 1
 cost = 1
 upgrade_type = 1
 element = 1
-mechanic_tags = null
+mechanic_tags = PackedStringArray("铸剑", "五行连携")
 display_name = "养剑诀"
 icon = ExtResource("4")
 sound = ExtResource("5")

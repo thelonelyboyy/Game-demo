@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3 uid="uid://ifi2144b2sdi"]
 
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://civrsdnd0770k" path="res://art/ui/icons/status_soul_mark.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/hun_kai_v2.png" id="2"]
 [ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
 [ext_resource type="Script" uid="uid://bj54tyjggots8" path="res://custom_resources/effects/configured_soul_mark_consume_effect.gd" id="e1"]
 [ext_resource type="Script" uid="uid://bo8gedp7cx6tx" path="res://custom_resources/effects/configured_block_effect.gd" id="e2"]
@@ -21,7 +21,7 @@ id = "hun_kai"
 type = 1
 target = 1
 cost = 1
-mechanic_tags = null
+mechanic_tags = PackedStringArray("煞气")
 display_name = "魂铠"
 icon = ExtResource("2")
 sound = ExtResource("3")

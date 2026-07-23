@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CultivationCard" load_steps=8 format=3 uid="uid://cj2xx1knanu47"]
 
 [ext_resource type="Script" uid="uid://druw8pk4uky7u" path="res://custom_resources/cultivation_card.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://balcp1e0d4xyq" path="res://art/ui/icons/status_energy_charge.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/cards/demonic_cultivator/ai/demon_flame_blue_v2.png" id="2"]
 [ext_resource type="AudioStream" uid="uid://df64e7qat73gs" path="res://art/audio/block.ogg" id="3"]
 [ext_resource type="Script" uid="uid://d203433d2f5si" path="res://custom_resources/effects/configured_mana_effect.gd" id="e1"]
 [ext_resource type="Script" uid="uid://d188jsaw7s537" path="res://custom_resources/effects/configured_flame_effect.gd" id="e2"]
@@ -24,7 +24,7 @@ type = 1
 rarity = 1
 cost = 1
 exhausts = true
-mechanic_tags = null
+mechanic_tags = PackedStringArray("魔焰")
 display_name = "魔焰蓝·灵涌"
 icon = ExtResource("2")
 sound = ExtResource("3")

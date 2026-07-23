@@ -4,7 +4,18 @@ extends Resource
 const DEBUG_CONSOLE_STATE := preload("res://custom_resources/debug_console_state.gd")
 
 enum TargetMode {CARD_TARGETS, PLAYER, ALL_ENEMIES, EVERYONE}
-enum ConditionType {ALWAYS, SELECTED_SPIRIT_ROOT, HAS_MECHANIC_TAG, CARD_TYPE, PLAYER_HAS_STATUS, FLAME_WHEEL_COLOR_COUNT}
+enum ConditionType {
+	ALWAYS,
+	SELECTED_SPIRIT_ROOT,
+	HAS_MECHANIC_TAG,
+	CARD_TYPE,
+	PLAYER_HAS_STATUS,
+	FLAME_WHEEL_COLOR_COUNT,
+	PREVIOUS_CARD_TYPE,
+	PREVIOUS_CARD_ELEMENT,
+	CARDS_PLAYED_THIS_TURN,
+	LOW_HEALTH,
+}
 
 @export_group("Value")
 @export var amount := 0
@@ -16,6 +27,7 @@ enum ConditionType {ALWAYS, SELECTED_SPIRIT_ROOT, HAS_MECHANIC_TAG, CARD_TYPE, P
 @export var condition_type := ConditionType.ALWAYS
 @export var condition_tag := ""
 @export var condition_card_type := Card.Type.ATTACK
+@export var condition_element := Card.Element.NONE
 @export var condition_status_id := ""
 @export var condition_amount := 0
 @export var bonus_amount := 0
@@ -149,6 +161,14 @@ func get_condition_description() -> String:
 			return "拥有状态：%s" % condition_status_id
 		ConditionType.FLAME_WHEEL_COLOR_COUNT:
 			return "焰轮已点亮至少 %s 色" % condition_amount
+		ConditionType.PREVIOUS_CARD_TYPE:
+			return "连携：上一张牌为%s" % _card_type_name(condition_card_type)
+		ConditionType.PREVIOUS_CARD_ELEMENT:
+			return "连携：上一张牌为%s元素" % _element_name(condition_element)
+		ConditionType.CARDS_PLAYED_THIS_TURN:
+			return "本回合已打出至少 %s 张牌" % condition_amount
+		ConditionType.LOW_HEALTH:
+			return "生命不高于 %s%%" % maxi(condition_amount, 50)
 		_:
 			return "无条件"
 
@@ -171,6 +191,28 @@ func _condition_matches(card: CultivationCard) -> bool:
 			if not handler or not handler.has_method("flame_color_count"):
 				return false
 			return handler.flame_color_count() >= condition_amount
+		ConditionType.PREVIOUS_CARD_TYPE:
+			var previous_type_handler := _get_class_mechanic_handler()
+			if not previous_type_handler or not previous_type_handler.has_method("get_previous_card_played"):
+				return false
+			var previous_type_card = previous_type_handler.get_previous_card_played(card)
+			return previous_type_card and previous_type_card.type == condition_card_type
+		ConditionType.PREVIOUS_CARD_ELEMENT:
+			var previous_element_handler := _get_class_mechanic_handler()
+			if not previous_element_handler or not previous_element_handler.has_method("get_previous_card_played"):
+				return false
+			var previous_element_card = previous_element_handler.get_previous_card_played(card)
+			return previous_element_card and previous_element_card.element == condition_element
+		ConditionType.CARDS_PLAYED_THIS_TURN:
+			var count_handler := _get_class_mechanic_handler()
+			if not count_handler or not count_handler.has_method("get_combat_card_count"):
+				return false
+			return count_handler.get_combat_card_count(0) >= condition_amount
+		ConditionType.LOW_HEALTH:
+			var player := _get_player(card)
+			if not player or not player.stats or player.stats.max_health <= 0:
+				return false
+			return player.stats.health * 100 <= player.stats.max_health * maxi(condition_amount, 50)
 		_:
 			return false
 
@@ -245,3 +287,19 @@ func _upgrade_number(value: int) -> int:
 	if value <= 0:
 		return value
 	return ceili(value * 1.5)
+
+
+func _card_type_name(card_type: Card.Type) -> String:
+	match card_type:
+		Card.Type.ATTACK:
+			return "攻击牌"
+		Card.Type.SKILL:
+			return "技能牌"
+		Card.Type.POWER:
+			return "功法牌"
+		_:
+			return "指定牌"
+
+
+func _element_name(card_element: Card.Element) -> String:
+	return ["无", "金", "木", "水", "火", "土"][clampi(int(card_element), 0, 5)]

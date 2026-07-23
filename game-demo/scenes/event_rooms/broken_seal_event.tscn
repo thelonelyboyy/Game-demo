@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "破碎封印"
 event_body = "一道裂开的封印下传来轻微呼吸声。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("加固封印：随机突破一张牌", "撬开边角：获得 85 灵石，失去 13 生命", "绕路")
-choice_effects = PackedStringArray("upgrade_random", "gain_gold:85|damage:13", "skip")
-choice_amounts = PackedInt32Array(0, 0, 0)
+choice_texts = PackedStringArray("引封印净火入体：净化一张污染牌", "撬开边角：获得 85 灵石，失去 13 生命", "绕路")
+choice_effects = PackedStringArray("purify_affliction", "gain_gold:85|damage:13", "skip")
+choice_amounts = PackedInt32Array(1, 0, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "锈蚀丹炉"
 event_body = "丹炉盖缝里飘出一缕药香。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("开炉：获得 80 灵石", "吞服残丹：回复 25 生命", "不碰古物")
-choice_effects = PackedStringArray("gain_gold", "heal", "skip")
-choice_amounts = PackedInt32Array(80, 25, 0)
+choice_texts = PackedStringArray("熔掉旧法：移除一张牌并获得一张随机牌", "吞服残丹：回复 25 生命", "不碰古物")
+choice_effects = PackedStringArray("remove_random:1|gain_random_card:1", "heal", "skip")
+choice_amounts = PackedInt32Array(0, 25, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

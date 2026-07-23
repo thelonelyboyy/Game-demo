@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "迷路弟子"
 event_body = "一个小宗弟子在雾里打转，快哭出来了。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("指路：获得 40 灵石", "护送：回复 16 生命", "赶路要紧")
-choice_effects = PackedStringArray("gain_gold", "heal", "skip")
-choice_amounts = PackedInt32Array(40, 16, 0)
+choice_texts = PackedStringArray("为其引路：按牌组每张牌获得 2 灵石", "护送：回复 16 生命", "赶路要紧")
+choice_effects = PackedStringArray("gain_gold_per_card", "heal", "skip")
+choice_amounts = PackedInt32Array(2, 16, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1

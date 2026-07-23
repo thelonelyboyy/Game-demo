@@ -18,6 +18,7 @@ affected_by_spirit_root = false
 
 [resource]
 script = ExtResource("1")
+innate = true
 configured_effects = Array[Resource]([SubResource("AutoEffect_1_damage"), SubResource("AutoEffect_2_self_damage")])
 effect_text = "失去 {self_damage} 点生命，对所有敌人造成 {damage} 点伤害。"
 id = "demon_blood_sea"
@@ -27,7 +28,7 @@ cost = 2
 upgrade_type = 1
 element = 3
 profession = 3
-mechanic_tags = PackedStringArray("献祭")
+mechanic_tags = PackedStringArray("献祭", "血炼", "先手")
 display_name = "血海翻涌"
 icon = ExtResource("2")
 sound = ExtResource("3")

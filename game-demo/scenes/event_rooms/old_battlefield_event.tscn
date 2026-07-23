@@ -15,9 +15,9 @@ script = ExtResource("1_script")
 event_title = "古战场"
 event_body = "残旗与碎甲埋在云砂里，杀意未散。"
 event_illustration = ExtResource("3_image")
-choice_texts = PackedStringArray("搜寻战利品：获得 85 灵石，失去 10 生命", "静坐化煞：生命上限 +3", "快步通过")
-choice_effects = PackedStringArray("gain_gold:85|damage:10", "max_hp", "skip")
-choice_amounts = PackedInt32Array(0, 3, 0)
+choice_texts = PackedStringArray("依伤势搜刮：每点已损生命换 3 灵石", "静坐化煞：生命上限 +3", "快步通过")
+choice_effects = PackedStringArray("gain_gold_per_missing_hp", "max_hp", "skip")
+choice_amounts = PackedInt32Array(3, 3, 0)
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 1
